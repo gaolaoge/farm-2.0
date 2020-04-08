@@ -5,6 +5,7 @@
       <span class="li" :class="[{'active': navActive == 2}]" @click="navActive = 2"></span>
     </nav>
     <section :class="[{'registeredPage': navActive == 2}]">
+      <!--登录-->
       <aside class="logIn">
         <div class="loginNav">
           <span class="phone"
@@ -85,6 +86,7 @@
              @click="navActive = 2"
              v-show="navActive == 1">
       </aside>
+      <!--注册-->
       <aside class="registered">
         <h6 class="label">
           {{ registered.label }}
@@ -129,6 +131,14 @@
                    class="farm-input" />
             <img src="@/icons/login-success.png" alt="" class="i" v-show="registered.status.phone === 'true'">
             <img src="@/icons/login-error .png" alt="" class="i" v-show="registered.status.phone === 'false'">
+          </div>
+          <!--拖动验证-->
+          <div class="drag" ref="drag">
+            <div class="bg" ref="bg" />
+            <div class="text" onselectstart="return false;" ref="text">
+              按住滑块，拖动到最右边
+            </div>
+            <div class="btn" ref="btn" />
           </div>
           <!--协议-->
           <div class="protocol">
@@ -206,6 +216,91 @@
     },
     mounted() {
       this.$store.commit('changeLogin',true)
+
+      //一、定义一个获取DOM元素的方法
+      let box = this.$refs.drag,//容器
+          bg = this.$refs.bg,//背景
+          text = this.$refs.text,//文字
+          btn = this.$refs.btn,//滑块
+          success = false,//是否通过验证的标志
+          distance = box.offsetWidth - btn.offsetWidth;//滑动成功的宽度（距离）
+
+      //二、给滑块注册鼠标按下事件
+      btn.onmousedown = function(e){
+
+        //1.鼠标按下之前必须清除掉后面设置的过渡属性
+        btn.style.transition = "";
+        bg.style.transition ="";
+
+        //说明：clientX 事件属性会返回当事件被触发时，鼠标指针向对于浏览器页面(或客户区)的水平坐标。
+
+        //2.当滑块位于初始位置时，得到鼠标按下时的水平位置
+        var e = e || window.event;
+        var downX = e.clientX;
+
+        //三、给文档注册鼠标移动事件
+        document.onmousemove = function(e){
+
+          var e = e || window.event;
+          //1.获取鼠标移动后的水平位置
+          var moveX = e.clientX;
+
+          //2.得到鼠标水平位置的偏移量（鼠标移动时的位置 - 鼠标按下时的位置）
+          var offsetX = moveX - downX;
+
+          //3.在这里判断一下：鼠标水平移动的距离 与 滑动成功的距离 之间的关系
+          if( offsetX > distance){
+            offsetX = distance;//如果滑过了终点，就将它停留在终点位置
+          }else if( offsetX < 0){
+            offsetX = 0;//如果滑到了起点的左侧，就将它重置为起点位置
+          }
+
+          //4.根据鼠标移动的距离来动态设置滑块的偏移量和背景颜色的宽度
+          btn.style.left = offsetX + "px";
+          bg.style.width = offsetX + 10 + "px";
+
+          //如果鼠标的水平移动距离 = 滑动成功的宽度
+          if( offsetX == distance){
+
+            //1.设置滑动成功后的样式
+            text.innerHTML = "验证通过";
+            text.style.color = "#fff";
+            btn.innerHTML = "&radic;";
+            btn.style.color = "green";
+            bg.style.backgroundColor = "#0f46a1";
+
+            //2.设置滑动成功后的状态
+            success = true;
+            //成功后，清除掉鼠标按下事件和移动事件（因为移动时并不会涉及到鼠标松开事件）
+            btn.onmousedown = null;
+            document.onmousemove = null;
+
+            //3.成功解锁后的回调函数
+            setTimeout(function(){
+              // alert('解锁成功！');
+            },100);
+          }
+        }
+
+        //四、给文档注册鼠标松开事件
+        document.onmouseup = function(e){
+
+          //如果鼠标松开时，滑到了终点，则验证通过
+          if(success){
+            return;
+          }else{
+            //反之，则将滑块复位（设置了1s的属性过渡效果）
+            btn.style.left = 0;
+            bg.style.width = '10px';
+            btn.style.transition = "left 1s ease";
+            bg.style.transition = "width 1s ease";
+          }
+          //只要鼠标松开了，说明此时不需要拖动滑块了，那么就清除鼠标移动和松开事件。
+          document.onmousemove = null;
+          document.onmouseup = null;
+        }
+      }
+
     },
     methods: {
       // 注册-帐号验证
@@ -267,7 +362,8 @@
       // 注册-手机号码验证
       phoneVerif(){
         let t = this.registered.form.phone
-        if(t.length != 11){
+        if(!/^1(3|4|5|6|7|8|9)\d{9}$/.test(t)){
+          this.$message.error('手机号输入错误')
           this.registered.status.phone = 'false'
           return false
         }
@@ -330,7 +426,9 @@
             message: '还未做短信验证',
             type: 'error',
             showClose: true,
-            duration: 0
+            center: true,
+            // offset: '10vh',
+            duration: 3000
           })
           return false
         }
@@ -551,6 +649,48 @@
           align-items: center;
           &:hover {
             background: RGBA(14, 71, 161, 1);
+          }
+        }
+        /*滑动条*/
+        .drag {
+          width:343px;
+          height:20px;
+          position: relative;
+          background-color: rgba(255, 255, 255, 0.1711);
+          border-radius: 8px;
+          margin-bottom: 18px;
+          margin-left: 10px;
+          /*已划过部分*/
+          .bg{
+            width:10px;
+            height: 20px;
+            position: absolute;
+            background-color: #0f46a1;
+            border-radius: 8px 0px 0px 8px;
+          }
+          /*文本*/
+          .text{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            user-select: none;
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.79);
+            line-height: 20px;
+          }
+          /*拖动按钮*/
+          .btn{
+            position: absolute;
+            top: -3px;
+            cursor: move;
+            text-align: center;
+            user-select: none;
+            border-radius: 50%;
+            width:26px;
+            height:26px;
+            background-color: rgba(255,255,255,1);
           }
         }
       }
