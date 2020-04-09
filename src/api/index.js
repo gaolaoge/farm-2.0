@@ -8,4 +8,9 @@ const http = new axios.create({
   }
 })
 
+http.interceptors.request.use(config => {
+  config.headers['token'] = sessionStorage.getItem('token')
+  return config
+})
+
 export default http

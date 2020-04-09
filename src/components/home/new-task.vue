@@ -82,13 +82,13 @@
               </span>
             </div>
             <div class="set-renderTemplate-item ed"
-                 :class="[{'active': item.selected}]"
-                 @click="item.selected = !item.selected"
+                 :class="[{'active': item.renderTemplate.isDefault != 0}]"
+                 @click="item.renderTemplate.isDefault == 0 ? item.renderTemplate.isDefault = 1 : item.renderTemplate.isDefault = 0"
                  v-for="item,index in stepTwoBase.renderList"
                  :key="index">
               <div class="headerB">
                 <span class="headerText">
-                  {{ item.renderName }}
+                  {{ item.renderTemplate.templateName }}
                 </span>
                 <span class="opacityBtnGroup">
                   <img src="@/icons/set-renderTemplate-item-edit.png"
@@ -101,13 +101,13 @@
               </div>
               <div class="bodyB">
                 <span class="hardware">
-                  {{ item.hardware }}
+                  {{ item.renderTemplate.softUuid }}
                 </span>
                 <span class="software">
-                  {{ item.software }}
+                  {{ item.renderTemplate.softName }}
                 </span>
                 <span class="plugin">
-                  {{ item.plugin }}
+                  {{ item.renderTemplate.softVer }}
                 </span>
                 <img src="@/icons/item-selected.png" alt="" class="item-selected">
               </div>
@@ -255,6 +255,10 @@
 </template>
 
 <script>
+  import {
+    createTaskSet
+  } from '@/api/api'
+
   export default {
     name: 'new-task',
     data(){
@@ -295,43 +299,11 @@
           renderList: [
             // {
             //   id: '',
-            //   renderName: '',     //模板名称
+            //   templateName: '',     //模板名称
             //   hardware: '',       //硬件
-            //   software: '',       //软件
+            //   softNameVer: '',       //软件
             //   plugin: ''          //插件
             // },
-            {
-              id: '1000',
-              renderName: '模板 3',
-              hardware: 'CPU',
-              software: 'maya2020',
-              plugin: '占位',
-              selected: false
-            },
-            {
-              id: '1001',
-              renderName: '模板 4',
-              hardware: 'CPU',
-              software: 'maya2020',
-              plugin: '占位',
-              selected: false
-            },
-            {
-              id: '1002',
-              renderName: '模板 5',
-              hardware: 'CPU',
-              software: 'maya2020',
-              plugin: '占位',
-              selected: false
-            },
-            {
-              id: '1003',
-              renderName: '模板 5',
-              hardware: 'CPU',
-              software: 'maya2020',
-              plugin: '占位',
-              selected: false
-            }
           ]
         },
         innerVisible: false,   //添加模板
@@ -458,7 +430,52 @@
             curr.status = false
           }
         })
+      },
+      // 获取渲染模板列表
+      getList(){
+        createTaskSet()
+          .then(data => {
+            this.stepTwoBase.renderList = data.data.data
+              // [
+              //   {
+              //     renderTemplate: {                       //模板
+              //       id: 16
+              //       createTime: 1586308643471
+              //       createBy: "user42cd-82bb-44e7-9bc4-d6d046b5dff2"
+              //       updateTime: 1586397047167
+              //       updateBy: "user42cd-82bb-44e7-9bc4-d6d046b5dff2"
+              //       templateUuid: "84168a1b-b32e-490c-854b-1590f756c28b"
+              //       dataStatus: 1
+              //       updateParamAfterAnalyse: null
+              //       templateName: "用户4测试模板3"          //模板名称
+              //       isDefault: 0                          //默认选中 0为非
+              //       softName: "3dmax"                     //软件名
+              //       softVer: "2021"                       //版本
+              //       softNameVer: "3dmax2021"              //
+              //       softUuid: "127"                       //软件编号
+              //       customerUuid: "user42cd-82bb-44e7-9bc4-d6d046b5dff2"
+              //     },
+              //     xxlPlugins: [           模板插件
+              //       {
+              //         id: 1
+              //         pluginName: "V-ray"              //插件名
+              //         version: "1.233"                 //插件版本
+              //         publisher: "2K"                  //插件发行商
+              //         pluginUuid: "456"                //编号 唯一标识
+              //         createTime: "2020-03-31"
+              //         createBy: "1"
+              //         updateTime: "2020-03-31"
+              //         updateBy: "1"
+              //         dataStatus: 1
+              //       }
+              //     ]
+              //   }
+              // ]
+          })
       }
+    },
+    mounted() {
+      this.getList()
     }
   }
 </script>

@@ -50,7 +50,7 @@
         <header class="label">
           {{ pastWeek.label }}
         </header>
-        <HomeCharts class="HomeCharts"/>
+        <HomeCharts class="HomeCharts" :cData="chartsData" :cDate="chartsDate"/>
       </div>
       <!--会员中心-->
       <div class="vip">
@@ -61,12 +61,12 @@
           <img src="@/assets/userImg.png" alt="">
           <div class="t">
             <p class="name">
-              {{ user.name }}
+              {{ vip.name }}
             </p>
             <p class="grade">
               <img src="@/icons/vipIcon.png" alt="">
               <span class="gradeT">
-                {{ user.grade }}
+                {{ vip.grade }}
               </span>
             </p>
           </div>
@@ -80,7 +80,7 @@
             {{ vip.unit }}
           </span>
           <span class="vipBalance">
-            {{ user.balance }}
+            {{ vip.balance }}
           </span>
         </div>
       </div>
@@ -130,6 +130,11 @@
   import HomeCharts from '@/components/home/home-charts'
   import newTask from '@/components/home/new-task'
 
+  import {
+    homeT,
+    echartsData,
+  } from '@/api/api.js'
+
 export default {
   name: 'home',
   data () {
@@ -176,12 +181,15 @@ export default {
         ]
       },
       pastWeek: {
-        label: '近一周任务',
+        label: '近七天任务',
       },
       vip: {
         label: '会员中心',
         te: '用户余额 :',
-        unit: '￥'
+        unit: '￥',
+        name: '',  //sessionStorage.getItem('username') ||
+        grade: '铂金会员',
+        balance: ''   //JSON.parse(sessionStorage.getItem('info'))['balance']
       },
       Recharge: {
         desc: '现在充值可享升级超级会员',
@@ -196,11 +204,24 @@ export default {
         label: '将场景文件拖拽至此区域',
         miniLabel: '暂支持扩展名：.ma .mb'
       },
-      showNewTask: false
+      showNewTask: false,
+      chartsData: [],
+      chartsDate: []
     }
   },
   computed: {
-    ...mapState(['user'])
+    ...mapState(['zoneId'])
+  },
+  watch: {
+    zoneId: {
+      handler: function(val){
+        if(!val) return false
+        this.getHomeTData(val)
+        this.getEchartsData(val)
+
+      },
+      immediate: true
+    }
   },
   components: {
     HomeCharts,
@@ -225,7 +246,37 @@ export default {
     // 关闭
     closeDialogFun(){
       this.showNewTask = false
-    }
+    },
+    // 获取任务状态数据统计
+    getHomeTData(val){
+      homeT(val)
+        .then(data => {
+          let d = data.data.data
+          this.taskStatus['list'][0]['num'] = d.ing        //任务状态-渲染中
+          this.taskStatus['list'][1]['num'] = d.stop       //任务状态-渲染暂停
+          this.taskStatus['list'][2]['num'] = d.finish     //任务状态-渲染完成
+          this.taskStatus['list'][3]['num'] = d.wait       //任务状态-待全部渲染
+          this.taskStatus['list'][4]['num'] = d.history    //任务状态-已归档
+          this.statistics['list'][0]['num'] = d.cost == null ? 0 : d.cost                     //数据统计-累计消费
+          this.statistics['list'][1]['num'] = d.useTime == null ? 0 : d.useTime / 3600000     //数据统计-累计渲染用时
+        })
+    },
+    // 获取曲线图数据
+    getEchartsData(val){
+      echartsData(val)
+        .then(data => {
+          this.chartsDate = []
+          this.chartsData = []
+          data.data.data.forEach(curr => {
+            let month = new Date(curr.date).getMonth() + 1,
+              month_ = month > 9 ? month : '0' + month,
+              day = new Date(curr.date).getDate(),
+              day_ = day > 9 ? day : '0' + day
+            this.chartsDate.push(month_ + '.' + day_)
+            this.chartsData.push(curr.sum)
+          })
+        })
+    },
   }
 }
 </script>
@@ -456,6 +507,7 @@ export default {
               font-weight:500;
               color:rgba(255,255,255,0.8);
               margin-top: 10px;
+              margin-bottom: 6px;
               line-height: 22px;
             }
             .grade {

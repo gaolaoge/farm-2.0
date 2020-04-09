@@ -43,6 +43,7 @@
               <li v-for="item,index in userOperateList"
                   :key="index"
                   class="operateLi"
+                  @click="routerPush(item.routerUrl)"
                   :class="[{
                     'userName': item.moreClass == 'userName',
                     'balance': item.moreClass == 'balance',
@@ -51,7 +52,9 @@
                   }]">
                 <span class="con">
                   <span class="t">
-                     {{ item.text }}
+                     <span class="sb">
+                       {{ item.text }}
+                     </span>
                       <img :src="item.iconUrl" alt="" v-if="item.iconUrl" class="iconUrl">
                       <span class="balanceNow" v-if="item.balanceIcon" :title="item.balance">
                         <span class="unit">
@@ -78,6 +81,10 @@
     mapState
   } from 'vuex'
 
+  import {
+    homeSelect,
+  } from '@/api/api.js'
+
   export default {
     name: 'headerM',
     data(){
@@ -87,47 +94,44 @@
           btn: '充值'
         },
         workBenchList: [
-          {
-            name: '影视版CPU 1区',
-            val: '影视版CPU 1区'
-          },
-          {
-            name: '影视版GPU 1区',
-            val: '影视版GPU 1区'
-          }
+          // {
+          //   name: '影视版CPU 1区',
+          //   val: '影视版CPU 1区'
+          // }
         ],
         // workBenchName: '当前工作台',
-        workBenchVal: '影视版CPU 1区',
+        workBenchVal: '',
         // showNews: false                      //展示消息
         showUserList: false,                  //个人信息下拉
         userOperateList: [
           {
-            text: 'user.name',
+            text: '',
             moreClass: 'userName',
             iconUrl: require('@/icons/vipIcon.png')
           },
           {
             text: '充值',
             moreClass: 'balance',
-            balance: '260000.23',
-            balanceIcon: '￥'
+            balance: 0,
+            balanceIcon: '￥',
+            routerUrl: '/upTop'
           },
-          {
-            text: '消费账单',
-          },
-          {
-            text: '充值记录',
-          },
+          // {
+          //   text: '消费账单',
+          // },
+          // {
+          //   text: '充值记录',
+          // },
           // {
           //   text: '导出清单',
           // },
           // {
           //   text: '渲染扣费规则',
           // },
-          {
-            text: '基本资料',
-            moreClass: 'data'
-          },
+          // {
+          //   text: '基本资料',
+          //   moreClass: 'data'
+          // },
           {
             text: '退出',
             moreClass: 'quit'
@@ -136,7 +140,45 @@
       }
     },
     computed: {
-      ...mapState(['user'])
+      ...mapState(['user','login']),
+    },
+    mounted() {
+      this.getList()
+    },
+    watch: {
+      login: {
+        handler: function(val){
+          if(val) return false
+          this.getList()
+          this.userOperateList[0]['text'] = JSON.parse(sessionStorage.getItem('info'))['account']
+          this.userOperateList[1]['balance'] = JSON.parse(sessionStorage.getItem('info'))['balance']
+        },
+        // immediate: true
+      },
+    },
+    methods: {
+      routerPush(url){
+        if(url == '/upTop')
+          this.$router.push('/upTop')
+      },
+      // 工作台 下拉框
+      getList(){
+        homeSelect()
+          .then(data => {
+            let d= data.data
+            if(d.code == 200){
+              d.data.forEach(curr => {
+                this.workBenchList.push({
+                  name: curr.zoneName,
+                  val: curr.zoneUuid
+                })
+              })
+              this.workBenchVal = this.workBenchList[0]['val']
+              this.$store.commit('changeZoneId', this.workBenchList[0]['val'])
+            }
+          })
+      },
+
     }
   }
 </script>
@@ -207,6 +249,7 @@
                       font-weight:500;
                       color:rgba(255,255,255,1);
                       line-height:20px;
+
                       .iconUrl {
                         vertical-align: middle;
                         margin-left: 4px;
@@ -218,6 +261,9 @@
                   padding: 8px 0px;
                   .con {
                     .t {
+                      .sb {
+                        vertical-align: text-top;
+                      }
                       .balanceNow {
                         float: right;
                         width: 82px;
@@ -255,7 +301,7 @@
           &.active {
             background:linear-gradient(180deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.3) 50%,rgba(10,98,241,0.6) 100%);
             .newsBase {
-              height:273px;
+              height:143px;
             }
           }
         }

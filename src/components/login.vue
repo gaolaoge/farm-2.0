@@ -166,7 +166,9 @@
     registerPhone,
     accountLogin,
     phoneVerif,
-    phoneLogin
+    phoneLogin,
+    getInfo
+    // getInfo
   } from '@/api/api'
 
   export default {
@@ -189,8 +191,8 @@
             v: false
           },
           accountForm: {
-            account: '',
-            password: '',
+            account: 'gaoge1834',
+            password: 'gaoge1834',
             autoLogin: false,
             switchLabel: '5天内自动登录',
             forgetPw: '忘记密码?',
@@ -211,7 +213,8 @@
             password: null,
             phone: null
           }
-        }
+        },
+        sliderVerification: false         //注册滑块验证
       }
     },
     mounted() {
@@ -223,7 +226,8 @@
           text = this.$refs.text,//文字
           btn = this.$refs.btn,//滑块
           success = false,//是否通过验证的标志
-          distance = box.offsetWidth - btn.offsetWidth;//滑动成功的宽度（距离）
+          distance = box.offsetWidth - btn.offsetWidth,//滑动成功的宽度（距离）
+          self = this
 
       //二、给滑块注册鼠标按下事件
       btn.onmousedown = function(e){
@@ -276,9 +280,7 @@
             document.onmousemove = null;
 
             //3.成功解锁后的回调函数
-            setTimeout(function(){
-              // alert('解锁成功！');
-            },100);
+            self.sliderVerification = true
           }
         }
 
@@ -381,6 +383,7 @@
       },
       // 注册
       registerFun(){
+        if(!this.sliderVerification) return false
         if(!this.registered.status.account === 'true' || !this.registered.status.password === 'true' || !this.registered.status.phone === 'true'){
           this.$message.error('未填写完整')
           return false
@@ -389,12 +392,21 @@
           .then(data => {
             //code:101 帐号或手机号重复
             if(data.data.code){
-              // 创建成功
+              // 注册成功
+              this.$message({
+                type: 'success',
+                message: '注册成功',
+                align: 'center'
+              })
+              setTimeout(function(){
+
+              },3000)
             }
           })
       },
       // 帐号 登录
       accountlogin(){
+        // 验证
         if(!this.login.accountForm.account || !this.login.accountForm.password){
           this.$message.error('帐号或密码未输入')
           return false
@@ -405,7 +417,10 @@
           isAutoLogin: this.login.accountForm.autoLogin
         })
           .then(data => {
-            console.log()
+            let d = data.data.data
+            sessionStorage.setItem('token', d.token)
+            this.$store.commit('changeLogin', false)
+            this.getUserInfo()
           })
       },
       // 登录 手机号验证
@@ -450,6 +465,20 @@
           .then(data=> {
 
           })
+      },
+      // 获取个人信息
+      getUserInfo(){
+        getInfo()
+          .then(data => {
+            let d = data.data.data
+            sessionStorage.setItem('info',JSON.stringify({
+              account: d.account,
+              phone: d.phone,
+              level: d.vipLevel,
+              balance: d.goldBalance
+            }))
+            this.$router.push('/')
+          })
       }
     },
     watch: {
@@ -460,6 +489,14 @@
           this.$refs.pwinput.type = 'password'
         }
       }
+    },
+    created() {
+      sessionStorage.setItem('info',JSON.stringify({
+        account: '',
+        phone: '',
+        level: '',
+        balance: ''
+      }))
     }
   }
 </script>
@@ -559,6 +596,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            img {
+              user-select: none;
+              -webkit-user-drag: none;
+            }
             &:hover {
               background:rgba(17, 21, 26, 1);
             }
@@ -647,6 +688,10 @@
           display: flex;
           justify-content: center;
           align-items: center;
+          img {
+            user-select: none;
+            -webkit-user-drag: none;
+          }
           &:hover {
             background: RGBA(14, 71, 161, 1);
           }

@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+// import store from '../store'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -40,3 +41,17 @@ export default new Router({
     }
   ]
 })
+
+router.beforeResolve((to,from,next) => {
+  if(to.path == '/login'){
+    next()
+  }else {
+    if(sessionStorage.getItem('token')){
+      next()
+    }else {
+      next({path: '/login'})
+    }
+  }
+})
+
+export default router

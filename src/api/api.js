@@ -50,3 +50,43 @@ export function phoneLogin(data){
     data
   })
 }
+
+// 首页 工作台下拉框
+export function homeSelect(){
+  return api({
+    url: `/professional/home/zone`,
+    method: 'GET',
+  })
+}
+
+// 首页 任务状态 数据统计
+export function homeT(data){
+  return api({
+    url: `/professional/home/statistics?zoneuuid=${data}`,
+    method: 'GET',
+  })
+}
+
+// 首页 echarts
+export function echartsData(data){
+  return api({
+    url: `/professional/home/daystask?zoneuuid=${data}`,
+    method: 'GET',
+  })
+}
+
+// 个人信息
+export function getInfo(){
+  return api({
+    url: `/customer/getCustomerByToken`,
+    method: 'GET'
+  })
+}
+
+// 新建任务 设置渲染模板
+export function createTaskSet(){
+  return api({
+    url: `/professional/template/getCustomerTemplateList`,
+    method: 'GET'
+  })
+}

@@ -7,14 +7,15 @@ export default new Vuex.Store({
   strict: true,
   state: {
     user: {
-      name: 'User Name',
+      name: '',
       imgUrl: require('@/assets/userImg.png'),
       imgUrlMini: require('@/assets/userImgMini.png'),
-      token: '1234567890',
-      balance: '26.23',
+      // token: '',
+      // balance: '26.23',
       grade: '铂金会员'
     },
-    login: false
+    login: false,
+    zoneId: ''
   },
   getter: {
 
@@ -22,6 +23,15 @@ export default new Vuex.Store({
   mutations: {
     changeLogin(state,val){
       state.login = val
+    },
+    changeUserName(state,val){
+      state.user.name = val
+    },
+    // changeToken(state,val){
+    //   state.user.token = val
+    // }
+    changeZoneId(state,val){
+      state.zoneId = val
     }
   },
   actions: {

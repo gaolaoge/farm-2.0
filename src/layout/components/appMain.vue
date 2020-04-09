@@ -27,6 +27,7 @@
     height: calc(100vh - 80px);
     min-height: 730px;
     background-color: rgba(28, 36, 47, 1);
+    overflow: hidden;
     &.login {
       width: 100vw;
       height: 100vh;
