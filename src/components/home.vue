@@ -218,7 +218,6 @@ export default {
         if(!val) return false
         this.getHomeTData(val)
         this.getEchartsData(val)
-
       },
       immediate: true
     }

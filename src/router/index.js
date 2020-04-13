@@ -38,6 +38,11 @@ const router = new Router({
       path: '/upTop',
       name: 'upTop',
       component: () => import('@/components/upTop.vue')
+    },
+    {
+      path: '/demo',
+      name: 'demo',
+      component: () => import('@/components/demo.vue')
     }
   ]
 })

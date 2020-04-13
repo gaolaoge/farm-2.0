@@ -32,6 +32,7 @@
           <el-select v-model="filter.projectVal"
                      placeholder="-"
                      class="filter-item-i filter-item-select">
+            <el-option label="全部" value="-1"/>
             <el-option
               v-for="item in filter.projectList"
               :key="item.value"
@@ -45,13 +46,14 @@
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
           </span>
-          <modelCalendar :val="filter.inquireVal" style="display: inline-block;" />
+          <modelCalendar style="display: inline-block;" @changeSelectDate="changeFilterDate" />
         </div>
-
-        <div class="filter-btn primary">
+        <!--查询-->
+        <div class="filter-btn primary" @click="getList">
           {{ filter.iquireBtn }}
         </div>
-        <div class="filter-btn">
+        <!--重置-->
+        <div class="filter-btn" @click="reset">
           {{ filter.resetBtn }}
         </div>
         <!--导出记录-->
@@ -101,11 +103,11 @@
           show-overflow-tooltip
           width="146" />
         <!--渲染时长 -->
-        <el-table-column
-          prop="time"
-          label="渲染时长"
-          show-overflow-tooltip
-          width="160" />
+        <!--<el-table-column-->
+          <!--prop="time"-->
+          <!--label="渲染时长"-->
+          <!--show-overflow-tooltip-->
+          <!--width="160" />-->
         <!--总帧数-->
         <el-table-column
           prop="total"
@@ -118,18 +120,18 @@
           label="消费类型"
           show-overflow-tooltip
           width="120" />
-        <!--应付金币-->
+        <!--费用（金币）-->
         <el-table-column
-          prop="shouldPay"
-          label="应付金币"
+          prop="pay"
+          label="费用（金币）"
           show-overflow-tooltip
           width="120" />
         <!--实付金币-->
-        <el-table-column
-          prop="actualPay"
-          label="实付金币"
-          show-overflow-tooltip
-          width="120" />
+        <!--<el-table-column-->
+          <!--prop="actualPay"-->
+          <!--label="实付金币"-->
+          <!--show-overflow-tooltip-->
+          <!--width="120" />-->
         <!--创建人-->
         <el-table-column
           prop="user"
@@ -161,6 +163,7 @@
       <el-pagination
         background
         layout="prev, pager, next, jumper"
+        :current-page.sync="table.currentPage"
         :total="table.outPutTableTotal">
       </el-pagination>
     </div>
@@ -177,6 +180,14 @@
 <script>
   import modelCalendar from '@/components/farm-model/farm-calendar'
   import moreDialog from '@/components/bill/more-dialog'
+  import {
+    getConsumptionTable,
+    getConsumptionSelectList
+  } from '@/api/api'
+  import {
+    createCalendar,
+    getDate
+  } from '@/assets/common.js'
 
   export default {
     name: 'consumption',
@@ -197,22 +208,10 @@
             //   user: '',             //创建人
             //   upDate: '',           //更新时间
             // },
-            {
-              id: '1001',
-              scenesName: '场景一.ma',
-              status: '渲染完成',
-              object: '项目一',
-              time: '48分53秒',
-              total: '48',
-              type: '下载消费',
-              shouldPay: '0.20',
-              actualPay: '0.20',
-              user: 'Admin',
-              upDate: '2020-01-01 23:11:52',
-            },
-
           ],
           outPutTableTotal: 82,
+          pageSize: 10,
+          currentPage: 1,
           selectionList: [],            //渲染输出选中项
         },
         filter: {
@@ -221,10 +220,11 @@
           scenesLabel: '场景名',
           scenesVal: '',
           projectLabel: '所属项目',
-          projectVal: '',
-          inquireLabel: '查询时间',
-          inquireVal: '',
+          projectVal: '-1',
           projectList: [],
+          inquireLabel: '查询时间',
+          inquireValS: 0,
+          inquireValV: new Date(),
           iquireBtn: '查询',
           resetBtn: '重置',
           exportBtn: '导出记录'
@@ -248,7 +248,65 @@
       seeMore(item){
         // console.log(item)
         this.dialogVisible = true
+      },
+      // 获取 table 数据
+      getList() {
+        let t = `pageSize=${this.table.pageSize}&pageIndex=${this.table.currentPage}&layerNo=${this.filter.taskIdVal}&layerName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`
+        getConsumptionTable(t)
+          .then(data => {
+            this.table.rechargeData = data.data.data.map(curr => {
+              return {
+                id: curr.layerTaskUuid,               //任务ID
+                scenesName: curr.layerName,           //场景名
+                status: curr.layerTaskStatus,         //状态
+                object: curr.projectName,             //所属项目
+                // time: '',                          //渲染时长
+                total: curr.totalFrame,               //总帧数
+                type: curr.patternOfConsumption,      //消费类型
+                pay: curr.totalCost,                  //费用（金币）
+                // actualPay: '',                     //实付金币
+                user: curr.account,                   //创建人
+                upDate: curr.updateTime,              //更新时间
+              }
+            })
+            console.log(this.table.rechargeData)
+          })
+      },
+      // 时间筛选条件修改
+      changeFilterDate(val){
+        [].forEach.call(val, (curr,index) => {
+          let [year, month, day] = curr.split('-'),
+            r = getDate(year, month, day)
+          if(index == 0){
+            this.filter.inquireValS = r
+          }else{
+            this.filter.inquireValV = r
+          }
+        })
+      },
+      // 重置
+      reset(){
+        Object.assign(this.filter,{
+          taskIdVal: '',
+          scenesVal: '',
+          projectVal: '-1',
+          inquireValS: 0,
+          inquireValV: new Date(),
+        })
+        this.getList()
       }
+    },
+    mounted() {
+      this.getList()
+      getConsumptionSelectList()
+        .then(data => {
+          this.filter.projectList = data.data.data.map(curr => {
+            return {
+              value: curr.taskProjectUuid,
+              label: curr.projectName
+            }
+          })
+        })
     }
   }
 </script>

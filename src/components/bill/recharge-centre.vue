@@ -5,58 +5,81 @@
 
       <!--条件筛选-->
       <div class="filter">
-        <!--任务ID-->
+        <!--交易状态-->
         <div class="filter-item">
           <span class="filter-item-label">
-            {{ filter.taskIdLabel }}：
+            {{ filter.tradingtatusLabel }}：
           </span>
-          <input type="text"
-                 class="filter-item-i filter-item-input"
-                 placeholder="请输入"
-                 v-model="filter.taskIdVal">
-        </div>
-        <!--场景名-->
-        <div class="filter-item">
-          <span class="filter-item-label">
-            {{ filter.scenesLabel }}：
-          </span>
-          <input type="text"
-                 class="filter-item-i t"
-                 v-model="filter.scenesVal">
-        </div>
-        <!--所属项目-->
-        <div class="filter-item">
-          <span class="filter-item-label">
-            {{ filter.projectLabel }}：
-          </span>
-          <el-select v-model="filter.projectVal"
+          <el-select v-model="filter.tradingtatusVal"
                      placeholder="-"
-                     class="filter-item-i filter-item-select">
+                     class="filter-item-i filter-item-select filter-item-select-mini">
             <el-option
-              v-for="item in filter.projectList"
+              v-for="item in filter.tradingtatusList"
               :key="item.value"
               :label="item.label"
               :value="item.value">
             </el-option>
           </el-select>
         </div>
+        <!--支付方式-->
+        <div class="filter-item">
+          <span class="filter-item-label">
+            {{ filter.paymentMethodLabel }}：
+          </span>
+          <el-select v-model="filter.paymentMethodVal"
+                     placeholder="-"
+                     class="filter-item-i filter-item-select filter-item-select-mini">
+            <el-option
+              v-for="item in filter.paymentMethodList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <!--开票标识-->
+        <div class="filter-item">
+          <span class="filter-item-label">
+            {{ filter.markLabel }}：
+          </span>
+          <el-select v-model="filter.markVal"
+                     placeholder="-"
+                     class="filter-item-i filter-item-select filter-item-select-mini">
+            <el-option
+              v-for="item in filter.markList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <!--支付账单-->
+        <div class="filter-item">
+          <span class="filter-item-label">
+            {{ filter.singleNumberLabel }}：
+          </span>
+          <input type="text"
+                 class="filter-item-i filter-item-input"
+                 placeholder="请输入"
+                 v-model="filter.singleNumberVal">
+        </div>
         <!--查询时间-->
         <div class="filter-item">
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
           </span>
-          <model-calendar :val="filter.inquireVal" style="display: inline-block;"/>
+          <model-calendar style="display: inline-block;" @changeSelectDate="changeFilterDate" />
         </div>
         <!--查询-->
-        <div class="filter-btn primary">
+        <div class="filter-btn primary" @click="getList">
           {{ filter.iquireBtn }}
         </div>
         <!--重置-->
-        <div class="filter-btn">
+        <div class="filter-btn" @click="reset">
           {{ filter.resetBtn }}
         </div>
         <!--导出记录-->
-        <div class="filter-btn r">
+        <div class="filter-btn r" @click="exportTable">
           {{ filter.exportBtn }}
         </div>
       </div>
@@ -134,8 +157,11 @@
           show-overflow-tooltip
           width="240">
           <template slot-scope="scope">
-            <div class="download-tab" @click="scope.row.operate">
-              下载数据
+            <div class="download-tab" @click="scope.row.operate" v-show="scope.row.operate != '-'">
+              {{ scope.row.operate }}
+            </div>
+            <div class="download-tab-none" v-show="scope.row.operate == '-'">
+              -
             </div>
           </template>
         </el-table-column>
@@ -148,6 +174,8 @@
       <el-pagination
         background
         layout="prev, pager, next, jumper"
+        @current-change="jump"
+        :current-page.sync="table.currentPage"
         :total="table.outPutTableTotal">
       </el-pagination>
     </div>
@@ -156,6 +184,14 @@
 
 <script>
   import modelCalendar from '@/components/farm-model/farm-calendar'
+  import {
+    createCalendar,
+    getDate
+  } from '@/assets/common.js'
+  import {
+    getUpTopTable,
+    exportUpTopTable
+  } from '@/api/api'
 
   export default {
     name: 'recharge-centre',
@@ -174,32 +210,74 @@
             //   date: '',             //交易时间
             //   operate: ''           //操作
             // },
-            {
-              id: '1002748211241',
-              state: '成功',
-              realPay: '100.00',
-              realArrive: '100.00',
-              directions: '注册赠送100金币',
-              paymentMethod: '支付宝',
-              singleNumber: '12988562306532',
-              date: '2020-03-02 00:23:46',
-              operate: '下载数据'
-            },
-
           ],
           outPutTableTotal: 82,
+          currentPage: 1,
+          pageSize: 10,
           selectionList: [],            //渲染输出选中项
         },
         filter: {
-          taskIdLabel: '查询ID',
-          taskIdVal: '',
-          scenesLabel: '场景名',
-          scenesVal: '',
-          projectLabel: '所属项目',
-          projectVal: '',
+          tradingtatusLabel: '交易状态',
+          tradingtatusVal: '-1',
+          tradingtatusList: [
+            {
+              label: '全部',
+              value: '-1'
+            },
+            {
+              label: '待付款',
+              value: '3'
+            },
+            {
+              label: '成功',
+              value: '1'
+            },
+            {
+              label: '失败',
+              value: '2'
+            }
+          ],
+          paymentMethodLabel: '支付方式',
+          paymentMethodVal: '-1',
+          paymentMethodList: [
+            {
+              label: '全部',
+              value: '-1'
+            },
+            {
+              label: '支付宝',
+              value: '1'
+            },
+            // {
+            //   label: '微信',
+            //   value: '2'
+            // }
+          ],
+          markLabel: '开票标识',
+          markVal: '-1',
+          markList: [
+            {
+              label: '全部',
+              value: '-1'
+            },
+            {
+              label: '不可开票',
+              value: '0'
+            },
+            {
+              label: '未开票',
+              value: '1'
+            },
+            {
+              label: '已开票',
+              value: '2'
+            }
+          ],
+          singleNumberLabel: '支付单号',
+          singleNumberVal: '',
           inquireLabel: '查询时间',
-          inquireVal: new Date(),
-          projectList: [],
+          inquireValS: 0,
+          inquireValV: new Date(),
           iquireBtn: '查询',
           resetBtn: '重置',
           exportBtn: '导出记录'
@@ -218,9 +296,94 @@
       filterHandler(value, row, column){
         console.log(value, row, column)
       },
+      // 时间筛选条件修改
+      changeFilterDate(val){
+        [].forEach.call(val, (curr,index) => {
+          let [year, month, day] = curr.split('-'),
+              r = getDate(year, month, day)
+          console.log(curr.split('-'))
+          if(index == 0){
+            this.filter.inquireValS = r
+          }else{
+            this.filter.inquireValV = r
+          }
+        })
+      },
+      // 获取table数据
+      getList(){
+        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`
+        getUpTopTable(t)
+          .then(data => {
+            this.table.outPutTableTotal = data.data.total
+            this.table.rechargeData = data.data.data.map(curr => {
+              curr.operate = '-'
+              switch(curr.paymentStatus){
+                case 1:
+                  curr.paymentStatus = '成功'
+                  if(curr.actualPayment) curr.operate = '下载收据'
+                  break
+                case 2:
+                  curr.paymentStatus = '失败'
+                  break
+                case 3:
+                  curr.paymentStatus = '待付款'
+                  if(curr.actualPayment) curr.operate = '待付款'
+                  break
+              }
+              if(!curr.actualPayment) curr.actualPayment = '-'
+              let {year, month, day} = createCalendar(new Date(curr.updateTime))
+              month = month > 9 ? month : '0' + (month + 1)
+              day = day > 9 ? day : '0' + day
+              return {
+                  id: curr.rechargeUuid,                //交易ID
+                  state: curr.paymentStatus,            //交易状态
+                  realPay: curr.actualPayment,          //实际支付金额（元）
+                  realArrive: curr.arrivalAmount,       //充值到账（金币）
+                  directions: curr.rechargeExplain,     //充值说明
+                  paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '微信',     //充值方式
+                  singleNumber: curr.outTradeNo,        //支付单号
+                  date: year + '-' + month + '-' + day,                //交易时间
+                  invoice: curr.invoice,                //开票标识
+                  operate: curr.operate                 //操作
+              }
+            })
+          })
+      },
+      // table 筛选条件重置
+      reset(){
+        Object.assign(this.filter,{
+          tradingtatusVal: '-1',
+          paymentMethodVal: '-1',
+          markVal: '-1',
+          singleNumberVal: '',
+          inquireValS: 0,
+          inquireValV: new Date(),
+        })
+        this.getList()
+      },
+      // 翻页
+      jump(val){
+        this.table.currentPage = val
+        this.getList()
+      },
+      // 导出记录
+      exportTable(){
+        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`
+        exportUpTopTable(t)
+          .then(data => {
+            const blob = new Blob([data.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+                  a = document.createElement("a"),
+                  url = window.URL.createObjectURL(blob),
+                  filename = '充值记录'
+            a.href = url
+            a.download = filename
+            a.click()
+            window.URL.revokeObjectURL(url)
+          })
+      }
     },
     mounted() {
-
+      this.getList()
     }
   }
 </script>
@@ -261,5 +424,10 @@
     color: rgba(0,97,255,1);
     text-decoration: underline;
     cursor: pointer;
+  }
+  .download-tab-none {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255 0.6);
   }
 </style>

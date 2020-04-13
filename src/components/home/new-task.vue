@@ -25,9 +25,9 @@
       </div>
       <!--主体-->
       <div class="stepBody">
+        <!--选择场景文件-->
         <div class="stepBody-item"
              v-show="stepBtnActive == 1">
-          <!--选择场景文件-->
           <div class="operateBtnGroup">
             <div class="farm-primary-form-btn"
                  v-for="item,index in stepOneBase.operateBtnGroup"
@@ -71,19 +71,24 @@
             </el-table>
           </div>
         </div>
+        <!--设置渲染模板-->
         <div class="stepBody-item"
              v-show="stepBtnActive == 2">
-        <!--设置渲染模板-->
           <div class="set-renderTemplate">
-            <div class="set-renderTemplate-item addMore" @click="innerVisible = true">
-              <img src="@/icons/addIcon.png" alt="" class="addMoreIcon">
+            <!--添加模板-->
+            <div class="set-renderTemplate-item addMore"
+                 @click="addTemplate('addMore','')">
+              <img src="@/icons/addIcon.png"
+                   alt=""
+                   class="addMoreIcon">
               <span class="addMoreText">
                 {{ stepTwoBase.addMoreText }}
               </span>
             </div>
+            <!--已存在模板-->
             <div class="set-renderTemplate-item ed"
-                 :class="[{'active': item.renderTemplate.isDefault != 0}]"
-                 @click="item.renderTemplate.isDefault == 0 ? item.renderTemplate.isDefault = 1 : item.renderTemplate.isDefault = 0"
+                 :class="[{'active': stepTwoBase.renderListActive == index}]"
+                 @click="stepTwoBase.renderListActive = index"
                  v-for="item,index in stepTwoBase.renderList"
                  :key="index">
               <div class="headerB">
@@ -91,11 +96,15 @@
                   {{ item.renderTemplate.templateName }}
                 </span>
                 <span class="opacityBtnGroup">
+                  <!--编辑-->
                   <img src="@/icons/set-renderTemplate-item-edit.png"
                        alt=""
+                       @click.stop="addTemplate('editOne',index)"
                        class="item-icon">
+                  <!--删除-->
                   <img src="@/icons/set-renderTemplate-item-delete.png"
                        alt=""
+                       @click="deleteTemplate(index)"
                        class="item-icon">
                 </span>
               </div>
@@ -138,6 +147,7 @@
       width="641px"
       :show-close=false
       :visible.sync="innerVisible"
+      @close="closeAddTemplateDialog"
       append-to-body>
       <div class="wrapper">
         <header class="header">
@@ -166,21 +176,20 @@
             <label class="farm-form-item-label">
               {{ dialogAdd.form.labelSoftware }}：
             </label>
-            <el-select v-model="dialogAdd.form.valSoftware" class="i">
-              <el-option
-                v-for="item,index in dialogAdd.softwareList"
-                :key="index"
-                :label="item.label"
-                :value="item.val">
-              </el-option>
-            </el-select>
+            <el-cascader
+              v-model="dialogAdd.form.valSoftware"
+              :options="dialogAdd.softwareList"
+              @change="changeSoftware" />
+
           </div>
           <!--渲染插件-->
           <div class="farm-form-item">
             <label class="farm-form-item-label">
               {{ dialogAdd.form.labelPlugin }}：
             </label>
-            <el-select v-model="dialogAdd.form.valPlugin" class="i">
+            <el-select v-model="dialogAdd.form.valPlugin"
+                       class="i"
+                       @change="changePlugin">
               <el-option
                 v-for="item,index in dialogAdd.pluginList"
                 :key="index"
@@ -191,6 +200,7 @@
           </div>
           <!--选择插件-->
           <div class="transferBase">
+            <!--选择插件版本-->
             <div class="o">
               <div class="label">
                 {{ dialogAdd.o }}
@@ -198,11 +208,11 @@
               <div class="list">
                 <div v-for="item,index in dialogAdd.oList"
                      :key="index"
-                     @click="changeOIndex(index)"
+                     @click="changeOIndex(index,item)"
                      class="li"
                      :class="[{'active': item.status == true}]">
                   <span class="name">
-                    {{ item.plugin }}
+                    {{ item.pluginName }} - {{ item.version }}
                   </span>
                   <span class="choiceIcon">
                     <img src="@/icons/choiceIcon.png"
@@ -214,19 +224,20 @@
               </div>
             </div>
             <div class="ig" />
+            <!--已选插件版本-->
             <div class="n">
               <div class="label">
                 {{ dialogAdd.n }}
               </div>
               <div class="list">
+                {{ dialogAdd.nList }}
                 <div v-for="item,index in dialogAdd.nList"
                      :key="index"
-                     class="li"
-                     :class="[{'active': item.status == true}]">
+                     class="li" >
                   <span class="name">
-                    {{ item.plugin }}
+                    {{ item.pluginName }} - {{ item.version }}
                   </span>
-                  <span class="deleteNIcon">
+                  <span class="deleteNIcon" @click='deleteSeletedOption(item,index)'>
                     <img src="@/icons/deleteLiIcon.png"
                          alt=""
                          class="icon">
@@ -242,7 +253,7 @@
                 {{ dialogAdd.save }}
               </span>
             </div>
-            <div class="btnGroup-btn cancel">
+            <div class="btnGroup-btn cancel" @click="innerVisible = false">
               <span>
                 {{ dialogAdd.cancel }}
               </span>
@@ -256,7 +267,9 @@
 
 <script>
   import {
-    createTaskSet
+    createTaskSet,
+    createTaskSetSoftware,
+    createTaskSetPlugin
   } from '@/api/api'
 
   export default {
@@ -295,7 +308,7 @@
         },
         stepTwoBase: {
           addMoreText: '添加模板',
-          //设置渲染模板列表
+          //设置渲染模板 - 已存在列表
           renderList: [
             // {
             //   id: '',
@@ -304,9 +317,11 @@
             //   softNameVer: '',       //软件
             //   plugin: ''          //插件
             // },
-          ]
+          ],
+          renderListActive: ''     //选中索引
         },
         innerVisible: false,   //添加模板
+        // 添加模板窗口
         dialogAdd: {
           title: '添加模板',
           namePlaceholder: '输入模版名称',
@@ -316,91 +331,48 @@
             labelSoftware: '渲染软件',
             valSoftware: 'Maya 2020',
             labelPlugin: '渲染插件',
-            valPlugin: 'mloa'
+            valPlugin: ''
           },
           // 渲染软件
           softwareList: [
-            {
-              label: 'Maya 2020',
-              val: 'Maya 2020'
-            },
-            {
-              label: 'Maya 2021',
-              val: 'Maya 2021'
-            },
+            // {
+            //   softName: 'Maya 2020',
+            //   softList: []
+            // }
           ],
-          // 渲染插件
+          // 渲染插件下拉框
           pluginList: [
-            {
-              label: 'mloa',
-              val: 'mloa'
-            },
-            {
-              label: 'other',
-              val: 'other'
-            }
+            // {
+            //   label: 'mloa',
+            //   val: 'mloa'
+            // }
           ],
           o: '选择插件版本',
           n: '已选插件版本',
           // 插件版本
           oList: [
-            {
-              id: '0001',
-              software: 'mloa',
-              plugin: 'mloa 4.0.2',
-              status: false
-            },
-            {
-              id: '0002',
-              software: 'mloa',
-              plugin: 'mloa 4.5.2.1',
-              status: true
-            },
-            {
-              id: '0003',
-              software: 'mloa',
-              plugin: 'mloa-max1.0rgi 4.0.2.4i.223',
-              status: false
-            },
-            {
-              id: '0004',
-              software: 'mloa',
-              plugin: 'mloa-max1.0rgi 4.0.2.4i.223',
-              status: false
-            },
-            {
-              id: '0005',
-              software: 'mloa',
-              plugin: 'mloa-max1.0rgi 4.0.2.4i.223',
-              status: false
-            }
+            // {
+            //    id: 2
+            //    pluginName: "Arnold"
+            //    version: "2.233"
+            //    publisher: "4K"
+            //    pluginUuid: "457"
+            //    createTime: "2020-03-31"
+            //    createBy: "1"
+            //    updateTime: "2020-03-31"
+            //    updateBy: "1"
+            //    dataStatus: 1
+            //    status: false
+            // }
           ],
           // 已选结果
           nList: [
-            {
-              id: '10011',
-              software: 'mloa',
-              plugin: 'mloa 4.0.2',
-              status: false
-            },
-            {
-              id: '0021',
-              software: 'mloa',
-              plugin: 'mloa 4.0.2',
-              status: false
-            },
-            {
-              id: '3011',
-              software: 'RenderMan_for_May',
-              plugin: 'RenderMan_for_May a 20.9',
-              status: false
-            },
-            {
-              id: '5011',
-              software: 'mloa',
-              plugin: 'mloa 4.0.2',
-              status: false
-            }
+            // {
+            //   pluginUuid: '10011',
+            //   pluginName: 'mloa',
+            //   version: 'mloa 4.0.2',
+            //   status: false
+            // }
           ],
           cancel: '取消',
           save: '保存'
@@ -421,17 +393,65 @@
         // console.log(e)
         // console.log(val)
       },
-      // 选择插件版本
+      // 新建任务 - 设置渲染模板 - 选择插件版本
       changeOIndex(index){
+        //插件版本左侧窗口切换选中状态
         this.dialogAdd.oList.forEach((curr,ind) => {
+          // curr = {
+          //   id: 2
+          //   pluginName: "Arnold"
+          //   version: "2.233"
+          //   publisher: "4K"
+          //   pluginUuid: "457"
+          //   createTime: "2020-03-31"
+          //   createBy: "1"
+          //   updateTime: "2020-03-31"
+          //   updateBy: "1"
+          //   dataStatus: 1
+          //   status: true
+          // }
+          // 当前选中项
           if(index == ind) {
-            curr.status = true
+            //当前插件是否有其它版本已被选中
+            // 当前插件curr.pluginName
+            // 当前版本curr.version
+            let r = this.dialogAdd.nList.findIndex(c => {
+              return c.pluginName == curr.pluginName
+            })
+            if(r != -1){
+              this.dialogAdd.nList.splice(r,1)
+            }
+            // 若还未选中
+            if(!curr.status){
+              // 判断此项是否已在选中项中
+              let d = this.dialogAdd.nList.findIndex(c => {
+                return c.pluginUuid == curr.pluginUuid
+              })
+              if(d == -1){
+                this.dialogAdd.nList.push(curr)
+              }
+              curr.status = true
+            }else {
+              curr.status = false
+            }
+
+
           }else {
+            // 其它项
             curr.status = false
           }
         })
       },
-      // 获取渲染模板列表
+      // 新建任务 - 设置渲染模板 - 删除已选择插件结果
+      deleteSeletedOption(item, index){
+        this.dialogAdd.oList.findIndex(curr => {
+          if(item.pluginUuid == curr.pluginUuid)
+            curr.status = false
+          return item.pluginUuid == curr.pluginUuid
+        })
+        this.dialogAdd.nList.splice(index,1)
+      },
+      // 新建任务 - 设置渲染模板 - 获取渲染模板列表
       getList(){
         createTaskSet()
           .then(data => {
@@ -472,6 +492,120 @@
               //   }
               // ]
           })
+      },
+      // 新建任务 - 设置渲染模板 - 打开【新建模板】
+      addTemplate(s,index){
+        // 获取软件列表
+        createTaskSetSoftware()
+          .then(data => {
+            this.dialogAdd.softwareList = data.data.data.map(curr => {   //options
+              return {
+                value: curr.softName,      //软件名
+                label: curr.softName,
+                children: curr.softList.map(curr_ =>  {
+                  return {
+                    label: curr_.softName + '-' + curr_.version,
+                    value: curr_.softUuid
+                  }
+                })
+                // children: [
+                //   {
+                //     value: 'shejiyuanze',
+                //     label: '设计原则',
+                //     children: [
+                //       {
+                //         value: 'yizhi',
+                //         label: '一致'
+                //       }
+                //     ]
+                //   }
+                // ]       //软件版本
+              }
+            })
+            // 打开弹窗
+            this.innerVisible = true
+            if(s == 'addOne'){
+              // 新建模板
+
+            }
+            if(s == 'editOne'){
+              // 编辑模板
+              let t = this['stepTwoBase']['renderList'][index],
+                  v = this.dialogAdd
+              let f = this.dialogAdd.softwareList.find(curr => {
+                return curr.label == t['renderTemplate']['softName']
+              })
+              let b = f['children'].find(curr => {
+                return curr.label == t['renderTemplate']['softName'] + '-' + t['renderTemplate']['softVer']
+              })
+              v.nList = t['xxlPlugins']                                         //已选中插件记录
+              v.form.valName = t['renderTemplate']['templateName']              //编辑窗口内模板名
+              v.form.valSoftware = [t['renderTemplate']['softName'], b.value]   //编辑窗口内渲染软件
+              this.changeSoftware([t['renderTemplate']['softName'], b.value])   //获取对应插件下拉框List
+            }
+          })
+      },
+      // 新建任务 - 设置渲染模板 - 删除模板
+      deleteTemplate(){
+
+      },
+      // 新建任务 - 设置渲染模板 - 软件下拉框选中
+      changeSoftware(val){
+        createTaskSetPlugin(val[1])
+          .then(data => {
+            this.dialogAdd.pluginList = data.data.data.map(curr => {
+              return {
+                label: curr.pluginName,
+                val: curr.pluginName,
+                list: curr.pluginList
+              }
+            })
+          })
+      },
+      // 新建任务 - 设置渲染模板 - 插件下拉框选中
+      changePlugin(val){
+        //匹配项
+        let t = this.dialogAdd.pluginList.find(curr => {
+            return curr.val == val
+          })
+        this.dialogAdd.oList = t.list.map(curr => {
+          let r = this.dialogAdd.nList.findIndex(c => {
+            return c.pluginName == curr.pluginName && c.version == curr.version
+          })
+          return {
+            ...curr,
+            status: r == -1 ? false : true
+          }
+        })
+        // {
+        //   id: '0001',
+        //   software: 'mloa',
+        //   plugin: 'mloa 4.0.2',
+        //   status: false
+        // }
+        // t.list.map(curr => {
+          // id: 2
+          // pluginName: "Arnold"
+          // version: "2.233"
+          // publisher: "4K"
+          // pluginUuid: "457"
+          // createTime: "2020-03-31"
+          // createBy: "1"
+          // updateTime: "2020-03-31"
+          // updateBy: "1"
+          // dataStatus: 1
+        // })
+      },
+      // 关闭 新建/编辑模板窗口
+      closeAddTemplateDialog(){
+        // 窗口数据初始化
+        this.dialogAdd.form.valName = ''
+        this.dialogAdd.form.valSoftware = ''
+        this.dialogAdd.form.softwareList = []
+        this.dialogAdd.form.valPlugin = ''
+        this.dialogAdd.pluginList = []
+        this.dialogAdd.oList = []
+        this.dialogAdd.nList = []
       }
     },
     mounted() {

@@ -30,9 +30,11 @@
           </div>
         </div>
         <div class="btn-item">
+          <!--确定-->
           <div class="btn-correct btn" @click="correctDateVal">
             {{ correct }}
           </div>
+          <!--取消-->
           <div class="btn-cancel btn">
             {{ cancel }}
           </div>
@@ -100,10 +102,7 @@
       }
     },
     props: {
-      val: {
-        type: Date,
-        default: () => new Date()
-      }
+
     },
     directives: {
       operating: {
@@ -248,6 +247,7 @@
       // 日期确定选择
       correctDateVal(){
         this.u = this.startDate + ' ~ ' + this.endDate
+        this.$emit('changeSelectDate',[this.startDate, this.endDate])
       }
     },
     mounted() {

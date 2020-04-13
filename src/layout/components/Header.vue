@@ -177,8 +177,17 @@
               this.$store.commit('changeZoneId', this.workBenchList[0]['val'])
             }
           })
+          .catch(error => {
+            console.log('...........')
+            console.log(error)
+            // 没有授权
+            if(error.code == 401){
+              this.$message.error('授权失效，需要重新登录')
+              sessionStorage.setItem('token','')
+              this.$router.push('/login')
+            }
+          })
       },
-
     }
   }
 </script>

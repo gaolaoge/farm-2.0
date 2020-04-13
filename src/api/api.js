@@ -83,10 +83,62 @@ export function getInfo(){
   })
 }
 
-// 新建任务 设置渲染模板
+// 新建任务 设置渲染模板-获取已存在记录
 export function createTaskSet(){
   return api({
     url: `/professional/template/getCustomerTemplateList`,
     method: 'GET'
+  })
+}
+
+// 新建任务 设置渲染模板-获取所有软件名和版本号
+export function createTaskSetSoftware(){
+  return api({
+    url: `/professional/template/getSoftList`,
+    method: 'GET'
+  })
+}
+
+// 新建任务 设置渲染模板-获取指定软件指定版本的所有插件
+export function createTaskSetPlugin(data){
+  return api({
+    url: `/professional/template/getPluginList?softUuid=${data}`,
+    method: 'GET'
+  })
+}
+
+// 账单 充值记录 获取table数据
+export function getUpTopTable(data){
+  return api({
+    url: `/billing/recharge/getRechargeList?${data}`,
+    method: 'GET'
+  })
+}
+
+// 账单 消费记录 获取所属项目List
+export function getConsumptionSelectList(){
+  return api({
+    url: `/professional/project/getCustomerProjectList`,
+    method: 'GET'
+  })
+}
+
+// 账单 消费记录 获取table数据
+export function getConsumptionTable(data){
+  return api({
+    url: `/billing/spending/getSpendingList?${data}`,
+    method: 'GET'
+  })
+}
+
+// 账单 充值记录 导出记录
+export function exportUpTopTable(data){
+  return api({
+    url: `/billing/recharge/getRechargeExcel?${data}`,
+    method: 'GET',
+    responseType: 'blob',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }

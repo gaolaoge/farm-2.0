@@ -58,7 +58,7 @@
         <span v-show="table.navListActiveIndex == 1" class="t">
           <span class="it">
             <span class="label">
-              {{ remind.consumptionLabel }}
+              {{ remind.consumptionLabel }}：
             </span>
             <span class="val">
               {{ remind.consumptionVal }}
@@ -115,7 +115,7 @@
           navListActiveIndex: 0,
           navList: [
             {
-              text: '充值中心'
+              text: '充值记录'
             },
             {
               text: '消费记录'
