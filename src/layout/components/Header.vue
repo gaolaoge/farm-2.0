@@ -155,6 +155,9 @@
         },
         // immediate: true
       },
+      workBenchVal(val){
+        this.$store.commit('changeZoneId', val)
+      }
     },
     methods: {
       routerPush(url){
@@ -178,8 +181,6 @@
             }
           })
           .catch(error => {
-            console.log('...........')
-            console.log(error)
             // 没有授权
             if(error.code == 401){
               this.$message.error('授权失效，需要重新登录')

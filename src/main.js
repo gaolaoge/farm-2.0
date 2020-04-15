@@ -12,10 +12,12 @@ Vue.use(ElementUI)
 
 Vue.prototype.$echarts = echarts
 
-new Vue({
+const vue = new Vue({
   el: '#app',
   router,
   store,
   components: { App },
   template: '<App/>'
 })
+
+export default vue

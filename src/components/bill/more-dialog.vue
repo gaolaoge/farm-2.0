@@ -14,7 +14,7 @@
       </div>
       <div class="tableList">
         <!--下载消费详情-->
-        <div class="table-box" v-show="showTable == 'downloadTable'">
+        <div class="table-box" v-show="dialogTableType == '下载消费'">
           <el-table
             :data="downloadTableData"
             class="o"
@@ -59,7 +59,7 @@
           </el-table>
         </div>
         <!--渲染消费详情-->
-        <div class="table-box" v-show="showTable == 'expendTable'">
+        <div class="table-box" v-show="dialogTableType == '渲染消费'">
           <el-table
             :data="expendTableData"
             class="o"
@@ -121,12 +121,15 @@
 </template>
 
 <script>
+  import {
+    createCalendar
+  } from '@/assets/common.js'
+
   export default {
     name: 'more-dialog',
     data(){
       return {
         dialogTit: '消费详情',
-        showTable: 'expendTable',
         // 下载消费详情
         downloadTableData: [
           // {
@@ -137,14 +140,6 @@
           //   price: null,           //单价（金币/核对）
           //   date: ''               //下载完成时间
           // },
-          {
-            framesNum: 1,
-            downloadNum: 3,
-            cost: 10.234,
-            size: '12.54G',
-            price: 1.362,
-            date: '2020-01-01 04:23:44'
-          },
         ],
         // 渲染消费详情
         expendTableData: [
@@ -158,24 +153,71 @@
           //   percent: '',     // CPU利用率
           //   peak: ''         // 内存峰值
           // },
-          {
-            num: 1,
-            gold: 1.362,
-            duration: '1分32秒',
-            startDate: '2020-03-11 06:55:41',
-            endDate: '2020-05-01 05:22:21',
-            price: 5.326,
-            percent: '23%',
-            peak: '26G'
-          },
         ],
 
+      }
+    },
+    props: {
+      dialogTableType: {
+        type: String,
+        default: 'as'
+      },
+      downloadDialogTableData: {
+        type: Array,
+        default: function(){
+          return []
+        }
+      },
+      renderDialogTableData: {
+        type: Array,
+        default: function(){
+          return []
+        }
+      }
+    },
+    watch: {
+      downloadDialogTableData: {
+        handler: function(val){
+          this.downloadTableData = val.map(curr => {
+            let { year, month, day, hour, minutes, seconds } = createCalendar(new Date(curr.finishTime))
+            return {
+              framesNum: curr.frameNo,          //帧数
+              downloadNum: curr.downloadNo,     //已下载次数
+              cost: curr.actualPayment,         //费用（金币）
+              size: curr.fileSize,              //大小
+              price: curr.unitPrice,            //单价（金币/核对）
+              date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`             //下载完成时间
+            }
+          })
+        },
+        deep: true,
+        immediate: true
+      },
+      renderDialogTableData: {
+        handler: function(val){
+          this.expendTableData = val.map(curr => {
+
+            return {
+              num: curr.frameNo,              //帧数
+              gold: curr.actualPayment,       // 渲染费用（金币）
+              // duration: `${hour - 8}时${min}分${sec}秒`,         // 渲染时长
+              duration: curr.useTime,
+              startDate: curr.startTime,      // 渲染开始时间
+              endDate: curr.endTime,          // 渲染结束时间
+              price: curr.unitPrice,          // 单价（金币/核对）
+              percent: curr.cpuRate,          // CPU利用率
+              peak: curr.memoryPeak           // 内存峰值
+            }
+          })
+        },
+        deep: true,
+        immediate: true
       }
     },
     methods: {
       // 关闭
       closeDialogFun(){
-
+        this.$emit('closeDialog', false)
       }
     }
   }
@@ -188,6 +230,8 @@
       position: absolute;
       width: 100%;
       .closeBtn {
+        position: relative;
+        z-index: 9;
         float: right;
         width:18px;
         height:18px;

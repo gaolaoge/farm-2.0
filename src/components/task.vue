@@ -5,7 +5,10 @@
       <!--上传分析操作-->
       <div class="uploadBtnGroup"
            v-show="table.navListActiveIndex == 0">
-        <div class="farm-primary-form-btn" v-for="item,index in btnGroup.uploadBtnGroup" :key="index">
+        <div class="farm-primary-form-btn"
+             v-for="item,index in btnGroup.uploadBtnGroup"
+             @click="uploadOperating(item['text'])"
+             :key="index">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
           <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
           <span>
@@ -30,8 +33,15 @@
           {{ btnGroup.archiveRecords }}（{{ btnGroup.archiveRecordsNum }}）
         </div>
         <div class="searchItem">
-          <input type="text" class="farm-form-input" placeholder="输入场景名、任务ID">
-          <img src="@/icons/searchIcon.png" alt="" class="searchIcon">
+          <input type="text"
+                 class="farm-form-input"
+                 v-model="btnGroup.searchInput"
+                 placeholder="输入场景名、任务ID">
+          <!--搜索按钮-->
+          <img src="@/icons/searchIcon.png"
+               alt=""
+               class="searchIcon"
+               @click="searchTaskDownload">
         </div>
       </div>
     </div>
@@ -64,7 +74,7 @@
         </div>
       </div>
     </div>
-    <!--弹窗-->
+    <!--弹窗 归档记录-->
     <el-dialog :visible.sync="dialogTable.status"
                :show-close="false"
                top="5vh"
@@ -77,6 +87,13 @@
       <!--窗口主体-->
       <archive-records />
     </el-dialog>
+    <!--弹窗 新建任务-->
+    <el-dialog :visible.sync="createTaskDialog"
+               :show-close=false
+               top="8vh"
+               width="1100px">
+      <newTask @closeDialogFun="closeDialogFun"/>
+    </el-dialog>
   </div>
 </template>
 
@@ -86,6 +103,7 @@
   import uploadTable from '@/components/task/upload-table'
   import downloadTable from '@/components/task/download-table'
   import archiveRecords from '@/components/task/archive-records'
+  import newTask from '@/components/home/new-task'
 
   export default {
     name: 'task',
@@ -158,20 +176,120 @@
             }
           ],
           archiveRecords: '归档记录',
-          archiveRecordsNum: '68'
+          archiveRecordsNum: '68',
+          searchInput: ''
         },
         dialogTable: {
           status: false,
         },
+        createTaskDialog: false
       }
     },
     components: {
       uploadTable,
       downloadTable,
-      archiveRecords
+      archiveRecords,
+      newTask
     },
     methods: {
+      // 关闭新建任务弹窗
+      closeDialogFun(){
+        this.createTaskDialog = false
+      },
+      // 上传分析 - 操作台
+      uploadOperating(ing){
+        switch(ing){
+          case '新建任务':
+            this.createTask()
+            break
+          case '删除':
+            this.deleteTaskUpload()
+            break
+          case '重新分配':
+            this.againTaskUpload()
+            break
+        }
+      },
+      // 渲染下载 - 操作台
+      uploadOperating(ing){
+        switch(ing){
+          case '新建任务':
+            this.createTask()
+            break
+          case '开始':
+            this.beginTaskDownload()
+            break
+          case '暂停':
+            this.pauseTaskDownload()
+            break
+          case '删除':
+            this.deleteTaskDownload()
+            break
+          case '下载完成帧':
+            this.completeTaskDownload()
+            break
+          case '全部渲染':
+            this.allTaskDownload()
+            break
+          case '重新渲染':
+            this.againTaskDownload()
+            break
+          case '开始渲染':
+            this.startTaskDownload()
+            break
+          case '归档':
+            this.archiveTaskDownload()
+            break
+        }
+      },
+      // 新建任务
+      createTask(){
+        this.createTaskDialog = true
+      },
+      // 删除 - 上传分析
+      deleteTaskUpload(){
 
+      },
+      // 重新分配 - 上传分析
+      againTaskUpload(){
+
+      },
+      // 开始 - 渲染下载
+      beginTaskDownload(){
+
+      },
+      // 暂停 - 渲染下载
+      pauseTaskDownload(){
+
+      },
+      // 删除 - 渲染下载
+      deleteTaskDownload(){
+
+      },
+      // 下载完成帧 - 渲染下载
+      completeTaskDownload(){
+
+      },
+      // 全部渲染 - 渲染下载
+      allTaskDownload(){
+
+      },
+      // 重新渲染 - 渲染下载
+      againTaskDownload(){
+
+      },
+      // 开始渲染 - 渲染下载
+      startTaskDownload(){
+
+      },
+      // 归档 - 渲染下载
+      archiveTaskDownload(){
+
+      },
+      // 关键字检索 - 渲染下载
+      searchTaskDownload(){
+
+      },
     },
     watch: {
 

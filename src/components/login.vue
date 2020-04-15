@@ -441,8 +441,6 @@
             message: '还未做短信验证',
             type: 'error',
             showClose: true,
-            center: true,
-            // offset: '10vh',
             duration: 3000
           })
           return false

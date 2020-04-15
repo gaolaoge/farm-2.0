@@ -367,7 +367,7 @@ thead {
   .el-table__row {
     &:hover {
       &::after {
-        width: 1801px;
+        width: 1642px;
       }
     }
   }
@@ -1056,6 +1056,7 @@ td {
   }
 }
 
+//提示信息
 .el-message {
   width: 438px;
   height: 40px;
@@ -1070,5 +1071,65 @@ td {
   .el-message__icon {
     font-size: 16px;
     margin-right: 5px;
+  }
+}
+
+//带有操作的提示信息
+.el-message-box {
+  width: 360px;
+  height: 210px;
+  background: rgba(28, 36, 47, 1);
+  border-radius: 8px;
+  border: 1px solid rgba(42, 55, 73, 1);
+  .el-message-box__title {
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .el-message-box__content {
+    padding: 10px 30px;
+    height: 70px;
+    .el-message-box__container {
+      .el-message-box__message {
+        font-size: 14px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 1);
+        line-height: 26px;
+      }
+    }
+  }
+  .el-message-box__btns {
+    padding: 30px;
+    .el-button {
+      width: 76px;
+      height: 32px;
+      border-radius: 8px;
+      margin-left: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      &.el-button--default {
+        background-color: transparent;
+        span {
+          color: rgba(255, 255, 255, 0.59);
+        }
+      }
+      &.el-button--primary {
+        background-color: rgba(53, 130, 254, 1);
+        border: 1px solid rgba(53, 130, 254, 0.8);
+        span {
+          color: rgba(255, 255, 255, 0.79);
+        }
+        &:hover {
+          border: 1px solid rgba(53, 130, 254, 1);
+          span {
+            color: rgba(255, 255, 255, 0.79);
+          }
+        }
+      }
+      &:hover {
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        span {
+          color: rgba(255, 255, 255, 0.79);
+        }
+      }
+    }
   }
 }

@@ -39,7 +39,7 @@
     </div>
     <div class="secRow">
       <!--新建任务-->
-      <div class="addBtn" @click="showNewTask = true">
+      <div class="addBtn" @click="createTaskFun">
         <img src="@/icons/addIcon-black.png" alt="" class="im">
         <span class="te">
           {{ addBtn.t }}
@@ -120,7 +120,7 @@
                :show-close=false
                top="8vh"
                width="1100px">
-      <newTask @closeDialogFun="closeDialogFun"/>
+      <newTask @closeDialogFun="closeDialogFun" :filelist="fileList" />
     </el-dialog>
   </div>
 </template>
@@ -206,7 +206,9 @@ export default {
       },
       showNewTask: false,
       chartsData: [],
-      chartsDate: []
+      chartsDate: [],
+      // 工程文件
+      fileList: []
     }
   },
   computed: {
@@ -276,6 +278,28 @@ export default {
           })
         })
     },
+    // 触发新建任务
+    createTaskFun(){
+      let inputDom = document.createElement('INPUT')
+      inputDom.type='file'
+      inputDom.accept='.ma,.mb'
+      inputDom.click()
+      inputDom.addEventListener('change',() => {
+
+        if(inputDom.files.length == 1){
+          this.fileList= [{
+            sceneFile: inputDom.files[0],
+            projectFileList: null,
+            projectFileName: '',
+            inputStatus: false,
+            path: '',
+            id: 10000
+          }]
+          this.showNewTask = true
+        }
+
+      })
+    }
   }
 }
 </script>

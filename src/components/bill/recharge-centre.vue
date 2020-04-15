@@ -155,9 +155,9 @@
         <el-table-column
           label="操作"
           show-overflow-tooltip
-          width="240">
+          width="200">
           <template slot-scope="scope">
-            <div class="download-tab" @click="scope.row.operate" v-show="scope.row.operate != '-'">
+            <div class="download-tab" @click="operateFun(scope.row)" v-show="scope.row.operate != '-'">
               {{ scope.row.operate }}
             </div>
             <div class="download-tab-none" v-show="scope.row.operate == '-'">
@@ -186,11 +186,13 @@
   import modelCalendar from '@/components/farm-model/farm-calendar'
   import {
     createCalendar,
-    getDate
+    getDate,
+    exportDownloadFun
   } from '@/assets/common.js'
   import {
     getUpTopTable,
-    exportUpTopTable
+    exportUpTopTable,
+    downloadReceipt
   } from '@/api/api'
 
   export default {
@@ -331,9 +333,8 @@
                   break
               }
               if(!curr.actualPayment) curr.actualPayment = '-'
-              let {year, month, day} = createCalendar(new Date(curr.updateTime))
-              month = month > 9 ? month : '0' + (month + 1)
-              day = day > 9 ? day : '0' + day
+              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime)),
+                t = `${year}-${month + 1 > 9 ? month + 1 : '0' + ( month + 1 )}-${day > 9 ? day : '0' + day} ${hour > 9 ? hour : '0' + hour}:${minutes > 9 ? minutes : '0' + minutes}:${seconds > 9 ? seconds : '0' + seconds}`
               return {
                   id: curr.rechargeUuid,                //交易ID
                   state: curr.paymentStatus,            //交易状态
@@ -342,7 +343,8 @@
                   directions: curr.rechargeExplain,     //充值说明
                   paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '微信',     //充值方式
                   singleNumber: curr.outTradeNo,        //支付单号
-                  date: year + '-' + month + '-' + day,                //交易时间
+                  date: t,                //交易时间
+                  dateDefault: curr.updateTime,
                   invoice: curr.invoice,                //开票标识
                   operate: curr.operate                 //操作
               }
@@ -371,15 +373,28 @@
         let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`
         exportUpTopTable(t)
           .then(data => {
-            const blob = new Blob([data.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
-                  a = document.createElement("a"),
-                  url = window.URL.createObjectURL(blob),
-                  filename = '充值记录'
-            a.href = url
-            a.download = filename
-            a.click()
-            window.URL.revokeObjectURL(url)
+            // 导出下载
+            exportDownloadFun(data, '充值记录','xlsx')
           })
+      },
+      // 操作
+      operateFun(item){
+        let u = {
+          outTradeNo: item.singleNumber,
+          updateTime: item.dateDefault,
+          actualPayment: item.realPay,
+          paymentTitle: item.paymentMethod == '支付宝' ? '1' : '2',
+          account: JSON.parse(sessionStorage.getItem('info'))['account']
+        }
+        let t =`outTradeNo=${u['outTradeNo']}&updateTime=${u['updateTime']}&actualPayment=${u['actualPayment']}&paymentTitle=${u['paymentTitle']}&account=${u['account']}`
+        if(item.operate == "下载收据"){
+          var a = document.createElement('a')
+          a.href = `http://192.168.1.184/file/farmReceipt?${t}`
+          a.setAttribute("id", "export")
+          document.body.append(a)
+          a.click()
+          document.getElementById("export").remove()
+        }
       }
     },
     mounted() {

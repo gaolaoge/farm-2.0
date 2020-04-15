@@ -28,8 +28,10 @@
         <!--选择场景文件-->
         <div class="stepBody-item"
              v-show="stepBtnActive == 1">
+          <!--操作按钮-->
           <div class="operateBtnGroup">
             <div class="farm-primary-form-btn"
+                 @click="operateBtnFun(item['text'])"
                  v-for="item,index in stepOneBase.operateBtnGroup"
                  :key="index">
               <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
@@ -39,35 +41,60 @@
               </span>
             </div>
           </div>
+          <!--table-->
           <div class="table">
             <el-table
-              :data="stepOneBase.tableData"
+              :data="filelist"
+              class="o"
               @selection-change="handleSelectionChange"
               style="width: 100%">
+
               <el-table-column
                 type="selection"
                 align="center"
                 width="55" />
-
+              <!--场景文件-->
               <el-table-column
-                prop="fileName"
+                prop="sceneFile.name"
                 label="场景名"
                 width="220" />
-
+              <!--工程文件夹-->
               <el-table-column
                 label="工程文件名">
                 <template slot-scope="scope">
-                  <div class="addressNameBase">
+                  <!--<div class="addressNameBase">-->
                     <span class="addressNameText">
-                    {{ scope.row.addressName }}
-                  </span>
-                    <input type="file"
-                           class="addressNameInput"
-                           webkitdirectory
-                           @change="inputFileChange($event,scope.row)">
-                  </div>
+                      {{ scope.row.projectFileName }}
+                    </span>
+                    <!--<input type="file"-->
+                           <!--class="addressNameInput"-->
+                           <!--webkitdirectory-->
+                           <!--@change="inputFileChange($event,scope.row)">-->
+                  <!--</div>-->
+                  <img src="@/icons/j.png"
+                       alt=""
+                       class="se"
+                       @click="selectFiles($event,scope.row)">
                 </template>
               </el-table-column>
+              <!--工程路径-->
+              <el-table-column 
+                prop="address" 
+                label="工程路径">
+                <template slot-scope="scope">
+                  <span class="address-span" :class="[{'inputing': scope.row.inputStatus}]">
+                    {{ scope.row.address }}
+                  </span>
+                  <input type="text"
+                         class="address-input"
+                         :class="[{'inputing': scope.row.inputStatus}]"
+                         @focus="scope.row.inputStatus = true"
+                         @blur="scope.row.inputStatus = false"
+
+                         v-model="scope.row.address">
+                </template>
+              </el-table-column>
+
             </el-table>
           </div>
         </div>
@@ -92,7 +119,7 @@
                  v-for="item,index in stepTwoBase.renderList"
                  :key="index">
               <div class="headerB">
-                <span class="headerText">
+                <span class="headerText" :title="item.renderTemplate.templateName">
                   {{ item.renderTemplate.templateName }}
                 </span>
                 <span class="opacityBtnGroup">
@@ -125,17 +152,20 @@
         </div>
       </div>
     </section>
+    <!--下一步-->
     <div class="btnGroup">
       <div class="btnGroup-btn confirm" v-show="stepBtnActive == 1" @click="stepBtnActive = 2">
         <span class="nextStep">
           {{ btn.next }}
         </span>
       </div>
-      <div class="btnGroup-btn confirm" v-show="stepBtnActive == 2">
+      <!--确定-->
+      <div class="btnGroup-btn confirm" v-show="stepBtnActive == 2" @click="confirmFun">
         <span>
           {{ btn.confirm }}
         </span>
       </div>
+      <!--上一步-->
       <div class="btnGroup-btn previous" v-show="stepBtnActive == 2" @click="stepBtnActive = 1">
         <span>
           {{ btn.previous }}
@@ -248,7 +278,7 @@
           </div>
           <!--按钮-->
           <div class="btnGroup">
-            <div class="btnGroup-btn save">
+            <div class="btnGroup-btn save" @click="taskDefine" :class="[{'disable-self': disableSelf}]">
               <span>
                 {{ dialogAdd.save }}
               </span>
@@ -269,8 +299,17 @@
   import {
     createTaskSet,
     createTaskSetSoftware,
-    createTaskSetPlugin
+    createTaskSetPlugin,
+    createTaskSetDeletePlugin,
+    createTaskSetNewPlugin,
+    createTaskSetEditPlugin,
+    pushTask,
+    upTopCJ,
+    upTopGC
   } from '@/api/api'
+  import {
+    mapState
+  } from 'vuex'
 
   export default {
     name: 'new-task',
@@ -298,27 +337,56 @@
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
           ],
-          tableData: [
-            {
-              fileName: '场景名少年的你123.ma',
-              addressName: 'F:\\ss929\\render\\map'
-            }
-          ],
+          // tableData: [
+          //   {
+          //     fileName: '场景名少年的你123.ma',
+          //     addressName: 'F:\\ss929\\render\\map',
+          //     inputStatus: false
+          //   }
+          // ],
           selectionTableData: [],     //选择场景文件 table 多选值
         },
         stepTwoBase: {
           addMoreText: '添加模板',
           //设置渲染模板 - 已存在列表
           renderList: [
-            // {
-            //   id: '',
-            //   templateName: '',     //模板名称
-            //   hardware: '',       //硬件
-            //   softNameVer: '',       //软件
-            //   plugin: ''          //插件
-            // },
+            // [
+            //   {
+            //     renderTemplate: {                       //模板
+            //       id: 16
+            //       createTime: 1586308643471
+            //       createBy: "user42cd-82bb-44e7-9bc4-d6d046b5dff2"
+            //       updateTime: 1586397047167
+            //       updateBy: "user42cd-82bb-44e7-9bc4-d6d046b5dff2"
+            //       templateUuid: "84168a1b-b32e-490c-854b-1590f756c28b"
+            //       dataStatus: 1
+            //       updateParamAfterAnalyse: null
+            //       templateName: "用户4测试模板3"          //模板名称
+            //       isDefault: 0                          //默认选中 0为非
+            //       softName: "3dmax"                     //软件名
+            //       softVer: "2021"                       //版本
+            //       softNameVer: "3dmax2021"              //
+            //       softUuid: "127"                       //软件编号
+            //       customerUuid: "user42cd-82bb-44e7-9bc4-d6d046b5dff2"
+            //     },
+            //     xxlPlugins: [           模板插件
+            //       {
+            //         id: 1
+            //         pluginName: "V-ray"              //插件名
+            //         version: "1.233"                 //插件版本
+            //         publisher: "2K"                  //插件发行商
+            //         pluginUuid: "456"                //编号 唯一标识
+            //         createTime: "2020-03-31"
+            //         createBy: "1"
+            //         updateTime: "2020-03-31"
+            //         updateBy: "1"
+            //         dataStatus: 1
+            //       }
+            //     ]
+            //   }
+            // ]
           ],
-          renderListActive: ''     //选中索引
+          renderListActive: 0     //选中索引
         },
         innerVisible: false,   //添加模板
         // 添加模板窗口
@@ -329,7 +397,7 @@
             labelName: '模板名称',
             valName: '',
             labelSoftware: '渲染软件',
-            valSoftware: 'Maya 2020',
+            valSoftware: '',
             labelPlugin: '渲染插件',
             valPlugin: ''
           },
@@ -375,7 +443,38 @@
             // }
           ],
           cancel: '取消',
-          save: '保存'
+          save: '保存',
+          // 【确定】标记编辑or新建
+          editOrAdd: '',
+          index: null      //编辑已存在模板时模板的索引
+        }
+      }
+    },
+    props: {
+      // 场景文件 + 工程文件 + 工程路径
+      filelist: {
+        type: Array,
+        required: true
+        // [
+        //   {
+        //      sceneFile: file,
+        //      projectFileList: files,
+        //      projectFileName: '',
+        //      path: '',
+        //      inputStatus: false,
+        //      id: 10000
+        //   }
+        //]
+      }
+    },
+    computed: {
+      ...mapState(['zoneId']),
+      // 验证表格是否填写完整
+      disableSelf(){
+        if(!this.dialogAdd.form.valName || !this.dialogAdd.form.valSoftware || !this.dialogAdd.nList.length){
+          return true
+        }else {
+          return false
         }
       }
     },
@@ -383,15 +482,6 @@
       // 关闭
       closeDialogFun(){
         this.$emit('closeDialogFun','')
-      },
-      // 选择场景文件 table 多选值
-      handleSelectionChange(val){
-        this.selectionTableData = val
-      },
-      // 选择场景文件 table 修改工程文件名
-      inputFileChange(e,val){
-        // console.log(e)
-        // console.log(val)
       },
       // 新建任务 - 设置渲染模板 - 选择插件版本
       changeOIndex(index){
@@ -524,30 +614,54 @@
             })
             // 打开弹窗
             this.innerVisible = true
+            this.dialogAdd.editOrAdd = s
             if(s == 'addOne'){
               // 新建模板
 
             }
             if(s == 'editOne'){
               // 编辑模板
-              let t = this['stepTwoBase']['renderList'][index],
+              this.dialogAdd.index = index
+              let t = this['stepTwoBase']['renderList'][index],   // 选中渲染模板data
                   v = this.dialogAdd
-              let f = this.dialogAdd.softwareList.find(curr => {
+              let f = this.dialogAdd.softwareList.find(curr => {  // 软件选中记录
                 return curr.label == t['renderTemplate']['softName']
               })
-              let b = f['children'].find(curr => {
+              let b = f['children'].find(curr => {                // 插件
                 return curr.label == t['renderTemplate']['softName'] + '-' + t['renderTemplate']['softVer']
               })
-              v.nList = t['xxlPlugins']                                         //已选中插件记录
+              v.nList = t['xxlPlugin']               // 导入已选中插件记录
               v.form.valName = t['renderTemplate']['templateName']              //编辑窗口内模板名
+              if(!b) return false
               v.form.valSoftware = [t['renderTemplate']['softName'], b.value]   //编辑窗口内渲染软件
               this.changeSoftware([t['renderTemplate']['softName'], b.value])   //获取对应插件下拉框List
             }
           })
       },
       // 新建任务 - 设置渲染模板 - 删除模板
-      deleteTemplate(){
+      deleteTemplate(index){
+        this.$confirm('删除后将无法找回，确认删除当前模板吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          showClose: false
+        })
+          .then(() => {
+            createTaskSetDeletePlugin(this.stepTwoBase.renderList[index]['renderTemplate']['templateUuid'])
+              .then(data => {
+                this.getList()
+                this.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                })
 
+              })
+          })
+          .catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+          })
       },
       // 新建任务 - 设置渲染模板 - 软件下拉框选中
       changeSoftware(val){
@@ -560,6 +674,7 @@
                 list: curr.pluginList
               }
             })
+            this.dialogAdd.nList = []
           })
       },
       // 新建任务 - 设置渲染模板 - 插件下拉框选中
@@ -606,6 +721,157 @@
         this.dialogAdd.pluginList = []
         this.dialogAdd.oList = []
         this.dialogAdd.nList = []
+      },
+      // 新建任务 - 设置渲染模板 - 添加or修改
+      taskDefine(){
+        let data
+        // 若表格未填写完整 返回
+        if(!this.dialogAdd.form.valName || !this.dialogAdd.form.valSoftware || !this.dialogAdd.nList.length){
+          return
+        }
+        switch(this.dialogAdd.editOrAdd){
+          // 新建模板
+          case 'addMore':
+            data = {
+              templateName: this.dialogAdd.form.valName,        //模板名称
+              softUuid: this.dialogAdd.form.valSoftware[1],     //软件uuid
+              pluginUuids: this.dialogAdd.nList.map(curr => {
+                return curr.pluginUuid
+              })
+            }
+            createTaskSetNewPlugin(data)
+              .then(data => {
+                if(data.data.code == 201){
+                  this.$message({
+                    type: 'success',
+                    message: '创建模板成功'
+                  })
+                  this.innerVisible = false
+                  this.getList()
+                }
+                //创建失败
+              })
+            break
+          // 编辑模板
+          case 'editOne':
+            let obj = this.stepTwoBase['renderList'][this.dialogAdd.index]
+            data = {
+              templateUuid: obj['renderTemplate']['templateUuid'],                 // 模板uuid
+              templateName: this.dialogAdd.form.valName,                           // 模板名称
+              softUuid: obj['renderTemplate']['softUuid'],                         // 软件uuid
+              isDefault: obj['renderTemplate']['isDefault'],                       // 是否默认
+              pluginUuids: this.dialogAdd.nList.map(curr => {                       // 插件
+                return curr.pluginUuid
+              })
+            }
+            createTaskSetEditPlugin(data)
+              .then(data => {
+                if(data.data.code == 200){
+                  this.$message({
+                    type: 'success',
+                    message: '编辑成功'
+                  })
+                  this.innerVisible = false
+                  this.getList()
+                }
+                // 编辑失败
+              })
+            break
+        }
+      },
+      // 选择场景文件 - 添加工程文件夹
+      selectFiles(e,row){
+        let inputFileDom = document.createElement('INPUT')
+        inputFileDom.type='file'
+        inputFileDom.setAttribute('webkitdirectory',true)
+        inputFileDom.click()
+        inputFileDom.addEventListener('change',() => {
+          row.projectFileList = inputFileDom.files
+          row.projectFileName = inputFileDom.files[0]['webkitRelativePath'].split('/')[0]
+        })
+      },
+      // 选择场景文件 - table 多选值
+      handleSelectionChange(val){
+        this.stepOneBase.selectionTableData = val
+      },
+      // 选择场景文件 - 操作按钮
+      operateBtnFun(action){
+        switch(action){
+          case '添加':
+            this.operateBtnAddMore()
+            break
+          case '删除':
+            this.operateBtnDelete()
+            break
+        }
+      },
+      // 选择场景文件 - 【添加】
+      operateBtnAddMore(){
+        let inputDom = document.createElement('INPUT')
+        inputDom.type = 'file'
+        inputDom.accept = '.ma,.mb'
+        inputDom.click()
+        inputDom.addEventListener('change',() => {
+          this.filelist.push({
+            sceneFile: inputDom.files[0],
+            projectFileList: [],
+            projectFileName: '',
+            path: '',
+            inputStatus: false,
+            id: String( Number(this.filelist[this.filelist.length - 1]['id']) + 1 )
+          })
+        })
+      },
+      // 选择场景文件 - 【删除】
+      operateBtnDelete(){
+        if(!this.stepOneBase.selectionTableData.length){
+          this.$message.error('没有选中项')
+          return false
+        }
+        this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            let deleteIdList = this.stepOneBase.selectionTableData.map(curr => {
+              return curr.id
+            })
+            deleteIdList.forEach(curr => {
+              let index = this.filelist.findIndex((c,index) => {
+                return c.id == curr
+              })
+              this.filelist.splice(index,1)
+            })
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+          })
+          .catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            })
+        });
+      },
+      // 新建任务 - 提交新【任务】
+      confirmFun(){
+        pushTask({
+          zoneUuid: this.zoneId,        //分区uuid
+          templateUuid: this.stepTwoBase.renderList[this.stepTwoBase.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
+          taskCount: this.filelist.length,    // 要创建任务的数量
+          pattern: 2,    //渲染模式
+          patternNorm: 2,    //提交模式
+          source: 2      // 任务来源
+        })
+          .then(data => {
+            this.upLoadFun(data.data.data)
+          })
+      },
+      // 上传【场景文件】【工程文件】
+      upLoadFun(idList){
+
       }
     },
     mounted() {
@@ -703,6 +969,38 @@
                 opacity: 0;
               }
             }
+            .address-span {
+              font-size: 14px;
+              font-weight: 400;
+              color: rgba(255, 255, 255, 0.6);
+              &.inputing {
+                display: none;
+              }
+            }
+            .address-input {
+              position: absolute;
+              left: 10px;
+              top: 13px;
+              font-size: 14px;
+              font-weight: 400;
+              color: rgba(255, 255, 255, 0.6);
+              background-color: transparent;
+              border: 0px;
+              outline: none;
+              opacity: 0;
+              font-family: 'SourceHanSansCN', 'Arial Bold';
+              &.inputing {
+                opacity: 1;
+              }
+            }
+            .se {
+              position: absolute;
+              right: 24px;
+              top: 18px;
+              width: 13px;
+              opacity: 0.6;
+              cursor: pointer;
+            }
           }
           /*设置渲染模板*/
           .set-renderTemplate {
@@ -752,6 +1050,11 @@
                     font-weight: 400;
                     line-height: 36px;
                     color: rgba(255, 255, 255, 0.8);
+                    display: inline-block;
+                    width: 94px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                   }
                   .opacityBtnGroup {
                     .item-icon {
@@ -1002,6 +1305,11 @@
         &.save {
           padding: 6px 24px;
           background-color: rgba(10, 98, 241, 1);
+        }
+        &.disable-self {
+          background-color: rgba(166, 166, 166, 0.6);
+          color: rgba(255, 255, 255, 0.4);
+          cursor: default;
         }
       }
     }

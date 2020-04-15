@@ -57,7 +57,7 @@
           {{ filter.resetBtn }}
         </div>
         <!--导出记录-->
-        <div class="filter-btn r">
+        <div class="filter-btn r" @click="exportTable">
           {{ filter.exportBtn }}
         </div>
       </div>
@@ -83,13 +83,13 @@
           label="任务ID"
           sortable
           show-overflow-tooltip
-          min-width="160" />
+          width="160" />
         <!--场景名-->
         <el-table-column
           prop="scenesName"
           label="场景名"
           show-overflow-tooltip
-          width="200" />
+          min-width="200" />
         <!--状态-->
         <el-table-column
           prop="status"
@@ -172,7 +172,10 @@
     <el-dialog :visible.sync="dialogVisible"
                width="80vw"
                :show-close=false >
-      <more-dialog />
+      <more-dialog @closeDialog="closeDialog"
+                   :dialogTableType="dialogTableType"
+                   :renderDialogTableData="renderDialogTableData"
+                   :downloadDialogTableData="downloadDialogTableData" />
     </el-dialog>
   </div>
 </template>
@@ -182,11 +185,15 @@
   import moreDialog from '@/components/bill/more-dialog'
   import {
     getConsumptionTable,
-    getConsumptionSelectList
+    getConsumptionSelectList,
+    exportConsumptionTable,
+    consumptionSeeMore,
+    upTopSeeMore
   } from '@/api/api'
   import {
     createCalendar,
-    getDate
+    getDate,
+    exportDownloadFun
   } from '@/assets/common.js'
 
   export default {
@@ -229,7 +236,10 @@
           resetBtn: '重置',
           exportBtn: '导出记录'
         },
-        dialogVisible: false
+        dialogVisible: false,
+        dialogTableType: '',
+        renderDialogTableData: [],
+        downloadDialogTableData: []
       }
     },
     components: {
@@ -246,8 +256,27 @@
         console.log(value, row, column)
       },
       seeMore(item){
-        // console.log(item)
-        this.dialogVisible = true
+        this.dialogTableType = item.type
+        let uuId = item.id
+
+        if(item.type == '渲染消费'){
+          consumptionSeeMore(uuId)
+            .then(data => {
+
+              this.renderDialogTableData = data.data.data
+              this.dialogVisible = true
+
+            })
+        }
+        if(item.type == '下载消费'){
+          upTopSeeMore(uuId)
+            .then(data => {
+
+              this.downloadDialogTableData = data.data.data
+              this.dialogVisible = true
+
+            })
+        }
       },
       // 获取 table 数据
       getList() {
@@ -255,21 +284,54 @@
         getConsumptionTable(t)
           .then(data => {
             this.table.rechargeData = data.data.data.map(curr => {
+              let tableStatus = ''
+              switch(curr.layerTaskStatus){
+                case 1:
+                  tableStatus = '等待'
+                  break
+                case 2:
+                  tableStatus = '渲染中'
+                  break
+                case 3:
+                  tableStatus = '渲染结束'
+                  break
+                case 4:
+                  tableStatus = '渲染暂停'
+                  break
+                case 6:
+                  tableStatus = '渲染放弃'
+                  break
+
+              }
+              let tableType = ''
+              switch(curr.patternOfConsumption){
+                case 1:
+                  tableType = '渲染消费'
+                  break
+                case 2:
+                  tableType = '下载消费'
+                  break
+              }
+              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime)),
+                  t = `${year}-${month + 1 > 9 ? month + 1 : '0' + ( month + 1 )}-${day > 9 ? day : '0' + day} ${hour > 9 ? hour : '0' + hour}:${minutes > 9 ? minutes : '0' + minutes}:${seconds > 9 ? seconds : '0' + seconds}`
               return {
                 id: curr.layerTaskUuid,               //任务ID
                 scenesName: curr.layerName,           //场景名
-                status: curr.layerTaskStatus,         //状态
+                status: tableStatus,                  //状态
+                statusDefault: curr.layerTaskStatus,
                 object: curr.projectName,             //所属项目
                 // time: '',                          //渲染时长
                 total: curr.totalFrame,               //总帧数
-                type: curr.patternOfConsumption,      //消费类型
+                type: tableType,                      //消费类型
+                typeDefault: curr.patternOfConsumption,
                 pay: curr.totalCost,                  //费用（金币）
                 // actualPay: '',                     //实付金币
                 user: curr.account,                   //创建人
-                upDate: curr.updateTime,              //更新时间
+                upDate: t,              //更新时间
+                dateDefault: curr.updateTime,         //时间戳记录
               }
             })
-            console.log(this.table.rechargeData)
+            this.table.outPutTableTotal = data.data.total
           })
       },
       // 时间筛选条件修改
@@ -294,6 +356,19 @@
           inquireValV: new Date(),
         })
         this.getList()
+      },
+      // 导出记录
+      exportTable(){
+        let t = `layerNo=${this.filter.taskIdVal}&layerName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`
+        exportConsumptionTable(t)
+          .then(data => {
+            // 导出下载
+            exportDownloadFun(data, '消费记录','xlsx')
+          })
+      },
+      //关闭消费详情
+      closeDialog(){
+        this.dialogVisible = false
       }
     },
     mounted() {
