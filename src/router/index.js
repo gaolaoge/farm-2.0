@@ -5,6 +5,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 const router = new Router({
+  // mode: 'history',
   routes: [
     {
       path: '/',
@@ -43,6 +44,11 @@ const router = new Router({
       path: '/demo',
       name: 'demo',
       component: () => import('@/components/demo.vue')
+    },
+    {
+      path: '/rechargepage',
+      name: 'rechargePage',
+      component: () => import('@/components/rechargePage.vue')
     }
   ]
 })

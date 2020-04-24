@@ -16,10 +16,27 @@
           </span>
         </div>
       </div>
+      <div class="rightOPerate"
+           v-show="table.navListActiveIndex == 0">
+        <div class="searchItem">
+          <input type="text"
+                 class="farm-form-input"
+                 v-model="btnGroup.searchInputUpload"
+                 placeholder="输入场景名、任务ID">
+          <!--搜索按钮-->
+          <img src="@/icons/searchIcon.png"
+               alt=""
+               class="searchIcon"
+               @click="searchUploadInput">
+        </div>
+      </div>
       <!--渲染下载操作-->
       <div class="renderBtnGroup"
            v-show="table.navListActiveIndex == 1">
-        <div class="farm-primary-form-btn" v-for="item,index in btnGroup.renderBtnGroup" :key="index">
+        <div class="farm-primary-form-btn"
+             @click="renderOperating(item['text'])"
+             v-for="item,index in btnGroup.renderBtnGroup"
+             :key="index">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
           <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
           <span>
@@ -35,13 +52,13 @@
         <div class="searchItem">
           <input type="text"
                  class="farm-form-input"
-                 v-model="btnGroup.searchInput"
+                 v-model="btnGroup.searchInputDownload"
                  placeholder="输入场景名、任务ID">
           <!--搜索按钮-->
           <img src="@/icons/searchIcon.png"
                alt=""
                class="searchIcon"
-               @click="searchTaskDownload">
+               @click="searchRenderInput">
         </div>
       </div>
     </div>
@@ -62,15 +79,18 @@
         <div ref="uploadTable"
              class="uploadTable"
              v-show="table.navListActiveIndex == 0">
-          <!--上传分析表格-->
-          <upload-table />
+          <!--上传分析 table-->
+          <upload-table :searchInput="btnGroup.searchInputUpload"
+                        @uploadTbaleTotalItem="uploadTbaleTotalItem"
+                        ref="uploadMode" />
         </div>
         <!--渲染下载-->
         <div ref="renderTable"
              class="renderTable"
              v-show="table.navListActiveIndex == 1">
           <!--渲染下载表格-->
-          <download-table/>
+          <download-table :searchInput="btnGroup.searchInputDownload"
+                          @renderTbaleTotalItem="renderTbaleTotalItem"/>
         </div>
       </div>
     </div>
@@ -92,13 +112,12 @@
                :show-close=false
                top="8vh"
                width="1100px">
-      <newTask @closeDialogFun="closeDialogFun"/>
+      <newTask @closeDialogFun="closeDialogFun" :filelist="fileList"/>
     </el-dialog>
   </div>
 </template>
 
 <script>
-
   import '@/assets/fonticon/iconfont.css'
   import uploadTable from '@/components/task/upload-table'
   import downloadTable from '@/components/task/download-table'
@@ -113,11 +132,11 @@
           navList: [
             {
               text: '上传分析',
-              num: 23
+              num: 0
             },
             {
               text: '渲染下载',
-              num: 36
+              num: 0
             }
           ],
           navListActiveIndex: 0,
@@ -177,12 +196,14 @@
           ],
           archiveRecords: '归档记录',
           archiveRecordsNum: '68',
-          searchInput: ''
+          searchInputUpload: '',       //上传分析 关键字检索
+          searchInputDownload: ''      //渲染下载 关键字检索
         },
         dialogTable: {
           status: false,
         },
-        createTaskDialog: false
+        createTaskDialog: false,
+        fileList: []
       }
     },
     components: {
@@ -192,6 +213,12 @@
       newTask
     },
     methods: {
+      uploadTbaleTotalItem(val){
+        this.table.navList[0]['num'] = val
+      },
+      renderTbaleTotalItem(val){
+        this.table.navList[1]['num'] = val
+      },
       // 关闭新建任务弹窗
       closeDialogFun(){
         this.createTaskDialog = false
@@ -211,7 +238,7 @@
         }
       },
       // 渲染下载 - 操作台
-      uploadOperating(ing){
+      renderOperating(ing){
         switch(ing){
           case '新建任务':
             this.createTask()
@@ -244,11 +271,30 @@
       },
       // 新建任务
       createTask(){
-        this.createTaskDialog = true
+        let inputDom = document.createElement('INPUT')
+        inputDom.type = 'file'
+        inputDom.accept = '.ma,.mb'
+        inputDom.click()
+        inputDom.addEventListener('change',() => {
+
+          if(inputDom.files.length == 1){
+            this.fileList= [{
+              sceneFile: inputDom.files[0],
+              projectFileList: null,
+              projectFileName: '',
+              inputStatus: false,
+              path: '',
+              id: Math.floor(Math.random() * 100000000000000)
+            }]
+            this.createTaskDialog = true
+          }
+
+        })
+        // this.createTaskDialog = true
       },
       // 删除 - 上传分析
       deleteTaskUpload(){
-
+        this.$refs.uploadMode.deleteItem()
       },
       // 重新分配 - 上传分析
       againTaskUpload(){
@@ -286,9 +332,14 @@
       archiveTaskDownload(){
 
       },
+      // 关键字检索 - 上传分析
+      searchUploadInput(){
+        // this.btnGroup.searchInputUpload
+        this.$refs.uploadMode.searchFun(this.btnGroup.searchInputUpload)
+      },
       // 关键字检索 - 渲染下载
-      searchTaskDownload(){
-
+      searchRenderInput(){
+        // this.btnGroup.searchInputDownload
       },
     },
     watch: {

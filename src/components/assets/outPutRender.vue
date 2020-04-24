@@ -70,10 +70,10 @@
           label="文件类型"
           show-overflow-tooltip
           width="140" />
-        <!--已下载次数 -->
+        <!--下载次数 -->
         <el-table-column
           prop="downLoadTime"
-          label="已下载次数"
+          label="下载次数"
           sortable
           show-overflow-tooltip
           width="140" />
@@ -104,6 +104,8 @@
     <div class="page">
       <el-pagination
         background
+        :current-page.sync="table.pageIndex"
+        :page-size="table.pageSize"
         layout="prev, pager, next, jumper"
         :total="table.outPutTableTotal">
       </el-pagination>
@@ -112,6 +114,12 @@
 </template>
 
 <script>
+  import {
+    assetsExportMain,
+    assetsExportLayer,
+    assetsExportFrame
+  } from '@/api/api'
+
   export default {
     name: 'outPut',
     data(){
@@ -128,28 +136,10 @@
             //   date: '',             //剩余有效期（天）
             //   upDate: '',           //更新时间
             // },
-            {
-              id: '000001',
-              fileName: '示例文件1',
-              project: '同桌的你',
-              fileSize: '370MB',
-              fileType: '.iff',
-              downLoadTime: '7',
-              date: '54',
-              upDate: '2020-03-22 18:22:34',
-            },
-            {
-              id: '000002',
-              fileName: '示例文件2',
-              project: '同桌的你',
-              fileSize: '370MB',
-              fileType: '.iff',
-              downLoadTime: '7',
-              date: '54',
-              upDate: '2020-03-22 18:22:34',
-            },
           ],
           outPutTableTotal: 82,
+          pageIndex: 1,
+          pageSize: 10,
           selectionList: [],            //渲染输出选中项
         },
         l: {
@@ -181,6 +171,25 @@
       filterHandler(value, row, column){
         console.log(value, row, column)
       },
+      async getList(){
+        let t = `pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
+            data = await assetsExportMain(t)
+        this.table.outPutData = data.data.data.map(curr => {
+          return {
+            id: curr.taskNo,               //任务ID
+            fileName: curr.fileName,         //文件名
+            project: curr.projectName,          //所属项目
+            fileSize: '-',         //文件大小
+            fileType: '-',         //文件类型
+            downLoadTime: '',     //下载次数
+            date: '',             //剩余有效期（天）
+            upDate: '',           //更新时间
+          }
+        })
+      }
+    },
+    mounted() {
+      this.getList()
     }
   }
 </script>

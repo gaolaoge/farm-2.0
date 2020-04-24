@@ -306,103 +306,92 @@
     },
     methods: {
       // 注册-帐号验证
-      accouVerif(){
+      async accouVerif(){
         let t = this.registered.form.account
+        // 为空
         if(!t){
-          // 为空
           this.$message.error('请输入框帐号')
           this.registered.status.account = 'false'
           return false
+        }
+        // 验证帐号长度
+        if(!/^[\w\W]{2,14}$/.test(t)){
+          this.$message.error('请输入框2-14个字符')
+          this.registered.status.account = 'false'
+          return false
+        }
+        // 验证帐号格式
+        let reg = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5]+$)/,
+            reg2 = /^[\u4E00-\u9FA5\w]+$/
+        if(!reg.test(t) || !reg2.test(t)){
+          this.$message.error('请在大小写字母、汉字、数字、下划线中设置帐号且至少包含任意2种')
+          this.registered.status.account = 'false'
+          return false
+        }
+        let data = await registerAccount(t)
+        // 用户名不存在
+        if(data.data.code == 4031){
+          // 帐号验证成功
+          this.registered.status.account = 'true'
         }else {
-          // 验证帐号长度
-          if(t.length < 8 || t.length > 14){
-            this.$message.error('请输入框2-14个字符')
-            this.registered.status.account = 'false'
-            return false
-          }
-          // 验证帐号格式
-          let reg = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)/
-          if(!reg.test(t)){
-            this.$message.error('请在大小写字母、汉字、数字、下划线中设置帐号且至少包含任意2种')
-            this.registered.status.account = 'false'
-            return false
-          }
-          registerAccount(t)
-            .then(data => {
-              // 用户名不存在
-              if(data.data.code == 4031){
-                // 帐号验证成功
-                this.registered.status.account = 'true'
-              }else {
-                this.registered.status.account = 'false'
-                this.$message.error('该账号已注册，请重新输入')
-              }
-            })
+          this.registered.status.account = 'false'
+          this.$message.error('该账号已注册，请重新输入')
         }
       },
       // 注册-密码验证
       passwVerif(){
         let t = this.registered.form.password,
-            regex = /^[A-Za-z0-9_\-]+$/
+            regex = /^[A-Za-z0-9_\-]{8,18}}$/
         if(!t){
           this.$message.error('请输入密码')
           this.registered.status.password = 'false'
           return false
         }
-        if(t.length < 8 || t.length > 18){
-          this.$message.error('请输入框8-18个字符')
-          this.registered.status.password = 'false'
-          return false
-        }
         if(!regex.test(t)){
-          this.$message.error('请至少输入包含大小写字母、数字、特殊字符中任意2种')
+          this.$message.error('请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符')
           this.registered.status.password = 'false'
           return false
         }
         this.registered.status.password = 'true'
       },
       // 注册-手机号码验证
-      phoneVerif(){
+      async phoneVerif(){
         let t = this.registered.form.phone
         if(!/^1(3|4|5|6|7|8|9)\d{9}$/.test(t)){
-          this.$message.error('手机号输入错误')
+          this.$message.error('手机号格式错误')
           this.registered.status.phone = 'false'
           return false
         }
-        registerPhone(t)
-          .then(data => {
+        let data = await registerPhone(t)
             //code:200   手机号已存在
             //code:4031  手机号未注册
-            if(data.data.code == 4031){
-              this.registered.status.phone = 'true'
-            }else{
-              this.$message.error('手机号已存在')
-              this.registered.status.phone = 'false'
-            }
-          })
+        if(data.data.code == 4031){
+          this.registered.status.phone = 'true'
+        }else{
+          this.$message.error('手机号已存在')
+          this.registered.status.phone = 'false'
+        }
       },
       // 注册
-      registerFun(){
+      async registerFun(){
         if(!this.sliderVerification) return false
         if(!this.registered.status.account === 'true' || !this.registered.status.password === 'true' || !this.registered.status.phone === 'true'){
           this.$message.error('未填写完整')
           return false
         }
-        register(this.registered.form)
-          .then(data => {
-            //code:101 帐号或手机号重复
-            if(data.data.code){
-              // 注册成功
-              this.$message({
-                type: 'success',
-                message: '注册成功',
-                align: 'center'
-              })
-              setTimeout(function(){
-
-              },3000)
-            }
+        let data = await register(this.registered.form)
+        //code:101 帐号或手机号重复
+        if(data.data.code){
+          // 注册成功
+          this.$message({
+            type: 'success',
+            message: '注册成功',
+            align: 'center'
           })
+          setTimeout(function(){
+            // 返回登录窗口
+          },1000)
+        }
       },
       // 帐号 登录
       accountlogin(){
@@ -465,18 +454,16 @@
           })
       },
       // 获取个人信息
-      getUserInfo(){
-        getInfo()
-          .then(data => {
-            let d = data.data.data
-            sessionStorage.setItem('info',JSON.stringify({
-              account: d.account,
-              phone: d.phone,
-              level: d.vipLevel,
-              balance: d.goldBalance
-            }))
-            this.$router.push('/')
-          })
+      async getUserInfo(){
+        let data = await getInfo(),
+            d = data.data.data
+        sessionStorage.setItem('info',JSON.stringify({
+          account: d.account,
+          phone: d.phone,
+          level: d.vipLevel,
+          balance: d.goldBalance
+        }))
+        this.$router.push('/')
       }
     },
     watch: {
@@ -564,7 +551,6 @@
             &.active {
               color:  rgba(255, 255, 255, 1);
             }
-
           }
         }
         .phoneForm,

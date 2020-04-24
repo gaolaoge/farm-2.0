@@ -1,5 +1,5 @@
 <template>
-  <div class="upTop">
+  <div class="upTop" ref="upTopDom">
     <div class="tableGroup">
       <div class="navList">
         <span class="navBtn"
@@ -9,6 +9,7 @@
           {{ item.text }}
         </span>
       </div>
+      <!--充值-->
       <div class="tableList">
         <div class="farm-form">
           <!--金币余额-->
@@ -18,7 +19,7 @@
             </div>
             <div class="farm-form-item-val">
               <span class="text">
-                {{ form.balanceVal }}
+                {{ user.balance }}
               </span>
             </div>
           </div>
@@ -30,30 +31,30 @@
             <div class="farm-form-item-val">
               <div class="g">
                 <div class="up-top-item"
-                     :class="[{'active': form.listActive == index}]"
+                     :class="[{'active': form.ChineseYuan == item.ChineseYuan}]"
                      v-for="item,index in form.list"
                      :key="index"
-                     @click="form.listActive = index">
+                     @click="form.ChineseYuan = item.ChineseYuan">
                   <div class="gold">
                     <span class="unit">
                       ￥
                     </span>
                       <span class="num">
-                      {{ item.gold }}
+                      {{ item.ChineseYuan }}
                     </span>
                   </div>
                   <div class="t">
                     <span class="remark">
                       {{ item.remark }}
                     </span>
-                    <img src="@/icons/item-selected.png" alt="" class="v" v-show="form.listActive == index">
+                    <img src="@/icons/item-selected.png" alt="" class="v" v-show="form.ChineseYuan == item.ChineseYuan">
                   </div>
                 </div>
               </div>
-              <input type="text" class="farm-form-item-input in" placeholder="其他金额">
+              <input type="text" class="farm-form-item-input in" placeholder="其他金额" v-model="form.ChineseYuan">
             </div>
           </div>
-          <!--充值到账金额-->
+          <!--充值到账金币-->
           <div class="farm-form-item">
             <div class="farm-form-item-label">
               {{ form.realLabel }}:
@@ -95,14 +96,14 @@
             <div class="farm-form-item-label">
             </div>
             <div class="farm-form-item-val">
-              <div class="btn">
+              <div class="btn" @click="payFun">
                 {{ btn.upTopNow }}
               </div>
             </div>
           </div>
         </div>
       </div>
-
+      <!--充值说明-->
       <div class="tableList">
         <div class="farm-form">
           <div class="farm-form-item">
@@ -120,10 +121,23 @@
         </div>
       </div>
     </div>
+    <!--充值-->
+    <el-dialog :visible.sync="rechargeIframe">
+      <div ref="dom"></div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+  import {
+    ALiPay,
+    computeGold,
+    upTopDefault
+  } from '@/api/api'
+  import {
+    mapState
+  } from 'vuex'
+
   export default {
     name: 'upTop',
     data(){
@@ -139,23 +153,26 @@
           balanceVal: '210.137',
           upTopLabel: '充值金额',
           upTopVal: '',
-          realLabel: '充值到账金额',
-          realVal: '500.000',
+          realLabel: '充值到账金币',
+          realVal: '200.000',
           modeLabel: '充值方式',
           modeVal: '',
           listActive: 0,
           list: [
             {
-              gold: '100',
-              remark: '充值100元到账200金币\n' + '资产总容量扩充至60G'
+              ChineseYuan: '100',
+              remark: '充值100元到账200金币\n' + '资产总容量扩充至60G',
+              gold: 200
             },
             {
-              gold: '200',
-              remark: '充值200元到账500金币\n' + '资产总容量扩充至60G'
+              ChineseYuan: '200',
+              remark: '充值200元到账500金币\n' + '资产总容量扩充至60G',
+              gold: 500
             },
             {
-              gold: '500',
-              remark: '充值500元到账1500金币\n' + '资产总容量扩充至70G'
+              ChineseYuan: '500',
+              remark: '充值500元到账1500金币\n' + '资产总容量扩充至70G',
+              gold: 1500
             }
           ],
           directions: '充值说明',
@@ -169,13 +186,69 @@
             {
               r: '充值其他问题，请联系客服：4000-701-017'
             }
-          ]
+          ],
+          ChineseYuan: 100
         },
         payMethods: 'zfb',
         btn: {
           upTopNow: '立即充值'
-        }
+        },
+        rechargeIframe: false
       }
+    },
+    watch: {
+      'form.ChineseYuan': function(val){
+        if(val == 100){
+          this.form.realVal = '200.000'
+          return false
+        }
+        if(val == 200){
+          this.form.realVal = '500.000'
+          return false
+        }
+        if(val == 500){
+          this.form.realVal = '1500.000'
+          return false
+        }
+        this.computeFun()
+      },
+      '$route': function(val){
+        console.log(val)
+      }
+    },
+    methods: {
+      // 计算金币
+      computeFun(){
+        if(!this.form.ChineseYuan) return false
+        computeGold(this.form.ChineseYuan)
+          .then(data => this.form.realVal = data.data.data.toFixed(3))
+      },
+      // 立即充值
+      payFun(){
+        if(this.payMethods == 'zfb') this.aLiPayFun()
+        if(this.payMethods == 'wx') this.wxPayFun()
+      },
+      // 支付宝充值
+      aLiPayFun(){
+        ALiPay(this.form.ChineseYuan)
+          .then(data => {
+            sessionStorage.setItem('aliPay',data.data.data)
+            let routerData = this.$router.resolve({name: 'rechargePage'})
+            window.open(routerData.href,'_blank')
+            // document.write(data.data.data)
+          })
+      },
+      // 微信充值
+      wxPayFun(){
+
+      }
+    },
+    computed: {
+      ...mapState(['user'])
+    },
+    mounted() {
+      if(/\?/.test(this.$route.fullPath))
+        upTopDefault(this.$route.fullPath.split('?')[1])
     }
   }
 </script>

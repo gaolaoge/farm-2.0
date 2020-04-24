@@ -4,7 +4,7 @@
       <div class="info">
         <img :src="info.img" alt="" class="avatar">
         <div class="name">
-          {{ info.name }}
+          {{ user.name }}
         </div>
         <div class="level">
           <img :src="info.levelIcon" alt="" class="i">
@@ -18,7 +18,7 @@
           {{ info.balanceLabel }}
         </div>
         <div class="balance">
-          {{ info.balanceVal }}
+          {{ user.balance }}
         </div>
         <div class="btn" @click="$router.push('/upTop')">
           {{ info.btn }}
@@ -89,6 +89,9 @@
 <script>
   import rechargeCentre from '@/components/bill/recharge-centre.vue'
   import consumption from '@/components/bill/consumption.vue'
+  import {
+    mapState
+  } from 'vuex'
 
   export default {
     name: 'bill',
@@ -158,6 +161,9 @@
     components: {
       rechargeCentre,
       consumption
+    },
+    computed: {
+      ...mapState(['user'])
     }
   }
 </script>

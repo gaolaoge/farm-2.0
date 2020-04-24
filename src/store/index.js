@@ -10,9 +10,9 @@ export default new Vuex.Store({
       name: '',
       imgUrl: require('@/assets/userImg.png'),
       imgUrlMini: require('@/assets/userImgMini.png'),
-      // token: '',
-      // balance: '26.23',
-      grade: '铂金会员'
+      token: '',
+      balance: '0.000',
+      // grade: '铂金会员'
     },
     login: false,
     zoneId: ''
@@ -27,12 +27,16 @@ export default new Vuex.Store({
     changeUserName(state,val){
       state.user.name = val
     },
+    changeUserBalance(state,val){
+      state.user.balance = val
+    },
     // changeToken(state,val){
     //   state.user.token = val
     // }
     changeZoneId(state,val){
       state.zoneId = val
-    }
+    },
+
   },
   actions: {
 

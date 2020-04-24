@@ -5,6 +5,7 @@
       @selection-change="handleSelectionChange"
       @filter-change="filterHandler"
       @row-click="showDetails"
+      :row-class-name="tableRowStyle"
       class="u"
       :border=true
       style="width: 100%">
@@ -28,7 +29,7 @@
         label="场景名"
         show-overflow-tooltip
         min-width="180" />
-
+      <!--状态-->
       <el-table-column
         label="状态"
         show-overflow-tooltip
@@ -43,19 +44,29 @@
                  ]"
         width="120">
         <template slot-scope="scope">
-                  <span style="color: tomato;">
+                  <span v-if="scope.row.status == '上传失败' || scope.row.status == '分析失败'" style="color: #F90023">
+                    {{ scope.row.status }}
+                  </span>
+                  <span v-if="scope.row.status == '待设置参数'" style="color: #00E3FF">
+                    {{ scope.row.status }}
+                  </span>
+                  <span v-if="scope.row.status == '分析警告' || scope.row.status == '上传暂停'" style="color: #E5C78A">
+                    {{ scope.row.status }}
+                  </span>
+                  <span v-if="scope.row.status == '已取消' || scope.row.status == '已放弃'" style="color: #555">
+                    {{ scope.row.status }}
+                  </span>
+                  <span v-if="scope.row.status == '上传中...' || scope.row.status == '上传成功' || scope.row.status == '分析中...'">
                     {{ scope.row.status }}
                   </span>
         </template>
       </el-table-column>
-
+      <!--所属项目-->
       <el-table-column
         prop="project"
         label="所属项目"
         show-overflow-tooltip
-        :filters="[
-                  {text: '少年的你项目组', value: '少年的你项目组'},
-                 ]"
+        :filters="table.projectList"
         width="200" />
 
       <el-table-column
@@ -89,27 +100,55 @@
         width="180" />
 
     </el-table>
+    <!--暂无数据-->
+    <div class="nullTableData" v-if="table.UploadAnalysisData.length == 0">
+      <img src="@/icons/tableDataNull.png" alt="">
+      <span>
+        暂无数据
+      </span>
+    </div>
     <!--分页-->
     <div class="page">
       <el-pagination
         background
+        :current-page.sync="table.current"
+        @current-change="handleCurrentChange"
         layout="prev, pager, next, jumper"
         :total="table.uploadTableTotal">
       </el-pagination>
     </div>
     <!--详情抽屉-->
-    <farmDrawer :showDrawer="showDrawer" @closeDrawer="closeDrawer"/>
+    <farmDrawer :showDrawer="showDrawer"
+                :typeInfo="itemName"
+                :taskData="drawerTaskData"
+                @changeTypeInfo="changeTypeInfo"
+                @closeDrawer="closeDrawer"/>
   </div>
 </template>
 
 <script>
   import farmDrawer from '@/components/task/farm-drawer'
+  import {
+    mapState
+  } from 'vuex'
+  import {
+    getTaskItemList,
+    getTaskTableList,
+    upTopTableSeeMore,
+    upTopTableDelete,
+    upTopTableSet
+  } from '@/api/api'
+  import {
+    createCalendar,
+    createDateFun
+  } from '@/assets/common.js'
 
   export default {
     name: 'upload-table',
     data(){
       return {
         table: {
+          // tableList
           UploadAnalysisData: [
             // {
             //   id: '',               //任务ID
@@ -124,145 +163,47 @@
             //   taskMode: '',         //任务模式
             //   wayOfAdding: ''       //添加方式
             // },
-            {
-              id: '10001',
-              scenesName: 'CJ1CJ1CJ1CJ1CJ1CJ1CJ1CJ1CJ1CJ1CJ1.ma',
-              status: '上传中...',
-              project: '少年的你项目组少年的你项目组少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10002',
-              scenesName: 'CJ1.ma',
-              status: '上传暂停',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10003',
-              scenesName: 'CJ1.ma',
-              status: '分析中...',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10004',
-              scenesName: 'CJ1.ma',
-              status: '上传失败',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10005',
-              scenesName: 'CJ1.ma',
-              status: '分析警告',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10006',
-              scenesName: 'CJ1.ma',
-              status: '分析失败',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10007',
-              scenesName: 'CJ1.ma',
-              status: '待设置参数',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10008',
-              scenesName: 'CJ1.ma',
-              status: '上传中',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10009',
-              scenesName: 'CJ1.ma',
-              status: '上传中',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
-            {
-              id: '10010',
-              scenesName: 'CJ1.ma',
-              status: '上传中',
-              project: '少年的你项目组',
-              startingTime: '2020-03-02 00:23:46',
-              endTime: '2020-04-04 00:56:23',
-              founder: '管理员',
-              creationTime: '2020-01-01 00:01:02',
-              source: '网页端',
-              taskMode: '专业渲染',
-              wayOfAdding: '本地文件选择'
-            },
           ],
-          uploadTableTotal: 82,
-          selectionList: [],            //上传分析选中项
+          uploadTableTotal: 0,
+          pageSize: 10,
+          current: 1,                   // 当前页码
+          selectionList: [],            // table 选中项
+          uploadStatus: [],             // 上传状态数组
+          analyseStatus: [],            // 分析状态数组
+          // 所属项目筛选数组
+          projectList: []
         },
         showDrawer: false,
-
+        itemName: 'upload-table',
+        drawerTaskData: null
       }
     },
     methods: {
+      // farm-drawer 翻页
+      changeTypeInfo(val){
+        this.itemName = val
+      },
+      // 翻页
+      handleCurrentChange(val){
+        this.table.current = val
+        this.getList()
+      },
+      // table 行样式
+      tableRowStyle({row, rowIndex}){
+        switch(row.status){
+          case '分析警告':
+          case '上传暂停':
+            return 'warning-row style-row'
+            break
+          case '上传失败':
+          case '分析失败':
+            return 'error-row style-row'
+            break
+          case '待设置参数':
+            return 'wait-row style-row'
+            break
+        }
+      },
       // 上传分析多选
       handleSelectionChange(val){
         this.table.selectionList = val
@@ -272,27 +213,177 @@
       filterHandler(value, row, column){
         console.log(value, row, column)
       },
-      // 上传分析详情查看
+      // 上传分析 - 打开详情
       showDetails(row, column, event){
+        if(row.status == '分析中...' || row.status == '等待') return false
         this.showDrawer = true
+        this.drawerTaskData = row
         let tableDomList = this.$refs.uploadTable.getElementsByClassName('el-table__row'),
           d = this.$refs.uploadTable.getElementsByClassName('farmTableSelected')[0],
           index_ = this.table.UploadAnalysisData.findIndex(curr_ => curr_.id == row.id )
         if(d) d.classList.remove('farmTableSelected')
         tableDomList[index_].classList.add('farmTableSelected')
       },
-      // 关闭抽屉
+      // 上传分析 - 关闭详情
       closeDrawer(){
         this.showDrawer = false
         let d = this.$refs.uploadTable.getElementsByClassName('farmTableSelected')[0]
         d.classList.remove('farmTableSelected')
+      },
+      // 获取项目列表
+      async getTaskItemListFun(){
+        let data = await getTaskItemList()
+        this.table.projectList = data.data.data.map(curr => {
+          return {
+            value: curr.taskProjectUuid,
+            text: curr.projectName
+          }
+        })
+        this.getList()
+      },
+      // 获取 table 列表
+      async getList(){
+        const loading = this.$loading({
+          lock: true,
+          text: 'Loading',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        })
+        // {
+        //   zoneUuid: this.zoneId,             //分区UUID
+        //   keyword: this.searchInput,         //查询关键字
+        //   pageIndex: this.table.current,     //当前页码
+        //   pageSize: this.table.pageSize,     //页大小
+        //   uploadStatus: this.table.uploadStatus,               //上传状态数组
+        //   analyseStatus: this.table.analyseStatus,             //分析状态数组
+        //   projectUuid: this.projectUuidList                    //项目UUID数组
+        // }
+        let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&uploadStatus=${this.table.uploadStatus.length == 0 ? '' : JSON.stringify(this.table.uploadStatus)}&analyseStatus=${this.table.analyseStatus.length == 0 ? '' : JSON.stringify(this.table.analyseStatus)}&projectUuid=${this.projectUuidList.length == 0 ? '' : JSON.stringify(this.projectUuidList)}`
+        let data = await getTaskTableList(t)
+        this.table.UploadAnalysisData = data.data.data.map(curr => {
+              let statusData = ''
+              // 状态转换
+              if(curr['taskStage'] == 2){
+                switch(curr['analyseStatus']){
+                  case 1:
+                  case 2:
+                  case 9:
+                    statusData = '分析中...'
+                    break
+                  case 3:
+                    statusData = '待设置参数'
+                    break
+                  case 4:
+                    statusData = '分析警告'
+                    break
+                  case 5:
+                    statusData = '分析失败'
+                    break
+                  case 6:
+                    statusData = '已放弃'
+                    break
+                }
+              }else if(curr['taskStage'] == 1){
+
+                switch(curr['uploadStatus']){
+                  case 1:
+                  case 2:
+                    statusData = '上传中...'
+                    break
+                  case 3:
+                    statusData = '上传成功'
+                    break
+                  case 4:
+                    statusData = '上传暂停'
+                    break
+                  case 5:
+                    statusData = '上传失败'
+                    break
+                  case 6:
+                    statusData = '已取消'
+                    break
+                }
+
+              }
+              return {
+                  taskUuid: curr['taskUuid'],
+                  id: curr['taskNo'],                                                // 任务ID
+                  scenesName: curr['fileName'],                                      // 场景名
+                  status: statusData,                                                // 状态
+                  project: curr['projectName'],                                      // 所属项目
+                  startingTime: createDateFun(new Date(curr['analyseStartTime'])),   // 分析开始时间
+                  endTime: createDateFun(new Date(curr['analyseEndTime'])),          // 分析结果时间
+                  founder: curr['account'],                                          // 创建人
+                  creationTime: createDateFun(new Date(curr['createTime'])),         // 创建时间
+                //   source: '',           //来源
+                //   taskMode: '',         //任务模式
+                //   wayOfAdding: ''       //添加方式
+              }
+            })
+        this.table.uploadTableTotal = data.data.total
+        this.$emit('uploadTbaleTotalItem', data.data.total)
+        loading.close()
+      },
+      // 关键字检索
+      searchFun(val){
+        this.searchInput = val
+        this.getList()
+      },
+      // 删除
+      deleteItem(){
+        if(this.table.selectionList.length == 0) return false
+
+        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(
+            () => {
+              return upTopTableDelete(this.table.selectionList.map(curr => curr.taskUuid))
+              this.table.loading = true
+            },
+            () => {
+              this.$message({
+                type: 'info',
+                message: '已取消删除'
+              })
+              return Promise.reject()
+            }
+          )
+          .then(data => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.getList()
+          })
+          .catch(() => {
+
+          })
+          .finally(() => this.table.loading = false)
       }
+    },
+    mounted(){
+      this.getTaskItemListFun()
     },
     watch: {
 
     },
+    computed: {
+      ...mapState(['zoneId']),
+      projectUuidList(){
+        return []
+      }
+    },
     components: {
       farmDrawer
+    },
+    props: {
+      searchInput: {
+        type: String,
+
+      }
     }
   }
 </script>
@@ -306,5 +397,6 @@
       left: 25px;
       bottom: 30px;
     }
+
   }
 </style>

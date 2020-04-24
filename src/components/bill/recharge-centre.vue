@@ -303,7 +303,6 @@
         [].forEach.call(val, (curr,index) => {
           let [year, month, day] = curr.split('-'),
               r = getDate(year, month, day)
-          console.log(curr.split('-'))
           if(index == 0){
             this.filter.inquireValS = r
           }else{
@@ -333,8 +332,7 @@
                   break
               }
               if(!curr.actualPayment) curr.actualPayment = '-'
-              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime)),
-                t = `${year}-${month + 1 > 9 ? month + 1 : '0' + ( month + 1 )}-${day > 9 ? day : '0' + day} ${hour > 9 ? hour : '0' + hour}:${minutes > 9 ? minutes : '0' + minutes}:${seconds > 9 ? seconds : '0' + seconds}`
+              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
               return {
                   id: curr.rechargeUuid,                //交易ID
                   state: curr.paymentStatus,            //交易状态
@@ -343,7 +341,7 @@
                   directions: curr.rechargeExplain,     //充值说明
                   paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '微信',     //充值方式
                   singleNumber: curr.outTradeNo,        //支付单号
-                  date: t,                //交易时间
+                  date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,                //交易时间
                   dateDefault: curr.updateTime,
                   invoice: curr.invoice,                //开票标识
                   operate: curr.operate                 //操作

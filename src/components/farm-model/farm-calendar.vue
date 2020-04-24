@@ -53,7 +53,7 @@
           <span class="monthAdjust">
             <img src="@/icons/enter.png" alt="" @click="changeMonth('previous')">
             <span class="o">
-              {{ monthNow + 1 }}月
+              {{ monthNow }}月
             </span>
             <img src="@/icons/enter.png" alt="" @click="changeMonth('next')">
           </span>
@@ -111,6 +111,9 @@
             if(el.contains(e.target)){
               if(!vnode.context.operating){
                 vnode.context.focus()
+              }
+              if(e.target.innerText == '确定'){
+                vnode.context.blur()
               }
             }else{
               if(vnode.context.operating){
@@ -184,19 +187,7 @@
       },
       // 日期格式
       formatFun( year, month, day ){
-        if(month + 1 < 9){
-          if(day < 9){
-            return `${year}-0${month + 1}-0${day}`
-          }else {
-            return `${year}-0${month + 1}-${day}`
-          }
-        }else {
-          if(day < 9){
-            return `${year}-${month + 1}-0${day}`
-          }else {
-            return `${year}-${month + 1}-${day}`
-          }
-        }
+        return `${year}-${month}-${day}`
       },
       // 显示面板
       focus(){
@@ -239,7 +230,7 @@
             if(this.monthNow == 12){
               this.checkTimesTamp = getDate(this.yearNow + 1, 1, 1)
             }else {
-              this.checkTimesTamp = getDate(this.yearNow, this.monthNow + 1, 1)
+              this.checkTimesTamp = getDate(this.yearNow, Number(this.monthNow) + 1, 1)
             }
             break
         }

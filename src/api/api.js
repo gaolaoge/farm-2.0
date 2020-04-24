@@ -219,8 +219,11 @@ export function upTopSeeMore(data){
 // 上传场景文件
 export function upTopCJ(data){
   return api({
-    url: `/professional/file/uploadFile`,
+    url: `/professional/file/uploadSceneFile`,
     method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
     data
   })
 }
@@ -231,5 +234,130 @@ export function upTopGC(data){
     url: `/professional/file/uploadResource`,
     method: 'POST',
     data
+  })
+}
+
+// 任务 - 分析上传 - 获取项目列表
+export function getTaskItemList(){
+  return api({
+    url: `/professional/project/getCustomerProjectList`,
+    method: 'GET'
+  })
+}
+
+// 任务 - 分析上传 - 获取列表
+export function getTaskTableList(data){
+  return api({
+    url: `/professional/task/getAnalyseTaskList?${data}`,
+    method: 'GET',
+    timeout: 5000
+  })
+}
+
+// 任务 - 分析上传 - 查看详情
+export function upTopTableSeeMore(data){
+  return api({
+    url: `/professional/task/getAnalyseTaskResult?${data}`,
+    method: 'GET',
+  })
+}
+
+// 任务 - 分析上传 - 删除
+export function upTopTableDelete(data){
+  return api({
+    url: `/professional/task/deleteAnalyseTask`,
+    method: 'DELETE',
+    data
+  })
+}
+
+// 任务 - 分析上传 - 设置参数
+export function upTopTableSet(data){
+  return api({
+    url: `/professional/setting/getLayerInfo/${data}`,
+    method: 'GET',
+    timeout: 3000
+  })
+}
+
+// 任务 - 渲染下载 - 获取列表
+export function getRenderTableList(data){
+  return api({
+    url: `/professional/task/getRenderTaskList?${data}`,
+    method: 'GET',
+  })
+}
+
+// 任务 - 渲染下载 - 查看详情
+export function getRenderTSeeMore(data){
+  return api({
+    url: `/professional/frame/getAssetsFrameTaskList?${data}`,
+    method: 'GET',
+  })
+}
+
+// 任务 - 详情窗口 - 新建项目
+export function addNewItem(data){
+  return api({
+    url: `/professional/project/addCustomerProject`,
+    method: 'POST',
+    data
+  })
+}
+
+// 任务 - 详情窗口 - 新建项目
+export function startRender(data){
+  return api({
+    url: `/professional/setting/setRenderSetting`,
+    method: 'POST',
+    data
+  })
+}
+
+// 账单 - 充值 - 立即充值 - 支付宝
+export function ALiPay(data){
+  return api({
+    url: `/recharge/alipay/toAlipay?payment=${data}`,
+    method: 'GET'
+  })
+}
+
+// 账单 - 充值 - 计算金币
+export function computeGold(data){
+  return api({
+    url: `/recharge/balance/getArrivalAmountByPayment/${data}`,
+    method: 'GET'
+  })
+}
+
+// 账单 - 充值 - 充值结果
+export function upTopDefault(data){
+  return api({
+    url: `/recharge/alipay/return?${data}`,
+    method: 'GET'
+  })
+}
+
+// 资产 - 渲染输出 - 主任务
+export function assetsExportMain(data){
+  return api({
+    url: `/professional/assets/getAssetsTaskList?${data}`,
+    method: 'GET'
+  })
+}
+
+// 资产 - 渲染输出 - 层任务
+export function assetsExportLayer(data){
+  return api({
+    url: `/professional/assets/getAssetsLayerTaskList?${data}`,
+    method: 'GET'
+  })
+}
+
+// 资产 - 渲染输出 - 帧任务
+export function assetsExportFrame(data){
+  return api({
+    url: `/professional/assets/getAssetsFrameTaskList?${data}`,
+    method: 'GET'
   })
 }

@@ -260,4 +260,11 @@
       }
     }
   }
+  /deep/.el-table {
+    th:nth-of-type(1),
+    td:nth-of-type(1) {
+      padding-left: 18px;
+    }
+  }
+
 </style>

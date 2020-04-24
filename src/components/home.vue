@@ -60,9 +60,11 @@
         <div class="s">
           <img src="@/assets/userImg.png" alt="">
           <div class="t">
+            <!--帐号-->
             <p class="name">
-              {{ vip.name }}
+              {{ user.name }}
             </p>
+            <!--等级-->
             <p class="grade">
               <img src="@/icons/vipIcon.png" alt="">
               <span class="gradeT">
@@ -79,8 +81,8 @@
           <span class="y">
             {{ vip.unit }}
           </span>
-          <span class="vipBalance">
-            {{ vip.balance }}
+          <span class="vipBalance" :title="user.balance">
+            {{ user.balance }}
           </span>
         </div>
       </div>
@@ -105,7 +107,6 @@
     </div>
     <div class="thiRow">
       <div class="upLoad" ref="dragWindow">
-
         <!--标签-->
         <p class="label">
           {{ upLoad.label }}
@@ -129,10 +130,10 @@
   import { mapState } from 'vuex'
   import HomeCharts from '@/components/home/home-charts'
   import newTask from '@/components/home/new-task'
-
   import {
     homeT,
     echartsData,
+    getInfo
   } from '@/api/api.js'
 
 export default {
@@ -144,23 +145,23 @@ export default {
         list: [
           {
             name: '渲染中',
-            num: 6
+            num: 0
           },
           {
             name: '渲染暂停',
-            num: 3
+            num: 0
           },
           {
             name: '渲染完成',
-            num: 82
+            num: 0
           },
           {
             name: '待全部渲染',
-            num: 1
+            num: 0
           },
           {
             name: '已归档',
-            num: 4
+            num: 0
           }
 
         ]
@@ -170,12 +171,12 @@ export default {
         list: [
           {
             text: '累计消费（金币）',
-            num: '1,263',
+            num: '0',
             iconImg: require('@/icons/gold.png')
           },
           {
             text: '累计渲染用时（小时）',
-            num: '2,879',
+            num: '0',
             iconImg: require('@/icons/time.png')
           }
         ]
@@ -187,9 +188,9 @@ export default {
         label: '会员中心',
         te: '用户余额 :',
         unit: '￥',
-        name: '',  //sessionStorage.getItem('username') ||
+        name: '',
         grade: '铂金会员',
-        balance: ''   //JSON.parse(sessionStorage.getItem('info'))['balance']
+        balance: ''
       },
       Recharge: {
         desc: '现在充值可享升级超级会员',
@@ -212,7 +213,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['zoneId'])
+    ...mapState(['zoneId','user'])
   },
   watch: {
     zoneId: {
@@ -238,9 +239,25 @@ export default {
         e.preventDefault()
       }, false)
 
+      let self = this
+
       this.$refs.dragWindow.ondrop = function(ev) {
-        console.log(ev.dataTransfer.files)
+        let oFile = ev.dataTransfer.files[0],
+            oFileType = oFile.name.split('.').pop()
+        if(oFileType == 'ma' || oFileType == 'mb'){
+
+          self.fileList = [{
+            sceneFile: oFile,
+            projectFileList: null,
+            projectFileName: '',
+            inputStatus: false,
+            path: '',
+            id: Math.floor(Math.random() * 100000000000000)
+          }]
+          self.showNewTask = true
+        }
       }
+
     },0)
   },
   methods: {
@@ -249,34 +266,30 @@ export default {
       this.showNewTask = false
     },
     // 获取任务状态数据统计
-    getHomeTData(val){
-      homeT(val)
-        .then(data => {
-          let d = data.data.data
-          this.taskStatus['list'][0]['num'] = d.ing        //任务状态-渲染中
-          this.taskStatus['list'][1]['num'] = d.stop       //任务状态-渲染暂停
-          this.taskStatus['list'][2]['num'] = d.finish     //任务状态-渲染完成
-          this.taskStatus['list'][3]['num'] = d.wait       //任务状态-待全部渲染
-          this.taskStatus['list'][4]['num'] = d.history    //任务状态-已归档
-          this.statistics['list'][0]['num'] = d.cost == null ? 0 : d.cost                     //数据统计-累计消费
-          this.statistics['list'][1]['num'] = d.useTime == null ? 0 : d.useTime / 3600000     //数据统计-累计渲染用时
-        })
+    async getHomeTData(val){
+      let data = await homeT(val),
+          d = data.data.data
+      this.taskStatus['list'][0]['num'] = d.ing        //任务状态-渲染中
+      this.taskStatus['list'][1]['num'] = d.stop       //任务状态-渲染暂停
+      this.taskStatus['list'][2]['num'] = d.finish     //任务状态-渲染完成
+      this.taskStatus['list'][3]['num'] = d.wait       //任务状态-待全部渲染
+      this.taskStatus['list'][4]['num'] = d.history    //任务状态-已归档
+      this.statistics['list'][0]['num'] = d.cost == null ? 0 : d.cost.toFixed(2)                     //数据统计-累计消费
+      this.statistics['list'][1]['num'] = d.useTime == null ? 0 : (d.useTime / 3600000).toFixed(2)     //数据统计-累计渲染用时
     },
     // 获取曲线图数据
-    getEchartsData(val){
-      echartsData(val)
-        .then(data => {
-          this.chartsDate = []
-          this.chartsData = []
-          data.data.data.forEach(curr => {
-            let month = new Date(curr.date).getMonth() + 1,
-              month_ = month > 9 ? month : '0' + month,
-              day = new Date(curr.date).getDate(),
-              day_ = day > 9 ? day : '0' + day
-            this.chartsDate.push(month_ + '.' + day_)
-            this.chartsData.push(curr.sum)
-          })
-        })
+    async getEchartsData(val){
+      let data = await echartsData(val)
+      this.chartsDate = []
+      this.chartsData = []
+      data.data.data.forEach(curr => {
+        let month = new Date(curr.date).getMonth() + 1,
+            month_ = month > 9 ? month : '0' + month,
+            day = new Date(curr.date).getDate(),
+            day_ = day > 9 ? day : '0' + day
+        this.chartsDate.push(month_ + '.' + day_)
+        this.chartsData.push(curr.sum)
+      })
     },
     // 触发新建任务
     createTaskFun(){
@@ -293,13 +306,13 @@ export default {
             projectFileName: '',
             inputStatus: false,
             path: '',
-            id: 10000
+            id: Math.floor(Math.random() * 100000000000000)
           }]
           this.showNewTask = true
         }
 
       })
-    }
+    },
   }
 }
 </script>
@@ -568,6 +581,9 @@ export default {
             font-weight:600;
             color:rgba(0,97,255,1);
             margin-bottom: 10px;
+            width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
         }
       }

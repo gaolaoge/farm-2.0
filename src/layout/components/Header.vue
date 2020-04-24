@@ -2,9 +2,6 @@
   <div class="header-wrapper">
     <div class="wrapper">
       <div class="workbench">
-        <!--<span class="workBench-label">-->
-          <!--{{ workBenchName }}-->
-        <!--</span>-->
         <el-select v-model="workBenchVal" class="workBench-optionBase">
           <el-option
             v-for="item,index in workBenchList"
@@ -16,57 +13,58 @@
         <img src="@/icons/questionMark.png" alt="" class="workBench-icon">
       </div>
       <div class="r">
-        <!--<div class="recharge">-->
-          <!--<span class="t">-->
-            <!--{{ recharge.info }}-->
-          <!--</span>-->
-            <!--<span class="rechargeBtn">-->
-            <!--{{ recharge.btn }}-->
-          <!--</span>-->
-        <!--</div>-->
-        <!--<div class="news" @click="showNews = !showNews">-->
-          <!--<img src="@/icons/news.png" alt="">-->
-        <!--</div>-->
         <div class="problem">
           <img src="@/icons/problem.png" alt="">
         </div>
-        <div class="userInfo" :class="[{'active': showUserList}]">
-        <!--<span class="name">-->
-          <!--{{user.name}}-->
-        <!--</span>-->
+        <div class="userInfo" :class="[{'active': showUserList}]" v-operating>
           <img :src="user.imgUrlMini"
                alt=""
                class="userImg"
                @click="showUserList = !showUserList">
+          <!--:class="[{'show': showUserList}]"-->
           <div class="newsBase" :class="[{'show': showUserList}]">
             <ul class="userOperate" v-show="showUserList">
-              <li v-for="item,index in userOperateList"
-                  :key="index"
-                  class="operateLi"
-                  @click="routerPush(item.routerUrl)"
-                  :class="[{
-                    'userName': item.moreClass == 'userName',
-                    'balance': item.moreClass == 'balance',
-                    'data': item.moreClass == 'data',
-                    'quit': item.moreClass == 'quit'
-                  }]">
+
+              <!--帐号-->
+              <li class="operateLi userName">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
-                       {{ item.text }}
+                       {{ user.name }}
                      </span>
-                      <img :src="item.iconUrl" alt="" v-if="item.iconUrl" class="iconUrl">
-                      <span class="balanceNow" v-if="item.balanceIcon" :title="item.balance">
-                        <span class="unit">
-                          {{ item.balanceIcon }}
-                        </span>
-                        <span class="amount">
-                          {{ item.balance }}
-                        </span>
-                      </span>
+                      <img :src="userOperateList[0]['iconUrl']" alt="" class="iconUrl">
                   </span>
                 </span>
               </li>
+              <!--充值-->
+              <li class="operateLi balance" @click="$router.push('/upTop')">
+                <span class="con">
+                  <span class="t">
+                     <span class="sb">
+                       {{ userOperateList[1]['text'] }}
+                     </span>
+                     <span class="balanceNow" :title="userOperateList[1]['balance']">
+                       <span class="unit">
+                          {{ userOperateList[1]['balanceIcon'] }}
+                       </span>
+                       <span class="amount">
+                          {{ user.balance }}
+                       </span>
+                     </span>
+                  </span>
+                </span>
+              </li>
+              <!--退出-->
+              <li class="operateLi quit" @click="quitFun">
+                <span class="con">
+                  <span class="t">
+                     <span class="sb">
+                       {{ userOperateList[2]['text'] }}
+                     </span>
+                  </span>
+                </span>
+              </li>
+
             </ul>
           </div>
         </div>
@@ -80,9 +78,9 @@
   import {
     mapState
   } from 'vuex'
-
   import {
     homeSelect,
+    getInfo
   } from '@/api/api.js'
 
   export default {
@@ -114,24 +112,8 @@
             moreClass: 'balance',
             balance: 0,
             balanceIcon: '￥',
-            routerUrl: '/upTop'
+            routerUrl: ''
           },
-          // {
-          //   text: '消费账单',
-          // },
-          // {
-          //   text: '充值记录',
-          // },
-          // {
-          //   text: '导出清单',
-          // },
-          // {
-          //   text: '渲染扣费规则',
-          // },
-          // {
-          //   text: '基本资料',
-          //   moreClass: 'data'
-          // },
           {
             text: '退出',
             moreClass: 'quit'
@@ -144,6 +126,7 @@
     },
     mounted() {
       this.getList()
+      this.getUserInfo()
     },
     watch: {
       login: {
@@ -160,9 +143,28 @@
       }
     },
     methods: {
-      routerPush(url){
-        if(url == '/upTop')
-          this.$router.push('/upTop')
+      // 退出
+      quitFun(){
+        this.$confirm('确认退出登录?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            sessionStorage.setItem('token','')
+            this.$router.push('/login')
+            this.$message({
+              type: 'success',
+              message: '退出成功!'
+            })
+          })
+          .catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消退出'
+            })
+          })
+
       },
       // 工作台 下拉框
       getList(){
@@ -177,7 +179,8 @@
                 })
               })
               this.workBenchVal = this.workBenchList[0]['val']
-              this.$store.commit('changeZoneId', this.workBenchList[0]['val'])
+              // this.$store.commit('changeZoneId', this.workBenchList[0]['val'])
+              sessionStorage.setItem('zoneUuid', this.workBenchList[0]['val'])
             }
           })
           .catch(error => {
@@ -189,6 +192,73 @@
             }
           })
       },
+      getUserInfo(){
+        getInfo()
+          .then(data => {
+            // {
+            //   id: 9
+            //   createTime: 1586331819460
+            //   createBy: "cbddfd2e-09fb-4ce0-91de-56536a4fcc50"
+            //   updateTime: 1586331819460
+            //   updateBy: "cbddfd2e-09fb-4ce0-91de-56536a4fcc50"
+            //   customerUuid: "1"
+            //   dataStatus: 1
+            //   openid: null
+            //   nickname: null
+            //   headImg: null
+            //   phone: "18514347164"
+            //   sex: null
+            //   city: null
+            //   birthday: null
+            //   corporation: null
+            //   qq: null
+            //   wechat: null
+            //   email: null
+            //   account: "gaoge1834"
+            //   loginFailure: 0
+            //   freezingTime: 0
+            //   capacity: null
+            //   haveCapacity: null
+            //   overdrive: null
+            //   vipUuid: null
+            //   vipLevel: 0
+            //   goldBalance: 100
+            //   cumulativeRecharge: 0
+            //   totalArrival: 200
+            //   cumulativeConsume: 0
+            // }
+
+            let d = data.data.data
+
+            this.userOperateList[0]['text'] = d.account
+            this.userOperateList[1]['balance'] = d.goldBalance
+            this.$store.commit('changeUserName',d.account)
+            this.$store.commit('changeUserBalance',d.goldBalance.toFixed(3))
+
+          })
+      }
+    },
+    directives: {
+      operating: {
+        bind(el,bindings,vnode){
+          let handler = e => {
+            if(el.contains(e.target)){
+              // 点击事件触发在目标DOM内
+            }else {
+              // 点击事件触发在目标DOM外
+              // 且DOM处于显示状态
+              if(vnode.context.showUserList){
+                vnode.context.showUserList = false
+              }
+            }
+          }
+          el.handler = handler
+          document.addEventListener('click',handler)
+        },
+        unbind(el){
+          document.removeEventListener('click',el.handler)
+        }
+      }
     }
   }
 </script>
@@ -243,7 +313,10 @@
                 width: 100%;
                 text-align: left;
                 cursor: pointer;
-                padding: 8px 0px;
+                line-height: 50px;
+                /*padding: 8px 0px;*/
+                border-bottom: 1px solid rgba(28, 36, 47, 1);
+                height: 50px;
                 .con {
                   .t {
                     font-size:14px;
@@ -252,7 +325,6 @@
                   }
                 }
                 &.userName {
-                  padding: 15px 0px;
                   .con {
                     .t {
                       font-size:14px;
@@ -268,12 +340,9 @@
                   }
                 }
                 &.balance {
-                  padding: 8px 0px;
                   .con {
                     .t {
-                      .sb {
-                        vertical-align: text-top;
-                      }
+                      .sb {}
                       .balanceNow {
                         float: right;
                         width: 82px;
@@ -284,21 +353,23 @@
                         .unit {
                           font-size: 14px;
                           margin-right: -4px;
+                          vertical-align: text-bottom;
                         }
                         .amount {
-                          font-family: 'PingFangSCRegular';
                           font-size: 16px;
                           font-weight: 400;
-                          color: RGBA(198, 194, 188, 1);
+                          color: rgba(229, 199, 138, 1);
                           text-shadow: 0px 0px 2px RGBA(198, 194, 188, 1);
+                          width: 60px;
+                          display: inline-block;
+                          overflow: hidden;
+                          text-overflow: ellipsis;
                         }
                       }
                     }
                   }
                 }
-                &.data,
                 &.quit {
-                  padding: 18px 0px;
                   .con {
                     .t {
 
@@ -311,7 +382,7 @@
           &.active {
             background:linear-gradient(180deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.3) 50%,rgba(10,98,241,0.6) 100%);
             .newsBase {
-              height:143px;
+              height:152px;
             }
           }
         }

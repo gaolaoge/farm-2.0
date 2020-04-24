@@ -173,6 +173,7 @@
                width="80vw"
                :show-close=false >
       <more-dialog @closeDialog="closeDialog"
+                   width="80vw"
                    :dialogTableType="dialogTableType"
                    :renderDialogTableData="renderDialogTableData"
                    :downloadDialogTableData="downloadDialogTableData" />
@@ -312,8 +313,7 @@
                   tableType = '下载消费'
                   break
               }
-              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime)),
-                  t = `${year}-${month + 1 > 9 ? month + 1 : '0' + ( month + 1 )}-${day > 9 ? day : '0' + day} ${hour > 9 ? hour : '0' + hour}:${minutes > 9 ? minutes : '0' + minutes}:${seconds > 9 ? seconds : '0' + seconds}`
+              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
               return {
                 id: curr.layerTaskUuid,               //任务ID
                 scenesName: curr.layerName,           //场景名
@@ -327,7 +327,7 @@
                 pay: curr.totalCost,                  //费用（金币）
                 // actualPay: '',                     //实付金币
                 user: curr.account,                   //创建人
-                upDate: t,              //更新时间
+                upDate: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,              //更新时间
                 dateDefault: curr.updateTime,         //时间戳记录
               }
             })

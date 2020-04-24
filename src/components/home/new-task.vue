@@ -90,7 +90,6 @@
                          :class="[{'inputing': scope.row.inputStatus}]"
                          @focus="scope.row.inputStatus = true"
                          @blur="scope.row.inputStatus = false"
-
                          v-model="scope.row.address">
                 </template>
               </el-table-column>
@@ -337,13 +336,6 @@
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
           ],
-          // tableData: [
-          //   {
-          //     fileName: '场景名少年的你123.ma',
-          //     addressName: 'F:\\ss929\\render\\map',
-          //     inputStatus: false
-          //   }
-          // ],
           selectionTableData: [],     //选择场景文件 table 多选值
         },
         stepTwoBase: {
@@ -726,9 +718,9 @@
       taskDefine(){
         let data
         // 若表格未填写完整 返回
-        if(!this.dialogAdd.form.valName || !this.dialogAdd.form.valSoftware || !this.dialogAdd.nList.length){
-          return
-        }
+        // if(!this.disableSelf){
+        //   return
+        // }
         switch(this.dialogAdd.editOrAdd){
           // 新建模板
           case 'addMore':
@@ -758,9 +750,9 @@
             data = {
               templateUuid: obj['renderTemplate']['templateUuid'],                 // 模板uuid
               templateName: this.dialogAdd.form.valName,                           // 模板名称
-              softUuid: obj['renderTemplate']['softUuid'],                         // 软件uuid
+              softUuid: this.dialogAdd.form.valSoftware[1 ],                           // 软件uuid
               isDefault: obj['renderTemplate']['isDefault'],                       // 是否默认
-              pluginUuids: this.dialogAdd.nList.map(curr => {                       // 插件
+              pluginUuids: this.dialogAdd.nList.map(curr => {                      // 插件
                 return curr.pluginUuid
               })
             }
@@ -781,12 +773,21 @@
       },
       // 选择场景文件 - 添加工程文件夹
       selectFiles(e,row){
+        let formDom = document.createElement('FORM')
+        formDom.classList.add('formDom')
+        formDom.style.display = 'none'
+
         let inputFileDom = document.createElement('INPUT')
         inputFileDom.type='file'
+        inputFileDom.name='folder'
         inputFileDom.setAttribute('webkitdirectory',true)
+
+        formDom.appendChild(inputFileDom)
+        document.querySelector('body').appendChild(formDom)
+
         inputFileDom.click()
         inputFileDom.addEventListener('change',() => {
-          row.projectFileList = inputFileDom.files
+          // row.projectFileList = inputFileDom.files
           row.projectFileName = inputFileDom.files[0]['webkitRelativePath'].split('/')[0]
         })
       },
@@ -818,7 +819,7 @@
             projectFileName: '',
             path: '',
             inputStatus: false,
-            id: String( Number(this.filelist[this.filelist.length - 1]['id']) + 1 )
+            id: Math.floor(Math.random() * 100000000000000)
           })
         })
       },
@@ -871,7 +872,36 @@
       },
       // 上传【场景文件】【工程文件】
       upLoadFun(idList){
+        idList.forEach((curr,index) => {
+          let CJData = new FormData()
+          CJData.append('file', this.filelist[index]['sceneFile'])          //场景文件
+          CJData.append('taskUuid', curr)      //任务ID
+          CJData.append('localPaths', this.filelist[index]['address'])     //用户手写路径 以盘符开头 结尾没有/ 例如 E:\Folder
 
+          let GCData = new FormData(document.getElementsByClassName('formDom')[index]) //工程文件
+          GCData.append('localPaths', this.filelist[index]['address'])     //用户手写路径 以盘符开头 结尾没有/ 例如 E:\Folder
+          // GCData.append('relativePath','')
+          GCData.append('taskUuid', curr)      //任务ID
+
+          // 上传场景文件
+          upTopCJ(CJData)
+            .then(data => {
+              // 上传工程文件
+              if(data.data.code == 200) return upTopGC(GCData)
+            })
+            .then(data => {
+              if(data.data.code == 200) this.$router.push('/task')
+            })
+            .catch(() => this.$message.error('网络传输失败'))
+          // let xml = new XMLHttpRequest()
+          // xml.open('POST','http://192.168.1.86:5000/professional/file/uploadSceneFile')
+          // xml.send(CJData)
+          //
+          // let xml2 = new XMLHttpRequest()
+          // xml2.open('POST','http://192.168.1.86:5000/professional/file/uploadResource')
+          // xml2.send(GCData)
+
+        })
       }
     },
     mounted() {
