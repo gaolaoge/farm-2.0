@@ -7,6 +7,7 @@
     <section :class="[{'registeredPage': navActive == 2}]">
       <!--登录-->
       <aside class="logIn">
+        <!--登录模板标签-->
         <div class="loginNav">
           <span class="phone"
                 :class="[{'active': login.nav.activeIndex == 1}]"
@@ -19,9 +20,10 @@
             {{ login.nav.accountText }}
           </span>
         </div>
-        <!--手机号登录-->
+        <!--手机号登录模板-->
         <div class="phoneForm" v-show="login.nav.activeIndex == 1">
           <input v-model="login.phoneForm.phone"
+                 autofocus
                  placeholder="请输入手机号"
                  class="farm-input" />
           <input v-model="login.phoneForm.code"
@@ -30,9 +32,14 @@
                  class="farm-input" />
           <!--验证-->
           <div class="verif">
-            <div class="btn" @click="verifPhone">
+            <div class="btn"
+                 @click="verifPhone"
+                 v-show="login.phoneForm.verifShow">
               {{ login.phoneForm.btn }}
             </div>
+            <span class="delayDate" v-show="!login.phoneForm.verifShow">
+              {{ login.phoneForm.countdown }}
+            </span>
           </div>
           <el-switch
             v-model="login.phoneForm.autoLogin">
@@ -44,7 +51,7 @@
             <img src="@/icons/login.png" alt="">
           </div>
         </div>
-        <!--帐号密码登录-->
+        <!--帐号密码登录模板-->
         <div class="accountForm" v-show="login.nav.activeIndex == 2">
           <!--帐号 手机号-->
           <input v-model="login.accountForm.account"
@@ -170,6 +177,9 @@
     getInfo
     // getInfo
   } from '@/api/api'
+  import {
+    messageFun
+  } from '@/assets/common.js'
 
   export default {
     name: 'login',
@@ -188,7 +198,9 @@
             autoLogin: false,
             switchLabel: '5天内自动登录',
             btn: '获取验证码',
-            v: false
+            v: false,
+            verifShow: true,
+            countdown: '60s'
           },
           accountForm: {
             account: 'gaoge1834',
@@ -310,13 +322,13 @@
         let t = this.registered.form.account
         // 为空
         if(!t){
-          this.$message.error('请输入框帐号')
+          messageFun('error','请输入帐号')
           this.registered.status.account = 'false'
           return false
         }
         // 验证帐号长度
         if(!/^[\w\W]{2,14}$/.test(t)){
-          this.$message.error('请输入框2-14个字符')
+          messageFun('error','请输入框2-14个字符')
           this.registered.status.account = 'false'
           return false
         }
@@ -324,7 +336,7 @@
         let reg = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5]+$)/,
             reg2 = /^[\u4E00-\u9FA5\w]+$/
         if(!reg.test(t) || !reg2.test(t)){
-          this.$message.error('请在大小写字母、汉字、数字、下划线中设置帐号且至少包含任意2种')
+          messageFun('error','请在大小写字母、汉字、数字、下划线中设置帐号且至少包含任意2种')
           this.registered.status.account = 'false'
           return false
         }
@@ -335,7 +347,7 @@
           this.registered.status.account = 'true'
         }else {
           this.registered.status.account = 'false'
-          this.$message.error('该账号已注册，请重新输入')
+          messageFun('error','该账号已注册，请重新输入')
         }
       },
       // 注册-密码验证
@@ -343,12 +355,12 @@
         let t = this.registered.form.password,
             regex = /^[A-Za-z0-9_\-]{8,18}}$/
         if(!t){
-          this.$message.error('请输入密码')
+          messageFun('error','请输入密码')
           this.registered.status.password = 'false'
           return false
         }
         if(!regex.test(t)){
-          this.$message.error('请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符')
+          messageFun('error','请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符')
           this.registered.status.password = 'false'
           return false
         }
@@ -358,7 +370,7 @@
       async phoneVerif(){
         let t = this.registered.form.phone
         if(!/^1(3|4|5|6|7|8|9)\d{9}$/.test(t)){
-          this.$message.error('手机号格式错误')
+          messageFun('error','手机号格式错误')
           this.registered.status.phone = 'false'
           return false
         }
@@ -368,7 +380,7 @@
         if(data.data.code == 4031){
           this.registered.status.phone = 'true'
         }else{
-          this.$message.error('手机号已存在')
+          messageFun('error','手机号已存在')
           this.registered.status.phone = 'false'
         }
       },
@@ -376,82 +388,82 @@
       async registerFun(){
         if(!this.sliderVerification) return false
         if(!this.registered.status.account === 'true' || !this.registered.status.password === 'true' || !this.registered.status.phone === 'true'){
-          this.$message.error('未填写完整')
+          messageFun('error','未填写完整')
           return false
         }
         let data = await register(this.registered.form)
         //code:101 帐号或手机号重复
         if(data.data.code){
           // 注册成功
-          this.$message({
-            type: 'success',
-            message: '注册成功',
-            align: 'center'
-          })
+          messageFun('success','注册成功')
           setTimeout(function(){
             // 返回登录窗口
           },1000)
         }
       },
       // 帐号 登录
-      accountlogin(){
+      async accountlogin(){
         // 验证
         if(!this.login.accountForm.account || !this.login.accountForm.password){
-          this.$message.error('帐号或密码未输入')
+          messageFun('error','帐号或密码未输入')
           return false
         }
-        accountLogin({
+        let data = await accountLogin({
           account: this.login.accountForm.account,
           password: this.login.accountForm.password,
           isAutoLogin: this.login.accountForm.autoLogin
         })
-          .then(data => {
-            let d = data.data.data
-            sessionStorage.setItem('token', d.token)
-            this.$store.commit('changeLogin', false)
-            this.getUserInfo()
-          })
+        if(data.data.code == '4032') {
+          messageFun('error','密码错误')
+          return false
+        }
+        sessionStorage.setItem('token', data.data.data.token)
+        this.getUserInfo()
       },
       // 登录 手机号验证
-      verifPhone(){
-        let num = this.login.phoneForm.phone
-        phoneVerif(num)
-          .then(data => {
-            if(data.data.code == 200){
-              this.login.phoneForm.v = true
-            }
-          })
+      async verifPhone(){
+        this.delayFun()
+        let num = this.login.phoneForm.phone,
+            data = await phoneVerif(num)
+        if(data.data.code == 200) this.login.phoneForm.v = true
+        if(data.data.code == 10001) messageFun('error','当前手机号未注册，请先注册')
+      },
+      // 登录 手机号验证事件60秒延迟
+      delayFun(){
+        this.login.phoneForm.verifShow = false
+        let d = window.setInterval(() => {
+          this.login.phoneForm.countdown = parseInt(this.login.phoneForm.countdown) - 1 + 's'
+          if(this.login.phoneForm.countdown == '0s') {
+            window.clearInterval(d)
+            this.login.phoneForm.verifShow = true
+            this.login.phoneForm.countdown = '60s'
+          }
+        },1000)
       },
       // 登录 手机号登录
-      phoneLoginFun(){
+      async phoneLoginFun(){
         // 已验证
         if(!this.login.phoneForm.v){
-          this.$message({
-            message: '还未做短信验证',
-            type: 'error',
-            showClose: true,
-            duration: 3000
-          })
+          messageFun('error','还未做短信验证')
           return false
         }
         // 手机号
         if(!/^1(3|4|5|6|7|8|9)\d{9}$/.test(this.login.phoneForm.phone)){
-          this.$message.error('已输入手机号格式错误')
+          messageFun('error','已输入手机号格式错误')
           return false
         }
         // 验证码
         if(!/^\d{6}$/.test(this.login.phoneForm.code)){
-          this.$message.error('已输入验证码格式错误')
+          messageFun('error','已输入验证码格式错误')
           return false
         }
-        phoneLogin({
+        let data = await phoneLogin({
           phone: this.login.phoneForm.phone,
           code: this.login.phoneForm.code,
           isAutoLogin: this.login.phoneForm.autoLogin
         })
-          .then(data=> {
-
-          })
+        sessionStorage.setItem('token', data.data.data.token)
+        this.getUserInfo()
       },
       // 获取个人信息
       async getUserInfo(){
@@ -463,6 +475,9 @@
           level: d.vipLevel,
           balance: d.goldBalance
         }))
+        this.$store.commit('changeLogin', false)
+        this.$store.commit('changeUserName',d.account)
+        this.$store.commit('changeUserBalance',d.goldBalance.toFixed(3))
         this.$router.push('/')
       }
     },
@@ -495,6 +510,7 @@
     display: flex;
     flex-wrap: nowrap;
     overflow: hidden;
+    user-select: none;
     nav {
       position: relative;
       z-index: 2;
@@ -605,6 +621,12 @@
               font-weight: 500;
               color: rgba(255, 255, 255, 1);
               cursor: pointer;
+            }
+            .delayDate {
+              font-size: 14px;
+              text-align: center;
+              color: rgba(255, 255, 255, 1);
+
             }
           }
         }

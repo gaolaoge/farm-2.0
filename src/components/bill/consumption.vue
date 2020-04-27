@@ -256,83 +256,72 @@
       filterHandler(value, row, column){
         console.log(value, row, column)
       },
-      seeMore(item){
+      async seeMore(item){
         this.dialogTableType = item.type
         let uuId = item.id
 
         if(item.type == '渲染消费'){
-          consumptionSeeMore(uuId)
-            .then(data => {
-
-              this.renderDialogTableData = data.data.data
-              this.dialogVisible = true
-
-            })
+          let data = await consumptionSeeMore(uuId)
+          this.renderDialogTableData = data.data.data
+          this.dialogVisible = true
         }
         if(item.type == '下载消费'){
-          upTopSeeMore(uuId)
-            .then(data => {
-
-              this.downloadDialogTableData = data.data.data
-              this.dialogVisible = true
-
-            })
+          let data = await upTopSeeMore(uuId)
+          this.downloadDialogTableData = data.data.data
+          this.dialogVisible = true
         }
       },
       // 获取 table 数据
-      getList() {
+      async getList() {
         let t = `pageSize=${this.table.pageSize}&pageIndex=${this.table.currentPage}&layerNo=${this.filter.taskIdVal}&layerName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`
-        getConsumptionTable(t)
-          .then(data => {
-            this.table.rechargeData = data.data.data.map(curr => {
-              let tableStatus = ''
-              switch(curr.layerTaskStatus){
-                case 1:
-                  tableStatus = '等待'
-                  break
-                case 2:
-                  tableStatus = '渲染中'
-                  break
-                case 3:
-                  tableStatus = '渲染结束'
-                  break
-                case 4:
-                  tableStatus = '渲染暂停'
-                  break
-                case 6:
-                  tableStatus = '渲染放弃'
-                  break
-
-              }
-              let tableType = ''
-              switch(curr.patternOfConsumption){
-                case 1:
-                  tableType = '渲染消费'
-                  break
-                case 2:
-                  tableType = '下载消费'
-                  break
-              }
-              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
-              return {
-                id: curr.layerTaskUuid,               //任务ID
-                scenesName: curr.layerName,           //场景名
-                status: tableStatus,                  //状态
-                statusDefault: curr.layerTaskStatus,
-                object: curr.projectName,             //所属项目
-                // time: '',                          //渲染时长
-                total: curr.totalFrame,               //总帧数
-                type: tableType,                      //消费类型
-                typeDefault: curr.patternOfConsumption,
-                pay: curr.totalCost,                  //费用（金币）
-                // actualPay: '',                     //实付金币
-                user: curr.account,                   //创建人
-                upDate: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,              //更新时间
-                dateDefault: curr.updateTime,         //时间戳记录
-              }
-            })
-            this.table.outPutTableTotal = data.data.total
-          })
+        let data = await getConsumptionTable(t)
+        this.table.rechargeData = data.data.data.map(curr => {
+          let tableStatus = ''
+          switch(curr.layerTaskStatus){
+            case 1:
+              tableStatus = '等待'
+              break
+            case 2:
+              tableStatus = '渲染中'
+              break
+            case 3:
+              tableStatus = '渲染结束'
+              break
+            case 4:
+              tableStatus = '渲染暂停'
+              break
+            case 6:
+              tableStatus = '渲染放弃'
+              break
+          }
+          let tableType = ''
+          switch(curr.patternOfConsumption){
+            case 1:
+              tableType = '渲染消费'
+              break
+            case 2:
+              tableType = '下载消费'
+              break
+          }
+          let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
+          return {
+            id: curr.layerTaskUuid,               //任务ID
+            scenesName: curr.layerName,           //场景名
+            status: tableStatus,                  //状态
+            statusDefault: curr.layerTaskStatus,
+            object: curr.projectName,             //所属项目
+            // time: '',                          //渲染时长
+            total: curr.totalFrame,               //总帧数
+            type: tableType,                      //消费类型
+            typeDefault: curr.patternOfConsumption,
+            pay: curr.totalCost,                  //费用（金币）
+            // actualPay: '',                     //实付金币
+            user: curr.account,                   //创建人
+            upDate: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,              //更新时间
+            dateDefault: curr.updateTime,         //时间戳记录
+          }
+        })
+        this.table.outPutTableTotal = data.data.total
       },
       // 时间筛选条件修改
       changeFilterDate(val){
@@ -358,13 +347,11 @@
         this.getList()
       },
       // 导出记录
-      exportTable(){
-        let t = `layerNo=${this.filter.taskIdVal}&layerName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`
-        exportConsumptionTable(t)
-          .then(data => {
-            // 导出下载
-            exportDownloadFun(data, '消费记录','xlsx')
-          })
+      async exportTable(){
+        let t = `layerNo=${this.filter.taskIdVal}&layerName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`,
+            data = await exportConsumptionTable(t)
+        // 导出下载
+        exportDownloadFun(data, '消费记录','xlsx')
       },
       //关闭消费详情
       closeDialog(){

@@ -122,7 +122,8 @@
 
 <script>
   import {
-    createCalendar
+    createCalendar,
+    createTableIconList
   } from '@/assets/common.js'
 
   export default {
@@ -219,6 +220,9 @@
       closeDialogFun(){
         this.$emit('closeDialog', false)
       }
+    },
+    mounted() {
+      createTableIconList()
     }
   }
 </script>

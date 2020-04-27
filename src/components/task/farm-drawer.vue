@@ -668,7 +668,7 @@
                 :data="result.tableData"
                 @selection-change="handleSelectionChange"
                 @filter-change="filterHandler"
-                class="v"
+                class="vv"
                 :border=true
                 v-el-table-infinite-scroll="mainTableAddMoreItem"
                 height="auto"
@@ -892,7 +892,6 @@
 </template>
 
 <script>
-
   import {
     upTopTableSet,
     upTopTableSeeMore,

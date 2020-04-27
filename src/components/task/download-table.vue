@@ -41,7 +41,9 @@
           show-overflow-tooltip
           width="230">
           <template slot-scope="scope">
-            <el-progress :percentage="scope.row.percent" :show-text="false" class="progressL" />
+            <el-progress :percentage="isNaN(scope.row.percent) ? 0 : scope.row.percent"
+                         :show-text="false"
+                         class="progressL" />
             <span clas="progressS">
               {{ scope.row.renderingProgress }}
             </span>
@@ -266,10 +268,16 @@
         },
         showDrawer: false,
         itemName: 'result',
-        drawerTaskData: null
+        drawerTaskData: null,
+        searchInput: ''
       }
     },
     methods: {
+      // 关键字检索
+      searchFun(val){
+        this.searchInput = val
+        this.getList()
+      },
       // 翻页
       handleCurrentChange(val){
         this.table.current = val
@@ -286,25 +294,20 @@
         //打开抽屉
         this.showDrawer = true
         this.drawerTaskData = row
+        // debugger
         let tableDomList = this.$refs.downLoadTable.getElementsByClassName('el-table__row'),
-            d = this.$refs.downLoadTable.getElementsByClassName('farmTableSelected')[0],
-            index_ = this.table.RenderDownloadData.findIndex(curr_ => curr_.id == row.id )
+            d = this.$refs.downLoadTable.getElementsByClassName('farmTableSelected')[0]
         if(d) d.classList.remove('farmTableSelected')
-        // 当选中行为children行
-        if(index_ == -1){
-          let n = 0
-          this.table.RenderDownloadData.find((curr,inde) => {
+        // 计算选中行
+        let n = 0
+        this.table.RenderDownloadData.find((curr,inde) => {
+          n ++
+          return -1 < curr.children.findIndex((c,i) => {
             n ++
-            if(curr.children){
-              return -1 < curr.children.findIndex((c,i) => {
-                n ++
-                return c.id == row.id
-              })
-            }
+            return c.taskUuid == row.taskUuid
           })
-          index_ = -- n
-        }
-        tableDomList[index_].classList.add('farmTableSelected')
+        })
+        tableDomList[--n].classList.add('farmTableSelected')
       },
       // 渲染下载关闭详情
       closeDrawer(){
@@ -402,11 +405,11 @@
     computed: {
       ...mapState(['zoneId']),
     },
-    props: {
-      searchInput: {
-        type: String,
-      }
-    }
+    // props: {
+    //   searchInput: {
+    //     type: String,
+    //   }
+    // }
   }
 </script>
 

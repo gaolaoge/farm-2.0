@@ -304,11 +304,14 @@
     createTaskSetEditPlugin,
     pushTask,
     upTopCJ,
-    upTopGC
+    upTopGC,
   } from '@/api/api'
   import {
     mapState
   } from 'vuex'
+  import {
+    messageFun
+  } from '@/assets/common.js'
 
   export default {
     name: 'new-task',
@@ -516,8 +519,6 @@
             }else {
               curr.status = false
             }
-
-
           }else {
             // 其它项
             curr.status = false
@@ -534,10 +535,9 @@
         this.dialogAdd.nList.splice(index,1)
       },
       // 新建任务 - 设置渲染模板 - 获取渲染模板列表
-      getList(){
-        createTaskSet()
-          .then(data => {
-            this.stepTwoBase.renderList = data.data.data
+      async getList(){
+        let data = await createTaskSet()
+        this.stepTwoBase.renderList = data.data.data
               // [
               //   {
               //     renderTemplate: {                       //模板
@@ -573,23 +573,21 @@
               //     ]
               //   }
               // ]
-          })
       },
       // 新建任务 - 设置渲染模板 - 打开【新建模板】
-      addTemplate(s,index){
+      async addTemplate(s,index){
         // 获取软件列表
-        createTaskSetSoftware()
-          .then(data => {
-            this.dialogAdd.softwareList = data.data.data.map(curr => {   //options
+        let data = await createTaskSetSoftware()
+        this.dialogAdd.softwareList = data.data.data.map(curr => {   //options
+          return {
+            value: curr.softName,      //软件名
+            label: curr.softName,
+            children: curr.softList.map(curr_ =>  {
               return {
-                value: curr.softName,      //软件名
-                label: curr.softName,
-                children: curr.softList.map(curr_ =>  {
-                  return {
-                    label: curr_.softName + '-' + curr_.version,
-                    value: curr_.softUuid
-                  }
-                })
+                label: curr_.softName + '-' + curr_.version,
+                value: curr_.softUuid
+              }
+            })
                 // children: [
                 //   {
                 //     value: 'shejiyuanze',
@@ -602,33 +600,33 @@
                 //     ]
                 //   }
                 // ]       //软件版本
-              }
-            })
-            // 打开弹窗
-            this.innerVisible = true
-            this.dialogAdd.editOrAdd = s
-            if(s == 'addOne'){
-              // 新建模板
-
-            }
-            if(s == 'editOne'){
-              // 编辑模板
-              this.dialogAdd.index = index
-              let t = this['stepTwoBase']['renderList'][index],   // 选中渲染模板data
-                  v = this.dialogAdd
-              let f = this.dialogAdd.softwareList.find(curr => {  // 软件选中记录
-                return curr.label == t['renderTemplate']['softName']
-              })
-              let b = f['children'].find(curr => {                // 插件
-                return curr.label == t['renderTemplate']['softName'] + '-' + t['renderTemplate']['softVer']
-              })
-              v.nList = t['xxlPlugin']               // 导入已选中插件记录
-              v.form.valName = t['renderTemplate']['templateName']              //编辑窗口内模板名
-              if(!b) return false
-              v.form.valSoftware = [t['renderTemplate']['softName'], b.value]   //编辑窗口内渲染软件
-              this.changeSoftware([t['renderTemplate']['softName'], b.value])   //获取对应插件下拉框List
-            }
+          }
+        })
+        // 打开弹窗
+        this.innerVisible = true
+        this.dialogAdd.editOrAdd = s
+        if(s == 'addOne'){
+          // 新建模板
+        }
+        if(s == 'editOne'){
+          // 编辑模板
+          this.dialogAdd.index = index
+          let t = this.stepTwoBase.renderList[index],   // 选中渲染模板data
+              v = this.dialogAdd,
+              f = v.softwareList.find(curr => {         // 软件选中记录
+            return curr.label == t.renderTemplate.softName
           })
+          let b = f['children'].find(curr => {                // 插件
+            return curr.label == t.renderTemplate.softName + '-' + t.renderTemplate.softVer
+          })
+          // debugger
+          v.nList = t.xxlPlugins                             // 导入已选中插件记录
+          this.$data.dialogAdd.nList = t.xxlPlugins
+          v.form.valName = t['renderTemplate']['templateName']              //编辑窗口内模板名
+          if(!b) return false
+          v.form.valSoftware = [t['renderTemplate']['softName'], b.value]   //编辑窗口内渲染软件
+          this.changeSoftware([t['renderTemplate']['softName'], b.value])   //获取对应插件下拉框List
+        }
       },
       // 新建任务 - 设置渲染模板 - 删除模板
       deleteTemplate(index){
@@ -641,33 +639,24 @@
             createTaskSetDeletePlugin(this.stepTwoBase.renderList[index]['renderTemplate']['templateUuid'])
               .then(data => {
                 this.getList()
-                this.$message({
-                  type: 'success',
-                  message: '删除成功!'
-                })
-
+                messageFun('success','删除成功')
               })
           })
           .catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
-            })
+            messageFun('info','已取消删除')
           })
       },
       // 新建任务 - 设置渲染模板 - 软件下拉框选中
-      changeSoftware(val){
-        createTaskSetPlugin(val[1])
-          .then(data => {
-            this.dialogAdd.pluginList = data.data.data.map(curr => {
-              return {
-                label: curr.pluginName,
-                val: curr.pluginName,
-                list: curr.pluginList
-              }
-            })
-            this.dialogAdd.nList = []
-          })
+      async changeSoftware(val){
+        let data = await createTaskSetPlugin(val[1])
+        this.dialogAdd.pluginList = data.data.data.map(curr => {
+          return {
+            label: curr.pluginName,
+            val: curr.pluginName,
+            list: curr.pluginList
+          }
+        })
+        this.dialogAdd.oList = []
       },
       // 新建任务 - 设置渲染模板 - 插件下拉框选中
       changePlugin(val){
@@ -715,59 +704,49 @@
         this.dialogAdd.nList = []
       },
       // 新建任务 - 设置渲染模板 - 添加or修改
-      taskDefine(){
-        let data
+      async taskDefine(){
+        let val
         // 若表格未填写完整 返回
-        // if(!this.disableSelf){
-        //   return
-        // }
+        if(!this.disableSelf){
+          return
+        }
         switch(this.dialogAdd.editOrAdd){
           // 新建模板
           case 'addMore':
-            data = {
+            val = {
               templateName: this.dialogAdd.form.valName,        //模板名称
               softUuid: this.dialogAdd.form.valSoftware[1],     //软件uuid
               pluginUuids: this.dialogAdd.nList.map(curr => {
                 return curr.pluginUuid
               })
             }
-            createTaskSetNewPlugin(data)
-              .then(data => {
-                if(data.data.code == 201){
-                  this.$message({
-                    type: 'success',
-                    message: '创建模板成功'
-                  })
-                  this.innerVisible = false
-                  this.getList()
-                }
-                //创建失败
-              })
+            let data = await createTaskSetNewPlugin(val)
+            if(data.data.code == 201){
+              messageFun('success','创建模板成功')
+              this.innerVisible = false
+              this.getList()
+            }
+            //创建失败
             break
           // 编辑模板
           case 'editOne':
             let obj = this.stepTwoBase['renderList'][this.dialogAdd.index]
-            data = {
+            val = {
               templateUuid: obj['renderTemplate']['templateUuid'],                 // 模板uuid
               templateName: this.dialogAdd.form.valName,                           // 模板名称
-              softUuid: this.dialogAdd.form.valSoftware[1 ],                           // 软件uuid
+              softUuid: this.dialogAdd.form.valSoftware[1],                        // 软件uuid
               isDefault: obj['renderTemplate']['isDefault'],                       // 是否默认
               pluginUuids: this.dialogAdd.nList.map(curr => {                      // 插件
                 return curr.pluginUuid
               })
             }
-            createTaskSetEditPlugin(data)
-              .then(data => {
-                if(data.data.code == 200){
-                  this.$message({
-                    type: 'success',
-                    message: '编辑成功'
-                  })
-                  this.innerVisible = false
-                  this.getList()
-                }
-                // 编辑失败
-              })
+            let data2 = await createTaskSetEditPlugin(val)
+            if(data2.data.code == 200){
+              messageFun('success','编辑成功')
+              this.innerVisible = false
+              this.getList()
+            }
+            // 编辑失败
             break
         }
       },
@@ -826,7 +805,7 @@
       // 选择场景文件 - 【删除】
       operateBtnDelete(){
         if(!this.stepOneBase.selectionTableData.length){
-          this.$message.error('没有选中项')
+          messageFun('error','没有选中项')
           return false
         }
         this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
@@ -844,21 +823,15 @@
               })
               this.filelist.splice(index,1)
             })
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            })
+            messageFun('success','删除成功')
           })
           .catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
-            })
+            messageFun('info','已取消删除')
         });
       },
       // 新建任务 - 提交新【任务】
-      confirmFun(){
-        pushTask({
+      async confirmFun(){
+        let data = await pushTask({
           zoneUuid: this.zoneId,        //分区uuid
           templateUuid: this.stepTwoBase.renderList[this.stepTwoBase.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
           taskCount: this.filelist.length,    // 要创建任务的数量
@@ -866,13 +839,11 @@
           patternNorm: 2,    //提交模式
           source: 2      // 任务来源
         })
-          .then(data => {
-            this.upLoadFun(data.data.data)
-          })
+        this.upLoadFun(data.data.data)
       },
       // 上传【场景文件】【工程文件】
       upLoadFun(idList){
-        idList.forEach((curr,index) => {
+        idList.forEach(async (curr,index) => {
           let CJData = new FormData()
           CJData.append('file', this.filelist[index]['sceneFile'])          //场景文件
           CJData.append('taskUuid', curr)      //任务ID
@@ -884,15 +855,16 @@
           GCData.append('taskUuid', curr)      //任务ID
 
           // 上传场景文件
-          upTopCJ(CJData)
-            .then(data => {
-              // 上传工程文件
-              if(data.data.code == 200) return upTopGC(GCData)
-            })
-            .then(data => {
-              if(data.data.code == 200) this.$router.push('/task')
-            })
-            .catch(() => this.$message.error('网络传输失败'))
+          // upTopCJ(CJData)
+          //   .then(data => {
+          //     // 上传工程文件
+          //     if(data.data.code == 200) return upTopGC(GCData)
+          //   })
+          //   .then(data => {
+          //     if(data.data.code == 200) this.$router.push('/task')
+          //   })
+          //   .catch(() => this.$message.error('网络传输失败'))
+
           // let xml = new XMLHttpRequest()
           // xml.open('POST','http://192.168.1.86:5000/professional/file/uploadSceneFile')
           // xml.send(CJData)
@@ -901,8 +873,16 @@
           // xml2.open('POST','http://192.168.1.86:5000/professional/file/uploadResource')
           // xml2.send(GCData)
 
+          // 上传场景文件
+          let data = await upTopCJ(CJData)
+          if(data.data.code != 200) throw '网络传输失败'
+          // 上传工程文件
+          let data2 = await upTopGC(GCData)
+          if(data2.data.code != 200) throw '网络传输失败'
+          messageFun('success','创建成功')
+          this.$router.push('/task')
         })
-      }
+      },
     },
     mounted() {
       this.getList()

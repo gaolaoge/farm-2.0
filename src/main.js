@@ -7,6 +7,8 @@ import elTableInfiniteScroll from 'el-table-infinite-scroll'
 import App from './App'
 import router from './router'
 
+Vue.config.devtools = true
+
 Vue.config.productionTip = false
 
 Vue.use(ElementUI)

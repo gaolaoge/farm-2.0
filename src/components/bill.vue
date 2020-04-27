@@ -92,6 +92,9 @@
   import {
     mapState
   } from 'vuex'
+  import {
+    createTableIconList
+  } from '@/assets/common.js'
 
   export default {
     name: 'bill',
@@ -128,35 +131,7 @@
       }
     },
     mounted() {
-      setTimeout(() => {
-        // 筛选图标
-        let t = [...document.getElementsByClassName('el-icon-arrow-down')]
-        t.forEach(curr => {
-          let i = document.createElement('I'),
-            ii = document.createElement('I')
-          i.classList.add('iconfont')
-          i.classList.add('iconshaixuan')
-          ii.classList.add('iconfont')
-          ii.classList.add('iconshaixuan1')
-          curr.appendChild(i)
-          curr.appendChild(ii)
-        })
-        // 排序图标
-        let q = [...document.getElementsByClassName('ascending')]
-        q.forEach(curr => {
-          let i = document.createElement('I')
-          i.classList.add('el-icon-arrow-up')
-          i.classList.add('k')
-          curr.appendChild(i)
-        })
-        let w = [...document.getElementsByClassName('descending')]
-        w.forEach(curr => {
-          let i = document.createElement('I')
-          i.classList.add('el-icon-arrow-up')
-          i.classList.add('k')
-          curr.appendChild(i)
-        })
-      },0)
+      createTableIconList()
     },
     components: {
       rechargeCentre,

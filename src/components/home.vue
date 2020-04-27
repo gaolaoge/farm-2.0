@@ -239,24 +239,20 @@ export default {
         e.preventDefault()
       }, false)
 
-      let self = this
-
       this.$refs.dragWindow.ondrop = function(ev) {
         let oFile = ev.dataTransfer.files[0],
             oFileType = oFile.name.split('.').pop()
-        if(oFileType == 'ma' || oFileType == 'mb'){
-
-          self.fileList = [{
-            sceneFile: oFile,
-            projectFileList: null,
-            projectFileName: '',
-            inputStatus: false,
-            path: '',
-            id: Math.floor(Math.random() * 100000000000000)
-          }]
-          self.showNewTask = true
-        }
-      }
+        if(oFileType != 'ma' && oFileType != 'mb') return false
+        this.fileList = [{
+          sceneFile: oFile,
+          projectFileList: null,
+          projectFileName: '',
+          inputStatus: false,
+          path: '',
+          id: Math.floor(Math.random() * 100000000000000)
+        }]
+        this.showNewTask = true
+      }.bind(this)
 
     },0)
   },
@@ -581,7 +577,7 @@ export default {
             font-weight:600;
             color:rgba(0,97,255,1);
             margin-bottom: 10px;
-            width: 100px;
+            width: 90px;
             overflow: hidden;
             text-overflow: ellipsis;
           }

@@ -311,43 +311,41 @@
         })
       },
       // 获取table数据
-      getList(){
-        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`
-        getUpTopTable(t)
-          .then(data => {
-            this.table.outPutTableTotal = data.data.total
-            this.table.rechargeData = data.data.data.map(curr => {
-              curr.operate = '-'
-              switch(curr.paymentStatus){
-                case 1:
-                  curr.paymentStatus = '成功'
-                  if(curr.actualPayment) curr.operate = '下载收据'
-                  break
-                case 2:
-                  curr.paymentStatus = '失败'
-                  break
-                case 3:
-                  curr.paymentStatus = '待付款'
-                  if(curr.actualPayment) curr.operate = '待付款'
-                  break
-              }
-              if(!curr.actualPayment) curr.actualPayment = '-'
-              let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
-              return {
-                  id: curr.rechargeUuid,                //交易ID
-                  state: curr.paymentStatus,            //交易状态
-                  realPay: curr.actualPayment,          //实际支付金额（元）
-                  realArrive: curr.arrivalAmount,       //充值到账（金币）
-                  directions: curr.rechargeExplain,     //充值说明
-                  paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '微信',     //充值方式
-                  singleNumber: curr.outTradeNo,        //支付单号
-                  date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,                //交易时间
-                  dateDefault: curr.updateTime,
-                  invoice: curr.invoice,                //开票标识
-                  operate: curr.operate                 //操作
-              }
-            })
-          })
+      async getList(){
+        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
+            data = await getUpTopTable(t)
+        this.table.outPutTableTotal = data.data.total
+        this.table.rechargeData = data.data.data.map(curr => {
+          curr.operate = '-'
+          switch(curr.paymentStatus){
+            case 1:
+              curr.paymentStatus = '成功'
+              if(curr.actualPayment) curr.operate = '下载收据'
+              break
+            case 2:
+              curr.paymentStatus = '失败'
+              break
+            case 3:
+              curr.paymentStatus = '待付款'
+              if(curr.actualPayment) curr.operate = '待付款'
+              break
+          }
+          if(!curr.actualPayment) curr.actualPayment = '-'
+          let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
+          return {
+            id: curr.rechargeUuid,                //交易ID
+            state: curr.paymentStatus,            //交易状态
+            realPay: curr.actualPayment,          //实际支付金额（元）
+            realArrive: curr.arrivalAmount,       //充值到账（金币）
+            directions: curr.rechargeExplain,     //充值说明
+            paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '微信',     //充值方式
+            singleNumber: curr.outTradeNo,        //支付单号
+            date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,                //交易时间
+            dateDefault: curr.updateTime,
+            invoice: curr.invoice,                //开票标识
+            operate: curr.operate                 //操作
+          }
+        })
       },
       // table 筛选条件重置
       reset(){
@@ -367,13 +365,11 @@
         this.getList()
       },
       // 导出记录
-      exportTable(){
-        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`
-        exportUpTopTable(t)
-          .then(data => {
-            // 导出下载
-            exportDownloadFun(data, '充值记录','xlsx')
-          })
+      async exportTable(){
+        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
+            data = await exportUpTopTable(t)
+        // 导出下载
+        exportDownloadFun(data, '充值记录','xlsx')
       },
       // 操作
       operateFun(item){

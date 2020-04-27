@@ -218,10 +218,10 @@
     },
     methods: {
       // 计算金币
-      computeFun(){
+      async computeFun(){
         if(!this.form.ChineseYuan) return false
-        computeGold(this.form.ChineseYuan)
-          .then(data => this.form.realVal = data.data.data.toFixed(3))
+        let data = await computeGold(this.form.ChineseYuan)
+        this.form.realVal = data.data.data.toFixed(3)
       },
       // 立即充值
       payFun(){
@@ -229,14 +229,11 @@
         if(this.payMethods == 'wx') this.wxPayFun()
       },
       // 支付宝充值
-      aLiPayFun(){
-        ALiPay(this.form.ChineseYuan)
-          .then(data => {
-            sessionStorage.setItem('aliPay',data.data.data)
-            let routerData = this.$router.resolve({name: 'rechargePage'})
-            window.open(routerData.href,'_blank')
-            // document.write(data.data.data)
-          })
+      async aLiPayFun(){
+        let data = await ALiPay(this.form.ChineseYuan)
+        sessionStorage.setItem('aliPay',data.data.data)
+        let routerData = this.$router.resolve({name: 'rechargePage'})
+        window.open(routerData.href,'_blank')
       },
       // 微信充值
       wxPayFun(){

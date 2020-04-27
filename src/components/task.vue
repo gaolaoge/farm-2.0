@@ -22,6 +22,7 @@
           <input type="text"
                  class="farm-form-input"
                  v-model="btnGroup.searchInputUpload"
+                 @keyup.enter="searchUploadInput"
                  placeholder="输入场景名、任务ID">
           <!--搜索按钮-->
           <img src="@/icons/searchIcon.png"
@@ -53,6 +54,7 @@
           <input type="text"
                  class="farm-form-input"
                  v-model="btnGroup.searchInputDownload"
+                 @keyup.enter="searchRenderInput"
                  placeholder="输入场景名、任务ID">
           <!--搜索按钮-->
           <img src="@/icons/searchIcon.png"
@@ -80,8 +82,7 @@
              class="uploadTable"
              v-show="table.navListActiveIndex == 0">
           <!--上传分析 table-->
-          <upload-table :searchInput="btnGroup.searchInputUpload"
-                        @uploadTbaleTotalItem="uploadTbaleTotalItem"
+          <upload-table @uploadTbaleTotalItem="uploadTbaleTotalItem"
                         ref="uploadMode" />
         </div>
         <!--渲染下载-->
@@ -89,8 +90,7 @@
              class="renderTable"
              v-show="table.navListActiveIndex == 1">
           <!--渲染下载表格-->
-          <download-table :searchInput="btnGroup.searchInputDownload"
-                          @renderTbaleTotalItem="renderTbaleTotalItem"/>
+          <download-table @renderTbaleTotalItem="renderTbaleTotalItem" ref="renderMode"/>
         </div>
       </div>
     </div>
@@ -123,6 +123,9 @@
   import downloadTable from '@/components/task/download-table'
   import archiveRecords from '@/components/task/archive-records'
   import newTask from '@/components/home/new-task'
+  import {
+    createTableIconList
+  } from '@/assets/common.js'
 
   export default {
     name: 'task',
@@ -188,9 +191,6 @@
               text: '重新渲染',
             },
             {
-              text: '开始渲染',
-            },
-            {
               text: '归档',
             }
           ],
@@ -232,7 +232,7 @@
           case '删除':
             this.deleteTaskUpload()
             break
-          case '重新分配':
+          case '重新分析':
             this.againTaskUpload()
             break
         }
@@ -260,9 +260,6 @@
             break
           case '重新渲染':
             this.againTaskDownload()
-            break
-          case '开始渲染':
-            this.startTaskDownload()
             break
           case '归档':
             this.archiveTaskDownload()
@@ -298,7 +295,7 @@
       },
       // 重新分配 - 上传分析
       againTaskUpload(){
-
+        this.$refs.uploadMode.analyseAgainFun()
       },
       // 开始 - 渲染下载
       beginTaskDownload(){
@@ -324,10 +321,6 @@
       againTaskDownload(){
 
       },
-      // 开始渲染 - 渲染下载
-      startTaskDownload(){
-
-      },
       // 归档 - 渲染下载
       archiveTaskDownload(){
 
@@ -339,42 +332,14 @@
       },
       // 关键字检索 - 渲染下载
       searchRenderInput(){
-        // this.btnGroup.searchInputDownload
+        this.$refs.renderMode.searchFun(this.btnGroup.searchInputDownload)
       },
     },
     watch: {
 
     },
     mounted() {
-      setTimeout(() => {
-        // 筛选图标
-        let t = [...document.getElementsByClassName('el-icon-arrow-down')]
-        t.forEach(curr => {
-          let i = document.createElement('I'),
-              ii = document.createElement('I')
-          i.classList.add('iconfont')
-          i.classList.add('iconshaixuan')
-          ii.classList.add('iconfont')
-          ii.classList.add('iconshaixuan1')
-          curr.appendChild(i)
-          curr.appendChild(ii)
-        })
-        // 排序图标
-        let q = [...document.getElementsByClassName('ascending')]
-        q.forEach(curr => {
-          let i = document.createElement('I')
-          i.classList.add('el-icon-arrow-up')
-          i.classList.add('k')
-          curr.appendChild(i)
-        })
-        let w = [...document.getElementsByClassName('descending')]
-        w.forEach(curr => {
-          let i = document.createElement('I')
-          i.classList.add('el-icon-arrow-up')
-          i.classList.add('k')
-          curr.appendChild(i)
-        })
-      },0)
+      createTableIconList()
     }
   }
 </script>

@@ -1,3 +1,8 @@
+import {
+  Message,
+  MessageBox
+} from 'element-ui'
+
 // 读取时间戳
 const createCalendar = function(date) {
   let year = date.getFullYear(),
@@ -60,7 +65,48 @@ const exportDownloadFun = (data, name, type) => {
     window.URL.revokeObjectURL(url)
 
   }
+}
 
+// table 筛选icon样式
+const createTableIconList = function(){
+  setTimeout(() => {
+    // 筛选图标
+    let t = [...document.getElementsByClassName('el-icon-arrow-down')]
+    t.forEach(curr => {
+      let i = document.createElement('I'),
+        ii = document.createElement('I')
+      i.classList.add('iconfont')
+      i.classList.add('iconshaixuan')
+      ii.classList.add('iconfont')
+      ii.classList.add('iconshaixuan1')
+      curr.appendChild(i)
+      curr.appendChild(ii)
+    })
+    // 排序图标
+    let q = [...document.getElementsByClassName('ascending')]
+    q.forEach(curr => {
+      let i = document.createElement('I')
+      i.classList.add('el-icon-arrow-up')
+      i.classList.add('k')
+      curr.appendChild(i)
+    })
+    let w = [...document.getElementsByClassName('descending')]
+    w.forEach(curr => {
+      let i = document.createElement('I')
+      i.classList.add('el-icon-arrow-up')
+      i.classList.add('k')
+      curr.appendChild(i)
+    })
+  },0)
+}
+
+const messageFun = function(type,message){
+  return Message({
+    message: message,
+    type: type,
+    showClose: true,
+    duration: 3000
+  })
 }
 
 export {
@@ -68,5 +114,9 @@ export {
   createDateFun,
   getDate,
   exportDownloadFun,
-  consum
+  consum,
+  createTableIconList,
+  messageFun
 }
+
+

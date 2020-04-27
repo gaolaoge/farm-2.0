@@ -1,5 +1,6 @@
 import axios from 'axios'
 import vue from '@/main.js'
+import {Message} from "element-ui";
 
 const http = new axios.create({
   baseURL: 'http://192.168.1.184/',
@@ -24,8 +25,14 @@ http.interceptors.response.use(response => {
       return response
     // }
   },error => {
-    if(error.response.status == 401){
-      vue.$message.error('授权失效，需要重新登录')
+  if(vue.$route.path == '/login') return false
+  if(error.response.status == 401){
+    vue.$message({
+      message: '授权失效，需要重新登录',
+      type: 'error',
+      showClose: true,
+      duration: 2000
+    })
       sessionStorage.setItem('token','')
       vue.$router.push('/login')
     }

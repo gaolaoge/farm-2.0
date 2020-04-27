@@ -136,7 +136,8 @@
     getTaskTableList,
     upTopTableSeeMore,
     upTopTableDelete,
-    upTopTableSet
+    upTopTableSet,
+    analyseAgain
   } from '@/api/api'
   import {
     createCalendar,
@@ -175,7 +176,8 @@
         },
         showDrawer: false,
         itemName: 'upload-table',
-        drawerTaskData: null
+        drawerTaskData: null,
+        searchInput: ''
       }
     },
     methods: {
@@ -362,6 +364,17 @@
 
           })
           .finally(() => this.table.loading = false)
+      },
+      // 重新分析
+      async analyseAgainFun(){
+        let list = [],
+            result = this.table.selectionList.every(curr => {
+              list.push(curr.taskUuid)
+              return (curr.status == '分析警告' || curr.status == '分析失败' ||curr.status == '分析成功')
+            })
+        if(!result) return false
+        let data = await analyseAgain({taskUuid: list})
+
       }
     },
     mounted(){
@@ -379,12 +392,12 @@
     components: {
       farmDrawer
     },
-    props: {
-      searchInput: {
-        type: String,
-
-      }
-    }
+    // props: {
+    //   searchInput: {
+    //     type: String,
+    //
+    //   }
+    // }
   }
 </script>
 

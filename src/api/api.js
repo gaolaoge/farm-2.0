@@ -262,6 +262,14 @@ export function upTopTableSeeMore(data){
   })
 }
 
+// 任务 - 分析上传 - 重新分析
+export function analyseAgain(data){
+  return api({
+    url: `/professional/task/resubmitAnalyseTask`,
+    method: 'POST'
+  })
+}
+
 // 任务 - 分析上传 - 删除
 export function upTopTableDelete(data){
   return api({
@@ -314,6 +322,14 @@ export function startRender(data){
   })
 }
 
+// 任务 - 归档记录 - 获取列表
+export function getRecordList(data){
+  return api({
+    url: `/professional/history/getHistoryTaskList?${data}`,
+    method: 'GET'
+  })
+}
+
 // 账单 - 充值 - 立即充值 - 支付宝
 export function ALiPay(data){
   return api({
@@ -361,3 +377,4 @@ export function assetsExportFrame(data){
     method: 'GET'
   })
 }
+

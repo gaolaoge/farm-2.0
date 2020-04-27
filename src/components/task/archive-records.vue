@@ -19,8 +19,15 @@
             </div>
           </div>
           <div class="searchItem">
-            <input type="text" class="farm-form-input" placeholder="输入场景名、任务ID">
-            <img src="@/icons/searchIcon.png" alt="" class="searchIcon">
+            <input type="text"
+                   v-model="dialogTable.searchInputVal"
+                   class="farm-form-input"
+                   @outup.enter="getList"
+                   placeholder="输入场景名、任务ID">
+            <img src="@/icons/searchIcon.png"
+                 alt=""
+                 class="searchIcon"
+                 @click="getList">
           </div>
         </div>
         <!--表格-->
@@ -121,7 +128,8 @@
             <el-pagination
               background
               layout="prev, pager, next, jumper"
-              :total="dialogTable.num">
+              :current-page.sync="dialogTable.pageIndex"
+              :total="dialogTable.total">
             </el-pagination>
           </div>
         </div>
@@ -131,13 +139,25 @@
 </template>
 
 <script>
+  import {
+    createTableIconList
+  } from '@/assets/common.js'
+  import {
+    getRecordList
+  } from '@/api/api'
+  import {
+    mapState
+  } from 'vuex'
+
   export default {
     name: 'archive-records',
     data(){
       return {
         dialogTable: {
           text: '归档记录',
-          num: 26,
+          total: 0,
+          pageSize: 10,
+          pageIndex: 1,
           btnGroup: [
             {
               text: '下载完成帧'
@@ -330,10 +350,14 @@
               ]
             },
           ],
-          dialogTableSelection: []
+          dialogTableSelection: [],
+          searchInputVal: ''
         },
         attribution: 'drawer'
       }
+    },
+    computed: {
+      ...mapState(['zoneId'])
     },
     methods: {
       //归档记录多选
@@ -343,7 +367,23 @@
       // 上传分析详情查看
       showDetails(row, column, event){
 
+      },
+      // 获取列表
+      getList(){
+        // {
+        //   projectIds: '',    // 项目id数组
+        //   zoneUuid: '',      // 分区id
+        //   queryStr: '',      // 用户输入的查询字符
+        //   pageSize: '',      // 分页尺寸
+        //   pageIndex: ''      // 当前页
+        // }
+        let t = `projectIds=&zoneUuid=${this.zoneId}&queryStr=${this.dialogTable.searchInputVal}&pageSize=${this.dialogTable.pageSize}&pageIndex=${this.dialogTable.pageIndex}`
+        getRecordList(t)
       }
+    },
+    mounted() {
+      createTableIconList()
+      this.getList()
     }
   }
 </script>

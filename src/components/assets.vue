@@ -14,8 +14,15 @@
       </div>
       <div class="rightOPerate">
         <div class="searchItem">
-          <input type="text" class="farm-form-input" placeholder="文件名">
-          <img src="@/icons/searchIcon.png" alt="" class="searchIcon">
+          <input type="text"
+                 class="farm-form-input"
+                 v-model="searchInputVal"
+                 @keyup.enter="searchFun"
+                 placeholder="文件名">
+          <img src="@/icons/searchIcon.png"
+               alt=""
+               class="searchIcon"
+               @click="searchFun">
         </div>
       </div>
     </div>
@@ -34,12 +41,11 @@
         </div>
       </div>
       <div class="tableList">
-        <!--上传分析-->
-        <div ref="outPutTable"
-             class="outPutTable"
+        <!--渲染输出-->
+        <div class="outPutTable"
              v-show="table.navListActiveIndex == 0">
-          <!--上传分析表格-->
-          <out-put-render />
+          <!--渲染输出Tab-->
+          <out-put-render ref="outPutTable" :searchInputVal="searchInputVal" @clearInput="clearInput"/>
         </div>
       </div>
     </div>
@@ -47,8 +53,8 @@
 </template>
 
 <script>
-
   import outPutRender from '@/components/assets/outPutRender.vue'
+  import { createTableIconList } from '@/assets/common.js'
 
   export default {
     name: 'assets',
@@ -76,42 +82,23 @@
               text: '渲染输出'
             }
           ]
-        }
+        },
+        searchInputVal: ''
       }
     },
     components: {
       outPutRender
     },
     mounted() {
-      setTimeout(() => {
-        // 筛选图标
-        let t = [...document.getElementsByClassName('el-icon-arrow-down')]
-        t.forEach(curr => {
-          let i = document.createElement('I'),
-            ii = document.createElement('I')
-          i.classList.add('iconfont')
-          i.classList.add('iconshaixuan')
-          ii.classList.add('iconfont')
-          ii.classList.add('iconshaixuan1')
-          curr.appendChild(i)
-          curr.appendChild(ii)
-        })
-        // 排序图标
-        let q = [...document.getElementsByClassName('ascending')]
-        q.forEach(curr => {
-          let i = document.createElement('I')
-          i.classList.add('el-icon-arrow-up')
-          i.classList.add('k')
-          curr.appendChild(i)
-        })
-        let w = [...document.getElementsByClassName('descending')]
-        w.forEach(curr => {
-          let i = document.createElement('I')
-          i.classList.add('el-icon-arrow-up')
-          i.classList.add('k')
-          curr.appendChild(i)
-        })
-      },0)
+      createTableIconList()
+    },
+    methods: {
+      searchFun(){
+        this.$refs.outPutTable.getList()
+      },
+      clearInput(){
+        this.searchInputVal = ''
+      }
     }
   }
 </script>
