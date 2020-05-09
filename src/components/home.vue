@@ -135,8 +135,11 @@
     echartsData,
     getInfo
   } from '@/api/api.js'
+  import {
+    messageFun
+  } from "../assets/common"
 
-export default {
+  export default {
   name: 'home',
   data () {
     return {
@@ -189,7 +192,7 @@ export default {
         te: '用户余额 :',
         unit: '￥',
         name: '',
-        grade: '铂金会员',
+        grade: '普通会员',
         balance: ''
       },
       Recharge: {
@@ -242,7 +245,7 @@ export default {
       this.$refs.dragWindow.ondrop = function(ev) {
         let oFile = ev.dataTransfer.files[0],
             oFileType = oFile.name.split('.').pop()
-        if(oFileType != 'ma' && oFileType != 'mb') return false
+        if(oFileType != 'ma' && oFileType != 'mb'){ messageFun('error','暂不支持此扩展名，请拖拽扩展名为.ma .mb的文件'); return false }
         this.fileList = [{
           sceneFile: oFile,
           projectFileList: null,

@@ -13,15 +13,44 @@
         <img src="@/icons/questionMark.png" alt="" class="workBench-icon">
       </div>
       <div class="r">
-        <div class="problem">
-          <img src="@/icons/problem.png" alt="">
+        <!--问号-->
+        <div class="problemE"  :class="[{'active': showProblemList}]" v-operating2>
+          <img src="@/icons/problem.png"
+               alt=""
+               class="problemImg"
+               @click="showProblemList = !showProblemList">
+          <!--下拉框-->
+          <div class="newsBase">
+            <ul class="userOperate"  v-show="showProblemList">
+              <li class="operateLi">
+                <span class="con">
+                  <span class="t">
+                     <span class="sb">
+                       {{ problemOperateList[0]['text'] }}
+                     </span>
+                  </span>
+                </span>
+              </li>
+              <li class="operateLi">
+                <span class="con">
+                  <span class="t">
+                     <span class="sb">
+                       {{ problemOperateList[1]['text'] }}
+                     </span>
+                  </span>
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
+        <!--头像-->
         <div class="userInfo" :class="[{'active': showUserList}]" v-operating>
           <img :src="user.imgUrlMini"
                alt=""
                class="userImg"
                @click="showUserList = !showUserList">
           <!--:class="[{'show': showUserList}]"-->
+          <!--下拉框-->
           <div class="newsBase" :class="[{'show': showUserList}]">
             <ul class="userOperate" v-show="showUserList">
 
@@ -99,8 +128,9 @@
         ],
         // workBenchName: '当前工作台',
         workBenchVal: '',
-        // showNews: false                      //展示消息
-        showUserList: false,                  //个人信息下拉
+        // showNews: false                      // 展示消息
+        showUserList: false,                    // 个人信息下拉
+        showProblemList: false,                 // 问题下拉
         userOperateList: [
           {
             text: '',
@@ -117,6 +147,14 @@
           {
             text: '退出',
             moreClass: 'quit'
+          }
+        ],
+        problemOperateList: [
+          {
+            text: '渲染指引'
+          },
+          {
+            text: '帮助中心'
           }
         ]
       }
@@ -258,6 +296,26 @@
         unbind(el){
           document.removeEventListener('click',el.handler)
         }
+      },
+      operating2: {
+        bind(el,bindings,vnode){
+          let handler = e => {
+            if(el.contains(e.target)){
+              // 点击事件触发在目标DOM内
+            }else {
+              // 点击事件触发在目标DOM外
+              // 且DOM处于显示状态
+              if(vnode.context.showProblemList){
+                vnode.context.showProblemList = false
+              }
+            }
+          }
+          el.handler = handler
+          document.addEventListener('click',handler)
+        },
+        unbind(el){
+          document.removeEventListener('click',el.handler)
+        }
       }
     }
   }
@@ -284,16 +342,9 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        .userInfo {
+        .userInfo,
+        .problemE {
           position: relative;
-          width: 70px;
-          height: 80px;
-          box-sizing: border-box;
-          .userImg {
-            margin: 26px auto;
-            display: block!important;
-            cursor: pointer;
-          }
           .newsBase {
             position: absolute;
             right: 0px;
@@ -379,10 +430,35 @@
               }
             }
           }
+        }
+        .userInfo {
+          width: 70px;
+          height: 80px;
+          box-sizing: border-box;
+          .userImg {
+            margin: 26px auto;
+            display: block!important;
+            cursor: pointer;
+          }
           &.active {
             background:linear-gradient(180deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.3) 50%,rgba(10,98,241,0.6) 100%);
             .newsBase {
-              height:152px;
+              height: 153px;
+            }
+          }
+        }
+        .problemE {
+          right: 40px;
+          .problemImg {
+            cursor: pointer;
+            user-select: none;
+          }
+          .newsBase {
+            top: 50px;
+          }
+          &.active {
+            .newsBase {
+              height: 103px;
             }
           }
         }

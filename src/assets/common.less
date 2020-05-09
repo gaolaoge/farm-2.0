@@ -243,13 +243,17 @@ div {
         /*滚动条里面小方块*/
         border-radius: 10px;
         -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
-        background-color: rgba(255, 255, 255, 0.29);
+        background-color: rgba(102, 89, 89, 0.2);
+        &:hover {
+          -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.4);
+          background-color: rgba(102, 89, 89, 0.4);
+        }
       }
       &::-webkit-scrollbar-track {
         /*滚动条里面轨道*/
-        -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
+        -webkit-box-shadow: inset 0 0 5px rgba(52, 59, 67, 0.2);
         border-radius: 10px;
-        background-color: rgba(226, 221, 221, 0);
+        background: rgba(52, 59, 67, 0.2);
       }
     }
 
@@ -281,13 +285,17 @@ div {
     /*滚动条里面小方块*/
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
-    background: #9e9797;
+    background-color: rgba(102, 89, 89, 0.2);
+    &:hover {
+      -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.4);
+      background-color: rgba(102, 89, 89, 0.4);
+    }
   }
   &::-webkit-scrollbar-track {
     /*滚动条里面轨道*/
-    -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
+    -webkit-box-shadow: inset 0 0 5px rgba(52, 59, 67, 0.2);
     border-radius: 10px;
-    background: rgb(226, 221, 221);
+    background: rgba(52, 59, 67, 0.2);
   }
 }
 .el-table__body {
@@ -424,6 +432,16 @@ thead {
     &:hover {
       &::after {
         width: 1398px;
+      }
+    }
+  }
+}
+//任务-归档记录
+.gd.el-table {
+  .el-table__row {
+    &:hover {
+      &::after {
+        width: 2724px;
       }
     }
   }
@@ -1039,6 +1057,9 @@ td {
     color: rgba(229, 199, 138, 0.59);
     line-height: 18px;
   }
+  &.mini {
+    width: 200px;
+  }
 }
 
 .filter {
@@ -1219,4 +1240,26 @@ td {
 
 .el-icon-loading {
   font-size: 20px;
+}
+
+// 滚动条
+.setScollBarStyle {
+  &::-webkit-scrollbar {
+    /*滚动条整体样式*/
+    /*高宽分别对应横竖滚动条的尺寸*/
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    /*滚动条里面小方块*/
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
+    background: #9e9797;
+  }
+  &::-webkit-scrollbar-track {
+    /*滚动条里面轨道*/
+    -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
+    border-radius: 10px;
+    background: rgba(226, 221, 221, 0.2);
+  }
 }

@@ -128,7 +128,7 @@
         img {
           position: relative;
           z-index: 1;
-          vertical-align: bottom;
+          vertical-align: sub;
           width: 18px;
           &.defaultIcon {
 

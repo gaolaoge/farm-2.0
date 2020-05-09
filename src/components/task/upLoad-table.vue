@@ -3,7 +3,6 @@
     <el-table
       :data="table.UploadAnalysisData"
       @selection-change="handleSelectionChange"
-      @filter-change="filterHandler"
       @row-click="showDetails"
       :row-class-name="tableRowStyle"
       class="u"
@@ -33,42 +32,35 @@
       <el-table-column
         label="状态"
         show-overflow-tooltip
-        :filters="[
-                  {text: '全选', value: '上传中'},
-                  {text: '待设置参数', value: '待设置参数'},
-                  {text: '上传中', value: '上传暂停'},
-                  {text: '上传失败', value: '上传失败'},
-                  {text: '分析中', value: '分析警告'},
-                  {text: '分析警告', value: '上传中...'},
-                  {text: '上传失败', value: '上中'},
-                 ]"
+        :filter-method="filterStatus"
+        :filters="table.statusList"
         width="120">
         <template slot-scope="scope">
-                  <span v-if="scope.row.status == '上传失败' || scope.row.status == '分析失败'" style="color: #F90023">
-                    {{ scope.row.status }}
-                  </span>
-                  <span v-if="scope.row.status == '待设置参数'" style="color: #00E3FF">
-                    {{ scope.row.status }}
-                  </span>
-                  <span v-if="scope.row.status == '分析警告' || scope.row.status == '上传暂停'" style="color: #E5C78A">
-                    {{ scope.row.status }}
-                  </span>
-                  <span v-if="scope.row.status == '已取消' || scope.row.status == '已放弃'" style="color: #555">
-                    {{ scope.row.status }}
-                  </span>
-                  <span v-if="scope.row.status == '上传中...' || scope.row.status == '上传成功' || scope.row.status == '分析中...'">
-                    {{ scope.row.status }}
-                  </span>
+          <span v-if="scope.row.status == '上传失败' || scope.row.status == '分析失败'" style="color: #F90023">
+            {{ scope.row.status }}
+          </span>
+          <span v-if="scope.row.status == '待设置参数'" style="color: #00E3FF">
+            {{ scope.row.status }}
+          </span>
+          <span v-if="scope.row.status == '分析警告' || scope.row.status == '上传暂停'" style="color: #E5C78A">
+            {{ scope.row.status }}
+          </span>
+          <span v-if="scope.row.status == '已取消' || scope.row.status == '已放弃'" style="color: #555">
+            {{ scope.row.status }}
+          </span>
+          <span v-if="scope.row.status == '上传中...' || scope.row.status == '上传成功' || scope.row.status == '分析中...'">
+            {{ scope.row.status }}
+          </span>
         </template>
       </el-table-column>
       <!--所属项目-->
-      <el-table-column
-        prop="project"
-        label="所属项目"
-        show-overflow-tooltip
-        :filters="table.projectList"
-        width="200" />
-
+      <!--<el-table-column-->
+        <!--prop="project"-->
+        <!--label="所属项目"-->
+        <!--show-overflow-tooltip-->
+        <!--:filters="table.projectList"-->
+        <!--width="200" />-->
+      <!--分析开始时间-->
       <el-table-column
         prop="startingTime"
         label="分析开始时间"
@@ -82,14 +74,12 @@
         sortable
         show-overflow-tooltip
         width="180" />
-
+      <!--创建人-->
       <el-table-column
         prop="founder"
         label="创建人"
         show-overflow-tooltip
-        :filters="[
-                  {text: '管理员', value: '管理员'},
-                 ]"
+        :filters="table.usersList"
         width="100" />
 
       <el-table-column
@@ -141,7 +131,8 @@
   } from '@/api/api'
   import {
     createCalendar,
-    createDateFun
+    createDateFun,
+    messageFun
   } from '@/assets/common.js'
 
   export default {
@@ -172,7 +163,19 @@
           uploadStatus: [],             // 上传状态数组
           analyseStatus: [],            // 分析状态数组
           // 所属项目筛选数组
-          projectList: []
+          projectList: [],
+          statusList: [
+            // {text: '上传中', value: '上传中...'},
+            // {text: '上传暂停', value: '上传暂停'},
+            // {text: '上传失败', value: '上传失败'},
+            // {text: '已取消', value: '已取消'},
+            // {text: '分析中', value: '分析中...'},
+            // {text: '分析警告', value: '分析警告'},
+            // {text: '待设置参数', value: '待设置参数'},
+            // {text: '分析失败', value: '分析失败'},
+            // {text: '已放弃', value: '已放弃'},
+          ],
+          usersList: []
         },
         showDrawer: false,
         itemName: 'upload-table',
@@ -210,10 +213,13 @@
       handleSelectionChange(val){
         this.table.selectionList = val
         this.closeDrawer()
+        let r = new Set()
+        val.forEach(curr => r.add(curr.status))
+        this.$emit('upLoadSeletedList',[...r])
       },
-      //筛选条件发生变化
-      filterHandler(value, row, column){
-        console.log(value, row, column)
+      // 上传分析 - 筛选 - 状态
+      filterStatus(value, row){
+        return row.status === value
       },
       // 上传分析 - 打开详情
       showDetails(row, column, event){
@@ -230,7 +236,7 @@
       closeDrawer(){
         this.showDrawer = false
         let d = this.$refs.uploadTable.getElementsByClassName('farmTableSelected')[0]
-        d.classList.remove('farmTableSelected')
+        if(d) d.classList.remove('farmTableSelected')
       },
       // 获取项目列表
       async getTaskItemListFun(){
@@ -261,7 +267,9 @@
         //   projectUuid: this.projectUuidList                    //项目UUID数组
         // }
         let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&uploadStatus=${this.table.uploadStatus.length == 0 ? '' : JSON.stringify(this.table.uploadStatus)}&analyseStatus=${this.table.analyseStatus.length == 0 ? '' : JSON.stringify(this.table.analyseStatus)}&projectUuid=${this.projectUuidList.length == 0 ? '' : JSON.stringify(this.projectUuidList)}`
-        let data = await getTaskTableList(t)
+        let data = await getTaskTableList(t),
+            usersList = new Set(),
+            statusList = new Set()
         this.table.UploadAnalysisData = data.data.data.map(curr => {
               let statusData = ''
               // 状态转换
@@ -286,7 +294,6 @@
                     break
                 }
               }else if(curr['taskStage'] == 1){
-
                 switch(curr['uploadStatus']){
                   case 1:
                   case 2:
@@ -305,8 +312,9 @@
                     statusData = '已取消'
                     break
                 }
-
               }
+              usersList.add(curr['account'])
+              statusList.add(statusData)
               return {
                   taskUuid: curr['taskUuid'],
                   id: curr['taskNo'],                                                // 任务ID
@@ -322,6 +330,8 @@
                 //   wayOfAdding: ''       //添加方式
               }
             })
+        this.table.usersList = [...usersList].map(curr => { return {'text': curr, 'value':curr }})
+        this.table.statusList = [...statusList].map(curr => { return {'text': curr, 'value':curr }})
         this.table.uploadTableTotal = data.data.total
         this.$emit('uploadTbaleTotalItem', data.data.total)
         loading.close()
@@ -331,10 +341,9 @@
         this.searchInput = val
         this.getList()
       },
-      // 删除
+      // 操作 - 删除
       deleteItem(){
-        if(this.table.selectionList.length == 0) return false
-
+        if(!this.table.selectionList.length) return false
         this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -365,16 +374,24 @@
           })
           .finally(() => this.table.loading = false)
       },
-      // 重新分析
-      async analyseAgainFun(){
-        let list = [],
-            result = this.table.selectionList.every(curr => {
+      // 操作 - 重新分析
+      analyseAgainFun(){
+        if(!this.table.selectionList.length) return false
+        this.$confirm('确认重新分析?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(async () => {
+            let list = []
+            this.table.selectionList.forEach(curr => {
               list.push(curr.taskUuid)
-              return (curr.status == '分析警告' || curr.status == '分析失败' ||curr.status == '分析成功')
             })
-        if(!result) return false
-        let data = await analyseAgain({taskUuid: list})
-
+            let data = await analyseAgain(list)
+            messageFun('success','重新分析成功')
+            setTimeout(() => this.getList(),1000)
+          })
+          .catch(() => messageFun('info','已取消重新分析'))
       }
     },
     mounted(){
@@ -387,7 +404,7 @@
       ...mapState(['zoneId']),
       projectUuidList(){
         return []
-      }
+      },
     },
     components: {
       farmDrawer

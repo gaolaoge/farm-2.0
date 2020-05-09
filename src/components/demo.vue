@@ -11,6 +11,10 @@
     </form>
 
     <el-button @click="handleChange">发送</el-button>
+
+    <a target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=183412808&site=qq&menu=yes">
+      <img border="0" src="http://wpa.qq.com/pa?p=2:183412808:52" alt="点击这里给我发消息" title="点击这里给我发消息"/>
+    </a>
   </div>
 </template>
 

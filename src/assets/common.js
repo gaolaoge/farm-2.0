@@ -54,16 +54,30 @@ const getDate = (year,month,day) => {
 const exportDownloadFun = (data, name, type) => {
   let blob = null
   if(type == 'xlsx'){
-
     blob = new Blob([data.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
-    const a = document.createElement("a"),
+    const a = document.createElement("A"),
       url = window.URL.createObjectURL(blob),
-      filename = name + '.pdf'
+      filename = name
     a.href = url
     a.download = filename
     a.click()
     window.URL.revokeObjectURL(url)
-
+  }else if(type == 'pdf'){
+    let url = window.URL.createObjectURL(new Blob([data.data],{type: `application/pdf;charset-UTF-8`})),
+        link = document.createElement('A')
+    link.style.display = 'none'
+    link.href = url
+    link.setAttribute('download', name + '.pdf')
+    document.body.appendChild(link)
+    link.click()
+  }else {
+    let url = window.URL.createObjectURL(new Blob([data.data])),
+        a = document.createElement('A')
+    a.style.display = 'none'
+    a.target = '_blank'
+    a.href = url
+    a.download = name
+    a.click()
   }
 }
 
@@ -71,6 +85,7 @@ const exportDownloadFun = (data, name, type) => {
 const createTableIconList = function(){
   setTimeout(() => {
     // 筛选图标
+    if(document.getElementsByClassName('iconshaixuan').length) return false
     let t = [...document.getElementsByClassName('el-icon-arrow-down')]
     t.forEach(curr => {
       let i = document.createElement('I'),
@@ -100,6 +115,7 @@ const createTableIconList = function(){
   },0)
 }
 
+ // message 信息
 const messageFun = function(type,message){
   return Message({
     message: message,
@@ -109,6 +125,37 @@ const messageFun = function(type,message){
   })
 }
 
+// 渲染帧范围
+const renderingRange = function(min,max,interval){
+  let a = [min],
+      m = min + interval
+  while(m <= max){
+    a.push(m)
+    m += interval
+  }
+  return a
+}
+
+const itemDownloadStatus = function(num){
+  switch(num){
+    case 1:
+      return '等待'
+      break
+    case 2:
+      return '渲染中'
+      break
+    case 3:
+      return '渲染结束'
+      break
+    case 4:
+      return '渲染暂停'
+      break
+    case 6:
+      return '渲染放弃'
+      break
+  }
+}
+
 export {
   createCalendar,
   createDateFun,
@@ -116,7 +163,9 @@ export {
   exportDownloadFun,
   consum,
   createTableIconList,
-  messageFun
+  messageFun,
+  renderingRange,
+  itemDownloadStatus
 }
 
 

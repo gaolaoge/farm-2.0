@@ -138,15 +138,20 @@
                    class="farm-input" />
             <img src="@/icons/login-success.png" alt="" class="i" v-show="registered.status.phone === 'true'">
             <img src="@/icons/login-error .png" alt="" class="i" v-show="registered.status.phone === 'false'">
+            <el-button @click="den">验证</el-button>
           </div>
+          <!--验证码-->
+          <input v-model="registered.form.code"
+                 placeholder="手机验证码"
+                 class="farm-input" />
           <!--拖动验证-->
-          <div class="drag" ref="drag">
-            <div class="bg" ref="bg" />
-            <div class="text" onselectstart="return false;" ref="text">
-              按住滑块，拖动到最右边
-            </div>
-            <div class="btn" ref="btn" />
-          </div>
+          <!--<div class="drag" ref="drag">-->
+            <!--<div class="bg" ref="bg" />-->
+            <!--<div class="text" onselectstart="return false;" ref="text">-->
+              <!--按住滑块，拖动到最右边-->
+            <!--</div>-->
+            <!--<div class="btn" ref="btn" />-->
+          <!--</div>-->
           <!--协议-->
           <div class="protocol">
             <span class="r">
@@ -174,8 +179,8 @@
     accountLogin,
     phoneVerif,
     phoneLogin,
-    getInfo
-    // getInfo
+    getInfo,
+    registerTelephone
   } from '@/api/api'
   import {
     messageFun
@@ -214,11 +219,12 @@
         registered: {
           label : '注册',
           text1: '我已阅读并同意',
-          text2: '《渲染农场注册协议》',
+          text2: '《用户服务协议》',
           form: {
             account: '',
             password: '',
-            phone: ''
+            phone: '',
+            code: ''
           },
           status: {
             account: null,
@@ -353,13 +359,14 @@
       // 注册-密码验证
       passwVerif(){
         let t = this.registered.form.password,
-            regex = /^[A-Za-z0-9_\-]{8,18}}$/
+            regex = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)/,
+            reg2 = /^\w{8,18}$/
         if(!t){
           messageFun('error','请输入密码')
           this.registered.status.password = 'false'
           return false
         }
-        if(!regex.test(t)){
+        if(!regex.test(t) || !reg2.test(t)){
           messageFun('error','请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符')
           this.registered.status.password = 'false'
           return false
@@ -383,6 +390,10 @@
           messageFun('error','手机号已存在')
           this.registered.status.phone = 'false'
         }
+      },
+      // 注册
+      den(){
+        registerTelephone(this.registered.form.phone)
       },
       // 注册
       async registerFun(){
@@ -475,9 +486,12 @@
           level: d.vipLevel,
           balance: d.goldBalance
         }))
-        this.$store.commit('changeLogin', false)
-        this.$store.commit('changeUserName',d.account)
-        this.$store.commit('changeUserBalance',d.goldBalance.toFixed(3))
+        this.$store.commit('changeLogin', false)                                    // 打开导航
+        this.$store.commit('changeUserName',d.account)                              // 帐号
+        this.$store.commit('changeUserBalance',d.goldBalance.toFixed(3))            // 现余额
+        this.$store.commit('changePayAmount',d.cumulativeRecharge.toFixed(3))       // 累计支付金额
+        this.$store.commit('changeGoldCoins',d.totalArrival.toFixed(3))             // 累计到账金币
+        this.$store.commit('changeConsumption',d.cumulativeConsume.toFixed(3))      // 累计消费金币
         this.$router.push('/')
       }
     },

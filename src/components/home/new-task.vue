@@ -159,7 +159,7 @@
         </span>
       </div>
       <!--确定-->
-      <div class="btnGroup-btn confirm" v-show="stepBtnActive == 2" @click="confirmFun">
+      <div class="btnGroup-btn confirm" v-show="stepBtnActive == 2" @click.once="confirmFun">
         <span>
           {{ btn.confirm }}
         </span>
@@ -277,7 +277,7 @@
           </div>
           <!--按钮-->
           <div class="btnGroup">
-            <div class="btnGroup-btn save" @click="taskDefine" :class="[{'disable-self': disableSelf}]">
+            <div class="btnGroup-btn save" @click="taskDefine" :class="[{'disable-self': !disableSelf}]">
               <span>
                 {{ dialogAdd.save }}
               </span>
@@ -305,6 +305,7 @@
     pushTask,
     upTopCJ,
     upTopGC,
+    oneMorePath
   } from '@/api/api'
   import {
     mapState
@@ -466,7 +467,7 @@
       ...mapState(['zoneId']),
       // 验证表格是否填写完整
       disableSelf(){
-        if(!this.dialogAdd.form.valName || !this.dialogAdd.form.valSoftware || !this.dialogAdd.nList.length){
+        if(this.dialogAdd.form.valName && this.dialogAdd.nList.length){
           return true
         }else {
           return false
@@ -831,14 +832,17 @@
       },
       // 新建任务 - 提交新【任务】
       async confirmFun(){
+        if(!this.filelist.every(curr => curr.projectFileName)){ messageFun('error','请选择工程文件'); this.stepBtnActive = 1; return false }
+        if(!this.filelist.every(curr => curr.id)){ messageFun('error','请填写工程路径'); this.stepBtnActive = 1; return false }
         let data = await pushTask({
-          zoneUuid: this.zoneId,        //分区uuid
+          zoneUuid: this.zoneId,              // 分区uuid
           templateUuid: this.stepTwoBase.renderList[this.stepTwoBase.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
           taskCount: this.filelist.length,    // 要创建任务的数量
-          pattern: 2,    //渲染模式
-          patternNorm: 2,    //提交模式
-          source: 2      // 任务来源
+          pattern: 2,                         // 渲染模式
+          patternNorm: 2,                     // 提交模式
+          source: 2                           // 任务来源
         })
+        await oneMorePath(data.data.data)
         this.upLoadFun(data.data.data)
       },
       // 上传【场景文件】【工程文件】
@@ -855,32 +859,13 @@
           GCData.append('taskUuid', curr)      //任务ID
 
           // 上传场景文件
-          // upTopCJ(CJData)
-          //   .then(data => {
-          //     // 上传工程文件
-          //     if(data.data.code == 200) return upTopGC(GCData)
-          //   })
-          //   .then(data => {
-          //     if(data.data.code == 200) this.$router.push('/task')
-          //   })
-          //   .catch(() => this.$message.error('网络传输失败'))
-
-          // let xml = new XMLHttpRequest()
-          // xml.open('POST','http://192.168.1.86:5000/professional/file/uploadSceneFile')
-          // xml.send(CJData)
-          //
-          // let xml2 = new XMLHttpRequest()
-          // xml2.open('POST','http://192.168.1.86:5000/professional/file/uploadResource')
-          // xml2.send(GCData)
-
-          // 上传场景文件
           let data = await upTopCJ(CJData)
-          if(data.data.code != 200) throw '网络传输失败'
+          if(data.data.code == 1001){ messageFun('error','余额不足'); return false}
+          this.$router.push('/task')
           // 上传工程文件
           let data2 = await upTopGC(GCData)
           if(data2.data.code != 200) throw '网络传输失败'
           messageFun('success','创建成功')
-          this.$router.push('/task')
         })
       },
     },

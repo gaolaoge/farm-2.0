@@ -141,10 +141,15 @@
           width="120" />
         <!--支付单号-->
         <el-table-column
-          prop="singleNumber"
           label="支付单号"
           show-overflow-tooltip
-          width="180" />
+          width="180">
+          <template slot-scope="scope">
+            <span @click="copySingleNumber(scope.row.singleNumber)">
+              {{ scope.row.singleNumber }}
+            </span>
+          </template>
+        </el-table-column>
         <!--交易时间-->
         <el-table-column
           prop="date"
@@ -168,7 +173,6 @@
 
       </el-table>
     </div>
-
     <!--分页-->
     <div class="page">
       <el-pagination
@@ -290,6 +294,15 @@
       modelCalendar
     },
     methods: {
+      copySingleNumber(val){
+        let oInput = document.createElement('INPUT')
+        oInput.style.display = 'none'
+        oInput.value = val
+        document.body.appendChild(oInput)
+        oInput.select()                    // 选中
+        document.execCommand("Copy")       // 复制
+        document.body.removeChild(oInput)
+      },
       // 充值中心多选
       handleSelectionChange(val){
         this.table.selectionList = val
@@ -312,7 +325,7 @@
       },
       // 获取table数据
       async getList(){
-        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
+        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&productOrderUuid=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
             data = await getUpTopTable(t)
         this.table.outPutTableTotal = data.data.total
         this.table.rechargeData = data.data.data.map(curr => {
@@ -333,17 +346,17 @@
           if(!curr.actualPayment) curr.actualPayment = '-'
           let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
           return {
-            id: curr.rechargeUuid,                //交易ID
-            state: curr.paymentStatus,            //交易状态
-            realPay: curr.actualPayment,          //实际支付金额（元）
-            realArrive: curr.arrivalAmount,       //充值到账（金币）
-            directions: curr.rechargeExplain,     //充值说明
-            paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '微信',     //充值方式
-            singleNumber: curr.outTradeNo,        //支付单号
-            date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,                //交易时间
+            id: curr.outTradeNo,                // 交易ID
+            state: curr.paymentStatus,            // 交易状态
+            realPay: curr.actualPayment,          // 实际支付金额（元）
+            realArrive: curr.arrivalAmount,       // 充值到账（金币）
+            directions: curr.rechargeExplain,     // 充值说明
+            paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '-',                      // 充值方式
+            singleNumber: curr.productOrderUuid ? curr.productOrderUuid : '-',  // 支付单号
+            date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,                // 交易时间
             dateDefault: curr.updateTime,
-            invoice: curr.invoice,                //开票标识
-            operate: curr.operate                 //操作
+            invoice: curr.invoice,                // 开票标识
+            operate: curr.operate                 // 操作
           }
         })
       },
@@ -366,13 +379,22 @@
       },
       // 导出记录
       async exportTable(){
+        // {
+        //   paymentTitle: 1,   // 支付方式 1支付宝
+        //   paymentStatus: 1,  // 交易状态:1成功，2失败；3待付款
+        //   invoice: 1,        // 开票标识:0不可开票,1未开票,2已开票
+        //   beginTime: '',     // 查询起始时间,时间戳
+        //   endTime: '',       // 查询结束时间,时间戳
+        //   sortColumn: '',    // 排序字段:0:交易id, 1:交易状态,2:实际支付金额,3:充值到账金币,4:充值说明,5:支付方式,6:支付单号,7:修改时间
+        //   sortBy: ''         // 排序方式:0降序,1升序
+        // }
         let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
             data = await exportUpTopTable(t)
         // 导出下载
         exportDownloadFun(data, '充值记录','xlsx')
       },
       // 操作
-      operateFun(item){
+      async operateFun(item){
         let u = {
           outTradeNo: item.singleNumber,
           updateTime: item.dateDefault,
@@ -382,12 +404,8 @@
         }
         let t =`outTradeNo=${u['outTradeNo']}&updateTime=${u['updateTime']}&actualPayment=${u['actualPayment']}&paymentTitle=${u['paymentTitle']}&account=${u['account']}`
         if(item.operate == "下载收据"){
-          var a = document.createElement('a')
-          a.href = `http://192.168.1.184/file/farmReceipt?${t}`
-          a.setAttribute("id", "export")
-          document.body.append(a)
-          a.click()
-          document.getElementById("export").remove()
+          let data = await downloadReceipt(t)
+          exportDownloadFun(data, '收据','pdf')
         }
       }
     },
@@ -398,13 +416,17 @@
 </script>
 
 <style lang="less" scoped>
+  .recharge-centre {
+    overflow: hidden;
+  }
   .page {
-    position: absolute;
-    bottom: 30px;
-    left: 25px;
+    /*position: relative;*/
+    /*bottom: 0px;*/
+    /*left: 25px;*/
+    margin: 4px 25px 30px;
   }
   /deep/.el-table__body-wrapper {
-    height: calc(100vh - 491px);
+    height: calc(100vh - 557px);
   }
 
   .recharge-table {

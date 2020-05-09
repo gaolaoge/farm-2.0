@@ -38,15 +38,7 @@
         <el-table-column
           label="所属项目"
           show-overflow-tooltip
-          :filters="[
-                  {text: '全选', value: '上传中'},
-                  {text: '待设置参数', value: '待设置参数'},
-                  {text: '上传中', value: '上传暂停'},
-                  {text: '上传失败', value: '上传失败'},
-                  {text: '分析中', value: '分析警告'},
-                  {text: '分析警告', value: '上传中...'},
-                  {text: '上传失败', value: '上中'},
-                 ]"
+          :filters="projectList"
           width="200">
           <template slot-scope="scope">
                   <span>
@@ -121,11 +113,13 @@
   import {
     assetsExportMain,
     assetsExportLayer,
-    assetsExportFrame
+    assetsExportFrame,
+    assetsDeleteItem
   } from '@/api/api'
   import {
     consum,
-    createDateFun
+    createDateFun,
+    messageFun
   } from '@/assets/common.js'
 
   export default {
@@ -155,6 +149,7 @@
           layerObj: {},                 // 层名
           frameObj: {}                  // 帧名
         },
+        projectList:[],
         l: {
           x: '已加载全部，共',
           n: '0',
@@ -177,7 +172,7 @@
       }
     },
     methods: {
-      // 上传分析多选
+      // 多选
       handleSelectionChange(val){
         this.table.selectionList = val
       },
@@ -217,19 +212,28 @@
         //   projectUuid: ''      // 选中项Uuid
         // }
         let t = `keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
-            data = await assetsExportMain(t)
+            data = await assetsExportMain(t),
+            projectList = new Set()
         this.table.main = true
         this.table.outPutData = data.data.data.map(curr => {
+          let downLoadTime = curr.downloadFrameCount == 0 ? '未下载' : curr.downloadFrameCount == curr.allFrameCount ? '已下载' : '部分下载'
+          projectList.add(curr.projectName)
           return {
             id: curr.taskNo,                    // 任务ID
-            fileName: curr.fileName,            // 文件名
+            fileName: curr.taskNo + ' _ ' + curr.fileName,            // 文件名
             project: curr.projectName,          // 所属项目
             fileSize: '-',                      // 文件大小
-            fileType: '文件夹',                      // 文件类型
-            downLoadTime: '-',                   // 下载次数
-            date: '-',                           // 剩余有效期（天）
-            upDate: createDateFun(new Date(curr.updateTime)),                         // 更新时间,
+            fileType: '文件夹',                 // 文件类型
+            downLoadTime,                       // 下载状态
+            date: '-',                          // 剩余有效期（天）
+            upDate: createDateFun(new Date(curr.updateTime)),  // 更新时间
             itemUuid: curr.taskUuid
+          }
+        })
+        this.projectList = [...projectList].map(item => {
+          return {
+            'text': item,
+            'value': item
           }
         })
         this.l.n = data.data.total
@@ -252,10 +256,10 @@
             fileName: curr.layerName,            // 文件名
             project: this.table.objectName,      // 所属项目
             fileSize: curr.fileSize,             // 文件大小
-            fileType: '文件夹',                   // 文件类型
-            downLoadTime: '-',                   // 下载次数
-            date: '',                            // 剩余有效期（天）
-            upDate: createDateFun(new Date(curr.updateTime)),                          // 更新时间,
+            fileType: '文件夹',                  // 文件类型
+            downLoadTime: '-',                  // 下载次数
+            date: '',                           // 剩余有效期（天）
+            upDate: createDateFun(new Date(curr.updateTime)),  // 更新时间
             itemUuid: curr.layerTaskUuid
           }
         })
@@ -273,14 +277,16 @@
             data = await assetsExportFrame(t)
         this.table.nextTbaleType = 'null'
         this.table.outPutData = data.data.data.map(curr => {
+          let fileType = curr.fileName.split('.')
           return {
             fileName: curr.fileName,                        // 文件名
             project: this.table.objectName,                 // 所属项目
             fileSize: curr.fileSize,                        // 文件大小
-            fileType: curr.fileName.split('.')[1],          // 文件类型
+            fileType: fileType[fileType.length - 1],        // 文件类型
             downLoadTime: curr.downloadCount,               // 下载次数
-            date: curr.date == 0 ? '-' : consum(new Date().getTime() - curr.indate),                            // 剩余有效期（天）
-            upDate: createDateFun(new Date(curr.updateTime)),                        // 更新时间,
+            date: curr.date == 0 ? '-' : consum(new Date().getTime() - curr.indate), // 剩余有效期（天）
+            upDate: createDateFun(new Date(curr.updateTime)),                        // 更新时间
+            itemUuid: curr.frameTaskUuid
           }
         })
         this.table.outPutTableTotal = data.data.total
@@ -306,6 +312,37 @@
           case 'frame':
             break
         }
+      },
+      // 下载item
+      downloadFun(){
+
+      },
+      // 删除item
+      deleteFun(){
+        this.$confirm('将删除选中选, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(
+            async () => {
+              let type = 3
+              if(this.table.nextTbaleType == 'layer') type = 1
+              if(this.table.nextTbaleType == 'frame') type = 2
+              let data = await assetsDeleteItem({
+                type,
+                uuidList: this.table.selectionList.map(item => item.itemUuid)
+              })
+
+              if(data.data.code == 204){
+                messageFun('success','操作成功')
+                if(type == 1) this.getList()
+                if(type == 2) this.getLayerList()
+                if(type == 3) this.getFrameList()
+              }else{ messageFun('error','报错，操作失败') }
+            },
+            () => { messageFun('info','已取消删除'); return false }
+          )
       }
     },
     mounted() {
@@ -329,7 +366,7 @@
   }
 
   /deep/.el-table__body-wrapper {
-    height: calc(100vh - 329px);
+    height: calc(100vh - 395px);
   }
 
   .outPut-table {
@@ -365,8 +402,12 @@
   }
 
   .page {
-    position: absolute;
-    bottom: 30px;
-    left: 25px;
+    /*position: po;*/
+    /*bottom: 30px;*/
+    /*left: 25px;*/
+    margin: 4px 25px 30px;
+  }
+  .outPut-wrapper {
+    overflow: hidden;
   }
 </style>

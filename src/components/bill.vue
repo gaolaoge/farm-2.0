@@ -43,7 +43,7 @@
               {{ remind.payLabel }}：
             </span>
             <span class="val">
-              {{ remind.payVal }}
+              {{ user.payAmount }}
             </span>
           </span>
           <span class="it">
@@ -51,7 +51,7 @@
               {{ remind.gainLabel }}：
             </span>
             <span class="val">
-              {{ remind.gainVal }}
+              {{ user.goldCoins }}
             </span>
           </span>
         </span>
@@ -61,7 +61,7 @@
               {{ remind.consumptionLabel }}：
             </span>
             <span class="val">
-              {{ remind.consumptionVal }}
+              {{ user.consumption }}
             </span>
           </span>
         </span>
@@ -106,16 +106,13 @@
           levelIcon: require('@/icons/vipIcon2.png'),
           levelText: '铂金会员',
           balanceLabel: '账户余额(金币)：',
-          balanceVal: '256.872',
+          balanceVal: 'null',
           btn: '立即充值'
         },
         remind: {
           payLabel: '累计支付金额',
-          payVal: '126.520',
           gainLabel: '累计到账金币',
-          gainVal: '300.000',
-          consumptionLabel: '累计消费金币',
-          consumptionVal: '300.000'
+          consumptionLabel: '累计消费金币'
         },
         table: {
           navListActiveIndex: 0,

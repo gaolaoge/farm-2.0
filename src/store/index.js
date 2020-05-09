@@ -12,6 +12,9 @@ export default new Vuex.Store({
       imgUrlMini: require('@/assets/userImgMini.png'),
       token: '',
       balance: '0.000',
+      payAmount: '0.000',
+      goldCoins: '0.000',
+      consumption: '0.000'
       // grade: '铂金会员'
     },
     login: false,
@@ -21,22 +24,41 @@ export default new Vuex.Store({
 
   },
   mutations: {
-    changeLogin(state,val){
-      state.login = val
+    changeLogin(s,val){
+      s.login = val
     },
-    changeUserName(state,val){
-      state.user.name = val
+    changeUserName(s,val){
+      s.user.name = val
     },
-    changeUserBalance(state,val){
-      state.user.balance = val
+    changeUserBalance(s,val){
+      s.user.balance = val
     },
-    // changeToken(state,val){
-    //   state.user.token = val
+    // changeToken(s,val){
+    //   s.user.token = val
     // }
-    changeZoneId(state,val){
-      state.zoneId = val
+    changeZoneId(s,val){
+      s.zoneId = val
     },
+    changePayAmount(s,val){
+      // 累计支付金额
+      s.user.payAmount = val
+    },
+    changeGoldCoins(s,val){
+      // 累计到账金币
+      s.user.goldCoins = val
+    },
+    changeConsumption(s,val){
+      // 累计消费金币
+      s.user.consumption = val
+    },
+    // 操作 - 下载
+    downloadFun(){
 
+    },
+    // 操作 - 删除
+    deleteFun(){
+
+    }
   },
   actions: {
 

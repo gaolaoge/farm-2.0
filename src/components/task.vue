@@ -4,8 +4,13 @@
     <div class="btnGroup">
       <!--上传分析操作-->
       <div class="uploadBtnGroup"
+           :class="[
+            {'cannotDelete': !btnGroup.uploadTableBtnDelete},
+            {'cannotAgain': !btnGroup.uploadTableBtnAgain}
+           ]"
            v-show="table.navListActiveIndex == 0">
         <div class="farm-primary-form-btn"
+             :class=item.class
              v-for="item,index in btnGroup.uploadBtnGroup"
              @click="uploadOperating(item['text'])"
              :key="index">
@@ -33,8 +38,18 @@
       </div>
       <!--渲染下载操作-->
       <div class="renderBtnGroup"
+           :class="[
+            {'cannotState': !btnGroup.downloadTableBtnStart},
+            {'cannotPause': !btnGroup.downloadTableBtnPause},
+            {'cannotDelete': !btnGroup.downloadTableBtnDelete},
+            {'cannotDownload': !btnGroup.downloadTableBtnDownload},
+            {'cannotRenderAll': !btnGroup.downloadTableBtnRenderAll},
+            {'cannotRenderAgain': !btnGroup.downloadTableBtnRenderAgain},
+            {'cannotArchive': !btnGroup.downloadTableBtnArchive}
+           ]"
            v-show="table.navListActiveIndex == 1">
         <div class="farm-primary-form-btn"
+             :class="item.class"
              @click="renderOperating(item['text'])"
              v-for="item,index in btnGroup.renderBtnGroup"
              :key="index">
@@ -83,6 +98,7 @@
              v-show="table.navListActiveIndex == 0">
           <!--上传分析 table-->
           <upload-table @uploadTbaleTotalItem="uploadTbaleTotalItem"
+                        @upLoadSeletedList="upLoadSeletedList"
                         ref="uploadMode" />
         </div>
         <!--渲染下载-->
@@ -90,7 +106,10 @@
              class="renderTable"
              v-show="table.navListActiveIndex == 1">
           <!--渲染下载表格-->
-          <download-table @renderTbaleTotalItem="renderTbaleTotalItem" ref="renderMode"/>
+          <download-table @renderTbaleTotalItem="renderTbaleTotalItem"
+                          @j="j"
+                          @archiveNum="getArchiveNum"
+                          ref="renderMode"/>
         </div>
       </div>
     </div>
@@ -105,7 +124,7 @@
            @click="dialogTable.status = false"
            class="shutDialogIcon">
       <!--窗口主体-->
-      <archive-records />
+      <archive-records @refreshTaskBase="x"/>
     </el-dialog>
     <!--弹窗 新建任务-->
     <el-dialog :visible.sync="createTaskDialog"
@@ -148,56 +167,76 @@
           uploadBtnGroup: [
             {
               text: '新建任务',
+              class: 'addMoreBtn',
               initialIcon: require('@/icons/addIcon-Blue.png'),
               selectedIcon: require('@/icons/addIcon-Whit.png')
             },
             {
               text: '删除',
+              class: 'deleteBtn',
               initialIcon: require('@/icons/deleteIcon-blue.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
             {
-              text: '重新分析'
+              text: '重新分析',
+              class: 'againBtn'
             }
           ],
           renderBtnGroup: [
             {
               text: '新建任务',
+              class: 'addMoreBtn',
               initialIcon: require('@/icons/addIcon-Blue.png'),
               selectedIcon: require('@/icons/addIcon-Whit.png')
             },
             {
               text: '开始',
+              class: 'startBtn',
               initialIcon: require('@/icons/playIcon-blue.png'),
               selectedIcon: require('@/icons/playIcon-white.png')
             },
             {
               text: '暂停',
+              class: 'pauseBtn',
               initialIcon: require('@/icons/pauseIcon-blue.png'),
               selectedIcon: require('@/icons/pauseIcon-white.png')
             },
             {
               text: '删除',
+              class: 'deleteBtn',
               initialIcon: require('@/icons/deleteIcon-blue.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
             {
               text: '下载完成帧',
+              class: 'downloadBtn',
             },
             {
               text: '全部渲染',
+              class: 'renderAllBtn',
             },
             {
               text: '重新渲染',
+              class: 'renderAgainBtn',
             },
             {
               text: '归档',
+              class: 'archiveBtn',
             }
           ],
           archiveRecords: '归档记录',
-          archiveRecordsNum: '68',
-          searchInputUpload: '',       //上传分析 关键字检索
-          searchInputDownload: ''      //渲染下载 关键字检索
+          archiveRecordsNum: 0,
+          searchInputUpload: '',                  // 上传分析 关键字检索
+          searchInputDownload: '',                // 渲染下载 关键字检索
+          uploadTableBtnDelete: true,             // 上传分析 - 删除按钮 - 可用状态
+          uploadTableBtnAgain: true,              // 上传分析 - 重新分析按钮 - 可用状态
+          downloadTableBtnStart: true,            // 渲染下载 - 开始 - 可用状态
+          downloadTableBtnPause: true,            // 渲染下载 - 暂停 - 可用状态
+          downloadTableBtnDelete: true,           // 渲染下载 - 删除 - 可用状态
+          downloadTableBtnDownload: true,         // 渲染下载 - 下载完成帧 - 可用状态
+          downloadTableBtnRenderAll: true,        // 渲染下载 - 全部渲染 - 可用状态
+          downloadTableBtnRenderAgain: true,      // 渲染下载 - 重新渲染 - 可用状态
+          downloadTableBtnArchive: true           // 渲染下载 - 归档 - 可用状态
         },
         dialogTable: {
           status: false,
@@ -213,6 +252,61 @@
       newTask
     },
     methods: {
+      // 上传分析 多选结果
+      upLoadSeletedList(val){
+        let t = this.btnGroup
+        t.uploadTableBtnDelete = true       // 上传分析 - 删除
+        t.uploadTableBtnAgain = true        // 上传分析 - 重新分析
+        if(val.includes('上传中...')){ t.uploadTableBtnDelete = false; t.uploadTableBtnAgain = false }
+        if(val.includes('分析中')){ t.uploadTableBtnDelete = false; t.uploadTableBtnAgain = false }
+        if(val.includes('上传暂停')) t.uploadTableBtnAgain = false
+        if(val.includes('上传失败')) t.uploadTableBtnAgain = false
+        if(val.includes('已取消')) t.uploadTableBtnAgain = false
+        if(val.includes('已放弃')) t.uploadTableBtnAgain = false
+        // if(val.includes('分析警告')) ''
+        // if(val.includes('待设置参数')) ''
+        // if(val.includes('分析失败')) ''
+      },
+      // 渲染下载 多选结果
+      j(val){
+        let t = this.btnGroup
+        t.downloadTableBtnStart = true       // 渲染下载 - 开始
+        t.downloadTableBtnPause = true       // 渲染下载 - 暂停
+        t.downloadTableBtnDelete = true      // 渲染下载 - 删除
+        t.downloadTableBtnDownload = true    // 渲染下载 - 下载完成帧
+        t.downloadTableBtnRenderAll = true   // 渲染下载 - 全部渲染
+        t.downloadTableBtnRenderAgain = true // 渲染下载 - 重新渲染
+        t.downloadTableBtnArchive = true     // 渲染下载 - 归档
+        if(val.includes('渲染中')){
+          t.downloadTableBtnDelete = false
+          t.downloadTableBtnStart = false
+          // t.downloadTableBtnRenderAll = false
+          t.downloadTableBtnArchive = false
+        }
+        if(val.includes('渲染暂停')){
+          t.downloadTableBtnPause = false
+          t.downloadTableBtnRenderAll = false
+          t.downloadTableBtnArchive = false
+        }
+        if(val.includes('待全部渲染')){
+          t.downloadTableBtnStart = false
+          t.downloadTableBtnPause = false
+          t.downloadTableBtnArchive = false
+        }
+        if(val.includes('渲染完成')){
+          t.downloadTableBtnStart = false
+          t.downloadTableBtnPause = false
+          t.downloadTableBtnRenderAll = false
+        }
+      },
+      // 【归档记录】触发重新获取数据
+      x(){
+        this.$refs.renderMode.getList()
+      },
+      // 获取归档记录长度
+      getArchiveNum(val){
+        this.btnGroup.archiveRecordsNum = val
+      },
       uploadTbaleTotalItem(val){
         this.table.navList[0]['num'] = val
       },
@@ -289,48 +383,54 @@
         })
         // this.createTaskDialog = true
       },
-      // 删除 - 上传分析
+      // 上传分析 - 删除
       deleteTaskUpload(){
+        if(!this.btnGroup.uploadTableBtnDelete) return false
         this.$refs.uploadMode.deleteItem()
       },
-      // 重新分配 - 上传分析
+      // 上传分析 - 重新分析
       againTaskUpload(){
+        if(!this.btnGroup.uploadTableBtnAgain) return false
         this.$refs.uploadMode.analyseAgainFun()
       },
-      // 开始 - 渲染下载
+      // 上传分析 - 关键字检索
+      searchUploadInput(){
+        this.$refs.uploadMode.searchFun(this.btnGroup.searchInputUpload)
+      },
+      // 渲染下载 - 开始
       beginTaskDownload(){
-
+        if(!this.btnGroup.downloadTableBtnStart) return false
+        this.$refs.renderMode.startFun()
       },
-      // 暂停 - 渲染下载
+      // 渲染下载 - 暂停
       pauseTaskDownload(){
-
+        if(!this.btnGroup.downloadTableBtnPause) return false
+        this.$refs.renderMode.pauseFun()
       },
-      // 删除 - 渲染下载
+      // 渲染下载 - 删除
       deleteTaskDownload(){
-
+        if(!this.btnGroup.downloadTableBtnDelete) return false
+        this.$refs.renderMode.deleteFun()
       },
-      // 下载完成帧 - 渲染下载
+      // 渲染下载 - 下载完成帧
       completeTaskDownload(){
 
       },
-      // 全部渲染 - 渲染下载
+      // 渲染下载 - 全部渲染
       allTaskDownload(){
-
+        if(!this.btnGroup.downloadTableBtnRenderAll) return false
+        this.$refs.renderMode.renderAllFun()
       },
-      // 重新渲染 - 渲染下载
+      // 渲染下载 - 重新渲染
       againTaskDownload(){
-
+        this.$refs.renderMode.renderAgainFun()
       },
-      // 归档 - 渲染下载
+      // 渲染下载 - 归档
       archiveTaskDownload(){
-
+        if(!this.btnGroup.downloadTableBtnArchive) return false
+        this.$refs.renderMode.archiveFun()
       },
-      // 关键字检索 - 上传分析
-      searchUploadInput(){
-        // this.btnGroup.searchInputUpload
-        this.$refs.uploadMode.searchFun(this.btnGroup.searchInputUpload)
-      },
-      // 关键字检索 - 渲染下载
+      // 渲染下载 - 关键字检索
       searchRenderInput(){
         this.$refs.renderMode.searchFun(this.btnGroup.searchInputDownload)
       },
@@ -361,6 +461,121 @@
         height: 100%;
         display: flex;
         align-items: center;
+      }
+      .uploadBtnGroup {
+        &.cannotDelete {
+          .deleteBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+            img {
+              opacity: 0;
+            }
+          }
+        }
+        &.cannotAgain {
+          .againBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+          }
+        }
+      }
+      .renderBtnGroup {
+        &.cannotState {
+          .startBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+            img {
+              opacity: 0;
+            }
+          }
+        }
+        &.cannotPause {
+          .pauseBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+            img {
+              opacity: 0;
+            }
+          }
+        }
+        &.cannotDelete {
+          .deleteBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+            img {
+              opacity: 0;
+            }
+          }
+        }
+        &.cannotDownload {
+          .downloadBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+            img {
+              opacity: 0;
+            }
+          }
+        }
+        &.cannotRenderAll {
+          .renderAllBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+            img {
+              opacity: 0;
+            }
+          }
+        }
+        &.cannotRenderAgain {
+          .renderAgainBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+            img {
+              opacity: 0;
+            }
+          }
+        }
+        &.cannotArchive {
+          .archiveBtn {
+            cursor: no-drop;
+            color: rgba(256, 256, 256, 0.1);
+            &:hover {
+              background-color: #212933;
+              color: rgba(256, 256, 256, 0.1);
+            }
+          }
+        }
       }
     }
     .tableGroup {

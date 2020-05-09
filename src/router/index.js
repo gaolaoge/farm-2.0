@@ -49,7 +49,7 @@ const router = new Router({
       path: '/rechargepage',
       name: 'rechargePage',
       component: () => import('@/components/rechargePage.vue')
-    }
+    },
   ]
 })
 

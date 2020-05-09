@@ -62,8 +62,8 @@
           },
           yAxis: {
             type: 'value',
-            // min: 0,
-            // max: 60,
+            min: 0,
+            max: 60,
             interval: 30,
             axisLine: {
               show: false

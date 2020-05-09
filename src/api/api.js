@@ -9,6 +9,14 @@ export function register(data){
   })
 }
 
+// 登录页-注册 手机验证码
+export function registerTelephone(data){
+  return api({
+    url: `/auth/phoneOwnVerify/${data}`,
+    method: 'GET'
+  })
+}
+
 // 登录页-注册 验证帐号
 export function registerAccount(data){
   return api({
@@ -144,6 +152,15 @@ export function pushTask(data){
   })
 }
 
+// 新建任务 设置渲染模板-新建模板-【提交】
+export function oneMorePath(data){
+  return api({
+    url: `/professional/file/beforeUpload`,
+    method: 'POST',
+    data
+  })
+}
+
 // 账单 充值记录 获取table数据
 export function getUpTopTable(data){
   return api({
@@ -156,7 +173,8 @@ export function getUpTopTable(data){
 export function downloadReceipt(data){
   return api({
     url: `/file/farmReceipt?${data}`,
-    method: 'GET'
+    method: 'GET',
+    responseType: 'blob'
   })
 }
 
@@ -266,7 +284,8 @@ export function upTopTableSeeMore(data){
 export function analyseAgain(data){
   return api({
     url: `/professional/task/resubmitAnalyseTask`,
-    method: 'POST'
+    method: 'POST',
+    data
   })
 }
 
@@ -287,7 +306,7 @@ export function upTopTableSet(data){
     timeout: 3000
   })
 }
-
+``
 // 任务 - 渲染下载 - 获取列表
 export function getRenderTableList(data){
   return api({
@@ -299,8 +318,35 @@ export function getRenderTableList(data){
 // 任务 - 渲染下载 - 查看详情
 export function getRenderTSeeMore(data){
   return api({
-    url: `/professional/frame/getAssetsFrameTaskList?${data}`,
+    url: `/professional/frame/getAllFrameTaskList?${data}`,
     method: 'GET',
+  })
+}
+
+// 任务 - 渲染下载 - 开始
+export function itemStart(data){
+  return api({
+    url: `/professional/task/instruct/instructTask`,
+    method: 'PUT',
+    data
+  })
+}
+
+// 任务 - 渲染下载 - 归档
+export function itemArchive(data){
+  return api({
+    url: `/professional/history/putToHistory`,
+    method: 'PUT',
+    data
+  })
+}
+
+// 任务 - 渲染下载 - 删除
+export function itemDelete(data){
+  return api({
+    url: `/professional/task/instruct/instructTask`,
+    method: 'PUT',
+    data
   })
 }
 
@@ -322,11 +368,54 @@ export function startRender(data){
   })
 }
 
+// 任务 - 详情窗口 - 查看余额
+export function seeBalance(){
+  return api({
+    url: `/professional/file/getRenderBalance`,
+    method: 'GET'
+  })
+}
+
+// 任务 - 详情窗口 - 下载完成帧
+export function downloadFrame(data){
+  return api({
+    url: `/professional/file/downloadFrameFile?${data}`,
+    method: 'GET',
+    responseType: 'blob'
+  })
+}
+
+// 任务 - 详情窗口 - 查看【帧-历史渲染记录】
+export function getFrameHistoryTable(data){
+  return api({
+    url: `/professional/frame/getFrameTaskAndLog?${data}`,
+    method: 'GET'
+  })
+}
+
+// 任务 - 详情窗口 - 下载日志
+export function downloadLog(data){
+  return api({
+    url: `/professional/log/downloadFrameLog?${data}`,
+    method: 'GET',
+    responseType: 'blob'
+  })
+}
+
 // 任务 - 归档记录 - 获取列表
 export function getRecordList(data){
   return api({
     url: `/professional/history/getHistoryTaskList?${data}`,
     method: 'GET'
+  })
+}
+
+// 任务 - 归档记录 - 还原到下载列表
+export function reductionDownloadList(data){
+  return api({
+    url: `/professional/history/returnToDownload`,
+    method: 'PUT',
+    data
   })
 }
 
@@ -375,6 +464,15 @@ export function assetsExportFrame(data){
   return api({
     url: `/professional/assets/getAssetsFrameTaskList?${data}`,
     method: 'GET'
+  })
+}
+
+// 资产 - 删除
+export function assetsDeleteItem(data){
+  return api({
+    url: `/professional/assets/deleteAssetsTaskList`,
+    method: 'DELETE',
+    data
   })
 }
 

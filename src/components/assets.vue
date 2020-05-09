@@ -4,7 +4,7 @@
     <div class="btnGroup">
       <!--渲染输出操作-->
       <div class="outPutBtnGroup">
-        <div class="farm-primary-form-btn" v-for="item,index in btnGroup.outPutBtnGroup" :key="index">
+        <div class="farm-primary-form-btn" v-for="item,index in btnGroup.outPutBtnGroup" :key="index" @click="operating(item['text'])">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
           <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
           <span>
@@ -98,6 +98,17 @@
       },
       clearInput(){
         this.searchInputVal = ''
+      },
+      // 操作
+      operating(active){
+        switch(active){
+          case '下载':
+            this.$refs.outPutTable.downloadFun()
+            break
+          case '删除':
+            this.$refs.outPutTable.deleteFun()
+            break
+        }
       }
     }
   }

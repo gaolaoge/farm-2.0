@@ -19,10 +19,10 @@ http.interceptors.request.use(config => {
 http.interceptors.response.use(response => {
     const res = response.data
     // if (res.code != 200) {
-    //   // alert('有一定的错误存在:' + res.message)  //不弹出 将错传给调用出使用
-    //   return Promise.reject(res.message)  //这里的值会传递给我调用接口处的错误返回信息
-    // } else {
-      return response
+  //   // alert('有一定的错误存在:' + res.message)  //不弹出 将错传给调用出使用
+  //   return Promise.reject(res.message)  //这里的值会传递给我调用接口处的错误返回信息
+  // } else {
+  return response
     // }
   },error => {
   if(vue.$route.path == '/login') return false

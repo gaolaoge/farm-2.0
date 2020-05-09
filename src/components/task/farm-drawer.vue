@@ -143,6 +143,7 @@
             <div class="switchLayered">
               <el-switch
                 v-model="setting.num.singleChoiceVal"
+                @change="h"
                 inactive-color="RGBA(256, 1256, 256, 0.5)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value=1
@@ -183,7 +184,10 @@
               label="帧范围"
               width="80">
               <template slot-scope="scope">
-                <span :class="[{'show': scope.row.rangeEdit == false}]"
+                <span :class="[
+                  {'show': scope.row.rangeEdit == false},
+                  {'err': scope.row.rangeErr}
+                 ]"
                       class="farm-table-td-span">
                   {{ scope.row.range }}
                 </span>
@@ -191,7 +195,7 @@
                        v-model="scope.row.range"
                        :class="[{'show': scope.row.rangeEdit == true}]"
                        @focus="scope.row.rangeEdit = true"
-                       @blur="rangeChange($event,scope.$index)"
+                       @blur="rangeChange($event,scope.$index,scope.row.range,scope.row)"
                        class="farm-table-td-input">
               </template>
             </el-table-column>
@@ -200,7 +204,10 @@
               width="80"
               label="间隔帧数">
               <template slot-scope="scope">
-                <span :class="[{'show': scope.row.numEdit == false}]"
+                <span :class="[
+                  {'show': scope.row.numEdit == false},
+                  {'err': scope.row.numErr}
+                ]"
                       class="farm-table-td-span">
                   {{ scope.row.num }}
                 </span>
@@ -208,7 +215,7 @@
                        v-model="scope.row.num"
                        :class="[{'show': scope.row.numEdit == true}]"
                        @focus="scope.row.numEdit = true"
-                       @blur="numChange($event,scope.$index)"
+                       @blur="numChange($event,scope.$index,scope.row)"
                        class="farm-table-td-input">
               </template>
             </el-table-column>
@@ -295,6 +302,7 @@
             <div class="item-switch">
               <el-switch
                 v-model="setting.priority.topVal"
+                @change="val => {if(val == 1) setting.priority.selfVal = 0}"
                 inactive-color="RGBA(256, 1256, 256, 0.5)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
@@ -307,6 +315,7 @@
             <div class="item-switch">
               <el-switch
                 v-model="setting.priority.middleVal"
+                @change="val => {if(val == 1) setting.priority.selfVal = 0}"
                 inactive-color="RGBA(256, 1256, 256, 0.5)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
@@ -319,6 +328,7 @@
             <div class="item-switch">
               <el-switch
                 v-model="setting.priority.bottomVal"
+                @change="val => {if(val == 1) setting.priority.selfVal = 0}"
                 inactive-color="RGBA(256, 1256, 256, 0.5)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
@@ -332,6 +342,7 @@
               <el-switch
                 style="vertical-align: inherit"
                 v-model="setting.priority.selfVal"
+                @change="val => {if(val == 0) setting.priority.customize = ''}"
                 inactive-color="RGBA(256, 1256, 256, 0.5)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
@@ -342,7 +353,11 @@
                 {{ setting.priority.selfLabel }}
               </span>
               <el-input class='customizeInput'
+                        :class="[{customizeInputError: setting.priority.customizeInputError}]"
+                        v-show="setting.priority.selfVal == 1"
                         v-model="setting.priority.customize"
+                        @blur="verifFormat"
+                        @focus="setting.priority.customizeInputError = false"
                         :placeholder="setting.priority.inputPlaceholder"/>
             </div>
           </div>
@@ -415,6 +430,13 @@
                      class="sliderVal"
                      @blur="changeSliderVal"
                      v-model="setting.other.remindVal">
+              <el-tooltip class="item"
+                          popper-class="t mini"
+                          effect="dark"
+                          content="单帧渲染时长超过设定，系统发送提醒消息给联系人，具体通知方式可在“消息设置”中完成"
+                          placement="right">
+                <img src="@/icons/question-mark-icon.png" alt="" class="mark">
+              </el-tooltip>
             </div>
             <!--超时提醒-->
             <div class="farm-drawer-item">
@@ -429,6 +451,13 @@
                      class="sliderVal"
                      @blur="changeStopVal"
                      v-model="setting.other.stopVal">
+              <el-tooltip class="item"
+                          popper-class="t mini"
+                          effect="dark"
+                          content="单帧渲染时长超过设定，系统停止当前帧的渲染并发送消息给联系人"
+                          placement="right">
+                <img src="@/icons/question-mark-icon.png" alt="" class="mark">
+              </el-tooltip>
             </div>
           </div>
         </div>
@@ -439,7 +468,7 @@
             {{ setting.btn.returnBtn }}
           </div>
           <!--开始渲染-->
-          <div class="btn" @click="startRender">
+          <div class="btn" @click="startRenderFun">
             {{ setting.btn.startBtn }}
           </div>
         </div>
@@ -486,7 +515,7 @@
       <div class="farm-drawer-body r">
         <div class="info">
           <div class="thumbnail">
-            <img src="@/assets/j.png" alt="" class="img">
+            <img :src="result.miniImgHref" alt="" class="img">
             <span class="status"
                   :class="[
                   {'wait': result.statusData == '等待'},
@@ -642,8 +671,12 @@
               </span>
               </div>
               <div class="searchBase">
-                <img src="@/icons/searchIcon.png" alt="" class="i">
-                <input type="text" class="search" placeholder="搜索帧">
+                <img src="@/icons/searchIcon.png" alt="" class="i" @click="getRenderItemMoreTableF">
+                <input type="text"
+                       v-model="result.searchInpVal"
+                       class="search"
+                       placeholder="搜索帧"
+                       @keyup.enter="getRenderItemMoreTableF">
               </div>
             </div>
             <!--详情-操作-->
@@ -658,19 +691,27 @@
               </span>
               </div>
               <div class="searchBase">
-                <img src="@/icons/searchIcon.png" alt="" class="i">
-                <input type="text" class="search" placeholder="搜索帧">
+                <img src="@/icons/searchIcon.png"
+                     alt=""
+                     class="i"
+                     @click="">
+                <input type="text"
+                       class="search"
+                       placeholder="搜索帧"
+                       @keyup.enter="">
               </div>
             </div>
             <!--主-table-->
             <div class="tableBase task-table-seeMore" v-show="!result.showDetails">
+              <!--v-el-table-infinite-scroll="mainTableAddMoreItem" 无限滚动 -->
               <el-table
                 :data="result.tableData"
                 @selection-change="handleSelectionChange"
                 @filter-change="filterHandler"
+                @row-click="showMiniImg"
+                ref="mainTable"
                 class="vv"
                 :border=true
-                v-el-table-infinite-scroll="mainTableAddMoreItem"
                 height="auto"
                 style="width: 100%">
 
@@ -685,16 +726,16 @@
                   label="帧数"
                   sortable
                   show-overflow-tooltip
-                  width="80">
+                  width="120">
                   <template slot-scope="scope">
-                    no. {{ scope.row.num }}
+                    {{ scope.row.num }}
                   </template>
                 </el-table-column>
                 <!--帧状态-->
                 <el-table-column
                   label="帧状态"
                   show-overflow-tooltip
-                  min-width="120">
+                  min-width="100">
                   <template slot-scope="scope">
                     <span :class="[
                         {'wait': scope.row.status == '等待中'},
@@ -712,7 +753,7 @@
                   prop="prices"
                   label="渲染费用（金币）"
                   show-overflow-tooltip
-                  width="172" />
+                  width="152" />
                 <!--渲染时长-->
                 <el-table-column
                   prop="direction"
@@ -760,8 +801,8 @@
                   sortable
                   show-overflow-tooltip
                   width="80">
-                  <template>
-                  <span class="seeMore" @click="showMore">
+                  <template slot-scope="scope">
+                  <span class="seeMore" @click="showMore(scope.row)">
                     查看
                   </span>
                   </template>
@@ -779,12 +820,12 @@
                 :border=true
                 style="width: 100%">
 
-                <el-table-column
-                  type="selection"
-                  align="right"
-                  show-overflow-tooltip
-                  min-width="58"
-                  width="58" />
+                <!--<el-table-column-->
+                  <!--type="selection"-->
+                  <!--align="right"-->
+                  <!--show-overflow-tooltip-->
+                  <!--min-width="58"-->
+                  <!--width="58" />-->
                 <!--帧数-->
                 <el-table-column
                   prop="num"
@@ -803,15 +844,6 @@
                   prop="prices"
                   label="渲染费用（金币）"
                   show-overflow-tooltip
-                  :filters="[
-                  {text: '全选', value: '上传中'},
-                  {text: '待设置参数', value: '待设置参数'},
-                  {text: '上传中', value: '上传暂停'},
-                  {text: '上传失败', value: '上传失败'},
-                  {text: '分析中', value: '分析警告'},
-                  {text: '分析警告', value: '上传中...'},
-                  {text: '上传失败', value: '上中'},
-                 ]"
                   width="172" />
                 <!--渲染时长-->
                 <el-table-column
@@ -834,18 +866,18 @@
                   show-overflow-tooltip
                   width="180" />
                 <!--CPU利用率-->
-                <el-table-column
-                  prop="percent"
-                  label="CPU利用率"
-                  show-overflow-tooltip
-                  width="110" />
+                <!--<el-table-column-->
+                  <!--prop="percent"-->
+                  <!--label="CPU利用率"-->
+                  <!--show-overflow-tooltip-->
+                  <!--width="110" />-->
                 <!--内存峰值-->
-                <el-table-column
-                  prop="RAM"
-                  label="内存峰值"
-                  sortable
-                  show-overflow-tooltip
-                  width="120" />
+                <!--<el-table-column-->
+                  <!--prop="peak"-->
+                  <!--label="内存峰值"-->
+                  <!--sortable-->
+                  <!--show-overflow-tooltip-->
+                  <!--width="120" />-->
                 <!--下载次数-->
                 <el-table-column
                   prop="times"
@@ -867,10 +899,8 @@
                 </div>
               </div>
               <!--日志详情-->
-              <div class="c">
-                <span>
-                  {{ demo }}
-                </span>
+              <div class="c setScollBarStyle">
+                <div v-html="demo"/>
               </div>
             </div>
           </div>
@@ -898,11 +928,20 @@
     getConsumptionSelectList,
     addNewItem,
     startRender,
-    getRenderTSeeMore
+    getRenderTSeeMore,
+    downloadFrame,
+    seeBalance,
+    itemStart,
+    getFrameHistoryTable,
+    downloadLog
   } from '@/api/api'
   import {
     createDateFun,
-    consum
+    consum,
+    renderingRange,
+    exportDownloadFun,
+    messageFun,
+    itemDownloadStatus
   } from '@/assets/common.js'
   import elTableInfiniteScroll from 'el-table-infinite-scroll'
 
@@ -985,7 +1024,10 @@
                 // ]
               },
             ],
-            selected: []
+            tableDataAll: [],
+            selected: [],
+            randerError: false,
+            numError: false
           },
           // 优先渲染
           priority: {
@@ -1001,7 +1043,8 @@
             selfVal: '0',
             info: '测试帧渲染完成后，任务处于“待全部渲染”状态，请点击【全部渲染】',
             customize: '',
-            inputPlaceholder: '例如1,2,5'
+            inputPlaceholder: '例如1,2,5',
+            customizeInputError: false
           },
           // 渲染模式
           mode: {
@@ -1016,13 +1059,13 @@
                 label: '16核32G【标准模式1】'
               },
               {
-                val: '16核64G【标准模式2】',
-                label: '16核64G【标准模式2】'
-              },
-              {
-                val: '32核128G【标准模式3】',
-                label: '32核128G【标准模式3】'
+                val: '32核64G【标准模式2】',
+                label: '32核64G【标准模式2】'
               }
+              // {
+              //   val: '32核128G【标准模式3】',
+              //   label: '32核128G【标准模式3】'
+              // }
             ]
           },
           // 其它设置
@@ -1037,9 +1080,9 @@
               // }
             ],
             view: '',
-            remindLabel: '超时提醒 (h)',
+            remindLabel: '单帧超时提醒 (h)',
             remindVal: 12,
-            stopLabel: '超时停止 (h)',
+            stopLabel: '单帧超时停止 (h)',
             stopVal: 24
           },
           btn: {
@@ -1051,7 +1094,7 @@
           t: '渲染结果',
           dataO: {
             costLabel: '费用(金币)',
-            costVal: '22.0000',
+            costVal: '.0000',
             totalLabel: '总渲染时长',
             totalVal: '22分0秒',
             averageLabel: '平均渲染时长',
@@ -1140,17 +1183,6 @@
               // peak: ''        // 内存峰值
               // time: null       // 下载次数
             // },
-            {
-              num: '1（优先）',
-              cost: 0.489,
-              duration: '44秒',
-              startDate: '2020-01-22 22:52:44',
-              endDate: '2020-12-12 12:11:41',
-              price: 4.0,
-              percent: '20%',
-              peak: '12.02G',
-              times: 12
-            },
           ],
           // 主 table 多选结果
           selectionResult: [],
@@ -1182,9 +1214,11 @@
             }
           ],
           x: '暂无数据',
-          showDetails: false
+          showDetails: false,
+          searchInpVal: '',            // 渲染结果 - 主table 操作 关键帧查询
+          miniImgHref: ''              // 渲染结果 - 缩略图
         },
-        demo: ` fermentum，无花果夜蛾，felistellus mollis orcicus pronin sapien nunc accue eget。`,
+        demo: ``,
         loading: null
       }
     },
@@ -1211,6 +1245,14 @@
     watch: {
       taskData: function(val){
         if(val.rowId != null || this.typeInfo == 'upload-table') this.getData()
+      },
+      'setting.priority.selfVal': function(val){
+        // 选中【单选】时取消【首帧】【中间帧】【末帧】，反之复原
+        if(val == 1){
+          this.setting.priority.topVal = 0
+          this.setting.priority.middleVal = 0
+          this.setting.priority.bottomVal = 0
+        }
       }
     },
     methods: {
@@ -1259,67 +1301,33 @@
           this.details.errorList = []
         }
       },
-      // 渲染下载 - 获取详情
+      // 渲染下载 - 获取详情 - 渲染结果
       getRenderItemMoreF(){
-        let s = null
-        switch(this.taskData.status){
-          case 1:
-            s = '等待'
-            break
-          case 2:
-            s = '渲染中'
-            break
-          case 3:
-            s = '渲染结束'
-            break
-          case 4:
-            s = '渲染暂停'
-            break
-          case 6:
-            s = '渲染放弃'
-            break
-        }
-
-        // console.log(this.taskData)
-
-        this.result.statusList.taskIdVal = this.taskData.id                         // 任务ID
-        this.result.statusList.scenesNameVal = this.taskData.sceneName              // 场景名
-        this.result.statusList.projectVal = this.taskData.projectName               // 所属项目
-        this.result.statusList.softwareVal = this.taskData.softwareVal              // 渲染软件
-        this.result.statusList.pluginVal = this.taskData.pluginVal                  // 渲染插件
-        this.result.statusList.layerVal = this.taskData.layerName                   // 层名
-        this.result.statusList.resolutionVal = this.taskData.resolutionVal          // 分辨率
-        this.result.statusList.formatVal = this.taskData.formatName                 // 输出格式
-        this.result.statusList.cameraVal = this.taskData.camera                     // 相机
-        this.result.statusList.modeVal = this.taskData.modeVal                      // 渲染模式
-        this.result.statusList.founderVal = this.taskData.founder                   // 创建人
-        this.result.statusList.creationTimeVal = createDateFun(new Date(this.taskData.creationTime))         // 创建时间
-        this.result.statusData = s                                                  // 状态
-        this.result.happen[0]['num'] = this.taskData.rendering,
-        this.result.happen[1]['num'] = this.taskData.wait,
-        this.result.happen[2]['num'] = this.taskData.timeOut,
-        this.result.happen[3]['num'] = this.taskData.carryOut,
-        this.result.happen[4]['num'] = this.taskData.failure,
-
         this.loading.close()
-
         this.getRenderItemMoreTableF()
       },
       // 渲染下载 - 详情 mainTable more
       mainTableAddMoreItem(){
         this.getRenderItemMoreTableF()
       },
+      // 渲染下载 - 详情 - 缩略图
+      async showMiniImg(row, column, event){
+        let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&type=1`,
+            data = await downloadFrame(t)
+        this.result.miniImgHref = window.URL.createObjectURL(data.data)
+      },
       async getRenderItemMoreTableF(){
         // {
+        //   TaskUuid: '',
         //   layerTaskUuid: '',
         //   keyword: '',
         //   pageIndex: '',
         //   pageSize: ''
         // }
-        // ++this.result.mainTableIndex
-        let parameter = `layerTaskUuid=${this.taskData.taskUuid}&keyword=&pageIndex=1&pageSize=999`,
-            data = await getRenderTSeeMore(parameter)
-        this.result.tableData = data.data.data.map(curr => {
+        let parameter = `taskUuid=${this.taskData.FatherTaskUuId}&layerTaskUuid=${this.taskData.taskUuid}&keyword=${this.result.searchInpVal}&pageIndex=1&pageSize=999`,
+            data = await getRenderTSeeMore(parameter),
+            data_ = data.data.data
+        this.result.tableData = data_.frameList.map(curr => {
           let s = null
           switch(curr.frameTaskStatus){
             case 1:
@@ -1340,22 +1348,68 @@
               break
           }
           return {
-              num: curr.frameNo,                // 帧数
-              status: s,                        // 帧状态
-              prices: curr.cost,                // 渲染费用（金币）
-              direction: consum(curr.useTime),          // 渲染时长
-              startDate: curr.startTime,        // 渲染开始时间
-              endDate: curr.endTime,            // 渲染结束时间
-              percent: '-',                     // CPU利用率
-              RAM: '-',                         // 内存峰值
-              times: curr.downloadCount,        // 已下载次数
+              num: curr.isTest == 1 ? curr.frameNo + '（优先）' : curr.frameNo,      // 帧数
+              status: s,                                            // 帧状态
+              prices: curr.cost,                                    // 渲染费用（金币）
+              direction: consum(curr.useTime),                      // 渲染时长
+              startDate: createDateFun(new Date(curr.startTime)),   // 渲染开始时间
+              endDate: createDateFun(new Date(curr.endTime)),       // 渲染结束时间
+              percent: '-',                                         // CPU利用率
+              RAM: '-',                                             // 内存峰值
+              times: '-',                                           // 已下载次数
+              layerTaskUuid: curr.layerTaskUuid,                    // 层uuid
+              frameTaskUuid: curr.frameTaskUuid,                    // 帧uuid
+              taskTaskUuid: curr.taskUuid,                          // 主uuid
           }
         })
-      },
+        this.result.happen[0]['num'] = data_.frameCount['running']
+        this.result.happen[1]['num'] = data_.frameCount['wait']
+        this.result.happen[2]['num'] = data_.frameCount['pause']
+        this.result.happen[3]['num'] = data_.frameCount['done']
+        this.result.happen[4]['num'] = data_.frameCount['fail']
+        this.result.dataO['costVal'] = data_.taskInfo['cost'].toFixed(3)
+        this.result.dataO['totalVal'] = consum(data_.taskInfo['useTime'])
+        this.result.dataO['averageVal'] = data_.frameCount['done'] ? consum(data_.taskInfo['useTime'] / data_.frameCount['done']) : 'null'
 
+        let ss = null
+        switch(data_.taskInfo.renderStatus){
+          case 1:
+            ss = '等待'
+            break
+          case 2:
+            ss = '渲染中'
+            break
+          case 3:
+            ss = '渲染结束'
+            break
+          case 4:
+            ss = '渲染暂停'
+            break
+          case 6:
+            ss = '渲染放弃'
+            break
+        }
+
+        this.result.statusList.taskIdVal = data_.taskInfo.taskNo                                            // 任务ID
+        this.result.statusList.scenesNameVal = data_.taskInfo.fileName                                      // 场景名
+        this.result.statusList.projectVal = data_.taskInfo.projectName                                      // 所属项目
+        this.result.statusList.softwareVal = data_.taskInfo.softName + ' ' + data_.taskInfo.softVer         // 渲染软件
+        this.result.statusList.pluginVal = data_.taskInfo.pluginName + ' ' + data_.taskInfo.pluginVersion   // 渲染插件
+        this.result.statusList.layerVal = data_.taskInfo.layerName                                          // 层名
+        this.result.statusList.resolutionVal = data_.taskInfo.width + '*' + data_.taskInfo.height           // 分辨率
+        this.result.statusList.formatVal = data_.taskInfo.formatName                                        // 输出格式
+        this.result.statusList.cameraVal = data_.taskInfo.camera                                            // 相机
+        this.result.statusList.modeVal = data_.taskInfo.core + '核' + '-' + data_.taskInfo.memory + 'G' + '（' + data_.taskInfo.patternName + '）' // 渲染模式
+        this.result.statusList.founderVal = data_.taskInfo.account                                          // 创建人
+        this.result.statusList.creationTimeVal = createDateFun(new Date(data_.taskInfo.createTime))         // 创建时间
+        this.result.statusData = ss                                                                         // 状态
+
+        this.showMiniImg(this.result.tableData[0])
+      },
       //关闭抽屉
       closeDrawer(){
         this.result.mainTableIndex = 0
+        this.result.showDetails = false
         this.$emit('closeDrawer')
       },
       // 超时提醒改变
@@ -1386,14 +1440,65 @@
         return '';
       },
       // 帧范围修改
-      rangeChange(e,index) {
-        this.setting.num.tableData[index]['rangeEdit'] = false
-        this.setting.num.tableData[index]['range'] = e.target.value
+      rangeChange(e,index,val,row) {
+        // debugger
+        row['rangeEdit'] = false
+        row['range'] = e.target.value
+        if(!val){ this.rangeChangeErr('empty',index); return false }
+        if(!val.includes('-')){ this.rangeChangeErr('err',index); return false }
+        let h = val.split('-')[0],
+            f = val.split('-')[1]
+        if(!/^[0-9]+$/.test(h) || !/^[0-9]+$/.test(f)){ this.rangeChangeErr('err',index); return false }
+        if(h >= 999 || f > 999){ this.rangeChangeErr('max',index); return false }
+        if(h >= f){ this.rangeChangeErr('err',index); return false }
+
+        row['rangeErr'] = false
+        if(this.setting.num.tableData.every(curr => !curr.rangeErr)) this.setting.num.randerError = false
+        // 检查当前行【间隔帧】
+        this.numChange(null,index,row)
+      },
+      // 帧范围修改报错
+      rangeChangeErr(type,index){
+        switch(type){
+          case 'empty':
+            messageFun('error','请输入,例:1-10')
+            break
+          case 'max':
+            messageFun('error','输入格式错误，帧范围为1-999')
+            break
+          case 'err':
+            messageFun('error','输入格式错误，请输入,例:1-10')
+        }
+        this.setting.num.tableData[index]['rangeErr'] = true
+        this.setting.num.randerError = true
       },
       // 间隔帧数修改
-      numChange(e,index) {
-        this.setting.num.tableData[index]['numEdit'] = false
-        this.setting.num.tableData[index]['num'] = e.target.value
+      numChange(e,index,row) {
+        // debugger
+        row['numEdit'] = false
+        if(e) row['num'] = e.target.value
+        if(!row.num) row.num = 1
+        if(!/^[0-9]+$/.test(row.num)){ this.numChangeErr(row,'format'); return false }
+        if(!row.rangeErr){
+          let fa = row.range.split('-'),
+              h = Number(fa[0]),
+              f = Number(fa[1])
+          if(f - h < Number(row.num)){ this.numChangeErr(row,'range'); return false }
+        }
+        row.numErr = false
+        if(this.setting.num.tableData.every(curr => !curr.numErr)) this.setting.num.numError = false
+      },
+      // 帧间隔修改报错
+      numChangeErr(row,type){
+        switch(type){
+          case 'format':
+            messageFun('error','输入格式错误，请输入数字')
+            break
+          case 'range':
+            messageFun('error','帧间隔要小于最小帧和最大帧之差，以确保至少存在两个有效帧')
+        }
+        row.numErr = true
+        this.setting.num.numError = true
       },
       // 图像宽度修改
       wChange(e,index) {
@@ -1418,8 +1523,28 @@
 
       },
       // 查看详情
-      showMore(){
+      async showMore(row){
         this.result.showDetails = true
+        let data = await getFrameHistoryTable(`layerTaskUuid=${row.layerTaskUuid}&frameTaskUuid=${row.frameTaskUuid}`)
+        this.result.detailsTableData = data.data.data.frameTaskList.map(item => {
+          return {
+            num: item.frameNo,                   // 帧数
+            status: itemDownloadStatus(item.frameTaskStatus),                  // 帧状态
+            prices: item.cost,                   // 渲染费用
+            direction: consum(item.useTime),     // 渲染时长
+            startDate: createDateFun(new Date(item.startTime)),   // 渲染开始时间
+            endDate: createDateFun(new Date(item.endTime)),       // 渲染结束时间
+            price: item.unitPrice,               // 单价
+            percent: item.cpuRate,               // CPU利用率
+            peak: item.memoryPeak,               // 内存峰值
+            times: item.downloadCount,           // 下载次数
+            layerTaskUuid: item.layerTaskUuid,
+            frameTaskUuid: item.frameTaskUuid
+          }
+        })
+        this.demo = data.data.data.log.reduce((total, curr) => {
+          return total + `<p class="p">${curr}</p>`
+        },'')
       },
       // 设置参数 - 其他设置 - 新建项目
       createItem(){
@@ -1469,8 +1594,12 @@
         this.setting.num.selected = val
       },
       // 设置参数 - 开始渲染
-      startRender(){
-        let layerSetSettingList = this.setting.num.tableData.map(curr => {
+      async startRenderFun(){
+        if(this.setting.priority.customizeInputError) { messageFun('error','自定义帧错误'); return false}
+        if(this.setting.num.randerError) { messageFun('error','帧范围设定存在错误'); return false}
+        if(this.setting.num.numError) { messageFun('error','帧间隔设定存在错误'); return false}
+
+        let layerSetSettingList = this.setting.num.selected.map(curr => {
           // id: '1',
           // name: '默认层',
           // range: '1-24',
@@ -1494,7 +1623,7 @@
           }
         })
 
-        startRender({
+        let data = await startRender({
           taskUuid: this.taskData.taskUuid,                       // 项目Uuid
           layer: Number(this.setting.num.singleChoiceVal),        // 启动分层渲染
           testRendering: this.setting.priority.topVal == '1' || this.setting.priority.middleVal == '1' || this.setting.priority.bottomVal == '1' ? '1' : '0',  // 开启优先渲染
@@ -1502,7 +1631,7 @@
           frameMiddle: this.setting.priority.middleVal,           // 中间帧
           frameFinally: this.setting.priority.bottomVal,          // 尾帧
           frameCustom: this.setting.priority.selfVal,             // 自定义
-          frameCustomNo: [],                                      // 自定义真
+          frameCustomNo: this.setting.priority.customize.match(/\d/g),         // 自定义帧
           allocation: this.setting.mode.mode,                     // 渲染模式
           projectUuid: this.setting.other.view.split('-')[0],     // 所属项目ID
           projectName: this.setting.other.view.split('-')[1],     // 所属项目label
@@ -1510,13 +1639,24 @@
           frameTimeoutStop: this.setting.other.stopVal,           // 超时停止
           layerSetSettingList
         })
-          .then(data => {
-            if(data.data.code == 200) this.typeInfo = 'result'
-          })
+        if(data.data.code == 200) this.closeDrawer()
       },
       // 渲染结果 - 主 - 操作
       operateFun(action){
-
+        switch(action){
+          case '开始':
+            this.operateStart()
+            break
+          case '暂停':
+            this.operatePause()
+            break
+          case '下载完成帧':
+            this.operateDownloadFrame()
+            break
+          case '重新渲染':
+            this.operateRenderAgain()
+            break
+        }
       },
       // 渲染结果 - 详情 - 操作
       moreOperateFun(action){
@@ -1529,13 +1669,75 @@
             break
         }
       },
+      // 渲染结果 - 主 - 操作 - 开始
+      async operateStart(){
+        if(!this.result.selectionResult.length) return false
+        let data = await itemStart({
+          "instructType": 11,
+          "frameUuidList" : this.result.selectionResult.map(curr => curr.frameTaskUuid)
+        })
+        if(data.data.code == 200){ messageFun('success','操作成功'); this.getRenderItemMoreTableF() }else{ messageFun('error','报错，操作失败') }
+      },
+      // 渲染结果 - 主 - 操作 - 暂停
+      async operatePause(){
+        if(!this.result.selectionResult.length) return false
+        let data = await itemStart({
+          "instructType": 22,
+          "frameUuidList" : this.result.selectionResult.map(curr => curr.frameTaskUuid)
+        })
+        if(data.data.code == 200){ messageFun('success','操作成功'); this.getRenderItemMoreTableF() }else{ messageFun('error','报错，操作失败') }
+      },
+      // 渲染结果 - 主 - 操作 - 下载完成帧
+      async operateDownloadFrame(){
+        let data = await seeBalance()
+        if(data.data.code == 1001){ messageFun('error','余额不足'); return false }
+
+        this.result.selectionResult.forEach(async curr => {
+          let t = `frameTaskUuid=${curr.frameTaskUuid}&layerTaskUuid=${curr.layerTaskUuid}&type=0`,
+              data = await downloadFrame(t)
+          exportDownloadFun(data, data.headers.file, '')
+        })
+      },
+      // 渲染结果 - 主 - 操作 - 重新渲染
+      operateRenderAgain(){
+        this.$confirm('此操作将重新渲染选中项, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        })
+          .then(
+            async () => {
+              let dataList = []
+              this.result.selectionResult.forEach(curr => {
+                console.log(curr)
+                if('selfIndex' in curr) return false
+                let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
+                if(dataListIndex == -1){
+                  dataList.push(curr.frameTaskUuid)
+                }else{
+                  dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
+                }
+              })
+              let data = await itemStart({
+                "instructType": 33,
+                "instructTaskList": [{
+                  "taskUuid": this.result.selectionResult[0]['taskTaskUuid']
+                }],
+                "frameUuidList": dataList
+              })
+              if(data.data.code == 200) messageFun('success','操作成功')
+            },
+            () => messageFun('info','已取消操作')
+          )
+          .catch(() => messageFun('error','报错，操作失败'))
+      },
       // 渲染结果 - 详情 - 操作 - 返回
       moreOperateBack(){
         this.result.showDetails = false
       },
       // 渲染结果 - 详情 - 操作 - 下载日志
-      moreOperateDownload(){
-
+      async moreOperateDownload(){
+        let data = await downloadLog(`layerTaskUuid=${this.result.detailsTableData[0]['layerTaskUuid']}&frameTaskUuid=${this.result.detailsTableData[0]['frameTaskUuid']}`)
+        exportDownloadFun(data, data.headers.file, 'text')
       },
       // 分析结果 - 进入设置参数
       setParameter(){
@@ -1557,7 +1759,7 @@
               return false
             }
             this.$emit('changeTypeInfo','setting')
-            this.setting.num.tableData = data.data.layerSettingList.map(curr => {
+            this.setting.num.tableDataAll = data.data.layerSettingList.map(curr => {
               let formatList = curr.format.map(item => {
                 return {
                   label: item.name,
@@ -1579,15 +1781,18 @@
                 h: curr.height,
                 format: formatList[0]['val'],
                 camera: cameraList[0]['val'],
-                rangeEdit: false,         //帧范围 - 状态切换 勿动
-                numEdit: false,           //间隔帧数 - 状态切换 勿动
-                wEdit: false,             //图像宽度 - 状态切换 勿动
-                hEdit: false,             //图像高度 - 状态切换 勿动
+                rangeEdit: false,         // 帧范围 - 状态切换 勿动
+                rangeErr: false,          // 帧范围 - 报错切换 勿动
+                numEdit: false,           // 间隔帧数 - 状态切换 勿动
+                numErr: false,            // 间隔帧数 - 报错切换 勿动
+                wEdit: false,             // 图像宽度 - 状态切换 勿动
+                hEdit: false,             // 图像高度 - 状态切换 勿动
                 formatList: formatList,
                 cameraList: cameraList
               }
             })
-            // this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0])
+            this.setting.num.tableData = [this.setting.num.tableDataAll[0]]
+            // this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0], true)
           })
       },
       // 设置参数 - 返回分析结果
@@ -1614,6 +1819,38 @@
             }
 
           })
+      },
+      // 设置参数 启动分层渲染按钮 改变
+      h(){
+        let s = this.setting.num
+        this.$refs.renderTable.clearSelection()
+        s.selected = []
+        s.singleChoiceVal == 1 ? s.tableData = s.tableDataAll : s.tableData = [s.tableDataAll[0]]
+      },
+      // 验证 自定义帧格式
+      verifFormat(){
+        let val = this.setting.priority.customize
+        if(!val) { this.setting.priority.customizeInputError = false; return false }
+
+        let valList = val.replace(/，/g,',').split(',')          // 输入帧
+
+        if(valList.length > 3) { this.errFun('最多优先测试3帧'); return false }
+        if(!valList.every(curr => /^[0-9]+$/.test(Number(curr)))) { this.errFun('输入格式不正确，请重新输入'); return false }
+
+        let range = this.setting.num.tableData[0].range,         // 帧范围
+            rangeH = Number(range.split('-')[0]),                // 首帧
+            rangeF = Number(range.split('-')[1]),                // 尾帧
+            interval = Number(this.setting.num.tableData[0].num),// 帧间隔
+            result = renderingRange(rangeH,rangeF,interval),     // 遍历帧范围
+            r = valList.every(curr => result.includes(Number(curr)))        // 【帧范围】是否完全包含【输入帧】
+
+        if(!r) { this.errFun('优先帧超出帧范围，请重新输入'); return false }
+        if(r) this.setting.priority.customizeInputError = false
+      },
+      // 验证报错
+      errFun(text){
+        messageFun('error',text)
+        this.setting.priority.customizeInputError = true
       }
     }
   }
@@ -1703,8 +1940,12 @@
 
         .farm-drawer-item {
           .farm-drawer-item-label {
-            width: 82px;
+            width: 110px;
             margin-right: 28px;
+          }
+          .mark {
+            vertical-align: middle;
+            cursor: pointer;
           }
           .farm-drawer-item-val {
 
@@ -1772,10 +2013,14 @@
     &.show {
       opacity: 1;
     }
+    &.err {
+      color: tomato;
+    }
   }
   .farm-table-td-input {
     position: absolute;
     left: 0px;
+    top: 14px;
     width: calc(100% - 10px);
     padding-left: 10px;
     height: 23px;
@@ -1979,29 +2224,29 @@
             box-sizing: border-box;
             /*max-height: calc(100vh - 500px);*/
             overflow-y: auto;
-            span {
+            /deep/.p {
               font-size: 13px;
               font-weight: 400;
               color: rgba(255, 255, 255, 0.59);
               line-height: 18px;
             }
-            &::-webkit-scrollbar {
-              /*滚动条整体样式*/
-              width: 8px; /*高宽分别对应横竖滚动条的尺寸*/
-              height: 8px;
-            }
-            &::-webkit-scrollbar-thumb {
-              /*滚动条里面小方块*/
-              border-radius: 10px;
-              -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
-              background: #9e9797;
-            }
-            &::-webkit-scrollbar-track {
-              /*滚动条里面轨道*/
-              -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
-              border-radius: 10px;
-              background: rgb(226, 221, 221);
-            }
+            /*&::-webkit-scrollbar {*/
+              /*!*滚动条整体样式*!*/
+              /*width: 8px; !*高宽分别对应横竖滚动条的尺寸*!*/
+              /*height: 8px;*/
+            /*}*/
+            /*&::-webkit-scrollbar-thumb {*/
+              /*!*滚动条里面小方块*!*/
+              /*border-radius: 10px;*/
+              /*-webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);*/
+              /*background: #9e9797;*/
+            /*}*/
+            /*&::-webkit-scrollbar-track {*/
+              /*!*滚动条里面轨道*!*/
+              /*-webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);*/
+              /*border-radius: 10px;*/
+              /*background: rgb(226, 221, 221);*/
+            /*}*/
           }
         }
       }
@@ -2052,6 +2297,11 @@
       color: rgba(255, 255, 255, 0.8);
       &::-webkit-input-placeholder {
         color: rgba(255, 255, 255, 0.4);
+      }
+    }
+    &.customizeInputError {
+      input.el-input__inner {
+        color: tomato;
       }
     }
   }
