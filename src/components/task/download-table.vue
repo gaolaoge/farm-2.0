@@ -35,18 +35,21 @@
         <!--状态-->
         <el-table-column
           label="状态"
+          :filter-method="filterStatus"
+          :filters="table.statusList"
           show-overflow-tooltip
           width="110">
           <template slot-scope="scope">
             <span v-if="scope.row.status == '等待' || scope.row.status == '渲染放弃' || scope.row.status == '渲染中'">
               {{ scope.row.status }}
             </span>
-            <span v-if="scope.row.status == '渲染结束'" style="color: rgba(0, 227, 255, 1)">
+            <span v-if="scope.row.status == '渲染完成'" style="color: rgba(0, 227, 255, 1)">
               {{ scope.row.status }}
             </span>
-            <span v-if="scope.row.status == '渲染暂停'" style="color: rgba(229, 199, 138, 1)">
+            <span v-if="scope.row.status == '渲染暂停' || scope.row.status == '待全速渲染'" style="color: rgba(229, 199, 138, 1)">
               {{ scope.row.status }}
             </span>
+
           </template>
         </el-table-column>
         <!--渲染进度-->
@@ -69,6 +72,8 @@
           prop="viewProject"
           label="所属项目"
           show-overflow-tooltip
+          :filter-method="filterStatus"
+          :filters="table.itemList"
           width="180" />
         <!--渲染中-->
         <el-table-column
@@ -151,7 +156,9 @@
         <el-table-column
           label="下载情况"
           show-overflow-tooltip
-          width="90">
+          :filter-method="filterStatus"
+          :filters="table.downloadStatusList"
+          width="120">
           <template slot-scope="scope">
             <span v-if="scope.row.downloadStatus == '待下载'" style="color: #F90023">
               {{ scope.row.downloadStatus }}
@@ -183,6 +190,8 @@
           prop="founder"
           label="创建人"
           show-overflow-tooltip
+          :filter-method="filterStatus"
+          :filters="table.usersList"
           width="100" />
         <!--创建时间-->
         <el-table-column
@@ -215,7 +224,37 @@
     <farmDrawer :showDrawer="showDrawer"
                 :typeInfo="itemName"
                 :taskData="drawerTaskData"
+                @getListAgain="getList()"
                 @closeDrawer="closeDrawer"/>
+    <!--重新渲染弹框-->
+    <el-dialog :visible.sync="dialogTableVisible"
+               top="calc(50vh - 135px)"
+               title="提示"
+               width="400px">
+      <span class="renderAgainBoxTit">{{ renderAgainBoxTit }}</span>
+      <el-checkbox-group v-model="s">
+        <el-checkbox label="4" class="kk">
+          {{ renderAgainBoxcheckbox[0] }}
+        </el-checkbox>
+        <el-checkbox label="3" class="kk">
+          {{ renderAgainBoxcheckbox[1] }}
+          <span>
+            {{ renderAgainBoxSupplement }}
+          </span>
+        </el-checkbox>
+      </el-checkbox-group>
+      <div style="text-align: right;margin-top: 50px;">
+        <button class="el-button el-button--default el-button--small nn nx"
+                @click="cancelBtn">
+          <span>{{ renderAgainBoxBtnList[0] }}</span>
+        </button>
+        <button class="el-button el-button--default el-button--small el-button--primary nn nz"
+                @click="certainBtn">
+          <span>{{ renderAgainBoxBtnList[1] }}</span>
+        </button>
+      </div>
+
+    </el-dialog>
   </div>
 </template>
 
@@ -225,7 +264,9 @@
     getRenderTableList,
     itemStart,
     itemArchive,
-    itemDelete
+    itemDelete,
+    compressionFiles,
+    seeBalance
   } from '@/api/api'
   import {
     mapState
@@ -234,13 +275,16 @@
     createDateFun,
     consum,
     messageFun,
-    itemDownloadStatus
+    itemDownloadStatus,
+    UuidFun,
+    exportDownloadFun
   } from '@/assets/common.js'
 
   export default {
     name: 'download-table',
     data(){
       return {
+        s: ['4'],
         table: {
           RenderDownloadData: [
             // {
@@ -296,29 +340,56 @@
           renderTableTotal: 0,          // 总数
           current: 1,                   // 当前页数
           pageSize: 10,
-          unfoldList: []                // 展开项
+          unfoldList: [],               // 展开项
+          downloadStatusList: [         // 筛选 - 下载情况
+            {text: '待下载', value: '待下载'},
+            {text: '部分下载', value: '部分下载'},
+            {text: '已下载', value: '已下载'}
+          ],
+          usersList: [],                // 筛选 - 创建人
+          itemList: [],                // 筛选 - 所属项目
+          statusList: [                 // 筛选 - 状态
+            {text: '待全部渲染', value: '待全部渲染'},
+            {text: '渲染中', value: '渲染中'},
+            {text: '渲染暂停', value: '渲染暂停'},
+            {text: '渲染完成', value: '渲染完成'}
+          ],
         },
         showDrawer: false,
         itemName: 'result',
         drawerTaskData: null,
-        searchInput: ''
+        searchInput: '',
+        dialogTableVisible: false,
+        renderAgainBoxcheckbox: ['失败帧', '完成帧'],
+        renderAgainBoxSupplement: '（完成帧重现渲染会重复扣除费用）',
+        renderAgainBoxTit: '确认重新渲染以下帧么？',
+        renderAgainBoxBtnList: ['取消', '确定']
       }
     },
     methods: {
+      // 筛选 - 状态
+      filterStatus(value, row){
+        return row.status === value
+      },
       // table 行样式
       tableRowStyle({row, rowIndex}){
+        let y = []
+        if('FatherIndex' in row) y.push('son-row')
         switch(row.status){
           case '渲染暂停':
           case '等待':
-            return 'warning-row style-row'
+            y.push('warning-row')
+            y.push('style-row')
             break
           // case '分析失败':
           //   return 'error-row style-row'
             break
           case '渲染结束':
-            return 'wait-row style-row'
+            y.push('wait-row')
+            y.push('style-row')
             break
         }
+        return y.join(' ')
       },
       // 关键字检索
       searchFun(val){
@@ -335,54 +406,58 @@
         let result = selection.some(curr => curr.rowId == row.rowId),     // 【选中事件】or【取消事件】
             tableData = this.table.RenderDownloadData,
             allSonSelected = false,
-            fatherSelected = false
+            fatherSelected = false,
+            selectionList = this.table.renderSelectionList,
+            table = this.$refs.renderTableImportant
 
         // 事件触发在子项
         if('FatherId' in row && result){
-          this.table.renderSelectionList.push(row)
+          selectionList.push(row)
           // 判断该组子项是否已全部选中进而选中父项
           allSonSelected = tableData[row.FatherIndex]['children'].every(son => selection.some(item => item.rowId == son.rowId))
           if(allSonSelected){ fatherSelected = selection.some(item => tableData[row.FatherIndex].rowId == item.rowId ) }
           // 将父级推入选中项
           if(allSonSelected && !fatherSelected) {
-            this.$refs.renderTableImportant.toggleRowSelection(tableData[row.FatherIndex],true)
-            this.table.renderSelectionList.push(tableData[row.FatherIndex])
+            table.toggleRowSelection(tableData[row.FatherIndex],true)
+            selectionList.push(tableData[row.FatherIndex])
           }
         }
         if('FatherId' in row && !result){
-          this.table.renderSelectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
+          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
           // 父项是否被选中 取消选中
           fatherSelected = selection.findIndex(item => tableData[row.FatherIndex].rowId == item.rowId )
           // 取消父级选中状态
           if(fatherSelected != -1) {
-            this.$refs.renderTableImportant.toggleRowSelection(tableData[row.FatherIndex],false)
-            this.table.renderSelectionList.splice(fatherSelected,1)
+            table.toggleRowSelection(tableData[row.FatherIndex],false)
+            selectionList.splice(fatherSelected,1)
           }
         }
 
         // 事件触发在父项
         if(!('FatherId' in row) && result){
-          this.table.renderSelectionList.push(row)
+          selectionList.push(row)
           // 勾选全部子项
           tableData[row.selfIndex]['children'].forEach(son => {
             // 将此子项勾选
             if(!selection.some(item => item.rowId == son.rowId)) {
-              this.$refs.renderTableImportant.toggleRowSelection(son,true)
-              this.table.renderSelectionList.push(son)
+              table.toggleRowSelection(son,true)
+              selectionList.push(son)
             }
           })
         }
         if(!('FatherId' in row) && !result){
-          this.table.renderSelectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
           // 取消勾选全部子项
           tableData[row.selfIndex]['children'].forEach(son => {
             // 将此子项取消勾选
             let sonDefault = selection.some(item => item.rowId == son.rowId)
             if(sonDefault != -1) {
-              this.$refs.renderTableImportant.toggleRowSelection(son,false)
-              this.table.renderSelectionList.splice(sonDefault,1)
+              table.toggleRowSelection(son,false)
+              selectionList.splice(sonDefault,1)
             }
           })
+          // 取消自身勾选
+          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
+          table.toggleRowSelection(row,false)
         }
       },
       // 渲染下载多选
@@ -433,7 +508,7 @@
         d.classList.remove('farmTableSelected')
       },
       // 获取列表
-      async getList(){
+      async getList(condition = 'null'){
         // {
         //   zoneUuid: '',            // 分区ID
         //   keyword: '',             // 关键字
@@ -442,12 +517,15 @@
         //   uploadStatus '',         // 渲染状态
         //   renderStatus: ''         // 工程ID
         // }
-        let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=&projectUuid=`
-        let data = await getRenderTableList(t)
+        let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=${condition == 'null' ? '' : condition}&projectUuid=`
+        let data = await getRenderTableList(t),
+            usersList = new Set()
         this.table.renderTableTotal = data.data.total
         this.$emit('renderTbaleTotalItem', data.data.total)
         this.table.RenderDownloadData = data.data.data.map((curr,fatherIndex) => {
-          let children = []
+          let children = [],
+              downloadStatusS = [],
+              downloadStatus = '部分下载'
           // 兼容数据结构错误 生产时删除判断
           if(curr.renderLayerTaskDTOList[0]){
             children = curr.renderLayerTaskDTOList.map((item,sonIndex) => {
@@ -469,10 +547,14 @@
               //     status = '渲染放弃'
               //     break
               // }
+              let downloadStatus = !Boolean(item.downloadFrameCount) ? '待下载' : ( item.downloadFrameCount == item.allFrameCount ? '已下载' : '部分下载' )
+              downloadStatusS.push(downloadStatus)
+              let status = itemDownloadStatus(item.layerTaskStatus)
+              if(status == '渲染暂停' && item.result == 5) status = '待全速渲染'
               return {
                 id: '-',                                                // 任务ID
                 sceneName: curr.fileName + '-' + item.layerName,        // 场景名
-                status: itemDownloadStatus(item.layerTaskStatus),                           // 状态
+                status,                           // 状态
                 renderingProgress: item.frameCount.done + '/' + item.frameCount.total,    //渲染进度
                 percent: curr.frameCount.total == null ? 0 : Math.floor(item.frameCount.done / item.frameCount.total * 100),
                 viewProject: curr.projectName,                         // 所属项目
@@ -487,7 +569,7 @@
                 intervalFrame: item.frameInterval,                     // 间隔帧
                 camera: item.camera,                                   // 相机
                 layerName: item.layerName,                             // 层名
-                downloadStatus: '待下载',                              // 下载情况
+                downloadStatus,                                        // 下载情况
                 renderingStartTime: createDateFun(new Date(item.startTime)),                    // 渲染开始时间
                 renderingEndTime: createDateFun(new Date(item.endTime)),                        // 渲染结束时间
                 founder: curr.account,                                 // 创建人
@@ -499,12 +581,16 @@
                 softwareVal: curr.softName + ' ' + curr.softVer,                                // 软件+版本
                 pluginVal: curr.pluginName + ' ' + curr.pluginVersion,                          // 插件+版本
                 taskUuid: item.layerTaskUuid,                          // 子项目ID 查看详情用
+                layerTaskUuid: item.layerTaskUuid,
                 FatherId: curr.taskNo,
                 FatherTaskUuId: curr.taskUuid,
                 FatherIndex: fatherIndex
               }
             })
           }
+          if(downloadStatusS.every(item => item == '待下载')) downloadStatus = '待下载'
+          if(downloadStatusS.every(item => item == '已下载')) downloadStatus = '已下载'
+          usersList.add(curr['account'])
           return {
             taskUuid: curr.taskUuid,
             id: curr.taskNo,                                       // 任务ID
@@ -524,7 +610,7 @@
             intervalFrame: '-',                                    // 间隔帧
             camera: '-',                                           // 相机
             layerName: '-',                                        // 层名
-            downloadStatus: '待下载',                              // 下载情况
+            downloadStatus,                                        // 下载情况
             renderingStartTime: createDateFun(new Date(curr.startTime)),                    // 渲染开始时间
             renderingEndTime: createDateFun(new Date(curr.endTime)),                        // 渲染结束时间
             founder: curr.account,                                 // 创建人
@@ -534,10 +620,12 @@
             selfIndex: fatherIndex
           }
         })
+        this.table.usersList = [...usersList].map(curr => { return {'text': curr, 'value':curr }})
         this.$emit('archiveNum',data.data.other)
       },
       // 操作 - 开始
       startFun(){
+        if(!this.table.renderSelectionList.length) return false
         this.$confirm('选中项将开始渲染, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -562,6 +650,7 @@
                 "instructType": 1,
                 "instructTaskList": dataList
               })
+              if(data.data.code == 1001){ messageFun('info','您已欠费'); return false }
               if(data.data.code == 200) messageFun('success','操作成功')
             },
             () => messageFun('info','已取消操作')
@@ -570,6 +659,7 @@
       },
       // 操作 - 归档
       archiveFun(){
+        if(!this.table.renderSelectionList.length) return false
         this.$confirm('确认归档选中项目?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -578,6 +668,7 @@
           .then(
             async () => {
               let taskUuidList = []
+              console.log(this.table.renderSelectionList)
               this.table.renderSelectionList.forEach(curr => {
                 if('FatherIndex' in curr) return false
                 taskUuidList.push(curr.taskUuid)
@@ -596,6 +687,7 @@
       },
       // 操作 - 全部渲染
       renderAllFun(){
+        if(!this.table.renderSelectionList.length) return false
         this.$confirm('选中项将开始全部渲染, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -628,6 +720,7 @@
       },
       // 操作 - 删除
       deleteFun(){
+        if(!this.table.renderSelectionList.length) return false
         this.$confirm('将删除选中选, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -666,6 +759,7 @@
       },
       // 操作 - 暂停
       pauseFun(){
+        if(!this.table.renderSelectionList.length) return false
         this.$confirm('将暂停选中选, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -698,35 +792,53 @@
       },
       // 操作 - 重新渲染
       renderAgainFun(){
-        this.$prompt('请输入val', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.dialogTableVisible = true
+      },
+      // 操作 - 下载完成帧
+      async downloadFils(){
+        if(!this.table.renderSelectionList.length) return false
+        let r = await seeBalance()
+        if(r.data.code == 1001){ messageFun('info',`当前账户余额为${r.data.data}，请先进行充值！`); return false }
+        let taskList = []
+        this.table.renderSelectionList.forEach(curr => {
+          if('selfIndex' in curr){
+            let i = taskList.findIndex(item => item['taskUuid'] == curr['taskUuid'])
+            if(i == -1) taskList.push({ taskUuid: curr.taskUuid, layerUuidList: [], hasFather: true })
+            if(i != -1) taskList[i]['hasFather'] = true
+          }else{
+            let i = taskList.findIndex(item => {
+              return item['taskUuid'] == curr['FatherTaskUuId']
+            })
+            if(i != -1) taskList[i]['layerUuidList'].push(curr['layerTaskUuid'])
+            if(i == -1) taskList.push({ taskUuid: curr.FatherTaskUuId, layerUuidList: [curr.layerTaskUuid]})
+          }
         })
-          .then(
-            async ({ value }) => {
-              let dataList = []
-              this.table.renderSelectionList.forEach(curr => {
-                if('selfIndex' in curr) return false
-                let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
-                if(dataListIndex == -1){
-                  dataList.push({
-                    taskUuid: curr.FatherTaskUuId,
-                    layerUuidList: [curr.taskUuid]
-                  })
-                }else{
-                  dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
-                }
-              })
-              let data = await itemStart({
-                "instructType": 3,
-                "instructCode": [value],
-                "instructTaskList": dataList
-              })
-              if(data.data.code == 200) messageFun('success','操作成功')
-          },
-            () => messageFun('info','已取消操作')
-          )
-          // .catch(() => messageFun('error','报错，操作失败'))
+        taskList = taskList.map(curr => {
+          if(curr['hasFather']) return {'taskUuid': curr.taskUuid, 'layerUuidList': []}
+          else return {'taskUuid': '', 'layerUuidList': curr['layerUuidList']}
+        })
+        messageFun('success','发起文件打包请求')
+        let code = UuidFun(),
+          // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
+            socket_ = new WebSocket(`ws://192.168.12.144:5000/professional/websocket/package/${code}`)
+        socket_.addEventListener('open',function(){
+          socket_.send(JSON.stringify({
+            'message': {
+              type: 3,
+              taskList
+            }
+          }))
+        })
+        socket_.addEventListener('message',e => {
+          let data = JSON.parse(e.data)
+          if(data.code == 200){ this.downloadingFun(data.data) }
+          if(data.code == 209){ socket_.close(); this.downloadingFun(data.data) }
+        })
+      },
+      // 打包后下载
+      async downloadingFun(path){
+        let data = await compressionFiles(path)
+        exportDownloadFun(data,data.headers.file,'zip')
       },
       // 展开项目组
       unfoldFun(row){
@@ -738,13 +850,46 @@
           this.table.unfoldList.push(row.rowId)
           this.$refs.renderTableImportant.toggleRowExpansion(row)
         }
+      },
+      // 操作 - 重新渲染 - 取消
+      cancelBtn(){
+        this.dialogTableVisible = false
+        this.s = []
+        messageFun('info','已取消操作')
+      },
+      // 操作 - 重新渲染 - 确定
+      async certainBtn(){
+        this.dialogTableVisible = false
+        if(!this.s.length) return false
+        let dataList = []
+        this.table.renderSelectionList.forEach(curr => {
+          if('selfIndex' in curr) return false
+          let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
+          if(dataListIndex == -1){
+            dataList.push({
+              taskUuid: curr.FatherTaskUuId,
+              layerUuidList: [curr.taskUuid]
+            })
+          }else{
+            dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
+          }
+        })
+        let data = await itemStart({
+          "instructType": 3,
+          "instructCode": this.s.map(curr => Number(curr)),
+          "instructTaskList": dataList
+        })
+        this.s = []
+        if(data.data.code == 1001){ messageFun('info','您已欠费'); return false }
+        if(data.data.code == 200) messageFun('success','操作成功')
       }
     },
     components: {
       farmDrawer
     },
     mounted() {
-      this.getList()
+      if(!this.$route.params.name) this.getList()
+      // document.getElementsByClassName('el-table__expand-icon')
     },
     computed: {
       ...mapState(['zoneId']),
@@ -761,7 +906,7 @@
         },
         deep: true
       }
-    }
+    },
     // props: {
     //   searchInput: {
     //     type: String,
@@ -788,5 +933,38 @@
     .progressS {
       color: rgba(255, 255, 255, 0.6);
     }
+  }
+  /deep/.el-dialog__header {
+    height: 14px;
+    padding: 20px 20px 10px;
+  }
+  /deep/.el-dialog__title {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .kk {
+    font-size: 14px;
+    display: block;
+    margin: 10px 0px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .nn {
+    width: 76px;
+    height: 32px;
+    border-radius: 8px;
+    margin-left: 20px;
+  }
+  .nx {
+    color: rgba(255, 255, 255, 0.59);
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+  .nz {
+    background-color: #3582fe;
+    border: 1px solid rgba(53, 130, 254, 0.8);
+  }
+  .renderAgainBoxTit {
+    color: rgba(255, 255, 255, 0.7);
+    display: block;
+    margin-bottom: 32px;
   }
 </style>

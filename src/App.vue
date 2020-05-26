@@ -28,5 +28,6 @@ export default {
     /*-webkit-font-smoothing: antialiased;*/
     /*-moz-osx-font-smoothing: grayscale;*/
     min-height: 810px;
+    min-width: 900px;
   }
 </style>

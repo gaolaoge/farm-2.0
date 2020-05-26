@@ -99,6 +99,7 @@
           <!--上传分析 table-->
           <upload-table @uploadTbaleTotalItem="uploadTbaleTotalItem"
                         @upLoadSeletedList="upLoadSeletedList"
+                        @toRenderTable="table.navListActiveIndex = 1"
                         ref="uploadMode" />
         </div>
         <!--渲染下载-->
@@ -124,14 +125,16 @@
            @click="dialogTable.status = false"
            class="shutDialogIcon">
       <!--窗口主体-->
-      <archive-records @refreshTaskBase="x"/>
+      <archive-records @refreshTaskBase="x" ref="archiveTable" />
     </el-dialog>
     <!--弹窗 新建任务-->
     <el-dialog :visible.sync="createTaskDialog"
                :show-close=false
                top="8vh"
                width="1100px">
-      <newTask @closeDialogFun="closeDialogFun" :filelist="fileList"/>
+      <newTask @closeDialogFun="closeDialogFun"
+               @getListAgain="$refs.uploadMode.getList()"
+               :filelist="fileList"/>
     </el-dialog>
   </div>
 </template>
@@ -180,6 +183,10 @@
             {
               text: '重新分析',
               class: 'againBtn'
+            },
+            {
+              text: '刷新',
+              class: 'refresh'
             }
           ],
           renderBtnGroup: [
@@ -222,21 +229,25 @@
             {
               text: '归档',
               class: 'archiveBtn',
+            },
+            {
+              text: '刷新',
+              class: 'refresh'
             }
           ],
           archiveRecords: '归档记录',
           archiveRecordsNum: 0,
-          searchInputUpload: '',                  // 上传分析 关键字检索
-          searchInputDownload: '',                // 渲染下载 关键字检索
-          uploadTableBtnDelete: true,             // 上传分析 - 删除按钮 - 可用状态
-          uploadTableBtnAgain: true,              // 上传分析 - 重新分析按钮 - 可用状态
-          downloadTableBtnStart: true,            // 渲染下载 - 开始 - 可用状态
-          downloadTableBtnPause: true,            // 渲染下载 - 暂停 - 可用状态
-          downloadTableBtnDelete: true,           // 渲染下载 - 删除 - 可用状态
-          downloadTableBtnDownload: true,         // 渲染下载 - 下载完成帧 - 可用状态
-          downloadTableBtnRenderAll: true,        // 渲染下载 - 全部渲染 - 可用状态
-          downloadTableBtnRenderAgain: true,      // 渲染下载 - 重新渲染 - 可用状态
-          downloadTableBtnArchive: true           // 渲染下载 - 归档 - 可用状态
+          searchInputUpload: '',                   // 上传分析 关键字检索
+          searchInputDownload: '',                 // 渲染下载 关键字检索
+          uploadTableBtnDelete: false,             // 上传分析 - 删除按钮 - 可用状态
+          uploadTableBtnAgain: false,              // 上传分析 - 重新分析按钮 - 可用状态
+          downloadTableBtnStart: false,            // 渲染下载 - 开始 - 可用状态
+          downloadTableBtnPause: false,            // 渲染下载 - 暂停 - 可用状态
+          downloadTableBtnDelete: false,           // 渲染下载 - 删除 - 可用状态
+          downloadTableBtnDownload: false,         // 渲染下载 - 下载完成帧 - 可用状态
+          downloadTableBtnRenderAll: false,        // 渲染下载 - 全部渲染 - 可用状态
+          downloadTableBtnRenderAgain: false,      // 渲染下载 - 重新渲染 - 可用状态
+          downloadTableBtnArchive: false           // 渲染下载 - 归档 - 可用状态
         },
         dialogTable: {
           status: false,
@@ -266,6 +277,10 @@
         // if(val.includes('分析警告')) ''
         // if(val.includes('待设置参数')) ''
         // if(val.includes('分析失败')) ''
+        if(!val.length){
+          t.uploadTableBtnDelete = false       // 上传分析 - 删除
+          t.uploadTableBtnAgain = false        // 上传分析 - 重新分析
+        }
       },
       // 渲染下载 多选结果
       j(val){
@@ -298,6 +313,15 @@
           t.downloadTableBtnPause = false
           t.downloadTableBtnRenderAll = false
         }
+        if(!val.length){
+          t.downloadTableBtnStart = false        // 渲染下载 - 开始
+          t.downloadTableBtnPause = false       // 渲染下载 - 暂停
+          t.downloadTableBtnDelete = false      // 渲染下载 - 删除
+          t.downloadTableBtnDownload = false    // 渲染下载 - 下载完成帧
+          t.downloadTableBtnRenderAll = false   // 渲染下载 - 全部渲染
+          t.downloadTableBtnRenderAgain = false // 渲染下载 - 重新渲染
+          t.downloadTableBtnArchive = false     // 渲染下载 - 归档
+        }
       },
       // 【归档记录】触发重新获取数据
       x(){
@@ -306,6 +330,7 @@
       // 获取归档记录长度
       getArchiveNum(val){
         this.btnGroup.archiveRecordsNum = val
+        this.$refs.archiveTable.getList()
       },
       uploadTbaleTotalItem(val){
         this.table.navList[0]['num'] = val
@@ -324,10 +349,15 @@
             this.createTask()
             break
           case '删除':
-            this.deleteTaskUpload()
+            if(!this.btnGroup.uploadTableBtnDelete) return false
+            this.$refs.uploadMode.deleteItem()
             break
           case '重新分析':
-            this.againTaskUpload()
+            if(!this.btnGroup.uploadTableBtnAgain) return false
+            this.$refs.uploadMode.analyseAgainFun()
+            break
+          case '刷新':
+            this.$refs.uploadMode.getList()
             break
         }
       },
@@ -338,25 +368,34 @@
             this.createTask()
             break
           case '开始':
-            this.beginTaskDownload()
+            if(!this.btnGroup.downloadTableBtnStart) return false
+            this.$refs.renderMode.startFun()
             break
           case '暂停':
-            this.pauseTaskDownload()
+            if(!this.btnGroup.downloadTableBtnPause) return false
+            this.$refs.renderMode.pauseFun()
             break
           case '删除':
-            this.deleteTaskDownload()
+            if(!this.btnGroup.downloadTableBtnDelete) return false
+            this.$refs.renderMode.deleteFun()
             break
           case '下载完成帧':
-            this.completeTaskDownload()
+            this.$refs.renderMode.downloadFils()
             break
           case '全部渲染':
-            this.allTaskDownload()
+            if(!this.btnGroup.downloadTableBtnRenderAll) return false
+            this.$refs.renderMode.renderAllFun()
             break
           case '重新渲染':
-            this.againTaskDownload()
+            if(!this.btnGroup.downloadTableBtnRenderAgain) return false
+            this.$refs.renderMode.renderAgainFun()
             break
           case '归档':
-            this.archiveTaskDownload()
+            if(!this.btnGroup.downloadTableBtnArchive) return false
+            this.$refs.renderMode.archiveFun()
+            break
+          case '刷新':
+            this.$refs.renderMode.getList()
             break
         }
       },
@@ -382,53 +421,12 @@
 
         })
         // this.createTaskDialog = true
-      },
-      // 上传分析 - 删除
-      deleteTaskUpload(){
-        if(!this.btnGroup.uploadTableBtnDelete) return false
-        this.$refs.uploadMode.deleteItem()
-      },
-      // 上传分析 - 重新分析
-      againTaskUpload(){
-        if(!this.btnGroup.uploadTableBtnAgain) return false
-        this.$refs.uploadMode.analyseAgainFun()
+        // this.$refs.uploadMode.getList()
+        // this.$refs.renderMode.getList()
       },
       // 上传分析 - 关键字检索
       searchUploadInput(){
         this.$refs.uploadMode.searchFun(this.btnGroup.searchInputUpload)
-      },
-      // 渲染下载 - 开始
-      beginTaskDownload(){
-        if(!this.btnGroup.downloadTableBtnStart) return false
-        this.$refs.renderMode.startFun()
-      },
-      // 渲染下载 - 暂停
-      pauseTaskDownload(){
-        if(!this.btnGroup.downloadTableBtnPause) return false
-        this.$refs.renderMode.pauseFun()
-      },
-      // 渲染下载 - 删除
-      deleteTaskDownload(){
-        if(!this.btnGroup.downloadTableBtnDelete) return false
-        this.$refs.renderMode.deleteFun()
-      },
-      // 渲染下载 - 下载完成帧
-      completeTaskDownload(){
-
-      },
-      // 渲染下载 - 全部渲染
-      allTaskDownload(){
-        if(!this.btnGroup.downloadTableBtnRenderAll) return false
-        this.$refs.renderMode.renderAllFun()
-      },
-      // 渲染下载 - 重新渲染
-      againTaskDownload(){
-        this.$refs.renderMode.renderAgainFun()
-      },
-      // 渲染下载 - 归档
-      archiveTaskDownload(){
-        if(!this.btnGroup.downloadTableBtnArchive) return false
-        this.$refs.renderMode.archiveFun()
       },
       // 渲染下载 - 关键字检索
       searchRenderInput(){
@@ -436,10 +434,44 @@
       },
     },
     watch: {
-
+      'table.navListActiveIndex': {
+        handler: function(val){
+          sessionStorage.setItem('taskListActive', val)
+        },
+      }
     },
     mounted() {
+      if(sessionStorage.getItem('taskListActive') == '1') this.table.navListActiveIndex = 1
       createTableIconList()
+      let name = this.$route.params.name ? this.$route.params.name : null
+      if(!name) return false
+      switch(name){
+        case '待设置参数':
+          sessionStorage.setItem('taskListActive','0')
+          this.table.navListActiveIndex = 0
+          this.$refs.uploadMode.getList(true)
+          break
+        case '渲染中':
+          sessionStorage.setItem('taskListActive','1')
+          this.table.navListActiveIndex = 1
+          this.$refs.renderMode.getList(2)
+          break
+        case '待全部渲染':
+          sessionStorage.setItem('taskListActive','1')
+          this.table.navListActiveIndex = 1
+          this.$refs.renderMode.getList(5)
+          break
+        case '渲染暂停':
+          sessionStorage.setItem('taskListActive','1')
+          this.table.navListActiveIndex = 1
+          this.$refs.renderMode.getList(4)
+          break
+        case '渲染完成':
+          sessionStorage.setItem('taskListActive','1')
+          this.table.navListActiveIndex = 1
+          this.$refs.renderMode.getList(3)
+          break
+      }
     }
   }
 </script>

@@ -1,6 +1,15 @@
 import api from './index.js'
 
-// 登录页-注册 提交
+// 获取用户协议
+export function getProtocal(){
+  return api({
+    url: '/professional/file/getProtocol',
+    method: 'GET',
+    responseType: "blob",
+  })
+}
+
+// 登录页 - 注册 提交
 export function register(data){
   return api({
     url: '/auth/signUp',
@@ -9,7 +18,7 @@ export function register(data){
   })
 }
 
-// 登录页-注册 手机验证码
+// 登录页 - 注册 手机验证码
 export function registerTelephone(data){
   return api({
     url: `/auth/phoneOwnVerify/${data}`,
@@ -17,7 +26,7 @@ export function registerTelephone(data){
   })
 }
 
-// 登录页-注册 验证帐号
+// 登录页 - 注册 验证帐号
 export function registerAccount(data){
   return api({
     url: `/auth/checkAccount/${data}`,
@@ -25,7 +34,7 @@ export function registerAccount(data){
   })
 }
 
-// 登录页-注册 验证手机号
+// 登录页 - 注册 验证手机号
 export function registerPhone(data){
   return api({
     url: `/auth/checkPhone/${data}`,
@@ -33,7 +42,7 @@ export function registerPhone(data){
   })
 }
 
-// 登录页-帐号密码登录
+// 登录页 - 帐号密码登录
 export function accountLogin(data){
   return api({
     url: `/auth/accountLogin`,
@@ -42,7 +51,7 @@ export function accountLogin(data){
   })
 }
 
-// 登录页-手机号登录 短信验证
+// 登录页 - 手机号登录 短信验证
 export function phoneVerif(data){
   return api({
     url: `/auth/sendCode/${data}`,
@@ -50,11 +59,36 @@ export function phoneVerif(data){
   })
 }
 
-// 登录页-手机号登录 登录
+// 登录页 - 手机号登录 登录
 export function phoneLogin(data){
   return api({
     url: `/auth/codeLogin`,
     method: 'POST',
+    data
+  })
+}
+
+// 登录页-找回密码 获取手机号验证码
+export function getPhoneVeriFG(data){
+  return api({
+    url: `/auth/sendChangePasswordCode/${data}`,
+    method: 'GET'
+  })
+}
+
+// 登录页-找回密码 验证验证码
+export function getVeriVal(data){
+  return api({
+    url: `/auth/changePasswordCheckoutCode?${data}`,
+    method: 'GET'
+  })
+}
+
+// 登录页-找回密码 修改密码
+export function editPS(data){
+  return api({
+    url: `/auth/changePassword`,
+    method: 'PUT',
     data
   })
 }
@@ -312,6 +346,7 @@ export function getRenderTableList(data){
   return api({
     url: `/professional/task/getRenderTaskList?${data}`,
     method: 'GET',
+
   })
 }
 
@@ -464,6 +499,18 @@ export function assetsExportFrame(data){
   return api({
     url: `/professional/assets/getAssetsFrameTaskList?${data}`,
     method: 'GET'
+  })
+}
+
+// 资产 - 渲染输出 - 申请压缩文件
+export function compressionFiles(data){
+  return api({
+    url: `/professional/package/downloadFolderZip?path=${data}`,
+    method: 'GET',
+    responseType: "blob",
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
 }
 

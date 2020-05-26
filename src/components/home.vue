@@ -1,13 +1,17 @@
 <template>
   <div class="home-wrapper" ref="homeWrapper">
     <div class="firRow">
+      <!--任务状态-->
       <div class="taskStatus">
         <header class="label">
           {{ taskStatus.label }}
         </header>
         <div class="statusList">
-          <div class="item" v-for="item,index in taskStatus.list" :key="index">
-            <div class="cir">
+          <div class="item"
+               v-for="item,index in taskStatus.list"
+               :key="index"
+               @click="$router.push({name: 'task',params: {'name': item.name}})">
+            <div class="cir" :class="[{'f': item.num != 0}]">
               <span class="n">
                 {{ item.num }}
               </span>
@@ -15,9 +19,18 @@
             <span class="name">
               {{ item.name }}
             </span>
+            <div v-if='index == 0'
+                 v-show="taskStatus.haveNewItem"
+                 class="infoMessage">
+              <span class="infoMessageText">
+                {{ taskStatus.messageText }}
+                <img src="@/icons/infoMessageBtn.png" alt="" class="btn" @click.stop="taskStatus.haveNewItem = false">
+              </span>
+            </div>
           </div>
         </div>
       </div>
+      <!--数据统计-->
       <div class="statistics">
         <header class="label">
           {{ statistics.label }}
@@ -27,8 +40,11 @@
             <div class="f">
               <img :src="item.iconImg" alt="">
               <span class="n">
-              {{ item.num }}
-            </span>
+                {{ item.num }}
+              </span>
+              <span class="k">
+                ( {{ item.unit }} )
+              </span>
             </div>
             <span class="d">
               {{ item.text }}
@@ -58,7 +74,7 @@
           {{ vip.label }}
         </header>
         <div class="s">
-          <img src="@/assets/userImg.png" alt="">
+          <img src="@/assets/userImg.png" alt="" style="width: 60px;border-radius: 8px;">
           <div class="t">
             <!--帐号-->
             <p class="name">
@@ -119,6 +135,7 @@
     </div>
     <el-dialog :visible.sync="showNewTask"
                :show-close=false
+               :close-on-click-modal=false
                top="8vh"
                width="1100px">
       <newTask @closeDialogFun="closeDialogFun" :filelist="fileList" />
@@ -147,7 +164,15 @@
         label: '任务状态',
         list: [
           {
+            name: '待设置参数',
+            num: 0
+          },
+          {
             name: '渲染中',
+            num: 0
+          },
+          {
+            name: '待全部渲染',
             num: 0
           },
           {
@@ -158,28 +183,27 @@
             name: '渲染完成',
             num: 0
           },
-          {
-            name: '待全部渲染',
-            num: 0
-          },
-          {
-            name: '已归档',
-            num: 0
-          }
-
-        ]
+          // {
+          //   name: 'null',
+          //   num: 0
+          // }
+        ],
+        messageText: '您有待设置参数任务，请尽快完成哦~',
+        haveNewItem: false
       },
       statistics: {
         label: '数据统计',
         list: [
           {
-            text: '累计消费（金币）',
+            text: '累计消费',
             num: '0',
+            unit: '金币',
             iconImg: require('@/icons/gold.png')
           },
           {
-            text: '累计渲染用时（小时）',
+            text: '累计渲染用时',
             num: '0',
+            unit: '小时',
             iconImg: require('@/icons/time.png')
           }
         ]
@@ -192,7 +216,7 @@
         te: '用户余额 :',
         unit: '￥',
         name: '',
-        grade: '普通会员',
+        grade: '大众会员',
         balance: ''
       },
       Recharge: {
@@ -221,9 +245,21 @@
   watch: {
     zoneId: {
       handler: function(val){
-        if(!val) return false
         this.getHomeTData(val)
         this.getEchartsData(val)
+      },
+      immediate: true
+    },
+    'user': {
+      handler: function(val){
+        this.statistics['list'][0]['num'] = val.consumption   //数据统计-累计消费
+      },
+      immediate: true,
+      deep: true
+    },
+    'taskStatus.list': {
+      handler: function(val){
+        if(val[0].num != 0) this.taskStatus.haveNewItem = true
       },
       immediate: true
     }
@@ -243,17 +279,22 @@
       }, false)
 
       this.$refs.dragWindow.ondrop = function(ev) {
-        let oFile = ev.dataTransfer.files[0],
-            oFileType = oFile.name.split('.').pop()
-        if(oFileType != 'ma' && oFileType != 'mb'){ messageFun('error','暂不支持此扩展名，请拖拽扩展名为.ma .mb的文件'); return false }
-        this.fileList = [{
-          sceneFile: oFile,
-          projectFileList: null,
-          projectFileName: '',
-          inputStatus: false,
-          path: '',
-          id: Math.floor(Math.random() * 100000000000000)
-        }]
+        let r = Array.from(ev.dataTransfer.files)
+        r.forEach(curr => {
+          let type = curr.name.split('.').pop()
+          if(type != 'ma' && type != 'mb') messageFun('error','暂不支持此扩展名，请拖拽扩展名为.ma .mb的文件')
+          return false
+        })
+        r.forEach(item => {
+          this.fileList.push({
+            sceneFile: item,
+            projectFileList: null,
+            projectFileName: '',
+            inputStatus: false,
+            path: '',
+            id: Math.floor(Math.random() * 100000000000000)
+          })
+        })
         this.showNewTask = true
       }.bind(this)
 
@@ -267,14 +308,19 @@
     // 获取任务状态数据统计
     async getHomeTData(val){
       let data = await homeT(val),
-          d = data.data.data
-      this.taskStatus['list'][0]['num'] = d.ing        //任务状态-渲染中
-      this.taskStatus['list'][1]['num'] = d.stop       //任务状态-渲染暂停
-      this.taskStatus['list'][2]['num'] = d.finish     //任务状态-渲染完成
-      this.taskStatus['list'][3]['num'] = d.wait       //任务状态-待全部渲染
-      this.taskStatus['list'][4]['num'] = d.history    //任务状态-已归档
-      this.statistics['list'][0]['num'] = d.cost == null ? 0 : d.cost.toFixed(2)                     //数据统计-累计消费
-      this.statistics['list'][1]['num'] = d.useTime == null ? 0 : (d.useTime / 3600000).toFixed(2)     //数据统计-累计渲染用时
+          d = data.data.data,
+          m
+      this.taskStatus['list'][0]['num'] = d.ing                 // 任务状态-渲染中
+      this.taskStatus['list'][1]['num'] = d.stop                // 任务状态-渲染暂停
+      this.taskStatus['list'][2]['num'] = d.finish              // 任务状态-渲染完成
+      this.taskStatus['list'][3]['num'] = d.wait                // 任务状态-待全部渲染
+      this.taskStatus['list'][4]['num'] = d.history             // 任务状态-已归档
+      // this.taskStatus['list'][5]['num'] = d.finishAnalyse    // 任务状态-已归档
+      if(d.useTime == null){ m = 0; this.statistics.list[1]['unit'] = '秒钟' }
+      if(d.useTime / 3600000 >= 1){ m = d.useTime / 3600000; this.statistics.list[1]['unit'] = '小时' }
+      else if(d.useTime / 3600000 / 60 >= 1){ m = d.useTime / 3600000 / 60; this.statistics.list[1]['unit'] = '分钟' }
+      else{ m = d.useTime / 3600000 / 60 / 60; this.statistics.list[1]['unit'] = '秒钟' }
+      this.statistics['list'][1]['num'] = m.toFixed(2)          // 数据统计-累计渲染用时
     },
     // 获取曲线图数据
     async getEchartsData(val){
@@ -341,12 +387,14 @@
           justify-content: space-around;
           flex-wrap: nowrap;
           .item {
+            position: relative;
             text-align: center;
+            cursor: pointer;
             .cir {
               position: relative;
               width: 100px;
               height: 100px;
-              background-image: linear-gradient(45deg, rgba(80,134,218,1), rgba(94,203,232,1));
+              background-image: linear-gradient(45deg, rgba(75,167,156,1), rgba(143,236,222,1));
               border-radius: 50%;
               .n {
                 position: absolute;
@@ -356,7 +404,7 @@
                 font-family: 'MicrosoftYaHei';
                 font-size: 30px;
                 font-weight: 400;
-                color: rgba(114,189,210,1);
+                color: rgba(84, 233, 221, 1);
                 text-shadow: 0px 0px 4px rgba(114,189,210,0.4);
                 line-height: 100px;
               }
@@ -388,6 +436,47 @@
               font-weight:400;
               color:rgba(255,255,255,0.59);
             }
+            .infoMessage {
+              position: absolute;
+              z-index: 9;
+              top: 74px;
+              left: calc(50% - 129px);
+              width: 265px;
+              padding: 11px 0px;
+              border-radius: 8px;
+              background-color: rgba(255, 106, 115, 0.8);
+              &::before {
+                content: '';
+                position: absolute;
+                left: calc(50% - 12.7px);
+                top: -18px;
+                width: 0px;
+                border-width: 9px;
+                border-style: solid;
+                border-color: transparent transparent rgba(255, 106, 115, 0.8);
+              }
+              .infoMessageText {
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                line-height: 17px;
+                font-weight:500;
+                color:rgba(255,255,255,1);
+                box-sizing: border-box;
+                padding: 0px 20px;
+                .btn {
+                  cursor: pointer;
+                }
+              }
+            }
+            &:nth-of-type(1) {
+              .cir.f {
+                box-shadow: 0px 2px 40px 0px rgba(132, 225, 212, 0.8);
+                &::after {
+                  border: 4px solid rgba(143, 236, 222, 0.09);
+                }
+              }
+            }
             &:nth-of-type(2) {
               .cir {
                 background-image: linear-gradient(45deg, rgba(8,99,247,1), rgba(41,140,253,1));
@@ -406,10 +495,10 @@
             }
             &:nth-of-type(4) {
               .cir {
-                background-image: linear-gradient(45deg, rgba(75,167,156,1), rgba(143,236,222,1));
+                background-image: linear-gradient(45deg, rgba(80,134,218,1), rgba(94,203,232,1));
               }
               .n {
-                color:rgba(84,233,221,1);
+                color:rgba(114, 189, 210, 1);
               }
             }
             &:nth-of-type(5) {
@@ -438,6 +527,7 @@
             padding: 35px 30px;
             box-sizing: border-box;
             .f {
+              position: relative;
               display: flex;
               justify-content: space-between;
               align-items: center;
@@ -447,6 +537,19 @@
                 color:rgba(27,99,226,1);
                 line-height:48px;
                 vertical-align: middle;
+                /*font-family: 'PingFangSCRegular';*/
+                font-family: 'MicrosoftYaHei';
+                margin-right: 54px;
+              }
+              .k {
+                position: absolute;
+                right: 0px;
+                bottom: 10px;
+                font-size: 14px;
+                font-weight: 600;
+                color: rgba(27,99,226,1);
+                line-height: 1em;
+                vertical-align: bottom;
                 /*font-family: 'PingFangSCRegular';*/
                 font-family: 'MicrosoftYaHei';
               }
@@ -463,7 +566,8 @@
             &:nth-of-type(1) {
               margin-right: 31px;
               .f {
-                .n {
+                .n,
+                .k {
                   color: rgba(23, 205, 227, 1);
                 }
               }
@@ -576,11 +680,11 @@
             margin-left: 3px;
             /*font-family: 'PingFangSCRegular';*/
             font-family: 'MicrosoftYaHei';
-            font-size:26px;
+            font-size:24px;
             font-weight:600;
             color:rgba(0,97,255,1);
             margin-bottom: 10px;
-            width: 90px;
+            width: 82px;
             overflow: hidden;
             text-overflow: ellipsis;
           }

@@ -1,110 +1,155 @@
 <template>
   <div class="upTop" ref="upTopDom">
     <div class="tableGroup">
+      <!--导航-->
       <div class="navList">
         <span class="navBtn"
               :class="[{'active': index == navListActiveIndex}]"
+              @click="navListActiveIndex = index"
               v-for="item,index in form.navList"
               :key="index">
           {{ item.text }}
         </span>
       </div>
-      <!--充值-->
+      <!--内容-->
       <div class="tableList">
-        <div class="farm-form">
-          <!--金币余额-->
-          <div class="farm-form-item">
-            <div class="farm-form-item-label">
-              {{ form.balanceLabel }}:
-            </div>
-            <div class="farm-form-item-val">
+        <!--充值-->
+        <div class="farm-form"
+             v-show="navListActiveIndex == 0">
+            <!--金币余额-->
+            <div class="farm-form-item">
+              <div class="farm-form-item-label">
+                {{ form.balanceLabel }}:
+              </div>
+              <div class="farm-form-item-val">
               <span class="text">
                 {{ user.balance }}
               </span>
+              </div>
             </div>
-          </div>
-          <!--充值金额-->
-          <div class="farm-form-item">
-            <div class="farm-form-item-label">
-              {{ form.upTopLabel }}:
-            </div>
-            <div class="farm-form-item-val">
-              <div class="g">
-                <div class="up-top-item"
-                     :class="[{'active': form.ChineseYuan == item.ChineseYuan}]"
-                     v-for="item,index in form.list"
-                     :key="index"
-                     @click="form.ChineseYuan = item.ChineseYuan">
-                  <div class="gold">
+            <!--充值金额-->
+            <div class="farm-form-item">
+              <div class="farm-form-item-label">
+                {{ form.upTopLabel }}:
+              </div>
+              <div class="farm-form-item-val">
+                <div class="g">
+                  <div class="up-top-item"
+                       :class="[{'active': form.ChineseYuan == item.ChineseYuan}]"
+                       v-for="item,index in form.list"
+                       :key="index"
+                       @click="form.ChineseYuan = item.ChineseYuan">
+                    <div class="gold">
                     <span class="unit">
                       ￥
                     </span>
                       <span class="num">
                       {{ item.ChineseYuan }}
                     </span>
-                  </div>
-                  <div class="t">
+                    </div>
+                    <div class="t">
                     <span class="remark">
                       {{ item.remark }}
                     </span>
-                    <img src="@/icons/item-selected.png" alt="" class="v" v-show="form.ChineseYuan == item.ChineseYuan">
+                      <img src="@/icons/item-selected.png" alt="" class="v" v-show="form.ChineseYuan == item.ChineseYuan">
+                    </div>
                   </div>
                 </div>
+                <input type="text" class="farm-form-item-input in" placeholder="其他金额" v-model="form.ChineseYuan">
               </div>
-              <input type="text" class="farm-form-item-input in" placeholder="其他金额" v-model="form.ChineseYuan">
             </div>
-          </div>
-          <!--充值到账金币-->
-          <div class="farm-form-item">
-            <div class="farm-form-item-label">
-              {{ form.realLabel }}:
-            </div>
-            <div class="farm-form-item-val">
+            <!--充值到账金币-->
+            <div class="farm-form-item">
+              <div class="farm-form-item-label">
+                {{ form.realLabel }}:
+              </div>
+              <div class="farm-form-item-val">
               <span class="text">
                 {{ form.realVal }}
               </span>
-            </div>
-          </div>
-          <!--充值方式-->
-          <div class="farm-form-item">
-            <div class="farm-form-item-label">
-              {{ form.modeLabel }}:
-            </div>
-            <div class="farm-form-item-val">
-              <div class="pay-base"
-                   @click="payMethods = 'zfb'"
-                   :class="[{'active': payMethods == 'zfb'}]">
-                <img src="@/icons/zfb-pay.png" alt="">
-                <img src="@/icons/nike.png"
-                     alt=""
-                     class="nike"
-                     v-show="payMethods == 'zfb'">
-              </div>
-              <div class="pay-base"
-                   @click="payMethods = 'wx'"
-                   :class="[{'active': payMethods == 'wx'}]">
-                <img src="@/icons/wx-pay.png" alt="">
-                <img src="@/icons/nike.png"
-                     alt=""
-                     class="nike"
-                     v-show="payMethods == 'wx'">
               </div>
             </div>
-          </div>
-          <!--btn-->
-          <div class="farm-form-item">
-            <div class="farm-form-item-label">
+            <!--充值方式-->
+            <div class="farm-form-item">
+              <div class="farm-form-item-label">
+                {{ form.modeLabel }}:
+              </div>
+              <div class="farm-form-item-val">
+                <div class="pay-base"
+                     @click="payMethods = 'zfb'"
+                     :class="[{'active': payMethods == 'zfb'}]">
+                  <img src="@/icons/zfb-pay.png" alt="">
+                  <img src="@/icons/nike.png"
+                       alt=""
+                       class="nike"
+                       v-show="payMethods == 'zfb'">
+                </div>
+                <div class="pay-base"
+                     @click="payMethods = 'wx'"
+                     :class="[{'active': payMethods == 'wx'}]">
+                  <img src="@/icons/wx-pay.png" alt="">
+                  <img src="@/icons/nike.png"
+                       alt=""
+                       class="nike"
+                       v-show="payMethods == 'wx'">
+                </div>
+              </div>
             </div>
-            <div class="farm-form-item-val">
-              <div class="btn" @click="payFun">
-                {{ btn.upTopNow }}
+            <!--btn-->
+            <div class="farm-form-item">
+              <div class="farm-form-item-label">
+              </div>
+              <div class="farm-form-item-val">
+                <div class="btn" @click="payFun">
+                  {{ btn.upTopNow }}
+                </div>
+              </div>
+            </div>
+          </div>
+        <!--计费说明-->
+        <div class="billingInstructions"
+             v-show="navListActiveIndex == 1">
+          <!--CPU-->
+          <div class="t">
+            <div class="card">{{ cpuCard }}</div>
+            <div class="priceList cpuPriceList">
+              <div class="item" v-for="item,index in form.cpuList" :key="index">
+                <h6>{{ item.userLevel }}</h6>
+                <p class="accumulative"> {{ item.total }} </p>
+                <p class="price">{{ form.unit }}<span class="num">{{ item.price }}</span>{{ form.unitPrice }}</p>
+                <p class="k">
+                  <!--相当于16核32线程节点机-->
+                  <span style="display: block">{{ item.dir1 }}</span>
+                  <!--包含每小时收费3.04元-->
+                  <span style="display: block">{{ form.dir4 }}<span class="v">{{ item.unitPrice }}</span>{{ form.dir2 }}</span>
+                  <!--包含50G 存储空间-->
+                  {{ form.f }}<span class="v">{{ item.RAM }}</span>{{ form.dir3 }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!--GPU-->
+          <div class="t">
+            <div class="card">{{ gpuCrad }}</div>
+            <div class="priceList gpuPriceList">
+              <div class="item" v-for="item,index in form.gpuList" :key="index">
+                <h6>{{ item.userLevel }}</h6>
+                <p class="accumulative"> {{ item.total }} </p>
+                <p class="price">{{ form.unit }}<span class="num">{{ item.price }}</span>{{ form.unitPrice2 }}</p>
+                <p class="k">
+                  <span style="display: block">{{ item.dir1 }}</span>
+                  <span style="display: block">{{ form.dir4 }}<span class="v">{{ item.price }}</span>{{ form.dir2 }}</span>
+                  {{ form.f }}<span class="v">{{ item.RAM }}</span>{{ form.dir3 }}
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
       <!--充值说明-->
-      <div class="tableList">
+      <div class="tableList"
+           v-show="navListActiveIndex == 0">
         <div class="farm-form">
           <div class="farm-form-item">
             <div class="farm-form-item-label">
@@ -147,6 +192,9 @@
           navList: [
             {
               text: '充值'
+            },
+            {
+              text: '计费说明'
             }
           ],
           balanceLabel: '金币余额',
@@ -161,18 +209,18 @@
           list: [
             {
               ChineseYuan: '100',
-              remark: '充值100元到账200金币\n' + '资产总容量扩充至60G',
+              remark: '充值100元送100金币 实际到账200金币',
               gold: 200
             },
             {
               ChineseYuan: '200',
-              remark: '充值200元到账500金币\n' + '资产总容量扩充至60G',
-              gold: 500
+              remark: '充值200元送200金币 实际到账400金币',
+              gold: 400
             },
             {
               ChineseYuan: '500',
-              remark: '充值500元到账1500金币\n' + '资产总容量扩充至70G',
-              gold: 1500
+              remark: '充值500元送500金币 实际到账1000金币',
+              gold: 1000
             }
           ],
           directions: '充值说明',
@@ -187,13 +235,102 @@
               r: '充值其他问题，请联系客服：13176527028'
             }
           ],
-          ChineseYuan: 100
+          ChineseYuan: 100,
+          unit: '￥',
+          unitPrice: '/核时',
+          unitPrice2: '/机时',
+          dir2: '元',
+          dir3: '存储空间',
+          dir4: '每小时收费',
+          f: '包含',
+          cpuList: [
+            {
+              userLevel: '普通用户',
+              total: '累计充值0元',
+              price: '0.190',
+              unitPrice: '3.04',
+              RAM: '50G',
+              dir1: '相当于16核32线程节点机'
+            },
+            {
+              userLevel: '璀璨白银',
+              total: '累计充值2000元',
+              price: '0.175',
+              unitPrice: '2.80',
+              RAM: '500G',
+              dir1: '相当于16核32线程节点机'
+            },
+            {
+              userLevel: '荣耀黄金',
+              total: '累计充值12000元',
+              price: '0.150',
+              unitPrice: '2.40',
+              RAM: '1T',
+              dir1: '相当于16核32线程节点机'
+            },
+            {
+              userLevel: '尊贵铂金',
+              total: '累计充值30000元',
+              price: '0.125',
+              unitPrice: '2',
+              RAM: '2T',
+              dir1: '相当于16核32线程节点机'
+            },
+            {
+              userLevel: '永恒钻石',
+              total: '累计充值60000元',
+              price: '0.100',
+              unitPrice: '1.60',
+              RAM: '5T',
+              dir1: '相当于16核32线程节点机',
+              dir4: '包含每小时收费'
+            }
+          ],
+          gpuList: [
+            {
+              userLevel: '普通用户',
+              total: '累计充值0元',
+              price: '9',
+              dir1: '相当于2张M10卡',
+              RAM: '50G'
+            },
+            {
+              userLevel: '璀璨白银',
+              total: '累计充值2000元',
+              price: '7',
+              dir1: '相当于2张M10卡',
+              RAM: '500G'
+            },
+            {
+              userLevel: '荣耀黄金',
+              total: '累计充值12000元',
+              price: '6',
+              dir1: '相当于2张M10卡',
+              RAM: '1T'
+            },
+            {
+              userLevel: '尊贵铂金',
+              total: '累计充值30000元',
+              price: '5',
+              dir1: '相当于2张M10卡',
+              RAM: '2T'
+            },
+            {
+              userLevel: '永恒钻石',
+              total: '累计充值60000元',
+              price: '4',
+              dir1: '相当于2张M10卡',
+              RAM: '5T'
+            }
+          ]
         },
         payMethods: 'zfb',
         btn: {
           upTopNow: '立即充值'
         },
-        rechargeIframe: false
+        rechargeIframe: false,
+        cpuCard: 'CPU',
+        gpuCrad: 'GPU'
       }
     },
     watch: {
@@ -203,23 +340,23 @@
           return false
         }
         if(val == 200){
-          this.form.realVal = '500.000'
+          this.form.realVal = '400.000'
           return false
         }
         if(val == 500){
-          this.form.realVal = '1500.000'
+          this.form.realVal = '1000.000'
           return false
         }
         this.computeFun()
       },
       '$route': function(val){
-        console.log(val)
+        // console.log(val)
       }
     },
     methods: {
       // 计算金币
       async computeFun(){
-        if(!this.form.ChineseYuan) return false
+        if(!this.form.ChineseYuan){ this.form.realVal = '0.000'; return false }
         let data = await computeGold(this.form.ChineseYuan)
         this.form.realVal = data.data.data.toFixed(3)
       },
@@ -314,7 +451,7 @@
               .remark {
                 display: inline-block;
                 padding: 15px 20px;
-                width: 150px;
+                width: 136px;
                 font-size: 13px;
                 font-weight: 400;
                 color: rgba(255, 255, 255, 0.6);
@@ -389,6 +526,90 @@
           margin-bottom: 0px;
           border-radius: 8px;
         }
+      }
+    }
+    .billingInstructions {
+      padding-left: 60px;
+      .priceList {
+        position: relative;
+        /*z-index: ;*/
+        width: 1316px;
+        height: 313px;
+        background: rgba(30, 38, 47, 1);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-around;
+        .item {
+          position: relative;
+          text-align: center;
+          padding: 50px;
+          &::after {
+            position: absolute;
+            right: 0px;
+            top: 66px;
+            content: '';
+            width: 1px;
+            height: 190px;
+            background-color: rgba(255, 255, 255, 0.2);
+          }
+          &:nth-last-of-type(1) {
+            &::after {
+              display: none;
+            }
+          }
+          h6 {
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 1);
+            margin-bottom: 10px;
+          }
+          .price,
+          .accumulative,
+          .k {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 22px;
+          }
+          .price {
+            margin: 30px 0px 20px;
+            line-height: 42px;
+            .num {
+              font-size: 30px;
+              font-weight: 900;
+              color: rgba(39, 95, 239, 1);
+              font-family: Arial-Black,Arial;
+            }
+          }
+          .k {
+            width: 158px;
+            .v {
+              color: rgba(255, 255, 255, 1);
+            }
+          }
+        }
+      }
+      .t {
+        position: relative;
+      }
+      .card {
+          position: absolute;
+          z-index: 0;
+          left: -60px;
+          content: 'CPU';
+          width: 90px;
+          height: 38px;
+          background: rgba(243, 119, 109, 1);
+          border-radius: 100px 0px 0px 100px;
+          font-size: 16px;
+          line-height: 38px;
+          padding-left: 15px;
+          color: rgba(255, 255, 255, 1);
+        }
+      .gpuPriceList {
+
       }
     }
   }

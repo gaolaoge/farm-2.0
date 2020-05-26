@@ -79,7 +79,8 @@
               </el-table-column>
               <!--工程路径-->
               <el-table-column 
-                prop="address" 
+                prop="address"
+                :render-header="renderHeader"
                 label="工程路径">
                 <template slot-scope="scope">
                   <span class="address-span" :class="[{'inputing': scope.row.inputStatus}]">
@@ -135,9 +136,9 @@
                 </span>
               </div>
               <div class="bodyB">
-                <span class="hardware">
-                  {{ item.renderTemplate.softUuid }}
-                </span>
+                <!--<span class="hardware">-->
+                  <!--{{ item.renderTemplate.softUuid }}-->
+                <!--</span>-->
                 <span class="software">
                   {{ item.renderTemplate.softName }}
                 </span>
@@ -197,7 +198,10 @@
             <input type="text"
                    id="templateName"
                    class="farm-form-item-input"
+                   :class="[{'inputError': !dialogAdd.form.formatName}]"
                    :placeholder="dialogAdd.namePlaceholder"
+                   @blur="nameVerif"
+                   @focus="dialogAdd.form.formatName = true"
                    v-model="dialogAdd.form.valName">
           </div>
           <!--渲染软件-->
@@ -291,6 +295,8 @@
         </div>
       </div>
     </el-dialog>
+    <!--操作指南-->
+    <operation-guide v-show="infoMessageShow" @shutMe="infoMessageShow = false" v-operating/>
   </div>
 </template>
 
@@ -313,6 +319,7 @@
   import {
     messageFun
   } from '@/assets/common.js'
+  import operationGuide from '@/components/home/operation-guide'
 
   export default {
     name: 'new-task',
@@ -392,6 +399,7 @@
           form: {
             labelName: '模板名称',
             valName: '',
+            formatName: false,
             labelSoftware: '渲染软件',
             valSoftware: '',
             labelPlugin: '渲染插件',
@@ -443,7 +451,8 @@
           // 【确定】标记编辑or新建
           editOrAdd: '',
           index: null      //编辑已存在模板时模板的索引
-        }
+        },
+        infoMessageShow: false
       }
     },
     props: {
@@ -463,11 +472,13 @@
         //]
       }
     },
+    components: { operationGuide },
     computed: {
       ...mapState(['zoneId']),
       // 验证表格是否填写完整
       disableSelf(){
-        if(this.dialogAdd.form.valName && this.dialogAdd.nList.length){
+        let a = this.dialogAdd
+        if(a.form.valName && a.nList.length && a.form.formatName){
           return true
         }else {
           return false
@@ -475,6 +486,24 @@
       }
     },
     methods: {
+      renderHeader(h,{column}){
+        return h('span', {}, [
+          h('span', {}, column.label),
+          h('img', {
+            attrs: {
+              class: 'ix',
+              src: require('@/icons/problemIcon.png'),
+              style: 'vertical-align: text-bottom;margin-left: 8px;cursor: pointer;',
+              title: '新建任务操作指南'
+            },
+            on: { click: () => this.infoMessageShow = true }
+          })
+        ])
+      },
+      nameVerif(){
+        if(this.dialogAdd.form.valName.length > 50){ messageFun('error','最多输入50个字符'); this.dialogAdd.form.formatName = false; return false }
+        this.dialogAdd.form.formatName = true
+      },
       // 关闭
       closeDialogFun(){
         this.$emit('closeDialogFun','')
@@ -539,6 +568,7 @@
       async getList(){
         let data = await createTaskSet()
         this.stepTwoBase.renderList = data.data.data
+        this.stepTwoBase.renderListActive = data.data.data.findIndex(curr => curr.renderTemplate.isDefault == 1)
               // [
               //   {
               //     renderTemplate: {                       //模板
@@ -708,9 +738,7 @@
       async taskDefine(){
         let val
         // 若表格未填写完整 返回
-        if(!this.disableSelf){
-          return
-        }
+        if(!this.disableSelf) return false
         switch(this.dialogAdd.editOrAdd){
           // 新建模板
           case 'addMore':
@@ -768,6 +796,7 @@
         inputFileDom.click()
         inputFileDom.addEventListener('change',() => {
           // row.projectFileList = inputFileDom.files
+          if(![...inputFileDom.files].every(item => !/:/.test(item['webkitRelativePath']))){ messageFun('error','请不要选择根目录'); return false }
           row.projectFileName = inputFileDom.files[0]['webkitRelativePath'].split('/')[0]
         })
       },
@@ -788,6 +817,7 @@
       },
       // 选择场景文件 - 【添加】
       operateBtnAddMore(){
+        if(this.filelist.length == 20){ messageFun('info', '操作失败，不能选择超过20个场景文件！'); return false }
         let inputDom = document.createElement('INPUT')
         inputDom.type = 'file'
         inputDom.accept = '.ma,.mb'
@@ -832,8 +862,9 @@
       },
       // 新建任务 - 提交新【任务】
       async confirmFun(){
+        console.log(this.filelist)
         if(!this.filelist.every(curr => curr.projectFileName)){ messageFun('error','请选择工程文件'); this.stepBtnActive = 1; return false }
-        if(!this.filelist.every(curr => curr.id)){ messageFun('error','请填写工程路径'); this.stepBtnActive = 1; return false }
+        if(!this.filelist.every(curr => curr.address)){ messageFun('error','请填写工程路径'); this.stepBtnActive = 1; return false }
         let data = await pushTask({
           zoneUuid: this.zoneId,              // 分区uuid
           templateUuid: this.stepTwoBase.renderList[this.stepTwoBase.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
@@ -843,6 +874,7 @@
           source: 2                           // 任务来源
         })
         await oneMorePath(data.data.data)
+        if(data.data.code == 1001){ messageFun('info','您已欠费'); return false }
         this.upLoadFun(data.data.data)
       },
       // 上传【场景文件】【工程文件】
@@ -862,22 +894,43 @@
           let data = await upTopCJ(CJData)
           if(data.data.code == 1001){ messageFun('error','余额不足'); return false}
           this.$router.push('/task')
+          this.closeDialogFun()
           // 上传工程文件
           let data2 = await upTopGC(GCData)
           if(data2.data.code != 200) throw '网络传输失败'
           messageFun('success','创建成功')
+          this.$emit('getListAgain')
         })
       },
     },
     mounted() {
       this.getList()
-    }
+    },
+    directives: {
+      operating: {
+        bind(el,bindings,vnode){
+          let handler = e => {
+            if(!el.contains(e.target)){
+              if([...e.target.classList].includes('ix')) return false
+              if(vnode.context.infoMessageShow) vnode.context.infoMessageShow = false
+            }
+          }
+          el.handler = handler
+          document.addEventListener('click',handler)
+        },
+        unbind(el){
+          document.removeEventListener('click',el.handler)
+        }
+      }
+    },
   }
 </script>
 
 <style lang="less" scoped>
   .newTask {
+    user-select: none;
     height: 80vh;
+    position: relative;
     .header {
       text-align: center;
       padding-bottom: 21px;
@@ -1308,5 +1361,8 @@
         }
       }
     }
+  }
+  .inputError {
+    color: #f40!important;
   }
 </style>

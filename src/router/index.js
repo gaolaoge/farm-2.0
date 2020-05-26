@@ -43,13 +43,18 @@ const router = new Router({
     {
       path: '/demo',
       name: 'demo',
-      component: () => import('@/components/demo.vue')
+      component: () => import('@/components/404.vue')
     },
     {
       path: '/rechargepage',
       name: 'rechargePage',
       component: () => import('@/components/rechargePage.vue')
     },
+    {
+      path: '*',
+      name: '404',
+      component: () => import('@/components/404.vue')
+    }
   ]
 })
 
@@ -57,7 +62,7 @@ router.beforeResolve((to,from,next) => {
   if(to.path == '/login'){
     next()
   }else {
-    if(sessionStorage.getItem('token')){
+    if(sessionStorage.getItem('token') || document.cookie){
       next()
     }else {
       next({path: '/login'})

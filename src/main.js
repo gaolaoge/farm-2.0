@@ -6,6 +6,7 @@ import echarts from 'echarts'
 import elTableInfiniteScroll from 'el-table-infinite-scroll'
 import App from './App'
 import router from './router'
+import 'babel-polyfill'
 
 Vue.config.devtools = true
 

@@ -22,7 +22,8 @@
           <!--下拉框-->
           <div class="newsBase">
             <ul class="userOperate"  v-show="showProblemList">
-              <li class="operateLi">
+              <!--渲染指引-->
+              <li class="operateLi" @click="guide">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -31,6 +32,7 @@
                   </span>
                 </span>
               </li>
+              <!--帮助中心-->
               <li class="operateLi">
                 <span class="con">
                   <span class="t">
@@ -48,6 +50,7 @@
           <img :src="user.imgUrlMini"
                alt=""
                class="userImg"
+               style="width: 28px;"
                @click="showUserList = !showUserList">
           <!--:class="[{'show': showUserList}]"-->
           <!--下拉框-->
@@ -98,7 +101,74 @@
           </div>
         </div>
       </div>
-
+      <!--渲染指引-->
+      <div class="guide-wrapper" v-if="guideShow">
+        <!--第一步-->
+        <div class="guide-step step-one" v-show="guideShowStep == 1">
+          <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
+          <div class="step-content">
+            <img src="@/assets/step-one.png" alt="" class="welcome" @click="guideShowStep = 2">
+          </div>
+        </div>
+        <!--第二步-->
+        <div class="guide-step step-two" v-show="guideShowStep == 2">
+          <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
+          <div class="step-content">
+            <img src="@/assets/step-two.png" class="newTesk" alt="">
+            <img src="@/assets/step-two2.png" class="newTaskIntroduction" alt="">
+            <div class="step-btn">
+              <img src="@/icons/step-previous.png" alt="" class="previous first">
+              <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 3">
+            </div>
+          </div>
+        </div>
+        <!--第三步-->
+        <div class="guide-step step-three" v-show="guideShowStep == 3">
+          <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
+          <div class="step-content">
+            <img src="@/assets/step-three.png" alt="" class="newMode">
+            <img src="@/assets/step-three2.png" alt="" class="step-threeDialogue">
+            <div class="step-btn">
+              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)" @click="guideShowStep = 2">
+              <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 4">
+            </div>
+          </div>
+        </div>
+        <!--第四步-->
+        <div class="guide-step step-four" v-show="guideShowStep == 4">
+          <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
+          <div class="step-content">
+            <img src="@/assets/step-four.png" alt="" class="set">
+            <img src="@/assets/step-four2.png" alt="" class="set2">
+            <div class="step-btn">
+              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)" @click="guideShowStep = 3">
+              <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 5">
+            </div>
+          </div>
+        </div>
+        <!--第五步-->
+        <div class="guide-step step-five" v-show="guideShowStep == 5">
+          <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
+          <div class="step-content">
+            <img src="@/assets/step-five.png" alt="" class="down">
+            <img src="@/assets/step-five2.png" alt="" class="down2">
+            <div class="step-btn">
+              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)" @click="guideShowStep = 4">
+              <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 6">
+            </div>
+          </div>
+        </div>
+        <!--第六步-->
+        <div class="guide-step step-six" v-show="guideShowStep == 6" @click="showGuide">
+          <div class="step-content">
+            <img src="@/assets/six-main.png" alt="" class="">
+            <img src="@/assets/six-top-left.png" alt="" class="tl">
+            <img src="@/assets/six-top-right.png" alt="" class="tr">
+            <img src="@/assets/six-bottom-left.png" alt="" class="bl">
+            <img src="@/assets/six-bottom-right.png" alt="" class="br">
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -111,6 +181,9 @@
     homeSelect,
     getInfo
   } from '@/api/api.js'
+  import {
+    setInfo
+  } from '@/assets/common'
 
   export default {
     name: 'headerM',
@@ -156,7 +229,9 @@
           {
             text: '帮助中心'
           }
-        ]
+        ],
+        guideShow: false,
+        guideShowStep: 1
       }
     },
     computed: {
@@ -173,14 +248,28 @@
           this.getList()
           this.userOperateList[0]['text'] = JSON.parse(sessionStorage.getItem('info'))['account']
           this.userOperateList[1]['balance'] = JSON.parse(sessionStorage.getItem('info'))['balance']
+          // 新手教程
+          setTimeout(() => {
+            if(localStorage.getItem(this.user.name) == 'false'){
+              this.guide(); localStorage.setItem(this.user.name, true) }
+          }, 100)
         },
         // immediate: true
       },
-      workBenchVal(val){
-        this.$store.commit('changeZoneId', val)
+      workBenchVal: {
+        handler: function(val){
+          this.$store.commit('changeZoneId', val)
+          sessionStorage.setItem('zoneUuid',val)
+        },
+        immediate: true,
+        deep: true
       }
     },
     methods: {
+      showGuide(){
+        this.guideShow = false
+        this.guideShowStep = 1
+      },
       // 退出
       quitFun(){
         this.$confirm('确认退出登录?', '提示', {
@@ -217,63 +306,22 @@
                 })
               })
               this.workBenchVal = this.workBenchList[0]['val']
-              // this.$store.commit('changeZoneId', this.workBenchList[0]['val'])
               sessionStorage.setItem('zoneUuid', this.workBenchList[0]['val'])
             }
           })
-          .catch(error => {
-            // 没有授权
-            if(error.code == 401){
-              this.$message.error('授权失效，需要重新登录')
-              sessionStorage.setItem('token','')
-              this.$router.push('/login')
-            }
-          })
+          .catch(error => console.log(`工作台下拉框获取报错，${error}`))
       },
-      getUserInfo(){
-        getInfo()
-          .then(data => {
-            // {
-            //   id: 9
-            //   createTime: 1586331819460
-            //   createBy: "cbddfd2e-09fb-4ce0-91de-56536a4fcc50"
-            //   updateTime: 1586331819460
-            //   updateBy: "cbddfd2e-09fb-4ce0-91de-56536a4fcc50"
-            //   customerUuid: "1"
-            //   dataStatus: 1
-            //   openid: null
-            //   nickname: null
-            //   headImg: null
-            //   phone: "18514347164"
-            //   sex: null
-            //   city: null
-            //   birthday: null
-            //   corporation: null
-            //   qq: null
-            //   wechat: null
-            //   email: null
-            //   account: "gaoge1834"
-            //   loginFailure: 0
-            //   freezingTime: 0
-            //   capacity: null
-            //   haveCapacity: null
-            //   overdrive: null
-            //   vipUuid: null
-            //   vipLevel: 0
-            //   goldBalance: 100
-            //   cumulativeRecharge: 0
-            //   totalArrival: 200
-            //   cumulativeConsume: 0
-            // }
-
-            let d = data.data.data
-
-            this.userOperateList[0]['text'] = d.account
-            this.userOperateList[1]['balance'] = d.goldBalance
-            this.$store.commit('changeUserName',d.account)
-            this.$store.commit('changeUserBalance',d.goldBalance.toFixed(3))
-
-          })
+      async getUserInfo(){
+        let data = await getInfo(),
+            d = data.data.data
+        if(data.data.code != 200) return false
+        setInfo(data.data.data)
+        this.userOperateList[0]['text'] = d.account
+        this.userOperateList[1]['balance'] = d.goldBalance
+      },
+      // 渲染指引
+      guide(){
+        this.guideShow = true
       }
     },
     directives: {
@@ -347,6 +395,7 @@
           position: relative;
           .newsBase {
             position: absolute;
+            z-index: 9;
             right: 0px;
             width:137px;
             height:0px;
@@ -357,11 +406,12 @@
               display: flex;
               flex-direction: column;
               align-items: center;
-              padding-left: 20px;
+              padding-left: 0px;
               box-sizing: border-box;
               .operateLi {
+                padding-left: 20px;
                 list-style: none;
-                width: 100%;
+                width: 117px;
                 text-align: left;
                 cursor: pointer;
                 line-height: 50px;
@@ -429,6 +479,9 @@
                 }
               }
             }
+            li:hover {
+              background: rgba(0, 97, 255, 0.2);
+            }
           }
         }
         .userInfo {
@@ -487,7 +540,7 @@
         height:40px;
         border-radius:15px;
         border:2px solid rgba(47,55,66,1);
-        padding-left: 30px;
+        /*padding-left: 30px;*/
         box-sizing: border-box;
         /*.workBench-label {*/
           /*font-size:14px;*/
@@ -498,6 +551,9 @@
         /*}*/
         .workBench-icon {
           cursor: pointer;
+        }
+        /deep/.el-input__inner {
+          padding-left: 30px;
         }
         //.workBench-optionBase
       }
@@ -514,7 +570,143 @@
           /*right: 0px;*/
         /*}*/
       /*}*/
-
+      .guide-wrapper {
+        position: fixed;
+        z-index: 999;
+        top: 0px;
+        left: 0px;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(28, 36, 47, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .guide-step {
+          position: relative;
+          width: 100%;
+          max-width: 1920px;
+          height: 100%;
+          max-height: 1080px;
+          img {
+            user-select: none;
+          }
+          .step-content {
+            height: 100%;
+            width: 100%;
+            /*border: 1px solid ;*/
+            .welcome {
+              display: block;
+              max-width: 74%;
+              margin: 160px auto;
+            }
+            .newTesk {
+              margin: 140px 0px 0px 200px;
+            }
+            .newTaskIntroduction {
+              vertical-align: top;
+              margin: 220px 0px 0px 60px;
+            }
+            .newMode {
+              display: block;
+              max-width: 74%;
+              margin: 90px auto;
+            }
+            .step-threeDialogue {
+              position: absolute;
+              top: 400px;
+              left: 760px;
+            }
+            .set {
+              position: absolute;
+              right: 10px;
+            }
+            .set2 {
+              position: absolute;
+              right: 890px;
+              top: 590px;
+            }
+            .down {
+              position: absolute;
+              right: 10px;
+            }
+            .down2 {
+              position: absolute;
+              left: 430px;
+              top: 440px;
+            }
+            .step-btn {
+              display: inline-block;
+              vertical-align: top;
+              img {
+                cursor: pointer;
+                &.first {
+                  cursor: auto;
+                }
+                &:nth-of-type(1) {
+                  margin-right: 30px;
+                }
+              }
+            }
+          }
+          .jump-btn {  // 跳过
+            position: absolute;
+            z-index: 2;
+            top: 40px;
+            right: 40px;
+            cursor: pointer;
+          }
+          .tl {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+          }
+          .tr {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+          }
+          .bl {
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+          }
+          .br {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+          }
+          &.step-two {
+            .step-btn {
+              margin: 340px 0px 0px -200px;
+            }
+          }
+          &.step-three {
+            .step-btn {
+              position: absolute;
+              top: 500px;
+              left: 1000px;
+            }
+          }
+          &.step-four {
+            .step-btn {
+              position: absolute;
+              top: 700px;
+              right: 980px;
+            }
+          }
+          &.step-five {
+            .step-btn {
+              position: absolute;
+              top: 550px;
+              left: 550px;
+            }
+          }
+          &.step-six {
+            cursor: pointer;
+          }
+        }
+      }
     }
+
   }
 </style>

@@ -2,7 +2,6 @@
   <div class="consumption-wrapper">
     <!--table-->
     <div class="recharge-table" ref="rechargeTable">
-
       <!--条件筛选-->
       <div class="filter">
         <!--任务ID-->
@@ -13,6 +12,7 @@
           <input type="text"
                  class="filter-item-i filter-item-input"
                  placeholder="请输入"
+                 @keyup.enter="getList"
                  v-model="filter.taskIdVal">
         </div>
         <!--场景名-->
@@ -22,6 +22,7 @@
           </span>
           <input type="text"
                  class="filter-item-i t"
+                 @keyup.enter="getList"
                  v-model="filter.scenesVal">
         </div>
         <!--所属项目-->
@@ -61,7 +62,6 @@
           {{ filter.exportBtn }}
         </div>
       </div>
-
       <!--table-->
       <el-table
         :data="table.rechargeData"
@@ -81,7 +81,6 @@
         <el-table-column
           prop="id"
           label="任务ID"
-          sortable
           show-overflow-tooltip
           width="160" />
         <!--场景名-->
@@ -148,7 +147,7 @@
         <el-table-column
           label="操作"
           show-overflow-tooltip
-          width="160">
+          width="100">
           <template slot-scope="scope">
             <div class="operateBtn" @click="seeMore(scope.row)">
               查看
@@ -157,26 +156,26 @@
         </el-table-column>
       </el-table>
     </div>
-
     <!--分页-->
     <div class="page">
       <el-pagination
         background
         layout="prev, pager, next, jumper"
+        @current-change="jump"
         :current-page.sync="table.currentPage"
         :total="table.outPutTableTotal">
       </el-pagination>
     </div>
-
     <!--详情-->
     <el-dialog :visible.sync="dialogVisible"
                width="80vw"
+               top="5vh"
                :show-close=false >
       <more-dialog @closeDialog="closeDialog"
                    width="80vw"
                    :dialogTableType="dialogTableType"
                    :renderDialogTableData="renderDialogTableData"
-                   :downloadDialogTableData="downloadDialogTableData" />
+                   :downloadDialogTableData="downloadDialogTableData"/>
     </el-dialog>
   </div>
 </template>
@@ -194,7 +193,9 @@
   import {
     createCalendar,
     getDate,
-    exportDownloadFun
+    exportDownloadFun,
+    consum,
+    createDateFun
   } from '@/assets/common.js'
 
   export default {
@@ -240,7 +241,8 @@
         dialogVisible: false,
         dialogTableType: '',
         renderDialogTableData: [],
-        downloadDialogTableData: []
+        downloadDialogTableData: [],
+        // pageInfo: {}
       }
     },
     components: {
@@ -248,6 +250,11 @@
       moreDialog
     },
     methods: {
+      // 翻页
+      jump(val){
+        this.table.currentPage = val
+        this.getList()
+      },
       // 充值中心多选
       handleSelectionChange(val){
         this.table.selectionList = val
@@ -256,24 +263,42 @@
       filterHandler(value, row, column){
         console.log(value, row, column)
       },
+      // 查看按钮
       async seeMore(item){
         this.dialogTableType = item.type
-        let uuId = item.id
+        let uuId = item.id,
+            data
 
         if(item.type == '渲染消费'){
-          let data = await consumptionSeeMore(uuId)
-          this.renderDialogTableData = data.data.data
+          data = await consumptionSeeMore(uuId)
+          // this.renderDialogTableData = data.data.data
+          this.renderDialogTableData = data.data.data.map(curr => {
+            return {
+              frameNo: curr.frameNo,
+              actualPayment: curr.actualPayment,
+              useTime: consum(curr.useTime),
+              startTime: createDateFun(new Date(curr.startTime)),
+              endTime: createDateFun(new Date(curr.endTime)),
+              unitPrice: curr.unitPrice,
+              cpuRate: curr.cpuRate,
+              memoryPeak: curr.memoryPeak
+            }
+          })
           this.dialogVisible = true
         }
         if(item.type == '下载消费'){
-          let data = await upTopSeeMore(uuId)
+          data = await upTopSeeMore(uuId)
           this.downloadDialogTableData = data.data.data
           this.dialogVisible = true
         }
+        // this.pageInfo = {
+        //   total: data.data.data,
+        //   pageIndex: data.data.data
+        // }
       },
       // 获取 table 数据
       async getList() {
-        let t = `pageSize=${this.table.pageSize}&pageIndex=${this.table.currentPage}&layerNo=${this.filter.taskIdVal}&layerName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`
+        let t = `pageSize=${this.table.pageSize}&pageIndex=${this.table.currentPage}&layerNo=${this.filter.taskIdVal}&fileName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`
         let data = await getConsumptionTable(t)
         this.table.rechargeData = data.data.data.map(curr => {
           let tableStatus = ''
@@ -306,7 +331,7 @@
           let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
           return {
             id: curr.layerTaskUuid,               //任务ID
-            scenesName: curr.layerName,           //场景名
+            scenesName: curr.fileName,           //场景名
             status: tableStatus,                  //状态
             statusDefault: curr.layerTaskStatus,
             object: curr.projectName,             //所属项目
@@ -348,7 +373,7 @@
       },
       // 导出记录
       async exportTable(){
-        let t = `layerNo=${this.filter.taskIdVal}&layerName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`,
+        let t = `layerNo=${this.filter.taskIdVal}&fileName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`,
             data = await exportConsumptionTable(t)
         // 导出下载
         exportDownloadFun(data, '消费记录','xlsx')
@@ -374,13 +399,14 @@
 </script>
 
 <style lang="less" scoped>
+  .consumption-wrapper {
+    overflow: hidden;
+  }
   .page {
-    position: absolute;
-    bottom: 30px;
-    left: 25px;
+    margin: 4px 25px 30px;
   }
   /deep/.el-table__body-wrapper {
-    height: calc(100vh - 491px);
+    height: calc(100vh - 557px);
   }
 
   .recharge-table {

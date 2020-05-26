@@ -61,6 +61,7 @@
           <input type="text"
                  class="filter-item-i filter-item-input"
                  placeholder="请输入"
+                 @keyup.enter="getList"
                  v-model="filter.singleNumberVal">
         </div>
         <!--查询时间-->
@@ -110,15 +111,15 @@
         <el-table-column
           prop="state"
           label="交易状态"
-          sortable
           show-overflow-tooltip
-          width="120">
+          width="100">
         </el-table-column>
         <!--实际支付金额（元）-->
         <el-table-column
           prop="realPay"
           label="实际支付金额（元）"
           show-overflow-tooltip
+          sortable
           width="200" />
         <!--充值到账（金币）-->
         <el-table-column
@@ -420,9 +421,6 @@
     overflow: hidden;
   }
   .page {
-    /*position: relative;*/
-    /*bottom: 0px;*/
-    /*left: 25px;*/
     margin: 4px 25px 30px;
   }
   /deep/.el-table__body-wrapper {

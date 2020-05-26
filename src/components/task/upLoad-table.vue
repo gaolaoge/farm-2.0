@@ -112,6 +112,8 @@
                 :typeInfo="itemName"
                 :taskData="drawerTaskData"
                 @changeTypeInfo="changeTypeInfo"
+                @toRenderTable="$emit('toRenderTable')"
+                @getListAgain="getList()"
                 @closeDrawer="closeDrawer"/>
   </div>
 </template>
@@ -165,15 +167,15 @@
           // 所属项目筛选数组
           projectList: [],
           statusList: [
-            // {text: '上传中', value: '上传中...'},
-            // {text: '上传暂停', value: '上传暂停'},
-            // {text: '上传失败', value: '上传失败'},
-            // {text: '已取消', value: '已取消'},
-            // {text: '分析中', value: '分析中...'},
-            // {text: '分析警告', value: '分析警告'},
-            // {text: '待设置参数', value: '待设置参数'},
-            // {text: '分析失败', value: '分析失败'},
-            // {text: '已放弃', value: '已放弃'},
+            {text: '上传中', value: '上传中...'},
+            {text: '上传暂停', value: '上传暂停'},
+            {text: '上传失败', value: '上传失败'},
+            {text: '已取消', value: '已取消'},
+            {text: '分析中', value: '分析中...'},
+            {text: '分析警告', value: '分析警告'},
+            {text: '待设置参数', value: '待设置参数'},
+            {text: '分析失败', value: '分析失败'},
+            {text: '已放弃', value: '已放弃'},
           ],
           usersList: []
         },
@@ -247,10 +249,10 @@
             text: curr.projectName
           }
         })
-        this.getList()
+        if(!this.$route.params.name) this.getList()
       },
       // 获取 table 列表
-      async getList(){
+      async getList(uploadStatus = ''){
         const loading = this.$loading({
           lock: true,
           text: 'Loading',
@@ -266,7 +268,7 @@
         //   analyseStatus: this.table.analyseStatus,             //分析状态数组
         //   projectUuid: this.projectUuidList                    //项目UUID数组
         // }
-        let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&uploadStatus=${this.table.uploadStatus.length == 0 ? '' : JSON.stringify(this.table.uploadStatus)}&analyseStatus=${this.table.analyseStatus.length == 0 ? '' : JSON.stringify(this.table.analyseStatus)}&projectUuid=${this.projectUuidList.length == 0 ? '' : JSON.stringify(this.projectUuidList)}`
+        let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&uploadStatus=&analyseStatus=&projectUuid=${this.projectUuidList.length == 0 ? '' : JSON.stringify(this.projectUuidList)}&setParameters=${uploadStatus ? 1 : ''}`
         let data = await getTaskTableList(t),
             usersList = new Set(),
             statusList = new Set()
@@ -331,7 +333,7 @@
               }
             })
         this.table.usersList = [...usersList].map(curr => { return {'text': curr, 'value':curr }})
-        this.table.statusList = [...statusList].map(curr => { return {'text': curr, 'value':curr }})
+        // this.table.statusList = [...statusList].map(curr => { return {'text': curr, 'value':curr }})
         this.table.uploadTableTotal = data.data.total
         this.$emit('uploadTbaleTotalItem', data.data.total)
         loading.close()

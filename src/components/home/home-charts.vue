@@ -15,16 +15,21 @@
     },
     props: {
       cData: {
-        type: Array,
-        default: [10,0,0,0,0,0,0]
+        type: Array
       },
       cDate: {
-        type: Array,
-        default: ['01.23', '01.24', '01.25', '01.26', '01.27', '01.28', '01.29']
+        type: Array
       }
     },
     mounted() {
       this.init()
+    },
+    computed: {
+      maxNum(){
+        let m = Math.max.apply(null, this.cData)
+        if(m == 0){ return 2 }
+        else{ return m % 2 == 1 ? m + 1 : m }
+      }
     },
     methods: {
       init(){
@@ -63,8 +68,8 @@
           yAxis: {
             type: 'value',
             min: 0,
-            max: 60,
-            interval: 30,
+            max: this.maxNum,
+            interval: Math.ceil(this.maxNum / 2),
             axisLine: {
               show: false
             },

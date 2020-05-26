@@ -104,7 +104,7 @@
           img: require('@/icons/n.png'),
           name: 'Terry Brewer',
           levelIcon: require('@/icons/vipIcon2.png'),
-          levelText: '铂金会员',
+          levelText: '大众会员',
           balanceLabel: '账户余额(金币)：',
           balanceVal: 'null',
           btn: '立即充值'

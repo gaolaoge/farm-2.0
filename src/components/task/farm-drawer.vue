@@ -50,22 +50,24 @@
           </div>
         </div>
         <div class="farm-drawer-body-item two">
-          <div class="farm-drawer-item">
-            <span class="farm-drawer-item-label">
-              {{ details.labelProgress }}：
-            </span>
-            <span class="farm-drawer-item-val">
-              {{ details.valProgress }}
-            </span>
-          </div>
-          <div class="farm-drawer-item">
-            <span class="farm-drawer-item-label">
-              {{ details.labelLog }}：
-            </span>
-            <span class="farm-drawer-item-val">
-              {{ details.valLog }}
-            </span>
-          </div>
+          <!--分析进度-->
+          <!--<div class="farm-drawer-item">-->
+            <!--<span class="farm-drawer-item-label">-->
+              <!--{{ details.labelProgress }}：-->
+            <!--</span>-->
+            <!--<span class="farm-drawer-item-val">-->
+              <!--{{ details.valProgress }}-->
+            <!--</span>-->
+          <!--</div>-->
+          <!--分析日志-->
+          <!--<div class="farm-drawer-item">-->
+            <!--<span class="farm-drawer-item-label">-->
+              <!--{{ details.labelLog }}：-->
+            <!--</span>-->
+            <!--<span class="farm-drawer-item-val">-->
+              <!--{{ details.valLog }}-->
+            <!--</span>-->
+          <!--</div>-->
           <div class="errorList" v-show="details.errorList[0]">
             <div class="farm-drawer-list-item" v-for="item,index in details.errorList">
               <div class="icon">
@@ -98,6 +100,7 @@
           </div>
           <!--重新分析-->
           <div class="farm-drawer-btn farm-drawer-again-btn"
+               @click="renderAgainBtnFun"
                v-show="details.status == 5 || details.status == 6">
             {{ details.btnGroup.again }}
           </div>
@@ -518,11 +521,11 @@
             <img :src="result.miniImgHref" alt="" class="img">
             <span class="status"
                   :class="[
-                  {'wait': result.statusData == '等待'},
+                  {'wait': result.statusData == '等待' || result.statusData == '暂停'},
                   {'ing': result.statusData == '渲染中'},
-                  {'done': result.statusData == '渲染结束'},
-                  {'pause': result.statusData == '渲染暂停'},
-                  {'giveUp': result.statusData == '渲染放弃'}
+                  {'done': result.statusData == '渲染成功'},
+                  {'pause': result.statusData == '暂无'},
+                  {'giveUp': result.statusData == '渲染放弃' || result.statusData == '暂停（欠费）'||  result.statusData == '暂停（超时）'}
                   ]">
               {{ result.statusData }}
             </span>
@@ -662,6 +665,7 @@
             <!--主-操作-->
             <div class="operateBtnBase" v-show="!result.showDetails">
               <div class="operateBtn"
+                   :class="[{'cannotTrigger': item.classState}]"
                    @click="operateFun(item.text)"
                    v-for="item,index in result.operateBtnList"
                    :key="index">
@@ -735,14 +739,14 @@
                 <el-table-column
                   label="帧状态"
                   show-overflow-tooltip
-                  min-width="100">
+                  min-width="120">
                   <template slot-scope="scope">
                     <span :class="[
                         {'wait': scope.row.status == '等待中'},
                         {'ing': scope.row.status == '渲染中'},
                         {'suc': scope.row.status == '渲染成功'},
-                        {'fail': scope.row.status == '渲染失败'},
-                        {'pause': scope.row.status == '停止中'},
+                        {'fail': scope.row.status == '渲染失败' || scope.row.status == '暂停（超时）' || scope.row.status == '暂停（欠费）'},
+                        {'pause': scope.row.status == '暂停'},
                       ]">
                       {{ scope.row.status }}
                     </span>
@@ -753,13 +757,13 @@
                   prop="prices"
                   label="渲染费用（金币）"
                   show-overflow-tooltip
-                  width="152" />
+                  width="142" />
                 <!--渲染时长-->
                 <el-table-column
                   prop="direction"
                   label="渲染时长"
                   show-overflow-tooltip
-                  width="160" />
+                  width="150" />
                 <!--渲染开始时间-->
                 <el-table-column
                   prop="startDate"
@@ -775,18 +779,18 @@
                   show-overflow-tooltip
                   width="180" />
                 <!--CPU利用率-->
-                <el-table-column
-                  prop="percent"
-                  label="CPU利用率"
-                  show-overflow-tooltip
-                  width="110" />
+                <!--<el-table-column-->
+                  <!--prop="percent"-->
+                  <!--label="CPU利用率"-->
+                  <!--show-overflow-tooltip-->
+                  <!--width="110" />-->
                 <!--内存峰值-->
-                <el-table-column
-                  prop="RAM"
-                  label="内存峰值"
-                  sortable
-                  show-overflow-tooltip
-                  width="120" />
+                <!--<el-table-column-->
+                  <!--prop="RAM"-->
+                  <!--label="内存峰值"-->
+                  <!--sortable-->
+                  <!--show-overflow-tooltip-->
+                  <!--width="120" />-->
                 <!--下载次数-->
                 <el-table-column
                   prop="times"
@@ -817,6 +821,7 @@
                 :data="result.detailsTableData"
                 @selection-change="handleDetailsSelectionChange"
                 class="g"
+                :class="[{'null': !result.detailsTableData.length}]"
                 :border=true
                 style="width: 100%">
 
@@ -933,7 +938,8 @@
     seeBalance,
     itemStart,
     getFrameHistoryTable,
-    downloadLog
+    downloadLog,
+    analyseAgain
   } from '@/api/api'
   import {
     createDateFun,
@@ -1131,17 +1137,21 @@
           operateBtnList: [
             {
               imgUrl: require('@/icons/playIcon-blue.png'),
-              text: '开始'
+              text: '开始',
+              classState: true
             },
             {
               imgUrl: require('@/icons/pauseIcon-blue.png'),
-              text: '暂停'
+              text: '暂停',
+              classState: true
             },
             {
-              text: '下载完成帧'
+              text: '下载完成帧',
+              classState: true
             },
             {
-              text: '重新渲染'
+              text: '重新渲染',
+              classState: true
             },
           ],
           // 详情 table 操作
@@ -1256,6 +1266,11 @@
       }
     },
     methods: {
+      // 上传分析 - 重新分析BTN
+      async renderAgainBtnFun(){
+        let data = await analyseAgain([this.taskData.taskUuid])
+        if(data.data.code == 200){ messageFun('success','操作成功'); this.$emit('getListAgain'); this.closeDrawer() }
+      },
       // 进入 - 获取详情
       getData(){
         this.loading = this.$loading({
@@ -1272,10 +1287,12 @@
       },
       // 上传分析 -  获取详情
       async getUpTopItemMore(){
-        this.details.valId = this.taskData.id
-        this.details.valName = this.taskData.scenesName
-        this.details.valCreateTime = this.taskData.creationTime
-        this.details.valState = this.taskData.status
+        Object.assign(this.details,{
+          valId: this.taskData.id,
+          valName: this.taskData.scenesName,
+          valCreateTime: this.taskData.creationTime,
+          valState: this.taskData.status
+        })
         let data = await upTopTableSeeMore(`taskUuid=${this.taskData.taskUuid}`)
         this.loading.close()
         this.details.status = data.data.data.status
@@ -1312,10 +1329,13 @@
       },
       // 渲染下载 - 详情 - 缩略图
       async showMiniImg(row, column, event){
+        this.result.statusData = row['status']
         let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&type=1`,
             data = await downloadFrame(t)
         this.result.miniImgHref = window.URL.createObjectURL(data.data)
+
       },
+      // 渲染下载 - 详情 - 主table 获取列表
       async getRenderItemMoreTableF(){
         // {
         //   TaskUuid: '',
@@ -1344,7 +1364,9 @@
               s = '渲染失败'
               break
             case 5:
-              s = '停止中'
+              if(curr.result == 7) s = '暂停（欠费）'
+              else if(curr.result == 6) s = '暂停（超时）'
+              else  s = '暂停'
               break
           }
           return {
@@ -1356,7 +1378,7 @@
               endDate: createDateFun(new Date(curr.endTime)),       // 渲染结束时间
               percent: '-',                                         // CPU利用率
               RAM: '-',                                             // 内存峰值
-              times: '-',                                           // 已下载次数
+              times: curr.downloadCount,                                           // 已下载次数
               layerTaskUuid: curr.layerTaskUuid,                    // 层uuid
               frameTaskUuid: curr.frameTaskUuid,                    // 帧uuid
               taskTaskUuid: curr.taskUuid,                          // 主uuid
@@ -1367,47 +1389,44 @@
         this.result.happen[2]['num'] = data_.frameCount['pause']
         this.result.happen[3]['num'] = data_.frameCount['done']
         this.result.happen[4]['num'] = data_.frameCount['fail']
-        this.result.dataO['costVal'] = data_.taskInfo['cost'].toFixed(3)
-        this.result.dataO['totalVal'] = consum(data_.taskInfo['useTime'])
-        this.result.dataO['averageVal'] = data_.frameCount['done'] ? consum(data_.taskInfo['useTime'] / data_.frameCount['done']) : 'null'
+        Object.assign(this.result.dataO,{
+          costVal: data_.taskInfo['cost'].toFixed(3),
+          totalVal: consum(data_.taskInfo['useTime']),
+          averageVal: data_.frameCount['done'] ? consum(data_.taskInfo['useTime'] / data_.frameCount['done']) : '-'
+        })
 
-        let ss = null
-        switch(data_.taskInfo.renderStatus){
-          case 1:
-            ss = '等待'
-            break
-          case 2:
-            ss = '渲染中'
-            break
-          case 3:
-            ss = '渲染结束'
-            break
-          case 4:
-            ss = '渲染暂停'
-            break
-          case 6:
-            ss = '渲染放弃'
-            break
-        }
-
-        this.result.statusList.taskIdVal = data_.taskInfo.taskNo                                            // 任务ID
-        this.result.statusList.scenesNameVal = data_.taskInfo.fileName                                      // 场景名
-        this.result.statusList.projectVal = data_.taskInfo.projectName                                      // 所属项目
-        this.result.statusList.softwareVal = data_.taskInfo.softName + ' ' + data_.taskInfo.softVer         // 渲染软件
-        this.result.statusList.pluginVal = data_.taskInfo.pluginName + ' ' + data_.taskInfo.pluginVersion   // 渲染插件
-        this.result.statusList.layerVal = data_.taskInfo.layerName                                          // 层名
-        this.result.statusList.resolutionVal = data_.taskInfo.width + '*' + data_.taskInfo.height           // 分辨率
-        this.result.statusList.formatVal = data_.taskInfo.formatName                                        // 输出格式
-        this.result.statusList.cameraVal = data_.taskInfo.camera                                            // 相机
-        this.result.statusList.modeVal = data_.taskInfo.core + '核' + '-' + data_.taskInfo.memory + 'G' + '（' + data_.taskInfo.patternName + '）' // 渲染模式
-        this.result.statusList.founderVal = data_.taskInfo.account                                          // 创建人
-        this.result.statusList.creationTimeVal = createDateFun(new Date(data_.taskInfo.createTime))         // 创建时间
-        this.result.statusData = ss                                                                         // 状态
-
+        Object.assign(this.result.statusList,{
+          taskIdVal: data_.taskInfo.taskNo,                                            // 任务ID
+          scenesNameVal: data_.taskInfo.fileName,                                      // 场景名
+          projectVal: data_.taskInfo.projectName,                                      // 所属项目
+          softwareVal: data_.taskInfo.softName + ' ' + data_.taskInfo.softVer,         // 渲染软件
+          pluginVal: data_.taskInfo.pluginName + ' ' + data_.taskInfo.pluginVersion,   // 渲染插件
+          layerVal: data_.taskInfo.layerName,                                          // 层名
+          resolutionVal: data_.taskInfo.width + '*' + data_.taskInfo.height,           // 分辨率
+          formatVal: data_.taskInfo.formatName,                                        // 输出格式
+          cameraVal: data_.taskInfo.camera,                                            // 相机
+          modeVal: data_.taskInfo.core + '核' + '-' + data_.taskInfo.memory + 'G' + '（' + data_.taskInfo.patternName + '）', // 渲染模式
+          founderVal: data_.taskInfo.account,                                          // 创建人
+          creationTimeVal: createDateFun(new Date(data_.taskInfo.createTime))          // 创建时间
+        })
         this.showMiniImg(this.result.tableData[0])
       },
       //关闭抽屉
       closeDrawer(){
+        this.settingBack()
+        Object.assign(this.setting.priority,{  // 优先渲染初始化
+          topVal: '1',
+          middleVal: '1',
+          bottomVal: '1',
+          selfVal: '0',
+          customize: ''
+        })
+        this.setting.mode.mode = '2002'        // 渲染模式初始化
+        Object.assign(this.setting.other,{     // 其它设置初始化
+          remindVal: 12,
+          stopVal: 24,
+          view: ''
+        })
         this.result.mainTableIndex = 0
         this.result.showDetails = false
         this.$emit('closeDrawer')
@@ -1513,6 +1532,16 @@
       // 主table多选事件
       handleSelectionChange(val){
         this.result.selectionResult = val
+        let t = val.map(curr => curr.status)
+        let s = this.result.operateBtnList[0],   // 开始
+            p = this.result.operateBtnList[1],   // 暂停
+            d = this.result.operateBtnList[2],   // 下载完成帧
+            a = this.result.operateBtnList[3]    // 重新渲染
+        if(t.length > 0 && t.every(item => ['暂停','暂停（超时）','暂停（欠费）'].includes(item))){ s['classState'] = false }else{ s['classState'] = true }
+        if(t.length > 0 && t.every(item => ['渲染成功','渲染失败'].includes(item))){ a['classState'] = false }else{ a['classState'] = true }
+        if(t.length > 0 && t.every(item => ['渲染中','等待中'].includes(item))){ p['classState'] = false }else{ p['classState'] = true }
+        if(t.length > 0){ d['classState'] = false }else{ d['classState'] = true }
+
       },
       // 详情table多选事件
       handleDetailsSelectionChange(val){
@@ -1633,13 +1662,17 @@
           frameCustom: this.setting.priority.selfVal,             // 自定义
           frameCustomNo: this.setting.priority.customize.match(/\d/g),         // 自定义帧
           allocation: this.setting.mode.mode,                     // 渲染模式
-          projectUuid: this.setting.other.view.split('-')[0],     // 所属项目ID
-          projectName: this.setting.other.view.split('-')[1],     // 所属项目label
+          projectUuid: this.setting.other.view.split('-/-')[0],     // 所属项目ID
+          projectName: this.setting.other.view.split('-/-')[1],     // 所属项目label
           frameTimeoutWarn: this.setting.other.remindVal,         // 超时提醒
           frameTimeoutStop: this.setting.other.stopVal,           // 超时停止
           layerSetSettingList
         })
-        if(data.data.code == 200) this.closeDrawer()
+        if(data.data.code == 200){
+          this.closeDrawer()
+          this.$emit('toRenderTable')
+          this.$emit('getListAgain')
+        }
       },
       // 渲染结果 - 主 - 操作
       operateFun(action){
@@ -1671,16 +1704,18 @@
       },
       // 渲染结果 - 主 - 操作 - 开始
       async operateStart(){
-        if(!this.result.selectionResult.length) return false
+        if(this.result.operateBtnList[0]['classState']) return false
         let data = await itemStart({
           "instructType": 11,
           "frameUuidList" : this.result.selectionResult.map(curr => curr.frameTaskUuid)
         })
-        if(data.data.code == 200){ messageFun('success','操作成功'); this.getRenderItemMoreTableF() }else{ messageFun('error','报错，操作失败') }
+        if(data.data.code == 200){ messageFun('success','操作成功'); this.getRenderItemMoreTableF() }
+        else if(data.data.code == 1001) messageFun('info','余额不足')
+        else messageFun('error','报错，操作失败')
       },
       // 渲染结果 - 主 - 操作 - 暂停
       async operatePause(){
-        if(!this.result.selectionResult.length) return false
+        if(this.result.operateBtnList[1]['classState']) return false
         let data = await itemStart({
           "instructType": 22,
           "frameUuidList" : this.result.selectionResult.map(curr => curr.frameTaskUuid)
@@ -1689,10 +1724,12 @@
       },
       // 渲染结果 - 主 - 操作 - 下载完成帧
       async operateDownloadFrame(){
+        if(this.result.operateBtnList[2]['classState']) return false
         let data = await seeBalance()
-        if(data.data.code == 1001){ messageFun('error','余额不足'); return false }
+        if(data.data.code == 1001){ messageFun('error',`当前账户余额为${data.data.data}，请先进行充值！`); return false }
 
         this.result.selectionResult.forEach(async curr => {
+          if(curr.status != '渲染成功') return false
           let t = `frameTaskUuid=${curr.frameTaskUuid}&layerTaskUuid=${curr.layerTaskUuid}&type=0`,
               data = await downloadFrame(t)
           exportDownloadFun(data, data.headers.file, '')
@@ -1700,6 +1737,7 @@
       },
       // 渲染结果 - 主 - 操作 - 重新渲染
       operateRenderAgain(){
+        if(this.result.operateBtnList[3]['classState']) return false
         this.$confirm('此操作将重新渲染选中项, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -1740,60 +1778,55 @@
         exportDownloadFun(data, data.headers.file, 'text')
       },
       // 分析结果 - 进入设置参数
-      setParameter(){
+      async setParameter(){
         const loading = this.$loading({
           lock: true,
           text: 'Loading',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         })
-        upTopTableSet(this.taskData.taskUuid)
-          .then(data => {
-            loading.close()
-            var data = data.data
-            if(data.code != 200){
-              this.$message({
-                message: '数据请求失败',
-                type: 'error'
-              })
-              return false
+        let data_ = await upTopTableSet(this.taskData.taskUuid)
+        loading.close()
+        let data = data_.data
+        if(data.code != 200){ messageFun('error','报错，数据请求失败'); return false }
+        this.$emit('changeTypeInfo','setting')
+        this.setting.num.tableDataAll = data.data.layerSettingList.map(curr => {
+          let formatList = curr.format.map(item => {
+            return {
+              label: item.name,
+              val: item.value + '-' + item.name + '-' + item.codeUuid
             }
-            this.$emit('changeTypeInfo','setting')
-            this.setting.num.tableDataAll = data.data.layerSettingList.map(curr => {
-              let formatList = curr.format.map(item => {
-                return {
-                  label: item.name,
-                  val: item.value + '-' + item.name + '-' + item.codeUuid
-                }
-              })
-              let cameraList = curr.camera.map(item => {
-                return {
-                  label: item,
-                  val: item
-                }
-              })
-              return {
-                id: curr.layerUuid,
-                name: curr.layerName,
-                range: curr.frameStart + '-' + curr.frameEnd,
-                num: '1',
-                w: curr.width,
-                h: curr.height,
-                format: formatList[0]['val'],
-                camera: cameraList[0]['val'],
-                rangeEdit: false,         // 帧范围 - 状态切换 勿动
-                rangeErr: false,          // 帧范围 - 报错切换 勿动
-                numEdit: false,           // 间隔帧数 - 状态切换 勿动
-                numErr: false,            // 间隔帧数 - 报错切换 勿动
-                wEdit: false,             // 图像宽度 - 状态切换 勿动
-                hEdit: false,             // 图像高度 - 状态切换 勿动
-                formatList: formatList,
-                cameraList: cameraList
-              }
-            })
-            this.setting.num.tableData = [this.setting.num.tableDataAll[0]]
-            // this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0], true)
           })
+          let cameraList = curr.camera.map(item => {
+            return {
+              label: item,
+              val: item
+            }
+          })
+          return {
+            id: curr.layerUuid,
+            name: curr.layerName,
+            range: curr.frameStart + '-' + curr.frameEnd,
+            num: '1',
+            w: curr.width,
+            h: curr.height,
+            format: formatList[0]['val'],
+            camera: cameraList[0]['val'],
+            rangeEdit: false,         // 帧范围 - 状态切换 勿动
+            rangeErr: false,          // 帧范围 - 报错切换 勿动
+            numEdit: false,           // 间隔帧数 - 状态切换 勿动
+            numErr: false,            // 间隔帧数 - 报错切换 勿动
+            wEdit: false,             // 图像宽度 - 状态切换 勿动
+            hEdit: false,             // 图像高度 - 状态切换 勿动
+            formatList: formatList,
+            cameraList: cameraList
+          }
+        })
+        this.setting.num.tableData = [this.setting.num.tableDataAll[0]]
+        // console.log(this.$refs)
+        setTimeout(()=>{
+          this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0], true)
+        },0)
       },
       // 设置参数 - 返回分析结果
       settingBack(){
@@ -1805,8 +1838,9 @@
           .then(data => {
             this.setting.other.viewList = data.data.data.map(curr => {
               return {
-                value: curr.taskProjectUuid + '-' + curr.projectName,
-                label: curr.projectName
+                value: curr.taskProjectUuid + '-/-' + curr.projectName,
+                label: curr.projectName,
+                id: curr.taskProjectUuid
               }
             })
             if(!name){
@@ -1832,7 +1866,7 @@
         let val = this.setting.priority.customize
         if(!val) { this.setting.priority.customizeInputError = false; return false }
 
-        let valList = val.replace(/，/g,',').split(',')          // 输入帧
+        let valList = val.replace(/，/g,',').split(',').filter(curr => curr != '')          // 输入帧
 
         if(valList.length > 3) { this.errFun('最多优先测试3帧'); return false }
         if(!valList.every(curr => /^[0-9]+$/.test(Number(curr)))) { this.errFun('输入格式不正确，请重新输入'); return false }
@@ -2163,6 +2197,15 @@
               margin-right: 4px;
               /*vertical-align: sub;*/
             }
+            &.cannotTrigger {
+              cursor: no-drop;
+              img {
+                opacity: 0;
+              }
+              span {
+                color: rgba(255, 255, 255, 0.1);
+              }
+            }
           }
           .searchBase {
             position: relative;
@@ -2204,6 +2247,7 @@
           .log {
             display: flex;
             justify-content: center;
+            margin-top: -316px;
             .tableDataNull {
               .tableDataNullText {
                 font-size: 14px;
@@ -2320,5 +2364,8 @@
   }
   .fail {
     color: rgba(249, 0, 35, 1);
+  }
+  .null {
+    height: 120px;
   }
 </style>

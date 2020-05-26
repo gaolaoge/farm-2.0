@@ -1,6 +1,11 @@
 <template>
   <div class="outPut-wrapper">
-    <div class="outPut-table" ref="outPutTable">
+    <div class="outPut-table"
+         ref="outPutTable"
+         element-loading-text="拼命加载中"
+         element-loading-spinner="el-icon-loading"
+         element-loading-background="rgba(0, 0, 0, 0.8)"
+         v-loading.fullscreen.lock="fullscreenLoading">
       <!--面包屑-->
       <div class="bread">
         <span v-for="item,index in bread.list"
@@ -101,6 +106,7 @@
       <el-pagination
         background
         :current-page.sync="table.pageIndex"
+        @current-change="handleCurrentChange"
         :page-size="table.pageSize"
         layout="prev, pager, next, jumper"
         :total="table.outPutTableTotal">
@@ -114,18 +120,24 @@
     assetsExportMain,
     assetsExportLayer,
     assetsExportFrame,
-    assetsDeleteItem
+    assetsDeleteItem,
+    compressionFiles,
+    downloadFrame,
+    seeBalance
   } from '@/api/api'
   import {
     consum,
     createDateFun,
-    messageFun
+    messageFun,
+    UuidFun,
+    exportDownloadFun
   } from '@/assets/common.js'
 
   export default {
     name: 'outPut',
     data(){
       return {
+        fullscreenLoading: false,
         table: {
           outPutData: [
             // {
@@ -172,6 +184,12 @@
       }
     },
     methods: {
+      // 翻页
+      handleCurrentChange(val){
+        if(this.table.nextTbaleType == 'layer'){ this.getList() }
+        else if(this.table.nextTbaleType == 'frame'){ this.getLayerList() }
+        else { this.getFrameList() }
+      },
       // 多选
       handleSelectionChange(val){
         this.table.selectionList = val
@@ -205,6 +223,7 @@
       // 查询主任务
       async getList(){
         this.$emit('clearInput')
+        this.fullscreenLoading = true
         // {
         //   keyword: '',         // 关键字
         //   pageIndex: '',
@@ -214,6 +233,7 @@
         let t = `keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
             data = await assetsExportMain(t),
             projectList = new Set()
+        this.fullscreenLoading = false
         this.table.main = true
         this.table.outPutData = data.data.data.map(curr => {
           let downLoadTime = curr.downloadFrameCount == 0 ? '未下载' : curr.downloadFrameCount == curr.allFrameCount ? '已下载' : '部分下载'
@@ -241,6 +261,7 @@
       },
       // 查询层任务
       async getLayerList(){
+        this.fullscreenLoading = true
         // {
         //   keyword: '',         // 关键字
         //   pageIndex: '',
@@ -249,6 +270,7 @@
         // }
         let t = `taskUuid=${this.table.rowUuid}&keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
             data = await assetsExportLayer(t)
+        this.fullscreenLoading = false
         this.table.nextTbaleType = 'frame'
         this.table.outPutData = data.data.data.map(curr => {
           return {
@@ -267,6 +289,7 @@
       },
       // 查询帧任务
       async getFrameList(){
+        this.fullscreenLoading = true
         // {
         //   keyword: '',           // 关键字
         //   pageIndex: '',
@@ -275,6 +298,7 @@
         // }
         let t = `layerTaskUuid=${this.table.rowUuid}&keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
             data = await assetsExportFrame(t)
+        this.fullscreenLoading = false
         this.table.nextTbaleType = 'null'
         this.table.outPutData = data.data.data.map(curr => {
           let fileType = curr.fileName.split('.')
@@ -284,9 +308,11 @@
             fileSize: curr.fileSize,                        // 文件大小
             fileType: fileType[fileType.length - 1],        // 文件类型
             downLoadTime: curr.downloadCount,               // 下载次数
-            date: curr.date == 0 ? '-' : consum(new Date().getTime() - curr.indate), // 剩余有效期（天）
+            date: curr.indate == 0 ? '-' : consum(curr.indate - new Date().getTime()), // 剩余有效期（天）
             upDate: createDateFun(new Date(curr.updateTime)),                        // 更新时间
-            itemUuid: curr.frameTaskUuid
+            itemUuid: curr.frameTaskUuid,
+            frameTaskUuid: curr.frameTaskUuid,
+            layerTaskUuid: curr.layerTaskUuid
           }
         })
         this.table.outPutTableTotal = data.data.total
@@ -313,9 +339,56 @@
             break
         }
       },
-      // 下载item
-      downloadFun(){
-
+      // 下载item 申请打包
+      async downloadFun(){
+        let r = await seeBalance()
+        if(r.data.code == 1001){ messageFun('info',`当前账户余额为${r.data.data}，请先进行充值！`); return false }
+        this.$confirm('将下载选中选, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(
+            async () => {
+              let code = 1,
+                  type = 3,
+                  uuidList = this.table.selectionList.map(item => item.itemUuid)
+              if(this.table.nextTbaleType == 'layer') type = 1
+              if(this.table.nextTbaleType == 'frame') type = 2
+              if(type != 3){
+                messageFun('success','发起文件打包请求')
+                let code = UuidFun(),
+                    // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
+                    socket_ = new WebSocket(`ws://192.168.12.144:5000/professional/websocket/package/${code}`)
+                socket_.addEventListener('open',function(){
+                  socket_.send(JSON.stringify({
+                    'message': {
+                      type,
+                      uuidList: uuidList
+                    }
+                  }))
+                })
+                socket_.addEventListener('message',e => {
+                  let data = JSON.parse(e.data)
+                  if(data.code == 200){ this.downloadingFun(data.data) }
+                  if(data.code == 209){ socket_.close(); this.downloadingFun(data.data) }
+                })
+              }
+              if(type == 3){
+                this.table.selectionList.forEach(async curr => {
+                  let t = `frameTaskUuid=${curr.frameTaskUuid}&layerTaskUuid=${curr.layerTaskUuid}&type=3`,
+                      data = await downloadFrame(t)
+                  exportDownloadFun(data, data.headers.file, '')
+                })
+              }
+            },
+            () => { messageFun('info','已取消下载'); return false }
+          )
+      },
+      // 打包后下载
+      async downloadingFun(path){
+        let data = await compressionFiles(path)
+        exportDownloadFun(data,data.headers.file,'zip')
       },
       // 删除item
       deleteFun(){

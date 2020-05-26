@@ -26,11 +26,12 @@
               prop="framesNum"
               label="帧数"
               sortable
+              width="140"
               show-overflow-tooltip />
-            <!--已下载次数-->
+            <!--下载次数-->
             <el-table-column
               prop="downloadNum"
-              label="已下载次数"
+              label="下载次数"
               sortable
               show-overflow-tooltip />
             <!--费用（金币）-->
@@ -70,6 +71,7 @@
             <el-table-column
               prop="num"
               label="帧数"
+              width="140"
               sortable
               show-overflow-tooltip />
             <!--渲染费用（金币）-->
@@ -96,25 +98,33 @@
               label="渲染结束时间"
               show-overflow-tooltip
               width="192" />
-            <!--单价（金币/核对）-->
+            <!--单价（金币/核时）-->
             <el-table-column
               prop="price"
-              label="单价（金币/核对）"
+              label="单价（金币/核时）"
               show-overflow-tooltip />
             <!--CPU利用率-->
-            <el-table-column
-              prop="percent"
-              label="CPU利用率"
-              show-overflow-tooltip />
+            <!--<el-table-column-->
+              <!--prop="percent"-->
+              <!--label="CPU利用率"-->
+              <!--show-overflow-tooltip />-->
             <!--内存峰值-->
-            <el-table-column
-              prop="peak"
-              label="内存峰值"
-              show-overflow-tooltip />
+            <!--<el-table-column-->
+              <!--prop="peak"-->
+              <!--label="内存峰值"-->
+              <!--show-overflow-tooltip />-->
 
           </el-table>
         </div>
-
+        <!--分页-->
+        <!--<div class="page">-->
+          <!--<el-pagination-->
+            <!--background-->
+            <!--layout="prev, pager, next, jumper"-->
+            <!--:current-page.sync="table.currentPage"-->
+            <!--:total="table.outPutTableTotal">-->
+          <!--</el-pagination>-->
+        <!--</div>-->
       </div>
     </section>
   </div>
@@ -229,6 +239,8 @@
 
 <style lang="less" scoped>
   .more-dialog {
+    overflow: hidden;
+    height: 87vh;
     position: relative;
     .header {
       position: absolute;
@@ -270,5 +282,11 @@
       padding-left: 18px;
     }
   }
+  /deep/.el-table__body-wrapper {
+    height: calc(100vh - 220px);
+  }
+  /*.page {*/
+    /*margin: 4px 25px 30px;*/
+  /*}*/
 
 </style>

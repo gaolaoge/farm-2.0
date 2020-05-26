@@ -36,10 +36,12 @@
           <el-table
             class="gd"
             :data="dialogTable.tableData"
-            :tree-props="{'children': 'children2'}"
-            @selection-change="dialogTableChange"
+            :tree-props="{'children': 'children'}"
+            @select="tableSelect"
             @row-click="showDetails"
+            @select-all="selectAll"
             row-key="rowId"
+            ref="archiveTable"
             style="width: 100%">
 
             <el-table-column
@@ -190,11 +192,15 @@
     createDateFun,
     consum,
     itemDownloadStatus,
-    messageFun
+    messageFun,
+    exportDownloadFun,
+    UuidFun
   } from '@/assets/common.js'
   import {
     getRecordList,
-    reductionDownloadList
+    reductionDownloadList,
+    compressionFiles,
+    seeBalance
   } from '@/api/api'
   import {
     mapState
@@ -239,10 +245,50 @@
         }
       },
       // 下载完成帧
-      downloadLayerFun(){
+      async downloadLayerFun(){
         if(!this.dialogTable.dialogTableSelection.length) return false
-
-
+        let r = await seeBalance()
+        if(r.data.code == 1001){ messageFun('info',`当前账户余额为${r.data.data}，请先进行充值！`); return false }
+        let taskList = []
+        this.dialogTable.dialogTableSelection.forEach(curr => {
+          if('selfIndex' in curr){
+            let i = taskList.findIndex(item => item['taskUuid'] == curr['taskUuid'])
+            if(i == -1) taskList.push({ taskUuid: curr.taskUuid, layerUuidList: [], hasFather: true })
+            if(i != -1) taskList[i]['hasFather'] = true
+          }else{
+            let i = taskList.findIndex(item => {
+              return item['taskUuid'] == curr['FatherTaskUuId']
+            })
+            if(i != -1) taskList[i]['layerUuidList'].push(curr['layerTaskUuid'])
+            if(i == -1) taskList.push({ taskUuid: curr.FatherTaskUuId, layerUuidList: [curr.layerTaskUuid]})
+          }
+        })
+        taskList = taskList.map(curr => {
+          if(curr['hasFather']) return {'taskUuid': curr.taskUuid, 'layerUuidList': []}
+          else return {'taskUuid': '', 'layerUuidList': curr['layerUuidList']}
+        })
+        messageFun('success','发起文件打包请求')
+        let code = UuidFun(),
+          // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
+            socket_ = new WebSocket(`ws://192.168.12.144:5000/professional/websocket/package/${code}`)
+        socket_.addEventListener('open',function(){
+          socket_.send(JSON.stringify({
+            'message': {
+              type: 3,
+              taskList
+            }
+          }))
+        })
+        socket_.addEventListener('message',e => {
+          let data = JSON.parse(e.data)
+          if(data.code == 200){ this.downloadingFun(data.data) }
+          if(data.code == 209){ socket_.close(); this.downloadingFun(data.data) }
+        })
+      },
+      // 打包后下载
+      async downloadingFun(path){
+        let data = await compressionFiles(path)
+        exportDownloadFun(data,data.headers.file,'zip')
       },
       // 还原到渲染下载
       reductionFUn(){
@@ -257,7 +303,7 @@
             async () => {
               let data = await reductionDownloadList({
                 taskUuids: this.dialogTable.dialogTableSelection.map(curr => {
-                  if('children2' in curr) return curr.rowId
+                  if('children' in curr) return curr.rowId
                 }),
                 zoneUuid: this.zoneId
               })
@@ -271,13 +317,85 @@
           )
           .catch(() => { })
       },
-      //归档记录多选
-      dialogTableChange(val){
-        this.dialogTable.dialogTableSelection = val
-      },
       // 上传分析详情查看
       showDetails(row, column, event){
 
+      },
+      // 【非业务逻辑】手动勾选数据行 Checkbox 时触发
+      tableSelect(selection, row){
+        let result = selection.some(curr => curr.rowId == row.rowId),     // 【选中事件】or【取消事件】
+          tableData = this.dialogTable.tableData,
+          allSonSelected = false,
+          fatherSelected = false,
+          selectionList = this.dialogTable.dialogTableSelection,
+          table = this.$refs.archiveTable
+
+        // 事件触发在子项
+        if('FatherId' in row && result){
+          selectionList.push(row)
+          // 判断该组子项是否已全部选中进而选中父项
+          allSonSelected = tableData[row.FatherIndex]['children'].every(son => selection.some(item => item.rowId == son.rowId))
+          if(allSonSelected){ fatherSelected = selection.some(item => tableData[row.FatherIndex].rowId == item.rowId ) }
+          // 将父级推入选中项
+          if(allSonSelected && !fatherSelected) {
+            table.toggleRowSelection(tableData[row.FatherIndex],true)
+            selectionList.push(tableData[row.FatherIndex])
+          }
+        }
+        if('FatherId' in row && !result){
+          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
+          // 父项是否被选中 取消选中
+          fatherSelected = selection.findIndex(item => tableData[row.FatherIndex].rowId == item.rowId )
+          // 取消父级选中状态
+          if(fatherSelected != -1) {
+            table.toggleRowSelection(tableData[row.FatherIndex],false)
+            selectionList.splice(fatherSelected,1)
+          }
+        }
+
+        // 事件触发在父项
+        if(!('FatherId' in row) && result){
+          selectionList.push(row)
+          // 勾选全部子项
+          tableData[row.selfIndex]['children'].forEach(son => {
+            // 将此子项勾选
+            if(!selection.some(item => item.rowId == son.rowId)) {
+              table.toggleRowSelection(son,true)
+              selectionList.push(son)
+            }
+          })
+        }
+        if(!('FatherId' in row) && !result){
+          // 取消勾选全部子项
+          tableData[row.selfIndex]['children'].forEach(son => {
+            // 将此子项取消勾选
+            let sonDefault = selection.some(item => item.rowId == son.rowId)
+            if(sonDefault != -1) {
+              table.toggleRowSelection(son,false)
+              selectionList.splice(sonDefault,1)
+            }
+          })
+          // 取消自身勾选
+          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
+          table.toggleRowSelection(row,false)
+        }
+      },
+      // 【非业务逻辑】全选
+      selectAll(selection){
+        if(!('children' in selection[0])){
+          this.dialogTable.dialogTableSelection = []
+          this.dialogTable.tableData.forEach(curr => curr.children.forEach(item => this.$refs.archiveTable.toggleRowSelection(item,false) ))
+          return false
+        }
+        let data = []
+        this.dialogTable.tableData.forEach(curr => {
+          data.push(curr)
+          curr.children.forEach(item => {
+            data.push(item)
+            this.$refs.archiveTable.toggleRowSelection(item,true)
+          })
+        })
+        this.dialogTable.dialogTableSelection = data
       },
       // 获取列表
       async getList(){
@@ -291,8 +409,9 @@
         let t = `projectIds=&zoneUuid=${this.zoneId}&queryStr=${this.dialogTable.searchInputVal}&pageSize=${this.dialogTable.pageSize}&pageIndex=${this.dialogTable.pageIndex}`,
             data = await getRecordList(t)
         this.dialogTable.total = data.data.total
-        this.dialogTable.tableData = data.data.data.map(curr => {
-          let children2 = curr.historyLayerTaskDTOList.map(item => {
+        this.dialogTable.tableData = data.data.data.map( (curr,fatherIndex) => {
+          let children
+          if(curr['historyLayerTaskDTOList'] != null) children = curr.historyLayerTaskDTOList.map(item => {
             let downloadStatus = ''
             switch(item.downloadStatus){
               case 0:
@@ -326,7 +445,10 @@
               renderDateStart: createDateFun(new Date(item.startTime)),
               renderDateEnd: createDateFun(new Date(item.endTime)),
               person: item.createByAccount,
-              createDate: createDateFun(new Date(item.createTime))
+              createDate: createDateFun(new Date(item.createTime)),
+              layerTaskUuid: item.layerTaskUuid,
+              FatherTaskUuId: curr.taskUuid,
+              fatherIndex
             }
           })
           return {
@@ -343,7 +465,7 @@
             renderingCost: curr.cost,
             frameRange: '-',
             intervalFrame: '-',
-            children2,
+            children,
             rowId: curr.taskUuid,
             camera: '-',
             layerName: '-',
@@ -352,9 +474,12 @@
             renderDateEnd: createDateFun(new Date(curr.endTime)),
             person: curr.createByAccount,
             createDate: createDateFun(new Date(curr.createTime)),
+            selfIndex: fatherIndex,
+            taskUuid: curr.taskUuid
           }
         })
-      }
+      },
+
     },
     mounted() {
       createTableIconList()
