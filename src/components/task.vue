@@ -660,4 +660,11 @@
       }
     }
   }
+
+  @media screen and (orientation: portrait) {
+    .task-wrapper .tableGroup .tableList {
+      min-height: 0px;
+      height: calc(100vw - 80px - 73px - 42px - 40px);
+    }
+  }
 </style>

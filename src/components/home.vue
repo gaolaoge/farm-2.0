@@ -740,7 +740,7 @@
       }
     }
     .thiRow {
-      height: calc(100vh - 80px - 20px - 248px - 30px - 30px - 229px - 20px );
+      height: calc(100vh - 80px - 20px - 248px - 30px - 30px - 229px - 20px);
       min-height: 140px;
       display: flex;
       margin-top: 30px;
@@ -793,6 +793,12 @@
           margin-bottom: 23px;
         }
       }
+    }
+  }
+
+  @media screen and (orientation: portrait) {
+    .home-wrapper .thiRow {
+      height: calc(100vw - 80px - 20px - 248px - 30px - 30px - 229px - 20px);
     }
   }
 </style>

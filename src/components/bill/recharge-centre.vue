@@ -459,4 +459,10 @@
     font-weight: 400;
     color: rgba(255, 255, 255 0.6);
   }
+
+  @media screen and (orientation: portrait) {
+    /deep/.el-table__body-wrapper {
+      height: calc(100vw - 557px);
+    }
+  }
 </style>

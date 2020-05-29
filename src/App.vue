@@ -30,4 +30,6 @@ export default {
     min-height: 810px;
     min-width: 900px;
   }
+
+
 </style>

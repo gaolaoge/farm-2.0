@@ -41,6 +41,7 @@
             <input v-model="login.phoneForm.code"
                    placeholder="请输入验证码"
                    ref="passwordInput"
+                   type="text"
                    class="farm-input" />
             <!--验证-->
             <div class="verif">
@@ -53,6 +54,7 @@
               {{ login.phoneForm.countdown }}
             </span>
             </div>
+            <!--<input type="password" >-->
             <!--5天内自动登录-->
             <el-switch v-model="login.phoneForm.autoLogin" />
             <span class="switchLabel">
@@ -65,16 +67,18 @@
           </div>
           <!--帐号密码登录模板-->
           <div class="accountForm" v-show="login.nav.activeIndex == 2">
-            <!--帐号 手机号-->
+            <input type="password" style="display: none"/>
+            <!--帐号-->
             <input v-model="login.accountForm.account"
                    placeholder="请输入账号/手机号"
                    class="farm-input" />
             <!--密码-->
             <input v-model="login.accountForm.password"
-                   type="password"
                    ref="pwinput"
                    placeholder="请输入密码"
                    @keyup.enter="accountlogin"
+                   autocomplete="new-password"
+                   type="password"
                    class="farm-input" />
             <div class="swicthPWI">
               <img src="@/icons/openPW.png" alt="" v-show="login.accountForm.passwordEye" @click="login.accountForm.passwordEye = false">
@@ -304,7 +308,7 @@
         login: {
           mode: 'login',
           nav: {
-            phoneText: '手机号登录',
+            phoneText: '短信验证登录',
             accountText: '账号密码登录',
             activeIndex: 1
           },
@@ -1066,5 +1070,12 @@
   }
   .inputError {
     color: #f40!important;
+  }
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #0f46a1 inset;
+    border-bottom: 1px solid RGBA(33, 86, 168, 1)!important;
+    -webkit-text-fill-color: #fff;
+    caret-color: #fff;
+    color: #fff!important;
   }
 </style>

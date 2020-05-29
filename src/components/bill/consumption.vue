@@ -168,8 +168,7 @@
     </div>
     <!--详情-->
     <el-dialog :visible.sync="dialogVisible"
-               width="80vw"
-               top="5vh"
+               :modal-append-to-body="false"
                :show-close=false >
       <more-dialog @closeDialog="closeDialog"
                    width="80vw"
@@ -435,5 +434,24 @@
     color: rgba(0,97,255,1);
     text-decoration: underline;
     cursor: pointer;
+  }
+
+  /deep/.el-dialog {
+    width: 80vw;
+    margin-top: 5vh!important;
+  }
+
+  @media screen and (orientation: portrait) {
+    /deep/.el-dialog__wrapper {
+      width: 100vh;
+    }
+    /deep/.el-table__body-wrapper {
+      height: calc(100vw - 557px);
+
+    }
+    /deep/.el-dialog {
+      width: 80vh;
+      margin-top: 5vw!important;
+    }
   }
 </style>

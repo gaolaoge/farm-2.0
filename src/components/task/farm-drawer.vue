@@ -1,9 +1,7 @@
 <template>
   <div class="farm-drawer-wrapper">
     <!--分析结果-->
-    <div class="farm-drawer"
-         :class="[{'active': showDrawer}]"
-         v-show="typeInfo == 'upload-table'">
+    <div class="farm-drawer" :class="[{'active': showDrawer}]" v-show="typeInfo == 'upload-table'">
       <div class="farm-drawer-title">
         <div class="drawer-t">
           <span class="drawer-text">

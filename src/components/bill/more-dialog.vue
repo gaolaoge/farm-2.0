@@ -288,5 +288,13 @@
   /*.page {*/
     /*margin: 4px 25px 30px;*/
   /*}*/
+  @media screen and (orientation: portrait) {
+    .more-dialog {
+      height: 87vw;
+    }
+    /deep/.el-table__body-wrapper {
+      height: calc(100vw - 220px);
+    }
+  }
 
 </style>

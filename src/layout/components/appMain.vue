@@ -36,4 +36,10 @@
       align-items: center;
     }
   }
+  @media screen and (orientation: portrait) {
+    .appMain-wrapper {
+      width: calc(100vh - 175px);
+      height: calc(100vw - 80px);
+    }
+  }
 </style>

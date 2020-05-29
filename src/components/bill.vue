@@ -243,4 +243,10 @@
       }
     }
   }
+
+  @media screen and (orientation: portrait) {
+    .bill-wrapper {
+
+    }
+  }
 </style>

@@ -483,4 +483,10 @@
   .outPut-wrapper {
     overflow: hidden;
   }
+
+  @media screen and (orientation: portrait) {
+    /deep/.el-table__body-wrapper {
+      height: calc(100vw - 395px);
+    }
+  }
 </style>
