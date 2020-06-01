@@ -49,7 +49,7 @@
           },
           grid: {
             top:  30,
-            bottom: 18,
+            bottom: 20,
             left: 25,
             right: 15
           },

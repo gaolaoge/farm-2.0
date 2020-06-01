@@ -516,7 +516,6 @@
       <div class="farm-drawer-body r">
         <div class="info">
           <div class="thumbnail">
-            <img :src="result.miniImgHref" alt="" class="img">
             <span class="status"
                   :class="[
                   {'wait': result.statusData == '等待' || result.statusData == '暂停'},
@@ -527,6 +526,7 @@
                   ]">
               {{ result.statusData }}
             </span>
+            <img :src="result.miniImgHref" alt="" class="img">
           </div>
           <div class="dataList">
 
