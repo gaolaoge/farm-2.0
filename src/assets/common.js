@@ -118,7 +118,7 @@ const createTableIconList = function(){
   },0)
 }
 
- // message 信息
+// message 信息
 const messageFun = function(type,message){
   return Message({
     message: message,

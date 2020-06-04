@@ -54,6 +54,16 @@ const router = new Router({
       path: '*',
       name: '404',
       component: () => import('@/components/404.vue')
+    },
+    {
+      path: '/messageCenter',
+      name: 'messageCenter',
+      component: () => import('@/components/messageCenter')
+    },
+    {
+      path: '/Pinfo',
+      name: 'Pinfo',
+      component: () => import('@/components/Pinfo')
     }
   ]
 })

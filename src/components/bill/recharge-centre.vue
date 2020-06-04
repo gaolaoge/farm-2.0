@@ -181,8 +181,7 @@
         layout="prev, pager, next, jumper"
         @current-change="jump"
         :current-page.sync="table.currentPage"
-        :total="table.outPutTableTotal">
-      </el-pagination>
+        :total="table.outPutTableTotal" />
     </div>
   </div>
 </template>

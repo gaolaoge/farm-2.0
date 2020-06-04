@@ -141,7 +141,7 @@
 
 <script>
   import '@/assets/fonticon/iconfont.css'
-  import uploadTable from '@/components/task/upload-table'
+  import uploadTable from '@/components/task/upLoad-table'
   import downloadTable from '@/components/task/download-table'
   import archiveRecords from '@/components/task/archive-records'
   import newTask from '@/components/home/new-task'
