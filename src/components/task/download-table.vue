@@ -668,7 +668,6 @@
           .then(
             async () => {
               let taskUuidList = []
-              console.log(this.table.renderSelectionList)
               this.table.renderSelectionList.forEach(curr => {
                 if('FatherIndex' in curr) return false
                 taskUuidList.push(curr.taskUuid)
@@ -888,7 +887,7 @@
       farmDrawer
     },
     mounted() {
-      if(!this.$route.params.name) this.getList()
+      if(!this.$route.params.name) setTimeout(() => this.getList(), 100)
       // document.getElementsByClassName('el-table__expand-icon')
     },
     computed: {

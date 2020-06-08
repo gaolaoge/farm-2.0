@@ -311,11 +311,11 @@
       let data = await homeT(val),
           d = data.data.data,
           m
-      this.taskStatus['list'][0]['num'] = d.ing                 // 任务状态-渲染中
-      this.taskStatus['list'][1]['num'] = d.stop                // 任务状态-渲染暂停
-      this.taskStatus['list'][2]['num'] = d.finish              // 任务状态-渲染完成
-      this.taskStatus['list'][3]['num'] = d.wait                // 任务状态-待全部渲染
-      this.taskStatus['list'][4]['num'] = d.history             // 任务状态-已归档
+      this.taskStatus['list'][1]['num'] = d.ing                 // 任务状态-渲染中
+      this.taskStatus['list'][3]['num'] = d.stop                // 任务状态-渲染暂停
+      this.taskStatus['list'][4]['num'] = d.finish              // 任务状态-渲染完成
+      this.taskStatus['list'][2]['num'] = d.wait                // 任务状态-待全部渲染
+      this.taskStatus['list'][0]['num'] = d.finishAnalyse       // 任务状态-待设置参数
       // this.taskStatus['list'][5]['num'] = d.finishAnalyse    // 任务状态-已归档
       if(d.useTime == null){ m = 0; this.statistics.list[1]['unit'] = '秒钟' }
       if(d.useTime / 3600000 >= 1){ m = d.useTime / 3600000; this.statistics.list[1]['unit'] = '小时' }
@@ -356,7 +356,6 @@
           }]
           this.showNewTask = true
         }
-
       })
     },
   }

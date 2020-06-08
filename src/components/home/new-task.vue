@@ -57,20 +57,15 @@
               <el-table-column
                 prop="sceneFile.name"
                 label="场景名"
+                show-overflow-tooltip
                 width="220" />
               <!--工程文件夹-->
               <el-table-column
                 label="工程文件名">
                 <template slot-scope="scope">
-                  <!--<div class="addressNameBase">-->
                     <span class="addressNameText">
                       {{ scope.row.projectFileName }}
                     </span>
-                    <!--<input type="file"-->
-                           <!--class="addressNameInput"-->
-                           <!--webkitdirectory-->
-                           <!--@change="inputFileChange($event,scope.row)">-->
-                  <!--</div>-->
                   <img src="@/icons/j.png"
                        alt=""
                        class="se"
@@ -78,7 +73,7 @@
                 </template>
               </el-table-column>
               <!--工程路径-->
-              <el-table-column 
+              <el-table-column
                 prop="address"
                 :render-header="renderHeader"
                 label="工程路径">
@@ -1111,7 +1106,7 @@
                       cursor: pointer;
                     }
                   }
-                  
+
                 }
                 .bodyB {
                   position: relative;
