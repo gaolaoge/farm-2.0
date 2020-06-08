@@ -278,7 +278,7 @@
           }
         ],
         guideShow: false,
-        guideShowStep: 1
+        guideShowStep: 1,
       }
     },
     computed: {
@@ -517,6 +517,7 @@
                   }
                 }
                 &.balance {
+                  position: relative;
                   .con {
                     .t {
                       .sb {}
@@ -541,6 +542,7 @@
                         }
                       }
                     }
+                  }
                   }
                 }
                 &.quit {
@@ -647,22 +649,13 @@
         height:40px;
         border-radius:15px;
         border:2px solid rgba(47,55,66,1);
-        /*padding-left: 30px;*/
         box-sizing: border-box;
-        /*.workBench-label {*/
-          /*font-size:14px;*/
-          /*font-weight:500;*/
-          /*color:rgba(74,88,104,1);*/
-          /*line-height:20px;*/
-          /*user-select: none;*/
-        /*}*/
         .workBench-icon {
           cursor: pointer;
         }
         /deep/.el-input__inner {
           padding-left: 30px;
         }
-        //.workBench-optionBase
       }
       .guide-wrapper {
         position: fixed;

@@ -820,7 +820,7 @@
         messageFun('success','发起文件打包请求')
         let code = UuidFun(),
           // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
-            socket_ = new WebSocket(`ws://192.168.12.144:5000/professional/websocket/package/${code}`)
+            socket_ = new WebSocket(`ws://223.80.107.190:5000/professional/websocket/package/${code}`)
         socket_.addEventListener('open',function(){
           socket_.send(JSON.stringify({
             'message': {
