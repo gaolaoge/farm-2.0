@@ -21,12 +21,10 @@
         <div class="balance">
           {{ user.balance }}
         </div>
-        <div class="btn" @click="$router.push('/upTop')">
-          <span>{{ info.btn }}</span>
-        </div>
-        <div class="btn n" @click="$router.push('/upTop')">
-          <span>{{ info.btnn }}</span>
-        </div>
+        <!--立即充值-->
+        <div class="btn" @click="$router.push('/upTop')"><span>{{ info.btn }}</span></div>
+        <!--立即开票-->
+        <div class="btn n" @click="$router.push('/upTop')"><span>{{ info.btnn }}</span></div>
       </div>
     </div>
     <!--table-->
@@ -153,7 +151,7 @@
           invoicableAmount: '可开票金额'
         },
         table: {
-          navListActiveIndex: 2,
+          navListActiveIndex: 0,
           navList: [
             {
               text: '充值记录'

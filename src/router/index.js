@@ -64,19 +64,20 @@ const router = new Router({
       path: '/Pinfo',
       name: 'Pinfo',
       component: () => import('@/components/Pinfo')
+    },
+    {
+      path: '/invoiceImmediately',
+      name: 'invoiceImmediately',
+      component: () => import('@/components/bill/invoiceImmediately')
     }
   ]
 })
 
 router.beforeResolve((to,from,next) => {
-  if(to.path == '/login'){
-    next()
-  }else {
-    if(sessionStorage.getItem('token') || document.cookie){
-      next()
-    }else {
-      next({path: '/login'})
-    }
+  if(to.path == '/login') next()
+  else {
+    if(sessionStorage.getItem('token') || document.cookie) next()
+    else next({path: '/login'})
   }
 })
 
