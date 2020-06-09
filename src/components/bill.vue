@@ -1,5 +1,6 @@
 <template>
   <div class="bill-wrapper">
+    <!--公共部分-->
     <div class="personInfo">
       <div class="info">
         <img :src="info.img" alt="" class="avatar">
@@ -21,11 +22,14 @@
           {{ user.balance }}
         </div>
         <div class="btn" @click="$router.push('/upTop')">
-          {{ info.btn }}
+          <span>{{ info.btn }}</span>
+        </div>
+        <div class="btn n" @click="$router.push('/upTop')">
+          <span>{{ info.btnn }}</span>
         </div>
       </div>
     </div>
-
+    <!--table-->
     <div class="tableGroup">
       <div class="navList">
         <span class="navBtn"
@@ -36,7 +40,9 @@
           {{ item.text }}
         </span>
       </div>
+      <!--统计-->
       <div class="remind">
+        <!--充值记录统计-->
         <span v-show="table.navListActiveIndex == 0" class="t">
           <span class="it">
             <span class="label">
@@ -55,6 +61,7 @@
             </span>
           </span>
         </span>
+        <!--消费记录统计-->
         <span v-show="table.navListActiveIndex == 1" class="t">
           <span class="it">
             <span class="label">
@@ -65,7 +72,27 @@
             </span>
           </span>
         </span>
+        <!--开票记录统计-->
+        <span v-show="table.navListActiveIndex == 2" class="t">
+          <span class="it">
+            <span class="label">
+              {{ remind.cumulativeBillingAmount }}：
+            </span>
+            <span class="val">
+              null
+            </span>
+          </span>
+          <span class="it">
+            <span class="label">
+              {{ remind.invoicableAmount }}：
+            </span>
+            <span class="val">
+              null
+            </span>
+          </span>
+        </span>
       </div>
+      <!--table-->
       <div class="tableList">
         <!--充值中心-->
         <div ref="rechargeTable"
@@ -81,6 +108,13 @@
           <!--消费记录表格-->
           <consumption />
         </div>
+        <!--开票记录-->
+        <div ref="invoicingTable"
+             class="invoicingTable"
+             v-show="table.navListActiveIndex == 2">
+          <!--开票记录表格-->
+          <invoicing />
+        </div>
       </div>
     </div>
   </div>
@@ -89,6 +123,7 @@
 <script>
   import rechargeCentre from '@/components/bill/recharge-centre.vue'
   import consumption from '@/components/bill/consumption.vue'
+  import invoicing from '@/components/bill/invoicing.vue'
   import {
     mapState
   } from 'vuex'
@@ -107,21 +142,27 @@
           levelText: '大众会员',
           balanceLabel: '账户余额(金币)：',
           balanceVal: 'null',
-          btn: '立即充值'
+          btn: '立即充值',
+          btnn: '立即开票'
         },
         remind: {
           payLabel: '累计支付金额',
           gainLabel: '累计到账金币',
-          consumptionLabel: '累计消费金币'
+          consumptionLabel: '累计消费金币',
+          cumulativeBillingAmount: '累计开票金额',
+          invoicableAmount: '可开票金额'
         },
         table: {
-          navListActiveIndex: 0,
+          navListActiveIndex: 2,
           navList: [
             {
               text: '充值记录'
             },
             {
               text: '消费记录'
+            },
+            {
+              text: '开票记录'
             }
           ]
         }
@@ -132,7 +173,8 @@
     },
     components: {
       rechargeCentre,
-      consumption
+      consumption,
+      invoicing
     },
     computed: {
       ...mapState(['user'])
@@ -189,17 +231,25 @@
           margin-bottom: 24px;
         }
         .btn {
-          width: 116px;
-          height: 32px;
-          background: rgba(0, 97, 255, 1);
+          width: 114px;
+          height: 30px;
+          background-color: rgba(0, 97, 255, 1);
+          border: 1px solid rgba(0, 97, 255, 1);
           box-shadow: 0px 1px 10px 0px rgba(22,29,37,0.2);
           text-align: center;
           border-radius: 6px;
-          font-size: 14px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 1);
-          line-height: 32px;
           cursor: pointer;
+          margin-bottom: 10px;
+          span {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 1);
+            line-height: 30px;
+          }
+          &.n {
+            border: 1px solid rgba(255, 255, 255, 0.21);
+            background-color: transparent;
+          }
         }
       }
     }

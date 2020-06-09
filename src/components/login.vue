@@ -255,6 +255,13 @@
             <!--</div>-->
             <!--<div class="btn" ref="btn" />-->
           <!--</div>-->
+          <div class="c">
+            <label>{{ registered.type }}</label>
+            <el-radio-group v-model="registered.form.type" class="radio">
+              <el-radio :label="registered.typeRadio[0]"></el-radio>
+              <el-radio :label="registered.typeRadio[1]"></el-radio>
+            </el-radio-group>
+          </div>
           <!--协议-->
           <div class="protocol">
             <img src="@/icons/df.png" alt="" class="protocolIcon" v-show="!registered.tick" @click="registered.tick = true">
@@ -358,6 +365,8 @@
           text1: '我已阅读并同意',
           text2: '《用户服务协议》',
           text: '获取验证码',
+          type: '类型',
+          typeRadio: ['影视版', '效果图'],
           tick: false,
           countdown: '60s',
           verifShow: true,
@@ -905,7 +914,25 @@
           font-weight:500;
           color:rgba(255,255,255,1);
           text-shadow: 0px 0px 4px rgba(255,255,255,0.2);
-          margin-bottom: 46px;
+          margin-bottom: 30px;
+        }
+        .farm-input {
+          margin-bottom: 12px;
+        }
+        .c {
+          margin-top: 4px;
+          margin-bottom: 20px;
+          label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+          }
+          .radio {
+            vertical-align: super;
+            margin-left: 30px;
+            /deep/.el-radio .el-radio__label {
+              font-size: 14px;
+            }
+          }
         }
         .registeredForm {
           .u {
@@ -937,7 +964,7 @@
         }
         /*注册模块-btn*/
         .btnLogin {
-          margin-top: 24px;
+          margin-top: 14px;
           width: 100%;
           height: 44px;
           background: RGBA(13, 71, 163, 0.5);

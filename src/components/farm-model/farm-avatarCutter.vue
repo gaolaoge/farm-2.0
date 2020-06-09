@@ -48,7 +48,10 @@
               <div class="cross" />
             </div>
           </div>
-          <p class="downloadAgain" @click="fileImage">{{ downloadAgain }}</p>
+          <p class="downloadAgain" @click="fileImage">
+            <span>{{ downloadAgain }}</span>
+            <img src="@/icons/fileAgain.png" alt="" class="imgAgain" @click="fileImage">
+          </p>
         </div>
         <!--右侧-->
         <div class="c-right">
@@ -518,6 +521,13 @@
       cursor: pointer;
       font-size: 14px;
       color: rgba(255, 255, 255, 1);
+      width: 100%;
+      .imgAgain {
+        margin-top: 3px;
+        float: right;
+        width: 14px;
+        cursor: pointer;
+      }
     }
   }
   .c-left--doing {background-image: url(../../icons/empty--pure.png);}

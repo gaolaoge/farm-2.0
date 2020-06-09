@@ -1,18 +1,17 @@
 <template>
-  <div class="recharge-centre">
+  <div class="invoicing">
     <!--table-->
-    <div class="recharge-table" ref="rechargeTable">
-
+    <div class="invoicing-table" ref="invoicingTable">
       <!--条件筛选-->
       <div class="filter">
-        <!--交易状态-->
+        <!--发票抬头-->
         <div class="filter-item">
           <span class="filter-item-label">
             {{ filter.tradingtatusLabel }}：
           </span>
           <el-select v-model="filter.tradingtatusVal"
                      placeholder="-"
-                     class="filter-item-i filter-item-select filter-item-select-mini">
+                     class="filter-item-i filter-item-select">
             <el-option
               v-for="item in filter.tradingtatusList"
               :key="item.value"
@@ -21,14 +20,14 @@
             </el-option>
           </el-select>
         </div>
-        <!--支付方式-->
+        <!--发票状态-->
         <div class="filter-item">
           <span class="filter-item-label">
             {{ filter.paymentMethodLabel }}：
           </span>
           <el-select v-model="filter.paymentMethodVal"
                      placeholder="-"
-                     class="filter-item-i filter-item-select filter-item-select-mini">
+                     class="filter-item-i filter-item-select">
             <el-option
               v-for="item in filter.paymentMethodList"
               :key="item.value"
@@ -36,33 +35,6 @@
               :value="item.value">
             </el-option>
           </el-select>
-        </div>
-        <!--开票标识-->
-        <div class="filter-item">
-          <span class="filter-item-label">
-            {{ filter.markLabel }}：
-          </span>
-          <el-select v-model="filter.markVal"
-                     placeholder="-"
-                     class="filter-item-i filter-item-select filter-item-select-mini">
-            <el-option
-              v-for="item in filter.markList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </div>
-        <!--支付账单-->
-        <div class="filter-item">
-          <span class="filter-item-label">
-            {{ filter.singleNumberLabel }}：
-          </span>
-          <input type="text"
-                 class="filter-item-i filter-item-input"
-                 placeholder="请输入"
-                 @keyup.enter="getList"
-                 v-model="filter.singleNumberVal">
         </div>
         <!--查询时间-->
         <div class="filter-item">
@@ -84,10 +56,9 @@
           {{ filter.exportBtn }}
         </div>
       </div>
-
       <!--table-->
       <el-table
-        :data="table.rechargeData"
+        :data="table.invoicingData"
         @selection-change="handleSelectionChange"
         @filter-change="filterHandler"
         class="o"
@@ -100,77 +71,57 @@
           show-overflow-tooltip
           min-width="58"
           width="58" />
-        <!--交易ID-->
+        <!--发票抬头-->
         <el-table-column
-          prop="id"
-          label="交易ID"
+          prop="invoice"
+          label="发票抬头"
           sortable
           show-overflow-tooltip
-          min-width="180" />
-        <!--交易状态-->
+          min-width="200" />
+        <!--纳税人标识号-->
         <el-table-column
-          prop="state"
-          label="交易状态"
+          prop="invoiceNum"
+          label="纳税人标识号"
+          sortable
           show-overflow-tooltip
-          width="100">
+          width="280">
         </el-table-column>
-        <!--实际支付金额（元）-->
+        <!--发票金额（元）-->
         <el-table-column
-          prop="realPay"
-          label="实际支付金额（元）"
-          show-overflow-tooltip
-          sortable
-          width="200" />
-        <!--充值到账（金币）-->
-        <el-table-column
-          prop="realArrive"
-          label="充值到账（金币）"
+          prop="invoiceAmount"
+          label="发票金额（元）"
           sortable
           show-overflow-tooltip
-          width="200" />
-        <!--充值说明 -->
+          width="180" />
+        <!--发票类型 -->
         <el-table-column
-          prop="directions"
-          label="充值说明"
+          prop="invoiceType"
+          label="发票类型"
+          sortable
           show-overflow-tooltip
-          width="200" />
-        <!--充值方式-->
+          width="180" />
+        <!--发票状态-->
         <el-table-column
-          prop="paymentMethod"
-          label="充值方式"
+          prop="invoiceState"
+          label="发票状态"
+          :filter-method="filterStatus"
+          :filters="table.statusList"
           show-overflow-tooltip
-          width="120" />
-        <!--支付单号-->
+          width="150" />
+        <!--邮箱-->
         <el-table-column
-          label="支付单号"
+          prop="email"
+          label="邮箱"
+          sortable
           show-overflow-tooltip
-          width="180">
-          <template slot-scope="scope">
-            <span @click="copySingleNumber(scope.row.singleNumber)">
-              {{ scope.row.singleNumber }}
-            </span>
-          </template>
-        </el-table-column>
+          width="240" />
         <!--交易时间-->
         <el-table-column
           prop="date"
           label="交易时间"
+          sortable
           show-overflow-tooltip
-          width="180" />
-        <!--操作-->
-        <el-table-column
-          label="操作"
-          show-overflow-tooltip
-          width="200">
-          <template slot-scope="scope">
-            <div class="download-tab" @click="operateFun(scope.row)" v-show="scope.row.operate != '-'">
-              {{ scope.row.operate }}
-            </div>
-            <div class="download-tab-none" v-show="scope.row.operate == '-'">
-              -
-            </div>
-          </template>
-        </el-table-column>
+          width="240" />
 
       </el-table>
     </div>
@@ -191,7 +142,8 @@
   import {
     createCalendar,
     getDate,
-    exportDownloadFun
+    exportDownloadFun,
+    createTableIconList
   } from '@/assets/common.js'
   import {
     getUpTopTable,
@@ -200,22 +152,49 @@
   } from '@/api/api'
 
   export default {
-    name: 'recharge-centre',
+    name: 'invoicing',
     data(){
       return {
         table: {
-          rechargeData: [
-            // {
-            //   id: '',               //交易ID
-            //   state: '',            //交易状态
-            //   realPay: '',          //实际支付金额（元）
-            //   realArrive: '',       //充值到账（金币）
-            //   directions: '',       //充值说明
-            //   paymentMethod: '',    //充值方式
-            //   singleNumber: '',     //支付单号
-            //   date: '',             //交易时间
-            //   operate: ''           //操作
-            // },
+          invoicingData: [
+//             {
+//               invoice: '',          // 发票抬头
+//               invoiceNum: '',       // 纳税人标识号
+//               invoiceAmount: '',    // 发票金额（元）
+//               invoiceType: '',      // 发票类型
+//               invoiceState: '',     // 发票状态
+//               email: '',            // 邮箱
+//               date: '',             // 开票时间
+//             },
+            {
+               invoice: '青岛很厉害科技有限公司',
+               invoiceNum: '27937293688628648',
+               invoiceAmount: '100.00',
+               invoiceType: '增值税普票',
+               invoiceState: '审核中',
+               email: '1738683@163.com',
+               date: '2020-03-02 00:23:46'
+             },
+            {
+              invoice: '青岛特别能控股有限集团',
+              invoiceNum: '27937293688628648',
+              invoiceAmount: '287.34',
+              invoiceType: '增值税普票',
+              invoiceState: '已发送',
+              email: '376yegww@qq.com',
+              date: '2020-03-02 00:23:46'
+            }
+          ],
+          statusList: [
+            {text: '上传中', value: '上传中...'},
+            {text: '上传暂停', value: '上传暂停'},
+            {text: '上传失败', value: '上传失败'},
+            {text: '已取消', value: '已取消'},
+            {text: '分析中', value: '分析中...'},
+            {text: '分析警告', value: '分析警告'},
+            {text: '待设置参数', value: '待设置参数'},
+            {text: '分析失败', value: '分析失败'},
+            {text: '已放弃', value: '已放弃'},
           ],
           outPutTableTotal: 0,
           currentPage: 1,
@@ -223,27 +202,15 @@
           selectionList: [],            //渲染输出选中项
         },
         filter: {
-          tradingtatusLabel: '交易状态',
+          tradingtatusLabel: '发票抬头',
           tradingtatusVal: '-1',
           tradingtatusList: [
             {
-              label: '全部',
+              label: '示例',
               value: '-1'
-            },
-            {
-              label: '待付款',
-              value: '3'
-            },
-            {
-              label: '成功',
-              value: '1'
-            },
-            {
-              label: '失败',
-              value: '2'
             }
           ],
-          paymentMethodLabel: '支付方式',
+          paymentMethodLabel: '发票状态',
           paymentMethodVal: '-1',
           paymentMethodList: [
             {
@@ -251,37 +218,23 @@
               value: '-1'
             },
             {
-              label: '支付宝',
-              value: '1'
-            },
-            // {
-            //   label: '微信',
-            //   value: '2'
-            // }
-          ],
-          markLabel: '开票标识',
-          markVal: '-1',
-          markList: [
-            {
-              label: '全部',
-              value: '-1'
+              label: '审核中',
+              value: '3'
             },
             {
-              label: '不可开票',
-              value: '0'
-            },
-            {
-              label: '未开票',
+              label: '审核不过',
               value: '1'
             },
             {
-              label: '已开票',
+              label: '审核通过',
+              value: '2'
+            },
+            {
+              label: '已发送',
               value: '2'
             }
           ],
-          singleNumberLabel: '支付单号',
-          singleNumberVal: '',
-          inquireLabel: '查询时间',
+          inquireLabel: '开票时间',
           inquireValS: 0,
           inquireValV: new Date(),
           iquireBtn: '查询',
@@ -294,6 +247,10 @@
       modelCalendar
     },
     methods: {
+      // 上传分析 - 筛选 - 状态
+      filterStatus(value, row){
+        return row.status === value
+      },
       copySingleNumber(val){
         let oInput = document.createElement('INPUT')
         oInput.style.display = 'none'
@@ -315,7 +272,7 @@
       changeFilterDate(val){
         [].forEach.call(val, (curr,index) => {
           let [year, month, day] = curr.split('-'),
-              r = getDate(year, month, day)
+            r = getDate(year, month, day)
           if(index == 0){
             this.filter.inquireValS = r
           }else{
@@ -326,7 +283,7 @@
       // 获取table数据
       async getList(){
         let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&productOrderUuid=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
-            data = await getUpTopTable(t)
+          data = await getUpTopTable(t)
         this.table.outPutTableTotal = data.data.total
         this.table.rechargeData = data.data.data.map(curr => {
           curr.operate = '-'
@@ -389,7 +346,7 @@
         //   sortBy: ''         // 排序方式:0降序,1升序
         // }
         let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
-            data = await exportUpTopTable(t)
+          data = await exportUpTopTable(t)
         // 导出下载
         exportDownloadFun(data, '充值记录','xlsx')
       },
@@ -411,12 +368,13 @@
     },
     mounted() {
       this.getList()
+      createTableIconList()
     }
   }
 </script>
 
 <style lang="less" scoped>
-  .recharge-centre {
+  .invoicing {
     overflow: hidden;
   }
   .page {
@@ -426,7 +384,7 @@
     height: calc(100vh - 557px);
   }
 
-  .recharge-table {
+  .invoicing-table {
     overflow: hidden;
     .filter {
       position: relative;

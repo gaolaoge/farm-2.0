@@ -87,7 +87,7 @@
                 </span>
               </li>
               <!--剩余金币-->
-              <li class="operateLi balance" @click="$router.push('/upTop')">
+              <li class="operateLi balance">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -100,6 +100,9 @@
                      </span>
                   </span>
                 </span>
+                <div class="btnU" @click="$router.push('/upTop')">
+                  <span>{{ uptop }}</span>
+                </div>
               </li>
               <!--剩余容量-->
               <li class="operateLi balance" @click="$router.push('/upTop')">
@@ -279,6 +282,7 @@
         ],
         guideShow: false,
         guideShowStep: 1,
+        uptop: '充值'
       }
     },
     computed: {
@@ -543,6 +547,23 @@
                       }
                     }
                   }
+                  .btnU {
+                    position: absolute;
+                    top: 17px;
+                    right: 25px;
+                    width: 34px;
+                    height: 18px;
+                    background-color: rgba(255, 62, 77, 1);
+                    border-radius: 3px;
+                    text-align: center;
+                    cursor: pointer;
+                    span {
+                      font-size: 12px;
+                      font-weight: 500;
+                      color: rgba(255, 255, 255, 1);
+                      line-height: 16px;
+                      vertical-align: top;
+                    }
                   }
                 }
                 &.quit {
