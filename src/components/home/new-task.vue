@@ -312,7 +312,8 @@
     mapState
   } from 'vuex'
   import {
-    messageFun
+    messageFun,
+    IEVersion
   } from '@/assets/common.js'
   import operationGuide from '@/components/home/operation-guide'
 
@@ -780,7 +781,12 @@
         formDom.classList.add('formDom')
         formDom.style.display = 'none'
 
-        let inputFileDom = document.createElement('INPUT')
+        let inputFileDom = document.createElement('INPUT'),
+            Fun = function(){
+              // row.projectFileList = inputFileDom.files
+              if(![...inputFileDom.files].every(item => !/:/.test(item['webkitRelativePath']))){ messageFun('error','请不要选择根目录'); return false }
+              row.projectFileName = inputFileDom.files[0]['webkitRelativePath'].split('/')[0]
+            }.bind(this)
         inputFileDom.type='file'
         inputFileDom.name='folder'
         inputFileDom.setAttribute('webkitdirectory',true)
@@ -788,12 +794,11 @@
         formDom.appendChild(inputFileDom)
         document.querySelector('body').appendChild(formDom)
 
+        if(IEVersion() == -1) inputFileDom.addEventListener('change', Fun)
+        else if(IEVersion() == 'edge') inputFileDom.onchange = Fun
+        else inputFileDom.onpropertychange = Fun
+
         inputFileDom.click()
-        inputFileDom.addEventListener('change',() => {
-          // row.projectFileList = inputFileDom.files
-          if(![...inputFileDom.files].every(item => !/:/.test(item['webkitRelativePath']))){ messageFun('error','请不要选择根目录'); return false }
-          row.projectFileName = inputFileDom.files[0]['webkitRelativePath'].split('/')[0]
-        })
       },
       // 选择场景文件 - table 多选值
       handleSelectionChange(val){
@@ -813,20 +818,24 @@
       // 选择场景文件 - 【添加】
       operateBtnAddMore(){
         if(this.filelist.length == 20){ messageFun('info', '操作失败，不能选择超过20个场景文件！'); return false }
-        let inputDom = document.createElement('INPUT')
+        let inputDom = document.createElement('INPUT'),
+            Fun = function(){
+              this.filelist.push({
+                sceneFile: inputDom.files[0],
+                projectFileList: [],
+                projectFileName: '',
+                path: '',
+                inputStatus: false,
+                id: Math.floor(Math.random() * 100000000000000)
+              })
+            }.bind(this)
         inputDom.type = 'file'
         inputDom.accept = '.ma,.mb'
+        if(IEVersion() == -1) inputDom.addEventListener('change', Fun)
+        else if(IEVersion() == 'edge') inputDom.onchange = Fun
+        else inputDom.onpropertychange = Fun
+
         inputDom.click()
-        inputDom.addEventListener('change',() => {
-          this.filelist.push({
-            sceneFile: inputDom.files[0],
-            projectFileList: [],
-            projectFileName: '',
-            path: '',
-            inputStatus: false,
-            id: Math.floor(Math.random() * 100000000000000)
-          })
-        })
       },
       // 选择场景文件 - 【删除】
       operateBtnDelete(){

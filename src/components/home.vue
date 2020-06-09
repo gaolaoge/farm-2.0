@@ -153,7 +153,8 @@
     getInfo
   } from '@/api/api.js'
   import {
-    messageFun
+    messageFun,
+    IEVersion
   } from "../assets/common"
 
   export default {
@@ -339,24 +340,28 @@
     },
     // 触发新建任务
     createTaskFun(){
-      let inputDom = document.createElement('INPUT')
+      let inputDom = document.createElement('INPUT'),
+          Fun = function(){
+            if(inputDom.files.length == 1){
+              this.fileList= [{
+                sceneFile: inputDom.files[0],
+                projectFileList: null,
+                projectFileName: '',
+                inputStatus: false,
+                path: '',
+                id: Math.floor(Math.random() * 100000000000000)
+              }]
+              this.showNewTask = true
+            }
+          }.bind(this)
       inputDom.type='file'
       inputDom.accept='.ma,.mb'
-      inputDom.click()
-      inputDom.addEventListener('change',() => {
 
-        if(inputDom.files.length == 1){
-          this.fileList= [{
-            sceneFile: inputDom.files[0],
-            projectFileList: null,
-            projectFileName: '',
-            inputStatus: false,
-            path: '',
-            id: Math.floor(Math.random() * 100000000000000)
-          }]
-          this.showNewTask = true
-        }
-      })
+      if(IEVersion() == -1) inputDom.addEventListener('change', Fun)
+      else if(IEVersion() == 'edge') inputDom.onchange = Fun
+      else inputDom.onpropertychange = Fun
+
+      inputDom.click()
     },
   }
 }

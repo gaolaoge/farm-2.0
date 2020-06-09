@@ -70,7 +70,7 @@
             <input type="password" style="display: none"/>
             <!--帐号-->
             <input v-model="login.accountForm.account"
-                   placeholder="请输入账号/手机号"
+                   placeholder="请输入账号"
                    class="farm-input" />
             <!--密码-->
             <input v-model="login.accountForm.password"
