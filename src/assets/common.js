@@ -59,7 +59,7 @@ const exportDownloadFun = (data, name, type, isProtocal) => {
     blob = new Blob([data.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const a = document.createElement("A"),
       url = window.URL.createObjectURL(blob),
-      filename = name
+      filename = name + '.xlsx'
     a.href = url
     a.download = filename
     a.click()
