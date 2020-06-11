@@ -24,7 +24,7 @@
         <!--立即充值-->
         <div class="btn" @click="$router.push('/upTop')"><span>{{ info.btn }}</span></div>
         <!--立即开票-->
-        <div class="btn n" @click="$router.push('/upTop')"><span>{{ info.btnn }}</span></div>
+        <div class="btn n" @click="$router.push('/invoiceImmediately')"><span>{{ info.btnn }}</span></div>
       </div>
     </div>
     <!--table-->
@@ -250,26 +250,6 @@
           }
         }
       }
-    }
-    .tableGroup {
-      position: relative;
-      margin: 20px 50px;
-      .navList {
-        position: relative;
-        .navBtn {
-          display: inline-block;
-          font-size:16px;
-          color:rgba(255,255,255,0.6);
-          padding: 10px 30px;
-          cursor: pointer;
-          &.active {
-            background-color: rgba(22, 29, 37, 1);
-            border-radius: 8px 8px 0px 0px;
-            font-weight:600;
-            color:rgba(255, 255, 255, 0.9);
-          }
-        }
-      }
       .remind {
         position: absolute;
         top: 0px;
@@ -283,11 +263,6 @@
             line-height: 36px;
           }
         }
-      }
-      .tableList {
-        background-color: rgba(22, 29, 37, 1);
-        border-radius: 0px 0px 8px 8px;
-
       }
     }
   }

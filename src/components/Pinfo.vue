@@ -47,29 +47,6 @@
 <style lang="less" scoped>
   .Pinfo-wrapper {
     overflow: hidden;
-    .tableGroup {
-      position: relative;
-      margin: 20px 50px;
-      .navList {
-        position: relative;
-        .navBtn {
-          display: inline-block;
-          font-size:16px;
-          color:rgba(255,255,255,0.6);
-          padding: 10px 30px;
-          cursor: pointer;
-          &.active {
-            background-color: rgba(22, 29, 37, 1);
-            border-radius: 8px 8px 0px 0px;
-            font-weight:600;
-            color:rgba(255, 255, 255, 0.9);
-          }
-        }
-      }
-      .tableList {
-        background-color: rgba(22, 29, 37, 1);
-        border-radius: 0px 0px 8px 8px;
-      }
-    }
+
   }
 </style>

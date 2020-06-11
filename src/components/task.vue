@@ -610,28 +610,9 @@
         }
       }
     }
-    .tableGroup {
-      margin: 20px 50px;
-      .navList {
-        .navBtn {
-          display: inline-block;
-          font-size:16px;
-          color:rgba(255,255,255,0.6);
-          padding: 10px 30px;
-          cursor: pointer;
-          &.active {
-            background-color: rgba(22, 29, 37, 1);
-            border-radius: 8px 8px 0px 0px;
-            font-weight:600;
-            color:rgba(255, 255, 255, 0.9);
-          }
-        }
-      }
-      .tableList {
+    .tableList {
         min-height: 700px;
         height: calc(100vh - 80px - 73px - 42px - 40px);
-        background-color: rgba(22, 29, 37, 1);
-        border-radius: 0px 0px 8px 8px;
         /*渲染下载*/
         .progressBar {
           vertical-align: middle;
@@ -658,7 +639,6 @@
           height: 100%;
         }
       }
-    }
   }
 
   @media screen and (orientation: portrait) {
