@@ -78,7 +78,7 @@
             align: 'bottom'
           },
           {
-            link: '/set',
+            link: '/setting',
             iconUrl: require('@/icons/set-white.png'),
             iconsUrlDefault: require('@/icons/set-black.png'),
             text: '设置',

@@ -27,34 +27,38 @@
             {{ login.nav.accountText }}
           </span>
           </div>
-          <!--手机号登录模板-->
+          <!--短信验证登录模板-->
           <div class="phoneForm" v-show="login.nav.activeIndex == 1">
             <!--手机号-->
-            <input v-model="login.phoneForm.phone"
-                   autofocus
-                   placeholder="请输入手机号"
-                   @blur="jk"
-                   @focus="login.phoneForm.phoneVerif = true"
-                   class="farm-input"
-                   :class="[{'inputError': !login.phoneForm.phoneVerif}]"/>
-            <!--验证码-->
-            <input v-model="login.phoneForm.code"
-                   placeholder="请输入验证码"
-                   ref="passwordInput"
-                   type="text"
-                   class="farm-input" />
-            <!--验证-->
-            <div class="verif">
-              <div class="btn"
-                   @click="verifPhone"
-                   v-show="login.phoneForm.verifShow">
-                {{ login.phoneForm.btn }}
-              </div>
-              <span class="delayDate" v-show="!login.phoneForm.verifShow">
-              {{ login.phoneForm.countdown }}
-            </span>
+            <div class="b">
+              <input v-model="login.phoneForm.phone"
+                     autofocus
+                     placeholder="请输入手机号"
+                     @blur="jk"
+                     @focus="login.phoneForm.phoneVerif = true"
+                     class="farm-input"
+                     :class="[{'inputError': !login.phoneForm.phoneVerif}]"/>
+              <span class="warnInfo" v-show="">{{ login.phoneForm.warnInfo.phone }}</span>
             </div>
-            <!--<input type="password" >-->
+            <!--验证码-->
+            <div class="b">
+              <input v-model="login.phoneForm.code"
+                     placeholder="请输入验证码"
+                     ref="passwordInput"
+                     type="text"
+                     class="farm-input" />
+              <!--验证-->
+              <div class="verif">
+                <div class="btn"
+                     @click="verifPhone"
+                     v-show="login.phoneForm.verifShow">
+                  {{ login.phoneForm.btn }}
+                </div>
+                <span class="delayDate" v-show="!login.phoneForm.verifShow">
+                  {{ login.phoneForm.countdown }}
+                </span>
+              </div>
+            </div>
             <!--5天内自动登录-->
             <el-switch v-model="login.phoneForm.autoLogin" />
             <span class="switchLabel">
@@ -192,52 +196,41 @@
         </h6>
         <div class="registeredForm">
           <!--帐号-->
-          <el-tooltip class="item"
-                      effect="dark"
-                      content="8-14个字符，至少输入包含大小写字母、汉字、数字、下划线中任意2种"
-                      placement="right-start">
-            <div class="u">
-              <input v-model="registered.form.account"
-                     placeholder="请输入帐号"
-                     @blur="accouVerif"
-                     @focus="registered.status.account = null"
-                     class="farm-input" />
-              <img src="@/icons/login-success.png" alt="" class="i" v-show="registered.status.account && !registered.status.accountInit">
-              <img src="@/icons/login-error .png" alt="" class="i" v-show="!registered.status.account && !registered.status.accountInit">
-            </div>
-          </el-tooltip>
+          <div class="u">
+            <input v-model="registered.form.account" placeholder="请输入帐号" @blur="accouVerif" @focus="inputGetFocus('account')" ref="accountRegister" class="farm-input" />
+            <span class="warnInfo" v-show="registered.status.account === false && !registered.status.accountInit">{{ registered.warnInfo.account }}</span>
+            <img src="@/icons/login-success.png" class="i" v-show="registered.status.account === true && !registered.status.accountInit">
+            <img src="@/icons/login-error .png" class="i canClick" v-show="registered.status.account === false && !registered.status.accountInit" @click="deleteInput('account')">
+          </div>
           <!--密码-->
-          <el-tooltip class="item"
-                      effect="dark"
-                      content="8-18个字符，至少包含大小写字母、数字、特殊字符中任意2种"
-                      placement="right-start">
-            <div class="u">
-              <input v-model="registered.form.password"
-                     placeholder="请输入密码"
-                     @blur="passwVerif"
-                     @focus="registered.status.password = null"
-                     class="farm-input" />
-              <img src="@/icons/login-success.png" alt="" class="i" v-show="registered.status.password && !registered.status.passwordInit">
-              <img src="@/icons/login-error .png" alt="" class="i" v-show="!registered.status.password && !registered.status.passwordInit">
+          <div class="u">
+            <input v-model="registered.form.password" type="password" placeholder="请输入密码" @blur="passwVerifTurn" @focus="inputGetFocus('password')" ref="passwordRegister" class="farm-input" />
+            <div class="swicthPWI">
+              <img src="@/icons/openPW.png" alt="" v-show="registered.passwordEye" @click="changePSType(false)">
+              <img src="@/icons/shuPW.png" alt="" v-show="!registered.passwordEye" @click="changePSType(true)">
             </div>
-          </el-tooltip>
+            <span class="warnInfo" v-show="registered.status.password === false && !registered.status.passwordInit">{{ registered.warnInfo.password }}</span>
+            <img src="@/icons/login-success.png" class="i" v-show="registered.status.password === true && !registered.status.passwordInit">
+            <img src="@/icons/login-error .png" class="i canClick" v-show="registered.status.password === false && !registered.status.passwordInit" @click="deleteInput('password')">
+          </div>
           <!--手机号-->
           <div class="u">
-            <input v-model="registered.form.phone"
-                   placeholder="请输入手机号"
-                   @blur="phoneVerif"
-                   @focus="registered.status.phone = null"
-                   class="farm-input" />
-            <img src="@/icons/login-success.png" alt="" class="i" v-show="registered.status.phone && !registered.status.phoneInit">
-            <img src="@/icons/login-error .png" alt="" class="i" v-show="!registered.status.phone && !registered.status.phoneInit">
+            <input v-model="registered.form.phone" placeholder="请输入手机号" @blur="phoneVerif" @focus="inputGetFocus('phone')" ref="phoneRegister" class="farm-input" />
+            <span class="warnInfo" v-show="registered.status.phone === false && !registered.status.phoneInit">{{ registered.warnInfo.phone }}</span>
+            <img src="@/icons/login-success.png" class="i" v-show="registered.status.phone === true && !registered.status.phoneInit">
+            <img src="@/icons/login-error .png" class="i canClick" v-show="registered.status.phone === false && !registered.status.phoneInit" @click="deleteInput('phone')">
           </div>
           <!--验证码-->
           <div class="v">
             <input v-model="registered.form.code"
                    placeholder="手机验证码"
+                   @blur="codeVerif"
+                   @focus="registered.status.code = null"
                    class="farm-input" />
+            <span class="warnInfo" v-show="registered.status.code === false">{{ registered.warnInfo.code }}</span>
             <div class="verif">
               <div class="btn"
+                   :class="[{'canClick': registered.status.phone}]"
                    @click="den"
                    v-show="registered.verifShow">
                 {{ registered.text }}
@@ -277,12 +270,16 @@
             <!--</a>-->
           </div>
           <!--注册-->
-          <div class="btnLogin" @click="registerFun">
+          <div class="btnLogin" :class="[{'canClick': this.registered.status.account && this.registered.status.password && this.registered.status.phone && this.registered.status.code }]" @click="registerFun">
             <img src="@/icons/login.png" alt="">
           </div>
         </div>
       </aside>
     </section>
+    <div class="promptList">
+      <span class="prompt" :class="[{show: registered.status.accountInit}]">{{ registered.prompt.account }}</span>
+      <span class="prompt" :class="[{show: registered.status.passwordInit}]">{{ registered.prompt.password }}</span>
+    </div>
   </div>
 </template>
 
@@ -329,7 +326,10 @@
             verifShow: true,
             countdown: '60s',
             intervalFun: null,
-            phoneVerif: false
+            phoneVerif: false,
+            warnInfo: {
+              phone: '手机号格式错误',
+            }
           },
           accountForm: {
             // account: 'gaoge1834',
@@ -371,20 +371,35 @@
           countdown: '60s',
           verifShow: true,
           intervalFun: null,
+          passwordEye: false,
+          warnInfo:{
+            account: '',
+            password: '',
+            phone: '',
+            code: '验证码未填写或填写格式错误'
+          },
+          clickEye: false,          // 刚刚点击了密码展示状态切换
           form: {
             account: '',
             password: '',
             phone: '',
-            code: ''
+            code: '',
+            type: '影视版'
           },
-          status: {
-            account: false,
-            password: false,
-            phone: false,
-            accountInit: true,
-            passwordInit: true,
-            phoneInit: true
-          }
+          status: {                 // 输入文本是否通过正则 && 是否获得焦点
+            account: null,
+            password: null,
+            phone: null,
+            code: null,
+            accountInit: false,
+            passwordInit: false,
+            phoneInit: false
+          },
+          prompt: {
+            account: '8-14个字符，至少输入包含大小写字母、汉字、数字、下划线中任意2种',
+            password: '8-18个字符，至少包含大小写字母、数字、特殊字符中任意2种'
+          },
+          codeObtained: false,   // 已获取验证码
         },
         // sliderVerification: false         //注册滑块验证
         reg: {
@@ -497,41 +512,51 @@
             rs = this.registered.status
         rs.accountInit = false
         // 为空
-        if(!rfa){ rs.account = false; return false }
+        if(!rfa){ rs.account = null; return false }
         // 验证帐号长度
-        if(!/^[\w\W]{8,14}$/.test(rfa)){ messageFun('error','请输入框8-14个字符'); rs.account = false; return false }
+        if(!/^[\w\W]{8,14}$/.test(rfa)){ this.registered.warnInfo.account = '请输入框8-14个字符'; rs.account = false; return false }
         // 验证帐号格式
         let reg = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5]+$)/,
             reg2 = /^[\u4E00-\u9FA5\w]+$/
-        if(!reg.test(rfa) || !reg2.test(rfa)){ messageFun('error','请在大小写字母、汉字、数字、下划线中设置帐号且至少包含任意2种'); rs.account = false; return false }
+        if(!reg.test(rfa) || !reg2.test(rfa)){ this.registered.warnInfo.account = '请在大小写字母、汉字、数字、下划线中设置帐号且至少包含任意2种'; rs.account = false; return false }
         // 验证帐号是否可用
         let data = await registerAccount(rfa)
-        // 用户名不存在
-        if(data.data.code == 4031){
-          // 帐号验证成功
-          rs.account = true
-        }else { rs.account = false; messageFun('error','该账号已注册，请重新输入') }
+        // 验证是否存在
+        if(data.data.code == 4031) rs.account = true
+        else { rs.account = false; this.registered.warnInfo.account = '该账号已注册，请重新输入' }
       },
       // 注册-密码验证
+      passwVerifTurn(){
+        setTimeout(this.passwVerif, 200)
+      },
       passwVerif(){
+        if(this.registered.clickEye){ this.registered.clickEye = false; return false }
         let t = this.registered.form.password,
             s = this.registered.status
         s.passwordInit = false
-        if(!t){ s.password = false; return false }
+        if(!t){ s.password = null; return false }
         if(!this.reg.passwordReg1.test(t) || !this.reg.passwordReg2.test(t)){
-          messageFun('error','请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符')
+          this.registered.warnInfo.password = '请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符'
           s.password = false
           return false
         }
         s.password = true
       },
+      // 注册-切换密码显示状态
+      changePSType(boolean){
+        this.registered.clickEye = true
+        this.registered.passwordEye = boolean
+        let inp = this.$refs['passwordRegister'],
+            len = this.registered.form.password.length
+        inp.focus()
+      },
       // 注册-手机号码验证
       async phoneVerif(){
         let r = this.registered
         r.status.phoneInit = false
-        if(!r.form.phone){ r.status.phone = false; return false }
+        if(!r.form.phone){ r.status.phone = null; return false }
         if(!this.reg.phoneReg.test(r.form.phone)){
-          messageFun('error','手机号格式错误')
+          this.registered.warnInfo.phone = '手机号格式错误'
           r.status.phone = false
           return false
         }
@@ -539,21 +564,41 @@
             //code:200   手机号已存在
             //code:4031  手机号未注册
         if(data.data.code == 4031){ r.status.phone = true }
-        else{ messageFun('error','手机号已存在'); r.status.phone = false }
+        else{ this.registered.warnInfo.phone = '手机号已存在'; r.status.phone = false }
       },
       // 注册-获取验证码
       den(){
-        if(!this.registered.status.phone) return false
+        let r = this.registered
+        if(!r.status.phone) return false
         this.delayFun('registered')
-        registerTelephone(this.registered.form.phone)
+        registerTelephone(r.form.phone)
+        r.codeObtained = true
+      },
+      // 注册-验证验证码
+      codeVerif(){
+        let r = this.registered
+        if(!r.form.code || !r.codeObtained){ r.status.code = null; return false }
+        if(/^\d{6}$/.test(r.form.code)) r.status.code = true
+        else r.status.code = false
+      },
+      // 注册 input获得焦点
+      inputGetFocus(item){
+        this.registered.status[item + 'Init'] = true
+        this.registered.warnInfo[item] = ''
+      },
+      // 注册 点击errIcon
+      deleteInput(item){
+        this.registered.form[item] = ''
+        this.$refs[item + 'Register'].focus()
+        this.inputGetFocus(item)
       },
       // 注册
       async registerFun(){
         // if(!this.sliderVerification) return false
         let rf = this.registered.form,
             rs = this.registered.status
+        if( !rs.account || !rs.password || !rs.phone || !rs.code ) return false
         if(!/^[0-9]{6}$/.test(rf.code)) { messageFun('error','验证码未填写或填写错误'); return false }
-        if(!rs.account || !rs.password || !rs.phone){ messageFun('error','注册信息未填写完整'); return false }
         if(!this.registered.tick){ messageFun('info','请阅读用户服务协议'); return false }
         let data = await register(rf)
         //code:101 帐号或手机号重复
@@ -774,6 +819,13 @@
           this.$refs.newPWA.type = 'password'
         }
       },
+      'registered.passwordEye': function(val){
+        if(val){
+          this.$refs.passwordRegister.type = "text"
+        }else{
+          this.$refs.passwordRegister.type = 'password'
+        }
+      }
     },
     created() {
       sessionStorage.setItem('info',JSON.stringify({
@@ -883,7 +935,10 @@
           }
           .verif {
             right: 10px;
-            top: 70px;
+            top: 10px;
+          }
+          .b {
+            position: relative;
           }
         }
       }
@@ -917,7 +972,9 @@
           margin-bottom: 30px;
         }
         .farm-input {
-          margin-bottom: 12px;
+          /*margin-bottom: 12px;*/
+          margin-bottom: 27px;
+          height: 25px!important;
         }
         .c {
           margin-top: 4px;
@@ -935,12 +992,35 @@
           }
         }
         .registeredForm {
-          .u {
+          .u,
+          .v {
             position: relative;
-            .i {
+            .swicthPWI {
               position: absolute;
               right: 0px;
-              top: 10px;
+              /*top: 14px;*/
+              top: 7px;
+            }
+            .warnInfo {
+              user-select: none;
+              position: absolute;
+              left: 0px;
+              /*bottom: -6px;*/
+              bottom: 9px;
+              font-size: 11px;
+              color: rgba(255, 62, 77, 0.79);
+              line-height: 16px;
+              width: 400px;
+            }
+            .i {
+              position: absolute;
+              width: 14px;
+              right: -20px;
+              /*top: 14px;*/
+              top: 7px;
+              &.canClick {
+                cursor: pointer;
+              }
             }
           }
         }
@@ -967,18 +1047,20 @@
           margin-top: 14px;
           width: 100%;
           height: 44px;
-          background: RGBA(13, 71, 163, 0.5);
-          border-radius:22px;
-          cursor: pointer;
+          background-color: RGBA(13, 71, 163, 0.5);
+          border-radius: 22px;
           display: flex;
           justify-content: center;
           align-items: center;
+          opacity: 1;
+          cursor: not-allowed;
           img {
             user-select: none;
             -webkit-user-drag: none;
           }
-          &:hover {
-            background: RGBA(14, 71, 161, 1);
+          &.canClick {
+            cursor: pointer;
+            background-color: RGBA(14, 71, 161, 1);
           }
         }
         /*滑动条*/
@@ -1028,6 +1110,28 @@
         margin-left: -575px;
       }
     }
+    .promptList {
+      position: fixed;
+      top: 0px;
+      left: calc(50% + 300px);
+      top: calc(50% - 142px);
+      .prompt {
+        display: block;
+        width: 400px;
+        margin-bottom: 18px;
+        border-radius: 4px;
+        padding: 10px;
+        font-size: 12px;
+        line-height: 1.2;
+        min-width: 10px;
+        background: #303133;
+        color: rgba(255, 255, 255, 1);
+        opacity: 0;
+        &.show {
+          opacity: 1;
+        }
+      }
+    }
   }
   /deep/.el-switch__core {
     background-color: RGBA(29, 52, 94, 1);
@@ -1038,8 +1142,11 @@
     .btn {
       font-size: 14px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 1);
-      cursor: pointer;
+      color: rgba(255, 255, 255, 0.4);
+      &.canClick {
+        color: rgba(255, 255, 255, 1);
+        cursor: pointer;
+      }
     }
     .delayDate {
       font-size: 14px;
@@ -1051,7 +1158,8 @@
   .v {
     position: relative;
     .verif {
-      top: 10px;
+      /*top: 10px;*/
+      top: 3px;
       right: 10px;
     }
   }

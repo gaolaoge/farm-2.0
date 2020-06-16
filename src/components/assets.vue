@@ -70,7 +70,8 @@
           {{ item }}
         </span>
         <div class="info">
-          {{ info }}
+          <span v-show="table.navListActiveIndex == '0'">{{ info[0] }}</span>
+          <span v-show="table.navListActiveIndex == '1'">{{ info[1] }}</span>
         </div>
       </div>
       <div class="tableList">
@@ -136,7 +137,10 @@
           howToCreateBtn: ['手动创建资产目录', '自动创建资产目录'],
           howToCreateIindex: 0
         },
-        info: '温馨提示：渲染输出文件夹的有效期为20天，20天后系统会自动清除，请在有效期截至前及时下载，如有特殊需求，可联系在线客服。',
+        info: [
+          '温馨提示：上传的资产有效期为20天，20天后系统会自动清除，请在有效期截至前进行渲染或下载，您可以充值扩充资产总容量。',
+          '温馨提示：渲染输出文件夹的有效期为20天，20天后系统会自动清除，请在有效期截至前及时下载，如有特殊需求，可联系在线客服。'
+        ],
         table: {
           navListActiveIndex: 0,
           navList: ['我的上传', '渲染输出']

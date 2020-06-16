@@ -69,6 +69,11 @@ const router = new Router({
       path: '/invoiceImmediately',
       name: 'invoiceImmediately',
       component: () => import('@/components/bill/invoiceImmediately')
+    },
+    {
+      path: '/setting',
+      name: 'setting',
+      component: () => import('@/components/setting-mainM')
     }
   ]
 })
