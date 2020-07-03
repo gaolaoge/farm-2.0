@@ -1460,11 +1460,11 @@
       rangeChange(e,index,val,row) {
         // debugger
         row['rangeEdit'] = false
-        row['range'] = e.target.value
+        row['range'] = val
         if(!val){ this.rangeChangeErr('empty',index); return false }
         if(!val.includes('-')){ this.rangeChangeErr('err',index); return false }
-        let h = val.split('-')[0],
-            f = val.split('-')[1]
+        let h = Number(val.split('-')[0]),
+            f = Number(val.split('-')[1])
         if(!/^[0-9]+$/.test(h) || !/^[0-9]+$/.test(f)){ this.rangeChangeErr('err',index); return false }
         if(h >= 999 || f > 999){ this.rangeChangeErr('max',index); return false }
         if(h >= f){ this.rangeChangeErr('err',index); return false }
@@ -1744,7 +1744,6 @@
             async () => {
               let dataList = []
               this.result.selectionResult.forEach(curr => {
-                console.log(curr)
                 if('selfIndex' in curr) return false
                 let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
                 if(dataListIndex == -1){
@@ -1821,7 +1820,6 @@
           }
         })
         this.setting.num.tableData = [this.setting.num.tableDataAll[0]]
-        // console.log(this.$refs)
         setTimeout(()=>{
           this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0], true)
         },0)
@@ -1865,6 +1863,7 @@
         if(!val) { this.setting.priority.customizeInputError = false; return false }
 
         let valList = val.replace(/，/g,',').split(',').filter(curr => curr != '')          // 输入帧
+        console.log(valList)
 
         if(valList.length > 3) { this.errFun('最多优先测试3帧'); return false }
         if(!valList.every(curr => /^[0-9]+$/.test(Number(curr)))) { this.errFun('输入格式不正确，请重新输入'); return false }
