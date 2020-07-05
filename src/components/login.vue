@@ -76,7 +76,7 @@
             <input v-model="login.accountForm.password"
                    ref="pwinput"
                    placeholder="请输入密码"
-                   @keyup.enter="accountlogin"
+                   @keyup.enter="accountloginFun"
                    autocomplete="new-password"
                    type="password"
                    class="farm-input" />
@@ -96,7 +96,7 @@
               {{ login.accountForm.forgetPw }}
             </span>
             <!--登录按钮-->
-            <div class="btnLogin" @click="accountlogin">
+            <div class="btnLogin" @click="accountloginFun">
               <img src="@/icons/login.png" alt="">
             </div>
           </div>
@@ -325,10 +325,10 @@
             phoneVerif: false
           },
           accountForm: {
-            // account: 'gaoge1834',
-            // password: 'gaoge1834',
-            account: '',
-            password: '',
+             account: 'gaoge1834',
+             password: 'gaoge1834',
+//            account: '',
+//            password: '',
             isAutoLogin: true,
             switchLabel: '5天内自动登录',
             forgetPw: '忘记密码?',
@@ -561,22 +561,17 @@
         }else messageFun('error','报错，注册失败')
       },
       // 帐号 登录
-      async accountlogin(){
+      async accountloginFun(){
         let { account, password, isAutoLogin } = this.login.accountForm
         // 验证
         if(!account || !password){ messageFun('error','帐号或密码未输入'); return false }
-        let data = await accountLogin({ account, password, isAutoLogin })
-        if(data.data.code == '4032') { messageFun('error','密码错误'); return false }
-        sessionStorage.setItem('token', data.data.data.token)
-        this.autoLogin(isAutoLogin, '', account, data.data.data.token)
-        this.getUserInfo()
-        // accountLogin({ account, password, isAutoLogin })
-        //   .then(data => {
-        //     if(data.data.code == '4032') { messageFun('error','密码错误'); return false }
-        //     sessionStorage.setItem('token', data.data.data.token)
-        //     this.autoLogin(isAutoLogin, '', account, data.data.data.token)
-        //     this.getUserInfo()
-        //   })
+        try {
+          let data = await accountLogin({ account, password, isAutoLogin })
+          if(data.data.code == '4032') { messageFun('error','密码错误'); return false }
+          sessionStorage.setItem('token', data.data.data.token)
+          this.autoLogin(isAutoLogin, '', account, data.data.data.token)
+          this.getUserInfo()
+        }catch(err){  }
       },
       // 登录 手机号验证
       async verifPhone(){

@@ -3,8 +3,7 @@ import vue from '@/main.js'
 import {Message} from "element-ui";
 
 const http = new axios.create({
-  // baseURL: 'http://192.168.1.184/',
-  baseURL: 'http://223.80.107.190:1814git 6/',
+  baseURL: 'http://192.168.1.179/',
   // baseURL: process.env.BASE_API,
   // timeout: 5000,
   headers: {
