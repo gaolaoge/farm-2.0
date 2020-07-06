@@ -19,12 +19,12 @@
             <span class="phone"
                   :class="[{'active': login.nav.activeIndex == 1}]"
                   @click="login.nav.activeIndex = 1">
-              {{ login.nav.phoneText }}
+              {{ $t('login_page.nav_phoneText') }}
             </span>
             <span class="account"
                   :class="[{'active': login.nav.activeIndex == 2}]"
                   @click="login.nav.activeIndex = 2">
-            {{ login.nav.accountText }}
+            {{ $t('login_page.nav_accountText') }}
           </span>
           </div>
           <!--短信验证登录模板-->
@@ -33,17 +33,17 @@
             <div class="b">
               <input v-model="login.phoneForm.phone"
                      autofocus
-                     placeholder="请输入手机号"
+                     :placeholder="$t('login_page.SMS_verif.phone_placeholder')"
                      @blur="jk"
                      @focus="login.phoneForm.phoneVerif = true"
                      class="farm-input"
                      :class="[{'inputError': !login.phoneForm.phoneVerif}]"/>
-              <span class="warnInfo" v-show="">{{ login.phoneForm.warnInfo.phone }}</span>
+              <span class="warnInfo" v-show="">{{ $t('login_page.SMS_verif.phone_warnInfo') }}</span>
             </div>
             <!--验证码-->
             <div class="b">
               <input v-model="login.phoneForm.code"
-                     placeholder="请输入验证码"
+                     :placeholder="$t('login_page.SMS_verif.code_placeholder')"
                      ref="passwordInput"
                      type="text"
                      class="farm-input" />
@@ -52,7 +52,7 @@
                 <div class="btn"
                      @click="verifPhone"
                      v-show="login.phoneForm.verifShow">
-                  {{ login.phoneForm.btn }}
+                  {{ $t('login_page.SMS_verif.getCodeBtn') }}
                 </div>
                 <span class="delayDate" v-show="!login.phoneForm.verifShow">
                   {{ login.phoneForm.countdown }}
@@ -62,7 +62,7 @@
             <!--5天内自动登录-->
             <el-switch v-model="login.phoneForm.autoLogin" />
             <span class="switchLabel">
-              {{ login.phoneForm.switchLabel }}
+              {{ $t('login_page.SMS_verif.auto_login') }}
             </span>
             <!--登录按钮-->
             <div class="btnLogin" @click="phoneLoginFun">
@@ -74,12 +74,12 @@
             <input type="password" style="display: none"/>
             <!--帐号-->
             <input v-model="login.accountForm.account"
-                   placeholder="请输入账号/手机号"
+                   :placeholder="$t('login_page.account_verif.ac_placeholder')"
                    class="farm-input" />
             <!--密码-->
             <input v-model="login.accountForm.password"
                    ref="pwinput"
-                   placeholder="请输入密码"
+                   :placeholder="$t('login_page.account_verif.ps_placeholder')"
                    @keyup.enter="accountlogin"
                    autocomplete="new-password"
                    type="password"
@@ -93,11 +93,11 @@
               v-model="login.accountForm.isAutoLogin">
             </el-switch>
             <span class="switchLabel">
-              {{ login.accountForm.switchLabel }}
+              {{ $t('login_page.account_verif.auto_login') }}
             </span>
             <!--忘记密码-->
             <span class="forgetPw" @click="login.mode = 'findBack'">
-              {{ login.accountForm.forgetPw }}
+              {{ $t('login_page.account_verif.forgetPw') }}
             </span>
             <!--登录按钮-->
             <div class="btnLogin" @click="accountlogin">
@@ -109,7 +109,7 @@
         <div class="findBack" v-show="login.mode == 'findBack'">
           <div class="loginNav">
             <span class="forgetPW active">
-              {{ login.forgetMode.tit }}
+              {{ $t('login_page.forgetMode.tit') }}
             </span>
           </div>
           <!--验证手机号-->
@@ -117,12 +117,12 @@
             <!--手机号-->
             <input v-model="login.forgetMode.phone"
                    autofocus
-                   placeholder="请输入手机号"
+                   :placeholder="$t('login_page.forgetMode.phone_placeholder')"
                    @blur="findBackPhoneVerif"
                    class="farm-input" />
             <!--验证码-->
             <input v-model="login.forgetMode.code"
-                   placeholder="请输入验证码"
+                   :placeholder="$t('login_page.forgetMode.code_placeholder')"
                    ref="passwordInput"
                    @blur="findBackCodeVerif"
                    class="farm-input" />
@@ -131,7 +131,7 @@
               <div class="btn"
                    @click="findBackGetCode"
                    v-show="login.forgetMode.verifShow">
-                {{ login.forgetMode.btn }}
+                {{ $t('login_page.forgetMode.btn') }}
               </div>
               <span class="delayDate" v-show="!login.forgetMode.verifShow">
                 {{ login.forgetMode.countdown }}
@@ -150,7 +150,7 @@
                      @blur="psFormat"
                      type="password"
                      ref="newPW"
-                     placeholder="请输入新密码"
+                     :placeholder="$t('login_page.forgetMode.ps_new')"
                      class="farm-input" />
               <div class="swicthPWI">
                 <img src="@/icons/openPW.png" alt="" v-show="login.forgetMode.passwordEye" @click="login.forgetMode.passwordEye = false">
@@ -163,7 +163,7 @@
                      @blur="npsFormat"
                      type="password"
                      ref="newPWA"
-                     placeholder="请再次输入新密码"
+                     :placeholder="$t('login_page.forgetMode.ps_again')"
                      class="farm-input" />
               <div class="swicthPWI">
                 <img src="@/icons/openPW.png" alt="" v-show="login.forgetMode.passwordEyeAgain" @click="login.forgetMode.passwordEyeAgain = false">
@@ -192,19 +192,19 @@
       <!--注册-->
       <aside class="registered">
         <h6 class="label">
-          {{ registered.label }}
+          {{ $t('login_page.register.label') }}
         </h6>
         <div class="registeredForm">
           <!--帐号-->
           <div class="u">
-            <input v-model="registered.form.account" placeholder="请输入帐号" @blur="accouVerif" @focus="inputGetFocus('account')" ref="accountRegister" class="farm-input" />
+            <input v-model="registered.form.account" :placeholder="$t('login_page.register.ac_placeholder')" @blur="accouVerif" @focus="inputGetFocus('account')" ref="accountRegister" class="farm-input" />
             <span class="warnInfo" v-show="registered.status.account === false && !registered.status.accountInit">{{ registered.warnInfo.account }}</span>
             <img src="@/icons/login-success.png" class="i" v-show="registered.status.account === true && !registered.status.accountInit">
             <img src="@/icons/login-error .png" class="i canClick" v-show="registered.status.account === false && !registered.status.accountInit" @click="deleteInput('account')">
           </div>
           <!--密码-->
           <div class="u">
-            <input v-model="registered.form.password" type="password" placeholder="请输入密码" @blur="passwVerifTurn" @focus="inputGetFocus('password')" ref="passwordRegister" class="farm-input" />
+            <input v-model="registered.form.password" type="password" :placeholder="$t('login_page.register.ps_placeholder')" @blur="passwVerifTurn" @focus="inputGetFocus('password')" ref="passwordRegister" class="farm-input" />
             <div class="swicthPWI">
               <img src="@/icons/openPW.png" alt="" v-show="registered.passwordEye" @click="changePSType(false)">
               <img src="@/icons/shuPW.png" alt="" v-show="!registered.passwordEye" @click="changePSType(true)">
@@ -215,7 +215,7 @@
           </div>
           <!--手机号-->
           <div class="u">
-            <input v-model="registered.form.phone" placeholder="请输入手机号" @blur="phoneVerif" @focus="inputGetFocus('phone')" ref="phoneRegister" class="farm-input" />
+            <input v-model="registered.form.phone" :placeholder="$t('login_page.register.ph_placeholder')" @blur="phoneVerif" @focus="inputGetFocus('phone')" ref="phoneRegister" class="farm-input" />
             <span class="warnInfo" v-show="registered.status.phone === false && !registered.status.phoneInit">{{ registered.warnInfo.phone }}</span>
             <img src="@/icons/login-success.png" class="i" v-show="registered.status.phone === true && !registered.status.phoneInit">
             <img src="@/icons/login-error .png" class="i canClick" v-show="registered.status.phone === false && !registered.status.phoneInit" @click="deleteInput('phone')">
@@ -223,7 +223,7 @@
           <!--验证码-->
           <div class="v">
             <input v-model="registered.form.code"
-                   placeholder="手机验证码"
+                   :placeholder="$t('login_page.register.code_placeholder')"
                    @blur="codeVerif"
                    @focus="registered.status.code = null"
                    class="farm-input" />
@@ -233,7 +233,7 @@
                    :class="[{'canClick': registered.status.phone}]"
                    @click="den"
                    v-show="registered.verifShow">
-                {{ registered.text }}
+                {{ $t('login_page.register.text') }}
               </div>
               <span class="delayDate" v-show="!registered.verifShow">
               {{ registered.countdown }}
@@ -249,10 +249,10 @@
             <!--<div class="btn" ref="btn" />-->
           <!--</div>-->
           <div class="c">
-            <label>{{ registered.type }}</label>
+            <label>{{ $t('login_page.register.type') }}</label>
             <el-radio-group v-model="registered.form.type" class="radio">
-              <el-radio :label="registered.typeRadio[0]"></el-radio>
-              <el-radio :label="registered.typeRadio[1]"></el-radio>
+              <el-radio :label="$t('login_page.register.typeRadio')[0]"></el-radio>
+              <el-radio :label="$t('login_page.register.typeRadio')[1]"></el-radio>
             </el-radio-group>
           </div>
           <!--协议-->
@@ -260,14 +260,11 @@
             <img src="@/icons/df.png" alt="" class="protocolIcon" v-show="!registered.tick" @click="registered.tick = true">
             <img src="@/icons/dfg.png" alt="" class="protocolIcon" v-show="registered.tick" @click="registered.tick = false">
             <span class="r">
-              {{ registered.text1 }}
+              {{ $t('login_page.register.text1') }}
             </span>
             <span class="protocolLetter" @click="showPDF">
-              {{ registered.text2 }}
+              {{ $t('login_page.register.text2') }}
             </span>
-            <!--<a :href="require('../../../static/protocal.pdf')" target="_blank" class="protocolLetter">-->
-              <!--{{ registered.text2 }}-->
-            <!--</a>-->
           </div>
           <!--注册-->
           <div class="btnLogin" :class="[{'canClick': this.registered.status.account && this.registered.status.password && this.registered.status.phone && this.registered.status.code }]" @click="registerFun">
@@ -277,8 +274,8 @@
       </aside>
     </section>
     <div class="promptList">
-      <span class="prompt" :class="[{show: registered.status.accountInit}]">{{ registered.prompt.account }}</span>
-      <span class="prompt" :class="[{show: registered.status.passwordInit}]">{{ registered.prompt.password }}</span>
+      <span class="prompt" :class="[{show: registered.status.accountInit}]">{{ $t('login_page.register.prompt.account') }}</span>
+      <span class="prompt" :class="[{show: registered.status.passwordInit}]">{{ $t('login_page.register.prompt.password') }}</span>
     </div>
   </div>
 </template>
@@ -312,42 +309,31 @@
         login: {
           mode: 'login',
           nav: {
-            phoneText: '短信验证登录',
-            accountText: '账号密码登录',
             activeIndex: 1
           },
           phoneForm: {
             phone: '',
             code: '',
             autoLogin: true,
-            switchLabel: '5天内自动登录',
-            btn: '获取验证码',
             v: false,
             verifShow: true,
             countdown: '60s',
             intervalFun: null,
             phoneVerif: false,
-            warnInfo: {
-              phone: '手机号格式错误',
-            }
           },
           accountForm: {
-            // account: 'gaoge1834',
-            // password: 'gaoge1834',
-            account: '',
-            password: '',
+             account: 'gaoge1834',
+             password: 'gaoge1834',
+//            account: '',
+//            password: '',
             isAutoLogin: true,
-            switchLabel: '5天内自动登录',
-            forgetPw: '忘记密码?',
             passwordEye: false
           },
           forgetMode: {
-            tit: '找回密码',
             phone: '',
             code: '',
             verifShow: true,
             countdown: '60s',
-            btn: '获取验证码',
             newPassWord: '',
             newPassWordAgain: '',
             passwordEye: false,
@@ -361,12 +347,6 @@
           }
         },
         registered: {
-          label : '注册',
-          text1: '我已阅读并同意',
-          text2: '《用户服务协议》',
-          text: '获取验证码',
-          type: '类型',
-          typeRadio: ['影视版', '效果图'],
           tick: false,
           countdown: '60s',
           verifShow: true,
@@ -376,7 +356,7 @@
             account: '',
             password: '',
             phone: '',
-            code: '验证码未填写或填写格式错误'
+            code: this.$t('login_page.register.warnInfo.code')
           },
           clickEye: false,          // 刚刚点击了密码展示状态切换
           form: {
@@ -395,11 +375,7 @@
             passwordInit: false,
             phoneInit: false
           },
-          prompt: {
-            account: '8-14个字符，至少输入包含大小写字母、汉字、数字、下划线中任意2种',
-            password: '8-18个字符，至少包含大小写字母、数字、特殊字符中任意2种'
-          },
-          codeObtained: false,   // 已获取验证码
+          codeObtained: false,      // 已获取验证码
         },
         // sliderVerification: false         //注册滑块验证
         reg: {
@@ -503,7 +479,7 @@
       jk(){
         let f = this.login.phoneForm
         if(!f.phone){ f.phoneVerif = false; return false }
-        if(!this.reg.phoneReg.test(f.phone)){ messageFun('error','手机号格式错误'); f.phoneVerif = false; return false }
+        if(!this.reg.phoneReg.test(f.phone)){ messageFun('error',this.$t('login_page.message.phoneTypeErr_one')); f.phoneVerif = false; return false }
         f.phoneVerif = true
       },
       // 注册-帐号验证
@@ -514,16 +490,16 @@
         // 为空
         if(!rfa){ rs.account = null; return false }
         // 验证帐号长度
-        if(!/^[\w\W]{8,14}$/.test(rfa)){ this.registered.warnInfo.account = '请输入框8-14个字符'; rs.account = false; return false }
+        if(!/^[\w\W]{8,14}$/.test(rfa)){ this.registered.warnInfo.account = this.$t('login_page.message.ac_verif_one'); rs.account = false; return false }
         // 验证帐号格式
         let reg = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5]+$)/,
             reg2 = /^[\u4E00-\u9FA5\w]+$/
-        if(!reg.test(rfa) || !reg2.test(rfa)){ this.registered.warnInfo.account = '请在大小写字母、汉字、数字、下划线中设置帐号且至少包含任意2种'; rs.account = false; return false }
+        if(!reg.test(rfa) || !reg2.test(rfa)){ this.registered.warnInfo.account = this.$t('login_page.message.ac_verif_two'); rs.account = false; return false }
         // 验证帐号是否可用
         let data = await registerAccount(rfa)
         // 验证是否存在
         if(data.data.code == 4031) rs.account = true
-        else { rs.account = false; this.registered.warnInfo.account = '该账号已注册，请重新输入' }
+        else { rs.account = false; this.registered.warnInfo.account = this.$t('login_page.message.ac_verif_three') }
       },
       // 注册-密码验证
       passwVerifTurn(){
@@ -536,7 +512,7 @@
         s.passwordInit = false
         if(!t){ s.password = null; return false }
         if(!this.reg.passwordReg1.test(t) || !this.reg.passwordReg2.test(t)){
-          this.registered.warnInfo.password = '请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符'
+          this.registered.warnInfo.password = this.$t('login_page.message.ps_verif_one')
           s.password = false
           return false
         }
@@ -556,7 +532,7 @@
         r.status.phoneInit = false
         if(!r.form.phone){ r.status.phone = null; return false }
         if(!this.reg.phoneReg.test(r.form.phone)){
-          this.registered.warnInfo.phone = '手机号格式错误'
+          this.registered.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_one')
           r.status.phone = false
           return false
         }
@@ -564,7 +540,7 @@
             //code:200   手机号已存在
             //code:4031  手机号未注册
         if(data.data.code == 4031){ r.status.phone = true }
-        else{ this.registered.warnInfo.phone = '手机号已存在'; r.status.phone = false }
+        else{ this.registered.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_two'); r.status.phone = false }
       },
       // 注册-获取验证码
       den(){
@@ -598,48 +574,45 @@
         let rf = this.registered.form,
             rs = this.registered.status
         if( !rs.account || !rs.password || !rs.phone || !rs.code ) return false
-        if(!/^[0-9]{6}$/.test(rf.code)) { messageFun('error','验证码未填写或填写错误'); return false }
-        if(!this.registered.tick){ messageFun('info','请阅读用户服务协议'); return false }
+        if(!/^[0-9]{6}$/.test(rf.code)) { messageFun('error',this.$t('login_page.message.codeTypeErr_one')); return false }
+        if(!this.registered.tick){ messageFun('info',this.$t('login_page.message.tickTypeErr_one')); return false }
         let data = await register(rf)
         //code:101 帐号或手机号重复
         if(data.data.code == '200'){
           // 注册成功
           localStorage.setItem(rf.account, false)
-          messageFun('success','注册成功')
+          messageFun('success',this.$t('login_page.message.registerSuc'))
           setTimeout(function(){
             // 返回登录窗口
             this.navActive = 1    // 切换回登录窗口
             rf = { account: '', password: '', phone: '', code: '' }
             rs = { account: false, password: false, phone: false }
           }.bind(this),800)
-        }else messageFun('error','报错，注册失败')
+        }else messageFun('error',this.$t('login_page.message.registerErr'))
       },
       // 帐号 登录
       async accountlogin(){
         let { account, password, isAutoLogin } = this.login.accountForm
         // 验证
-        if(!account || !password){ messageFun('error','帐号或密码未输入'); return false }
-        let data = await accountLogin({ account, password, isAutoLogin })
-        if(data.data.code == '4032') { messageFun('error','密码错误'); return false }
-        sessionStorage.setItem('token', data.data.data.token)
-        this.autoLogin(isAutoLogin, '', account, data.data.data.token)
-        this.getUserInfo()
-        // accountLogin({ account, password, isAutoLogin })
-        //   .then(data => {
-        //     if(data.data.code == '4032') { messageFun('error','密码错误'); return false }
-        //     sessionStorage.setItem('token', data.data.data.token)
-        //     this.autoLogin(isAutoLogin, '', account, data.data.data.token)
-        //     this.getUserInfo()
-        //   })
+        if(!account || !password){ messageFun('error',this.$t('login_page.message.ac_ps_null')); return false }
+        try{
+          let data = await accountLogin({ account, password, isAutoLogin })
+          if(data.data.code == '4032') { messageFun('error',this.$t('login_page.message.ps_err')); return false }
+          sessionStorage.setItem('token', data.data.data.token)
+          this.autoLogin(isAutoLogin, '', account, data.data.data.token)
+          this.getUserInfo()
+        }catch(err){
+          console.log('登录失败, ' + err)
+        }
       },
       // 登录 手机号验证
       async verifPhone(){
         let f = this.login.phoneForm
-        if(!f.phoneVerif){ messageFun('error','未输入手机号或输入格式有误'); return false }
+        if(!f.phoneVerif){ messageFun('error',this.$t('login_page.message.ph_err')); return false }
         this.delayFun('login')
         let data = await phoneVerif(f.phone)
-        if(data.data.code == 200){ f.v = true; messageFun('info','验证信息已发送') }
-        if(data.data.code == 10001) messageFun('error','当前手机号未注册，请先注册')
+        if(data.data.code == 200){ f.v = true; messageFun('info',this.$t('login_page.message.code_is_coming')) }
+        if(data.data.code == 10001) messageFun('error',this.$t('login_page.message.need_to_register'))
       },
       // 手机号验证事件60秒延迟
       delayFun(obj){
@@ -663,14 +636,14 @@
       async phoneLoginFun(){
         let {v, phone, code, isAutoLogin} = this.login.phoneForm
         // 已验证
-        if(!v){ messageFun('error','还未做短信验证'); return false }
+        if(!v){ messageFun('error',this.$t('login_page.message.no_sms')); return false }
         // 手机号
-        if(!this.reg.phoneReg.test(phone)){ messageFun('error','已输入手机号格式错误'); return false }
+        if(!this.reg.phoneReg.test(phone)){ messageFun('error',this.$t('login_page.message.phoneTypeErr_three')); return false }
         // 验证码
-        if(!this.reg.codeReg.test(code)){messageFun('error','已输入验证码格式错误'); return false }
+        if(!this.reg.codeReg.test(code)){messageFun('error',this.$t('login_page.message.codeTypeErr_two')); return false }
         let data = await phoneLogin({ phone, code, isAutoLogin })
-        if(data.data.code == 4032){ messageFun('error','验证码错误'); return false }
-        if(data.data.code == 200) messageFun('success','登录成功')
+        if(data.data.code == 4032){ messageFun('error',this.$t('login_page.message.code_err')); return false }
+        if(data.data.code == 200) messageFun('success',this.$t('login_page.message.login_suc'))
         this.autoLogin(isAutoLogin, phone, data.data.data.account, data.data.data.token)
         sessionStorage.setItem('token', data.data.data.token)
         this.getUserInfo()
@@ -678,7 +651,7 @@
       // 找回密码 验证手机号是否有效
       findBackPhoneVerif(){
         let f = this.login.forgetMode
-        if(!this.reg.phoneReg.test(f.phone)){ messageFun('error','手机号码格式错误'); f.phoneFormat = false; return false }
+        if(!this.reg.phoneReg.test(f.phone)){ messageFun('error',this.$t('login_page.message.phoneTypeErr_one')); f.phoneFormat = false; return false }
         f.phoneFormat = true
       },
       // 找回密码 验证验证码是否有效
@@ -686,7 +659,7 @@
         let f = this.login.forgetMode
         if(!f.phoneFormat) return false
         if(!f.code){ f.phoneFormat = false; return false }
-        if(!this.reg.codeReg.test(f.code)){ messageFun('error','验证码格式错误'); f.codeFormat = false; return false }
+        if(!this.reg.codeReg.test(f.code)){ messageFun('error',this.$t('login_page.message.codeTypeErr_three')); f.codeFormat = false; return false }
         f.codeFormat = true
       },
       // 找回密码 获取验证码
@@ -702,15 +675,15 @@
         let f = this.login.forgetMode
         if(!f.phoneFormat || !f.codeFormat) return false
         let data = await getVeriVal(`phone=${f.phone}&code=${f.code}`)
-        if(data.data.code == 4034){ messageFun('error','验证码无效'); return false }
+        if(data.data.code == 4034){ messageFun('error',this.$t('login_page.message.code_err_two')); return false }
         else if(data.data.code == 200){ f.step = 'two' }
-        else messageFun('error','报错，验证失败')
+        else messageFun('error',this.$t('login_page.message.verifErr'))
       },
       // 找回密码 验证密码
       psFormat(){
         let t = this.login.forgetMode
         if(!this.reg.passwordReg1.test(t.newPassWord) || !this.reg.passwordReg2.test(t.newPassWord)){
-          messageFun('error','请至少输入包含大小写字母、数字、特殊字符中任意2种的8-18个字符')
+          messageFun('error',this.$t('login_page.message.psTypeErr_one'))
           t.newPassWordFormat = false
           return false
         }
@@ -720,7 +693,7 @@
       npsFormat(){
         let t = this.login.forgetMode
         if(t.newPassWord !== t.newPassWordAgain){
-          messageFun('error','两次输入密码不一致，请核对后重新输入')
+          messageFun('error',this.$t('login_page.message.psTypeErr_two'))
           t.newPassWordAgainFormat = false
           return false
         }
@@ -737,7 +710,7 @@
           repeatPassword: t.newPassWordAgain
         })
         if(data.data.code == 200){
-          messageFun('success','修改成功')
+          messageFun('success',this.$t('login_page.message.edit_suc'))
           setTimeout(() => {
             this.login.mode = 'login'
             window.clearInterval(this.login.forgetMode.intervalFun)

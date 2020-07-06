@@ -3,13 +3,10 @@ import vue from '@/main.js'
 import {Message} from "element-ui";
 
 const http = new axios.create({
-  // baseURL: 'http://192.168.1.184/',
-  baseURL: 'http://223.80.107.190:18146/',
-  // baseURL: process.env.BASE_API,
+  baseURL: 'http://192.168.1.179/',
+  // baseURL: process.env.VUE_APP_BASE_API,
   // timeout: 5000,
-  headers: {
-
-  }
+  // headers: {}
 })
 
 http.interceptors.request.use(config => {
