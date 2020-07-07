@@ -474,8 +474,8 @@ thead {
   background:rgba(33,41,51,1);
   color:rgba(0,97,255,1);
   .btnIcon {
-    vertical-align: baseline;
-    height: 10px;
+    vertical-align: middle;
+    height: 12px;
     &.default {
       display: inline-block;
     }
@@ -492,6 +492,42 @@ thead {
       }
       &.hover {
         display: inline-block;
+      }
+    }
+  }
+}
+.farm-btn {
+  width: 74px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-block;
+  text-align: center;
+  margin-left: 30px;
+  cursor: pointer;
+  transition: all 0.1s;
+  span {
+    font-size: 14px;
+    line-height: 30px;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.1s;
+  }
+  &.save {
+    background-color: rgba(10, 98, 241, 0.4);
+    border: 1px solid rgba(10, 98, 241, 0.4);
+    &:hover {
+      background-color: rgba(10, 98, 241, 1);
+      border: 1px solid rgba(10, 98, 241, 1);
+      span {
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+  &.cancel {
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    &:hover {
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      span {
+        color: rgba(255, 255, 255, 0.8);
       }
     }
   }
@@ -1333,5 +1369,84 @@ td {
   //提示信息
   .el-message {
     top: 10vw !important;
+  }
+}
+
+// 弹窗
+.farm-dialog {
+  position: fixed;
+  display: flex;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .container {
+    position: absolute;
+    z-index: 2;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: rgba(28,36, 47, 1);
+    box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
+    border-radius: 8px;
+    overflow: hidden;
+    .title {
+      position: relative;
+      text-align: center;
+      line-height: 25px;
+      letter-spacing: 2px;
+      margin-bottom: 37px;
+      span {
+        font-size: 18px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 1);
+      }
+      .shutImg {
+        position: absolute;
+        right: 0px;
+        top: 2px;
+        width: 18px;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+// 选项卡
+.tableGroup {
+  position: relative;
+  margin: 20px 50px;
+  .navList {
+    position: relative;
+    .navBtn {
+      display: inline-block;
+      font-size: 16px;
+      color: rgba(255,255,255,0.6);
+      padding: 10px 30px;
+      cursor: pointer;
+      &.active {
+        background-color: rgba(22, 29, 37, 1);
+        border-radius: 8px 8px 0px 0px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+  }
+  .tableList {
+    background-color: rgba(22, 29, 37, 1);
+    border-radius: 0px 0px 8px 8px;
   }
 }

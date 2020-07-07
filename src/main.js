@@ -7,6 +7,7 @@ import elTableInfiniteScroll from 'el-table-infinite-scroll'
 import App from './App'
 import router from './router'
 import 'babel-polyfill'
+import i18n from './lang'
 
 Vue.config.devtools = true
 
@@ -21,8 +22,10 @@ const vue = new Vue({
   el: '#app',
   router,
   store,
+  i18n,
   components: { App },
   template: '<App/>'
 })
 
 export default vue
+

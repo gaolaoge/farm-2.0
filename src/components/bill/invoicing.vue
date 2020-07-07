@@ -1,0 +1,425 @@
+<template>
+  <div class="invoicing">
+    <!--table-->
+    <div class="invoicing-table" ref="invoicingTable">
+      <!--条件筛选-->
+      <div class="filter">
+        <!--发票抬头-->
+        <div class="filter-item">
+          <span class="filter-item-label">
+            {{ filter.tradingtatusLabel }}：
+          </span>
+          <el-select v-model="filter.tradingtatusVal"
+                     placeholder="-"
+                     class="filter-item-i filter-item-select">
+            <el-option
+              v-for="item in filter.tradingtatusList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <!--发票状态-->
+        <div class="filter-item">
+          <span class="filter-item-label">
+            {{ filter.paymentMethodLabel }}：
+          </span>
+          <el-select v-model="filter.paymentMethodVal"
+                     placeholder="-"
+                     class="filter-item-i filter-item-select">
+            <el-option
+              v-for="item in filter.paymentMethodList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
+        <!--查询时间-->
+        <div class="filter-item">
+          <span class="filter-item-label">
+            {{ filter.inquireLabel }}：
+          </span>
+          <model-calendar style="display: inline-block;" @changeSelectDate="changeFilterDate" />
+        </div>
+        <!--查询-->
+        <div class="filter-btn primary" @click="getList">
+          {{ filter.iquireBtn }}
+        </div>
+        <!--重置-->
+        <div class="filter-btn" @click="reset">
+          {{ filter.resetBtn }}
+        </div>
+        <!--导出记录-->
+        <div class="filter-btn r" @click="exportTable">
+          {{ filter.exportBtn }}
+        </div>
+      </div>
+      <!--table-->
+      <el-table
+        :data="table.invoicingData"
+        @selection-change="handleSelectionChange"
+        @filter-change="filterHandler"
+        class="o"
+        :border=true
+        style="width: 100%">
+
+        <el-table-column
+          type="selection"
+          align="right"
+          show-overflow-tooltip
+          min-width="58"
+          width="58" />
+        <!--发票抬头-->
+        <el-table-column
+          prop="invoice"
+          label="发票抬头"
+          sortable
+          show-overflow-tooltip
+          min-width="200" />
+        <!--纳税人标识号-->
+        <el-table-column
+          prop="invoiceNum"
+          label="纳税人标识号"
+          sortable
+          show-overflow-tooltip
+          width="280">
+        </el-table-column>
+        <!--发票金额（元）-->
+        <el-table-column
+          prop="invoiceAmount"
+          label="发票金额（元）"
+          sortable
+          show-overflow-tooltip
+          width="180" />
+        <!--发票类型 -->
+        <el-table-column
+          prop="invoiceType"
+          label="发票类型"
+          sortable
+          show-overflow-tooltip
+          width="180" />
+        <!--发票状态-->
+        <el-table-column
+          prop="invoiceState"
+          label="发票状态"
+          :filter-method="filterStatus"
+          :filters="table.statusList"
+          show-overflow-tooltip
+          width="150" />
+        <!--邮箱-->
+        <el-table-column
+          prop="email"
+          label="邮箱"
+          sortable
+          show-overflow-tooltip
+          width="240" />
+        <!--交易时间-->
+        <el-table-column
+          prop="date"
+          label="交易时间"
+          sortable
+          show-overflow-tooltip
+          width="240" />
+
+      </el-table>
+    </div>
+    <!--分页-->
+    <div class="page">
+      <el-pagination
+        background
+        layout="prev, pager, next, jumper"
+        @current-change="jump"
+        :current-page.sync="table.currentPage"
+        :total="table.outPutTableTotal" />
+    </div>
+  </div>
+</template>
+
+<script>
+  import modelCalendar from '@/components/farm-model/farm-calendar'
+  import {
+    createCalendar,
+    getDate,
+    exportDownloadFun,
+    createTableIconList
+  } from '@/assets/common.js'
+  import {
+    getUpTopTable,
+    exportUpTopTable,
+    downloadReceipt
+  } from '@/api/api'
+
+  export default {
+    name: 'invoicing',
+    data(){
+      return {
+        table: {
+          invoicingData: [
+//             {
+//               invoice: '',          // 发票抬头
+//               invoiceNum: '',       // 纳税人标识号
+//               invoiceAmount: '',    // 发票金额（元）
+//               invoiceType: '',      // 发票类型
+//               invoiceState: '',     // 发票状态
+//               email: '',            // 邮箱
+//               date: '',             // 开票时间
+//             },
+            {
+               invoice: '青岛很厉害科技有限公司',
+               invoiceNum: '27937293688628648',
+               invoiceAmount: '100.00',
+               invoiceType: '增值税普票',
+               invoiceState: '审核中',
+               email: '1738683@163.com',
+               date: '2020-03-02 00:23:46'
+             },
+            {
+              invoice: '青岛特别能控股有限集团',
+              invoiceNum: '27937293688628648',
+              invoiceAmount: '287.34',
+              invoiceType: '增值税普票',
+              invoiceState: '已发送',
+              email: '376yegww@qq.com',
+              date: '2020-03-02 00:23:46'
+            }
+          ],
+          statusList: [
+            {text: '上传中', value: '上传中...'},
+            {text: '上传暂停', value: '上传暂停'},
+            {text: '上传失败', value: '上传失败'},
+            {text: '已取消', value: '已取消'},
+            {text: '分析中', value: '分析中...'},
+            {text: '分析警告', value: '分析警告'},
+            {text: '待设置参数', value: '待设置参数'},
+            {text: '分析失败', value: '分析失败'},
+            {text: '已放弃', value: '已放弃'},
+          ],
+          outPutTableTotal: 0,
+          currentPage: 1,
+          pageSize: 10,
+          selectionList: [],            //渲染输出选中项
+        },
+        filter: {
+          tradingtatusLabel: '发票抬头',
+          tradingtatusVal: '-1',
+          tradingtatusList: [
+            {
+              label: '示例',
+              value: '-1'
+            }
+          ],
+          paymentMethodLabel: '发票状态',
+          paymentMethodVal: '-1',
+          paymentMethodList: [
+            {
+              label: '全部',
+              value: '-1'
+            },
+            {
+              label: '审核中',
+              value: '3'
+            },
+            {
+              label: '审核不过',
+              value: '1'
+            },
+            {
+              label: '审核通过',
+              value: '2'
+            },
+            {
+              label: '已发送',
+              value: '2'
+            }
+          ],
+          inquireLabel: '开票时间',
+          inquireValS: 0,
+          inquireValV: new Date(),
+          iquireBtn: '查询',
+          resetBtn: '重置',
+          exportBtn: '导出记录'
+        }
+      }
+    },
+    components: {
+      modelCalendar
+    },
+    methods: {
+      // 上传分析 - 筛选 - 状态
+      filterStatus(value, row){
+        return row.status === value
+      },
+      copySingleNumber(val){
+        let oInput = document.createElement('INPUT')
+        oInput.style.display = 'none'
+        oInput.value = val
+        document.body.appendChild(oInput)
+        oInput.select()                    // 选中
+        document.execCommand("Copy")       // 复制
+        document.body.removeChild(oInput)
+      },
+      // 充值中心多选
+      handleSelectionChange(val){
+        this.table.selectionList = val
+      },
+      //筛选条件发生变化
+      filterHandler(value, row, column){
+        console.log(value, row, column)
+      },
+      // 时间筛选条件修改
+      changeFilterDate(val){
+        [].forEach.call(val, (curr,index) => {
+          let [year, month, day] = curr.split('-'),
+            r = getDate(year, month, day)
+          if(index == 0){
+            this.filter.inquireValS = r
+          }else{
+            this.filter.inquireValV = r
+          }
+        })
+      },
+      // 获取table数据
+      async getList(){
+        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&productOrderUuid=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
+          data = await getUpTopTable(t)
+        this.table.outPutTableTotal = data.data.total
+        this.table.rechargeData = data.data.data.map(curr => {
+          curr.operate = '-'
+          switch(curr.paymentStatus){
+            case 1:
+              curr.paymentStatus = '成功'
+              if(curr.actualPayment) curr.operate = '下载收据'
+              break
+            case 2:
+              curr.paymentStatus = '失败'
+              break
+            case 3:
+              curr.paymentStatus = '待付款'
+              if(curr.actualPayment) curr.operate = '待付款'
+              break
+          }
+          if(!curr.actualPayment) curr.actualPayment = '-'
+          let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
+          return {
+            id: curr.outTradeNo,                // 交易ID
+            state: curr.paymentStatus,            // 交易状态
+            realPay: curr.actualPayment,          // 实际支付金额（元）
+            realArrive: curr.arrivalAmount,       // 充值到账（金币）
+            directions: curr.rechargeExplain,     // 充值说明
+            paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '-',                      // 充值方式
+            singleNumber: curr.productOrderUuid ? curr.productOrderUuid : '-',  // 支付单号
+            date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,                // 交易时间
+            dateDefault: curr.updateTime,
+            invoice: curr.invoice,                // 开票标识
+            operate: curr.operate                 // 操作
+          }
+        })
+      },
+      // table 筛选条件重置
+      reset(){
+        Object.assign(this.filter,{
+          tradingtatusVal: '-1',
+          paymentMethodVal: '-1',
+          markVal: '-1',
+          singleNumberVal: '',
+          inquireValS: 0,
+          inquireValV: new Date(),
+        })
+        this.getList()
+      },
+      // 翻页
+      jump(val){
+        this.table.currentPage = val
+        this.getList()
+      },
+      // 导出记录
+      async exportTable(){
+        // {
+        //   paymentTitle: 1,   // 支付方式 1支付宝
+        //   paymentStatus: 1,  // 交易状态:1成功，2失败；3待付款
+        //   invoice: 1,        // 开票标识:0不可开票,1未开票,2已开票
+        //   beginTime: '',     // 查询起始时间,时间戳
+        //   endTime: '',       // 查询结束时间,时间戳
+        //   sortColumn: '',    // 排序字段:0:交易id, 1:交易状态,2:实际支付金额,3:充值到账金币,4:充值说明,5:支付方式,6:支付单号,7:修改时间
+        //   sortBy: ''         // 排序方式:0降序,1升序
+        // }
+        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
+          data = await exportUpTopTable(t)
+        // 导出下载
+        exportDownloadFun(data, '充值记录','xlsx')
+      },
+      // 操作
+      async operateFun(item){
+        let u = {
+          outTradeNo: item.singleNumber,
+          updateTime: item.dateDefault,
+          actualPayment: item.realPay,
+          paymentTitle: item.paymentMethod == '支付宝' ? '1' : '2',
+          account: JSON.parse(sessionStorage.getItem('info'))['account']
+        }
+        let t =`outTradeNo=${u['outTradeNo']}&updateTime=${u['updateTime']}&actualPayment=${u['actualPayment']}&paymentTitle=${u['paymentTitle']}&account=${u['account']}`
+        if(item.operate == "下载收据"){
+          let data = await downloadReceipt(t)
+          exportDownloadFun(data, '收据','pdf')
+        }
+      }
+    },
+    mounted() {
+      this.getList()
+      createTableIconList()
+    }
+  }
+</script>
+
+<style lang="less" scoped>
+  .invoicing {
+    overflow: hidden;
+  }
+  .page {
+    margin: 4px 25px 30px;
+  }
+  /deep/.el-table__body-wrapper {
+    height: calc(100vh - 557px);
+  }
+
+  .invoicing-table {
+    overflow: hidden;
+    .filter {
+      position: relative;
+      height: 50px;
+      background: rgba(33, 41, 51, 0.59);
+      border-radius: 4px;
+      margin: 20px 10px 0px;
+      width: calc(100% - 20px);
+      padding: 0px 20px;
+      box-sizing: border-box;
+      .t {
+        width: 200px;
+      }
+      .r {
+        position: absolute;
+        right: 0px;
+      }
+    }
+  }
+  .download-tab {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(0,97,255,1);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .download-tab-none {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255 0.6);
+  }
+
+  @media screen and (orientation: portrait) {
+    /deep/.el-table__body-wrapper {
+      height: calc(100vw - 557px);
+    }
+  }
+</style>

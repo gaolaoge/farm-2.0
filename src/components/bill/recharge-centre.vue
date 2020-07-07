@@ -181,8 +181,7 @@
         layout="prev, pager, next, jumper"
         @current-change="jump"
         :current-page.sync="table.currentPage"
-        :total="table.outPutTableTotal">
-      </el-pagination>
+        :total="table.outPutTableTotal" />
     </div>
   </div>
 </template>
@@ -218,7 +217,7 @@
             //   operate: ''           //操作
             // },
           ],
-          outPutTableTotal: 82,
+          outPutTableTotal: 0,
           currentPage: 1,
           pageSize: 10,
           selectionList: [],            //渲染输出选中项

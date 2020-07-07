@@ -1,3 +1,4 @@
-export { default as appMain } from './appMain.vue'
-export { default as Navbar } from './Navbar.vue'
-export { default as Header } from './Header.vue'
+export { default as appMain } from './appMain'
+export { default as Navbar } from './Navbar'
+export { default as Header } from './Header'
+

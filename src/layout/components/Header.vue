@@ -1,6 +1,7 @@
 <template>
   <div class="header-wrapper">
     <div class="wrapper">
+      <!--选择分区-->
       <div class="workbench">
         <el-select v-model="workBenchVal" class="workBench-optionBase">
           <el-option
@@ -13,6 +14,23 @@
         <img src="@/icons/questionMark.png" alt="" class="workBench-icon">
       </div>
       <div class="r">
+        <!--消息-->
+        <div class="messageE" :class="[{'active': showMessageList}]" v-operating3>
+          <img src="@/icons/messageIconheaderM.png"
+               @click="showMessageList = !showMessageList"
+               v-show="!showMessageList"
+               class="problemImg"
+               alt="" >
+          <img src="@/icons/messageIconheaderM-hover.png"
+               @click="showMessageList = !showMessageList"
+               v-show="showMessageList"
+               class="problemImg"
+               alt="">
+          <!--下拉框-->
+          <div class="messageBase">
+            <message-table v-show="showMessageList" />
+          </div>
+        </div>
         <!--问号-->
         <div class="problemE"  :class="[{'active': showProblemList}]" v-operating2>
           <img src="@/icons/problem.png"
@@ -68,20 +86,45 @@
                   </span>
                 </span>
               </li>
-              <!--充值-->
-              <li class="operateLi balance" @click="$router.push('/upTop')">
+              <!--剩余金币-->
+              <li class="operateLi balance">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
                        {{ userOperateList[1]['text'] }}
                      </span>
                      <span class="balanceNow" :title="userOperateList[1]['balance']">
-                       <span class="unit">
-                          {{ userOperateList[1]['balanceIcon'] }}
-                       </span>
                        <span class="amount">
                           {{ user.balance }}
                        </span>
+                     </span>
+                  </span>
+                </span>
+                <div class="btnU" @click="$router.push('/upTop')">
+                  <span>{{ uptop }}</span>
+                </div>
+              </li>
+              <!--剩余容量-->
+              <li class="operateLi balance" @click="$router.push('/upTop')">
+                <span class="con">
+                  <span class="t">
+                     <span class="sb">
+                       {{ userOperateList[2]['text'] }}
+                     </span>
+                     <span class="balanceNow" :title="userOperateList[2]['balance']">
+                       <span class="amount">
+                          {{ user.balance }}
+                       </span>
+                     </span>
+                  </span>
+                </span>
+              </li>
+              <!--基本信息-->
+              <li class="operateLi Pinfo" @click="$router.push('/Pinfo')">
+                <span class="con">
+                  <span class="t">
+                     <span class="sb">
+                       {{ userOperateList[3]['text'] }}
                      </span>
                   </span>
                 </span>
@@ -91,7 +134,7 @@
                 <span class="con">
                   <span class="t">
                      <span class="sb">
-                       {{ userOperateList[2]['text'] }}
+                       {{ userOperateList[4]['text'] }}
                      </span>
                   </span>
                 </span>
@@ -174,16 +217,13 @@
 </template>
 
 <script>
-  import {
-    mapState
-  } from 'vuex'
+  import { mapState } from 'vuex'
   import {
     homeSelect,
     getInfo
   } from '@/api/api.js'
-  import {
-    setInfo
-  } from '@/assets/common'
+  import { setInfo } from '@/assets/common'
+  import messageTable from '@/components/headerM/message-table'
 
   export default {
     name: 'headerM',
@@ -204,6 +244,7 @@
         // showNews: false                      // 展示消息
         showUserList: false,                    // 个人信息下拉
         showProblemList: false,                 // 问题下拉
+        showMessageList: false,                 // 消息下拉
         userOperateList: [
           {
             text: '',
@@ -211,11 +252,20 @@
             iconUrl: require('@/icons/vipIcon.png')
           },
           {
-            text: '充值',
+            text: '金币余额',
             moreClass: 'balance',
             balance: 0,
-            balanceIcon: '￥',
             routerUrl: ''
+          },
+          {
+            text: '剩余容量',
+            moreClass: 'capacity',
+            balance: 0,
+            routerUrl: ''
+          },
+          {
+            text: '基本信息',
+            moreClass: 'info'
           },
           {
             text: '退出',
@@ -231,7 +281,8 @@
           }
         ],
         guideShow: false,
-        guideShowStep: 1
+        guideShowStep: 1,
+        uptop: '充值'
       }
     },
     computed: {
@@ -330,6 +381,8 @@
           let handler = e => {
             if(el.contains(e.target)){
               // 点击事件触发在目标DOM内
+              if(e.target.classList.contains('amount') || e.target.classList.contains('Pinfo'))
+                vnode.context.showUserList = false
             }else {
               // 点击事件触发在目标DOM外
               // 且DOM处于显示状态
@@ -364,7 +417,31 @@
         unbind(el){
           document.removeEventListener('click',el.handler)
         }
+      },
+      operating3: {
+        bind(el,bindings,vnode){
+          let handler = e => {
+            if(el.contains(e.target)){
+              // 点击事件触发在目标DOM内
+              if(e.target.classList.contains('showMeAll'))
+                vnode.context.showMessageList = false
+            }else {
+              // 点击事件触发在目标DOM外
+              // 且DOM处于显示状态
+              if(vnode.context.showMessageList)
+                vnode.context.showMessageList = false
+            }
+          }
+          el.handler = handler
+          document.addEventListener('click',handler)
+        },
+        unbind(el){
+          document.removeEventListener('click',el.handler)
+        }
       }
+    },
+    components: {
+      messageTable
     }
   }
 </script>
@@ -391,17 +468,21 @@
         flex-wrap: wrap;
         align-items: center;
         .userInfo,
-        .problemE {
+        .problemE,
+        .messageE {
           position: relative;
-          .newsBase {
+          .newsBase,
+          .messageBase {
             position: absolute;
             z-index: 9;
-            right: 0px;
-            width:137px;
             height:0px;
             background:rgba(33,41,51,1);
             box-shadow:0px 2px 20px 0px rgba(28,36,47,1);
             transition: height 0.2s ease-out;
+          }
+          .newsBase {
+            width:250px;
+            right: 0px;
             .userOperate {
               display: flex;
               flex-direction: column;
@@ -411,7 +492,7 @@
               .operateLi {
                 padding-left: 20px;
                 list-style: none;
-                width: 117px;
+                width: 230px;
                 text-align: left;
                 cursor: pointer;
                 line-height: 50px;
@@ -428,10 +509,9 @@
                 &.userName {
                   .con {
                     .t {
-                      font-size:14px;
-                      font-weight:500;
-                      color:rgba(255,255,255,1);
-                      line-height:20px;
+                      font-size: 14px;
+                      color: rgba(255, 255, 255, 0.9);
+                      line-height: 20px;
 
                       .iconUrl {
                         vertical-align: middle;
@@ -441,32 +521,48 @@
                   }
                 }
                 &.balance {
+                  position: relative;
                   .con {
                     .t {
                       .sb {}
                       .balanceNow {
-                        float: right;
-                        width: 82px;
-                        text-align: center;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                        .unit {
-                          font-size: 14px;
-                          margin-right: -4px;
-                          vertical-align: text-bottom;
-                        }
+                        /*float: right;*/
+                        /*width: 82px;*/
+                        /*text-align: center;*/
+                        /*overflow: hidden;*/
+                        /*text-overflow: ellipsis;*/
+                        /*white-space: nowrap;*/
                         .amount {
                           font-size: 16px;
-                          font-weight: 400;
+                          /*font-weight: 400;*/
+                          /*vertical-align: text-bottom;*/
                           color: rgba(229, 199, 138, 1);
                           text-shadow: 0px 0px 2px RGBA(198, 194, 188, 1);
-                          width: 60px;
+                          /*width: 60px;*/
                           display: inline-block;
-                          overflow: hidden;
-                          text-overflow: ellipsis;
+                          padding-left: 10px;
+                          /*overflow: hidden;*/
+                          /*text-overflow: ellipsis;*/
                         }
                       }
+                    }
+                  }
+                  .btnU {
+                    position: absolute;
+                    top: 17px;
+                    right: 25px;
+                    width: 34px;
+                    height: 18px;
+                    background-color: rgba(255, 62, 77, 1);
+                    border-radius: 3px;
+                    text-align: center;
+                    cursor: pointer;
+                    span {
+                      font-size: 12px;
+                      font-weight: 500;
+                      color: rgba(255, 255, 255, 1);
+                      line-height: 16px;
+                      vertical-align: top;
                     }
                   }
                 }
@@ -483,6 +579,14 @@
               background: rgba(0, 97, 255, 0.2);
             }
           }
+          .messageBase {
+            width: 476px;
+            right: -140px;
+            .messageTable {
+
+            }
+
+          }
         }
         .userInfo {
           width: 70px;
@@ -496,22 +600,28 @@
           &.active {
             background:linear-gradient(180deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.3) 50%,rgba(10,98,241,0.6) 100%);
             .newsBase {
-              height: 153px;
+              height: 254px;
             }
           }
         }
-        .problemE {
+        .problemE,
+        .messageE {
           right: 40px;
+          margin-left: 30px;
           .problemImg {
             cursor: pointer;
             user-select: none;
           }
-          .newsBase {
+          .newsBase,
+          .messageBase {
             top: 50px;
           }
           &.active {
             .newsBase {
               height: 103px;
+            }
+            .messageBase {
+              height: 400px;
             }
           }
         }
@@ -531,6 +641,26 @@
             user-select: none;
           }
         }
+        .messageE {
+          &::after {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 62, 77, 0.8);
+            border-radius: 50%;
+          }
+        }
+        .problemE {
+          .newsBase {
+            width: 150px;
+            .operateLi {
+              width: 130px!important;
+            }
+          }
+        }
       }
       .workbench {
         display: flex;
@@ -540,36 +670,14 @@
         height:40px;
         border-radius:15px;
         border:2px solid rgba(47,55,66,1);
-        /*padding-left: 30px;*/
         box-sizing: border-box;
-        /*.workBench-label {*/
-          /*font-size:14px;*/
-          /*font-weight:500;*/
-          /*color:rgba(74,88,104,1);*/
-          /*line-height:20px;*/
-          /*user-select: none;*/
-        /*}*/
         .workBench-icon {
           cursor: pointer;
         }
         /deep/.el-input__inner {
           padding-left: 30px;
         }
-        //.workBench-optionBase
       }
-      /*.newsBase {*/
-        /*position: absolute;*/
-        /*top: 80px;*/
-        /*right: -282px;*/
-        /*width: 282px;*/
-        /*height: calc(100vh - 80px);*/
-        /*background:rgba(33,41,51,1);*/
-        /*box-shadow:0px 2px 20px 0px rgba(28,36,47,1);*/
-        /*transition: right 0.2s ease-out;*/
-        /*&.show {*/
-          /*right: 0px;*/
-        /*}*/
-      /*}*/
       .guide-wrapper {
         position: fixed;
         z-index: 999;

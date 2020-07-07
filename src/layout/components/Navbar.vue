@@ -6,8 +6,27 @@
         <li v-for="item,index in navList"
             :key="index"
             class="navLink"
-            :class="[{'active': index == navActive}]"
+            :class="[
+              {'active': index == navActive},
+            ]"
             @click="jump(index,item.link)">
+          <img :src="item.iconUrl" alt="" class="selectIcon">
+          <img :src="item.iconsUrlDefault" alt="" class="defaultIcon">
+          <span class="text">
+            {{ item.text }}
+          </span>
+        </li>
+      </ul>
+    </div>
+    <div class="systemList">
+      <ul>
+        <li v-for="item,index in systemList"
+            :key="index"
+            class="systemLink"
+            :class="[
+              {'active': index + 4 == navActive},
+            ]"
+            @click="jump(index + 4,item.link)">
           <img :src="item.iconUrl" alt="" class="selectIcon">
           <img :src="item.iconsUrlDefault" alt="" class="defaultIcon">
           <span class="text">
@@ -31,16 +50,6 @@
             iconsUrlDefault: require('@/icons/home-black.png'),
             text: '首页'
           },
-          // {
-          //   link: '/',
-          //   iconUrl: require('@/icons/analysis.png'),
-          //   text: '分析'
-          // },
-          // {
-          //   link: '/',
-          //   iconUrl: require('@/icons/upLoad.png'),
-          //   text: '上传'
-          // },
           {
             link: '/task',
             iconUrl: require('@/icons/render-white.png'),
@@ -58,8 +67,23 @@
             iconUrl: require('@/icons/list-white.png'),
             iconsUrlDefault: require('@/icons/list-black.png'),
             text: '账单'
+          }
+        ],
+        systemList: [
+          {
+            link: '/statistics',
+            iconUrl: require('@/icons/statistics-white.png'),
+            iconsUrlDefault: require('@/icons/statistics-black.png'),
+            text: '统计',
+            align: 'bottom'
           },
-
+          {
+            link: '/setting',
+            iconUrl: require('@/icons/set-white.png'),
+            iconsUrlDefault: require('@/icons/set-black.png'),
+            text: '设置',
+            align: 'bottom'
+          }
         ],
         navActive: 0
       }
@@ -113,8 +137,10 @@
       cursor: pointer;
       margin-bottom: 52px;
     }
-    .navList {
-      .navLink {
+    .navList,
+    .systemList {
+      .navLink,
+      .systemLink {
         position: relative;
         width: 75px;
         list-style: none;
@@ -167,7 +193,14 @@
             border-radius:0px 20px 20px 0px;
           }
         }
+        &.floatBottom {
+          float: bottom;
+        }
       }
+    }
+    .systemList {
+      position: absolute;
+      bottom: 40px;
     }
   }
 </style>

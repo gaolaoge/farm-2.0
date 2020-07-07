@@ -54,19 +54,35 @@ const router = new Router({
       path: '*',
       name: '404',
       component: () => import('@/components/404.vue')
+    },
+    {
+      path: '/messageCenter',
+      name: 'messageCenter',
+      component: () => import('@/components/messageCenter')
+    },
+    {
+      path: '/Pinfo',
+      name: 'Pinfo',
+      component: () => import('@/components/Pinfo')
+    },
+    {
+      path: '/invoiceImmediately',
+      name: 'invoiceImmediately',
+      component: () => import('@/components/bill/invoiceImmediately')
+    },
+    {
+      path: '/setting',
+      name: 'setting',
+      component: () => import('@/components/setting-mainM')
     }
   ]
 })
 
 router.beforeResolve((to,from,next) => {
-  if(to.path == '/login'){
-    next()
-  }else {
-    if(sessionStorage.getItem('token') || document.cookie){
-      next()
-    }else {
-      next({path: '/login'})
-    }
+  if(to.path == '/login') next()
+  else {
+    if(sessionStorage.getItem('token') || document.cookie) next()
+    else next({path: '/login'})
   }
 })
 

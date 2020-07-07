@@ -1,5 +1,9 @@
 <template>
   <div class="home-wrapper" ref="homeWrapper">
+    <div class="bulletin" v-show="bulletin.bulletinVal">
+      <span class="tit">{{ bulletin.bulletinTit }}</span>
+      <span class="val">{{ bulletin.bulletinVal }}</span>
+    </div>
     <div class="firRow">
       <!--任务状态-->
       <div class="taskStatus">
@@ -8,7 +12,7 @@
         </header>
         <div class="statusList">
           <div class="item"
-               v-for="item,index in taskStatus.list"
+               v-for="(item,index) in taskStatus.list"
                :key="index"
                @click="$router.push({name: 'task',params: {'name': item.name}})">
             <div class="cir" :class="[{'f': item.num != 0}]">
@@ -36,7 +40,7 @@
           {{ statistics.label }}
         </header>
         <section class="s">
-          <div class="sw" v-for="item,index in statistics.list" :key="index">
+          <div class="sw" v-for="(item,index) in statistics.list" :key="index">
             <div class="f">
               <img :src="item.iconImg" alt="">
               <span class="n">
@@ -68,39 +72,12 @@
         </header>
         <HomeCharts class="HomeCharts" :cData="chartsData" :cDate="chartsDate"/>
       </div>
-      <!--会员中心-->
+      <!--存储统计-->
       <div class="vip">
         <header class="label">
-          {{ vip.label }}
+          <span>{{ vip.label }}</span>
         </header>
-        <div class="s">
-          <img src="@/assets/userImg.png" alt="" style="width: 60px;border-radius: 8px;">
-          <div class="t">
-            <!--帐号-->
-            <p class="name">
-              {{ user.name }}
-            </p>
-            <!--等级-->
-            <p class="grade">
-              <img src="@/icons/vipIcon.png" alt="">
-              <span class="gradeT">
-                {{ vip.grade }}
-              </span>
-            </p>
-          </div>
-        </div>
-        <div class="q">
-          <img src="@/icons/warnIcon.png" alt="">
-          <span class="y">
-            {{ vip.te }}
-          </span>
-          <span class="y">
-            {{ vip.unit }}
-          </span>
-          <span class="vipBalance" :title="user.balance">
-            {{ user.balance }}
-          </span>
-        </div>
+        <storageCharts class="storage-charts"/>
       </div>
       <!--立即充值-->
       <div class="Recharge">
@@ -121,7 +98,7 @@
         </div>
       </div>
     </div>
-    <div class="thiRow">
+    <div class="thiRow" :class="[{'haveBulletin': bulletin.bulletinVal}]">
       <div class="upLoad" ref="dragWindow">
         <!--标签-->
         <p class="label">
@@ -146,6 +123,7 @@
 <script>
   import { mapState } from 'vuex'
   import HomeCharts from '@/components/home/home-charts'
+  import storageCharts from '@/components/home/storage-charts'
   import newTask from '@/components/home/new-task'
   import {
     homeT,
@@ -213,12 +191,7 @@
         label: '近七天任务',
       },
       vip: {
-        label: '会员中心',
-        te: '用户余额 :',
-        unit: '￥',
-        name: '',
-        grade: '大众会员',
-        balance: ''
+        label: '存储统计'
       },
       Recharge: {
         desc: '现在充值可享升级超级会员',
@@ -237,7 +210,12 @@
       chartsData: [],
       chartsDate: [],
       // 工程文件
-      fileList: []
+      fileList: [],
+      // 公告
+      bulletin: {
+        bulletinTit: '公告：',
+        bulletinVal: `1.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊。 2.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧…`,
+      }
     }
   },
   computed: {
@@ -268,7 +246,8 @@
   },
   components: {
     HomeCharts,
-    newTask
+    newTask,
+    storageCharts
   },
   mounted(){
     setTimeout(() => {
@@ -317,7 +296,6 @@
       this.taskStatus['list'][4]['num'] = d.finish              // 任务状态-渲染完成
       this.taskStatus['list'][2]['num'] = d.wait                // 任务状态-待全部渲染
       this.taskStatus['list'][0]['num'] = d.finishAnalyse       // 任务状态-待设置参数
-      // this.taskStatus['list'][5]['num'] = d.finishAnalyse    // 任务状态-已归档
       if(d.useTime == null){ m = 0; this.statistics.list[1]['unit'] = '秒钟' }
       if(d.useTime / 3600000 >= 1){ m = d.useTime / 3600000; this.statistics.list[1]['unit'] = '小时' }
       else if(d.useTime / 3600000 / 60 >= 1){ m = d.useTime / 3600000 / 60; this.statistics.list[1]['unit'] = '分钟' }
@@ -637,62 +615,16 @@
         }
       }
       .vip {
+        position: relative;
         width: 259px;
         margin-right: 30px;
-        .s {
-          display: flex;
-          flex-wrap: nowrap;
-          justify-content: space-between;
-          .t {
-            margin-left: 10px;
-            flex-grow: 1;
-            .name {
-              font-size:16px;
-              font-weight:500;
-              color:rgba(255,255,255,0.8);
-              margin-top: 10px;
-              margin-bottom: 6px;
-              line-height: 22px;
-            }
-            .grade {
-              .gradeT {
-                font-size:12px;
-                font-weight:400;
-                color:rgba(229,199,138,0.7);
-                line-height:17px;
-                vertical-align: top;
-                margin-left: 2px;
-              }
-            }
-          }
+        .label {
+          margin-bottom: 0px!important;
         }
-        .q {
-          margin-top: 28px;
-          display: flex;
-          align-items: center;
-          flex-wrap: nowrap;
-          img {
-            margin-right: 4px;
-          }
-          .y {
-            display: inline-block;
-            /*margin-left: 3px;*/
-            font-size:14px;
-            font-weight:400;
-            color:rgba(255,255,255,0.6);
-          }
-          .vipBalance {
-            margin-left: 3px;
-            /*font-family: 'PingFangSCRegular';*/
-            font-family: 'MicrosoftYaHei';
-            font-size:24px;
-            font-weight:600;
-            color:rgba(0,97,255,1);
-            margin-bottom: 10px;
-            width: 82px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
+        .storage-charts {
+          position: absolute;
+          width: calc(100% - 60px);
+          /*bottom:36px;*/
         }
       }
       .Recharge {
@@ -745,11 +677,11 @@
       }
     }
     .thiRow {
-      height: calc(100vh - 80px - 20px - 248px - 30px - 30px - 229px - 20px);
+      height: calc(100vh - 657px);
       min-height: 140px;
       display: flex;
       margin-top: 30px;
-      padding: 30px;
+      padding: 10px;
       box-sizing: border-box;
       background-color: rgba(22,29,37,1);
       border-radius:15px;
@@ -784,6 +716,9 @@
           }
         }
       }
+      &.haveBulletin {
+        height: calc(100vh - 657px - 60px);
+      }
     }
     .firRow,
     .secRow {
@@ -797,6 +732,34 @@
           color:rgba(255,255,255,1);
           margin-bottom: 23px;
         }
+      }
+    }
+  }
+  .bulletin {
+    height: 40px;
+    border-radius: 20px;
+    padding: 0px 20px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    background-color: rgba(222, 54, 65, 0.05);
+    border: 1px dashed rgba(222, 54, 65, 0.3);
+    span {
+      display: inline-block;
+      font-size: 14px;
+      line-height: 40px;
+      font-family: PingFangSC-Semibold,PingFang SC;
+      vertical-align: text-bottom;
+      &.tit {
+        font-weight: 600;
+        color: rgba(222, 54, 65, 1);
+      }
+      &.val {
+        width: calc(100% - 100px);
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.59);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
     }
   }

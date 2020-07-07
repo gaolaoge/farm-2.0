@@ -4,11 +4,8 @@ import {Message} from "element-ui";
 
 const http = new axios.create({
   baseURL: 'http://192.168.1.179/',
-  // baseURL: process.env.BASE_API,
   // timeout: 5000,
-  headers: {
-
-  }
+  // headers: {}
 })
 
 http.interceptors.request.use(config => {
