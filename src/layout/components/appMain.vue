@@ -22,11 +22,10 @@
 
 <style scoped lang="less">
   .appMain-wrapper {
-    width: calc(100vw - 175px);
+    width: calc(100vw - 120px);
     min-width: 1625px;
     height: calc(100vh - 80px);
     min-height: 730px;
-    background-color: rgba(28, 36, 47, 1);
     overflow: hidden;
     &.login {
       width: 100vw;

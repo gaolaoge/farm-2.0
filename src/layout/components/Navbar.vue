@@ -1,9 +1,9 @@
 <template>
   <div class="Navbar-wrapper">
-    <img src="@/icons/logo.png" alt="" class="mainLogo" @click="$router.push('/')">
+    <img src="@/icons/logo2.png" alt="" class="mainLogo" @click="$router.push('/')">
     <div class="navList">
       <ul>
-        <li v-for="item,index in navList"
+        <li v-for="(item,index) in navList"
             :key="index"
             class="navLink"
             :class="[
@@ -20,7 +20,7 @@
     </div>
     <div class="systemList">
       <ul>
-        <li v-for="item,index in systemList"
+        <li v-for="(item,index) in systemList"
             :key="index"
             class="systemLink"
             :class="[
@@ -46,41 +46,41 @@
         navList: [
           {
             link: '/',
-            iconUrl: require('@/icons/home-white.png'),
-            iconsUrlDefault: require('@/icons/home-black.png'),
+            iconUrl: require('@/icons/console-icon-home-h.png'),
+            iconsUrlDefault: require('@/icons/console-icon-home-h.png'),
             text: '首页'
           },
           {
             link: '/task',
-            iconUrl: require('@/icons/render-white.png'),
-            iconsUrlDefault: require('@/icons/render-black.png'),
+            iconUrl: require('@/icons/console-icon-task.png'),
+            iconsUrlDefault: require('@/icons/console-icon-task.png'),
             text: '任务'
           },
           {
             link: '/assets',
-            iconUrl: require('@/icons/money-white.png'),
-            iconsUrlDefault: require('@/icons/money-black.png'),
+            iconUrl: require('@/icons/console-icon-assets.png'),
+            iconsUrlDefault: require('@/icons/console-icon-assets.png'),
             text: '资产'
           },
           {
             link: '/bill',
-            iconUrl: require('@/icons/list-white.png'),
-            iconsUrlDefault: require('@/icons/list-black.png'),
+            iconUrl: require('@/icons/console-icon-bill.png'),
+            iconsUrlDefault: require('@/icons/console-icon-bill.png'),
             text: '账单'
           }
         ],
         systemList: [
           {
             link: '/statistics',
-            iconUrl: require('@/icons/statistics-white.png'),
-            iconsUrlDefault: require('@/icons/statistics-black.png'),
+            iconUrl: require('@/icons/console-icon-statistics.png'),
+            iconsUrlDefault: require('@/icons/console-icon-statistics.png'),
             text: '统计',
             align: 'bottom'
           },
           {
             link: '/setting',
-            iconUrl: require('@/icons/set-white.png'),
-            iconsUrlDefault: require('@/icons/set-black.png'),
+            iconUrl: require('@/icons/console-icon-set.png'),
+            iconsUrlDefault: require('@/icons/console-icon-set.png'),
             text: '设置',
             align: 'bottom'
           }
@@ -123,16 +123,19 @@
 
 <style scoped lang="less">
   .Navbar-wrapper  {
-    width:175px;
+    width:120px;
     height:100vh;
     min-height: 810px;
-    background:rgba(21,25,28,1);
+    background-color: rgba(255,255,255,1);
+    border-radius: 0px 20px 20px 0px;
+    box-shadow:4px 0px 20px 0px rgba(27,83,244,0.05);
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     img.mainLogo {
       flex-shrink: 0;
-      width: 75px;
+      width: 56px;
       margin-top: 30px;
       cursor: pointer;
       margin-bottom: 52px;
@@ -142,20 +145,16 @@
       .navLink,
       .systemLink {
         position: relative;
-        width: 75px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 56px;
         list-style: none;
-        height: 40px;
-        margin-bottom: 18px;
-        color: rgba(256,256,256,0.6);
-        font-size:14px;
-        font-weight:500;
-        line-height:20px;
+        margin-bottom: 23px;
         cursor: pointer;
         img {
-          position: relative;
-          z-index: 1;
-          vertical-align: sub;
-          width: 18px;
+            width: 44px;
+          height: 44px;
           &.defaultIcon {
 
           }
@@ -164,8 +163,9 @@
           }
         }
         .text {
-          position: relative;
-          z-index: 1;
+          margin-top: 8px;
+          color: rgba(22,29,37,0.39);
+          font-size: 14px;
         }
         &.active,
         &:hover {
@@ -175,22 +175,23 @@
             }
             &.selectIcon {
               display: inline-block;
+              box-shadow: 0px 2px 12px 0px rgba(27, 83, 244, 0.15);
             }
           }
           .text {
             /*font-weight: 600;*/
-            color: rgba(256,256,256,0.9);
+            color: rgba(22,29,37,1);
             text-shadow: 0px 0px 2px rgba(256,256,256,0.9);
           }
           &::after {
-            content: '';
-            position: absolute;
-            top: -12px;
-            left: -50px;
-            width: 145px;
-            height: 40px;
-            background-color: rgba(14, 71, 161, 1);
-            border-radius:0px 20px 20px 0px;
+            /*content: '';*/
+            /*position: absolute;*/
+            /*top: -12px;*/
+            /*left: -50px;*/
+            /*width: 145px;*/
+            /*height: 40px;*/
+            /*background-color: rgba(14, 71, 161, 1);*/
+            /*border-radius:0px 20px 20px 0px;*/
           }
         }
         &.floatBottom {

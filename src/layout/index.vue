@@ -37,6 +37,7 @@
 
 <style lang="less" scoped>
   .layout-wrapper {
+    background-color: rgba(241, 244, 249, 1);
     display: flex;
     flex-wrap: wrap;
     height: 100vh;

@@ -74,11 +74,7 @@
             <input type="password" style="display: none"/>
             <!--帐号-->
             <input v-model="login.accountForm.account"
-<<<<<<< HEAD
-                   placeholder="请输入账号"
-=======
                    :placeholder="$t('login_page.account_verif.ac_placeholder')"
->>>>>>> farm2.0.1
                    class="farm-input" />
             <!--密码-->
             <input v-model="login.accountForm.password"

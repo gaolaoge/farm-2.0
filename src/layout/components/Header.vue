@@ -1,47 +1,55 @@
 <template>
   <div class="header-wrapper">
     <div class="wrapper">
-      <!--选择分区-->
-      <div class="workbench">
-        <el-select v-model="workBenchVal" class="workBench-optionBase">
-          <el-option
-            v-for="item,index in workBenchList"
-            :key="index"
-            :label="item.name"
-            :value="item.val">
-          </el-option>
-        </el-select>
-        <img src="@/icons/questionMark.png" alt="" class="workBench-icon">
+      <!--公告-->
+      <div class="bulletin" v-show="bulletin.bulletinVal">
+        <img src="@/icons/bulletin-icon.png" alt="" class="bulletin-icon">
+        <span class="tit">{{ bulletin.bulletinTit }}</span>
+        <span class="val">{{ bulletin.bulletinVal }}</span>
       </div>
-      <div class="r">
-        <!--消息-->
-        <div class="messageE" :class="[{'active': showMessageList}]" v-operating3>
-          <img src="@/icons/messageIconheaderM.png"
-               @click="showMessageList = !showMessageList"
-               v-show="!showMessageList"
-               class="problemImg"
-               alt="" >
-          <img src="@/icons/messageIconheaderM-hover.png"
-               @click="showMessageList = !showMessageList"
-               v-show="showMessageList"
-               class="problemImg"
-               alt="">
-          <!--下拉框-->
-          <div class="messageBase">
-            <message-table v-show="showMessageList" />
-          </div>
+
+      <div class="oper">
+        <!--选择分区-->
+        <div class="workbench">
+          <img src="@/icons/switch-icon.png" alt="" class="switch">
+          <el-select v-model="workBenchVal" class="workBench-optionBase">
+            <el-option
+              v-for="(item,index) in workBenchList"
+              :key="index"
+              :label="item.name"
+              :value="item.val">
+            </el-option>
+          </el-select>
         </div>
-        <!--问号-->
-        <div class="problemE"  :class="[{'active': showProblemList}]" v-operating2>
-          <img src="@/icons/problem.png"
-               alt=""
-               class="problemImg"
-               @click="showProblemList = !showProblemList">
-          <!--下拉框-->
-          <div class="newsBase">
-            <ul class="userOperate"  v-show="showProblemList">
-              <!--渲染指引-->
-              <li class="operateLi" @click="guide">
+        <div class="r">
+          <!--消息-->
+          <div class="messageE" :class="[{'active': showMessageList}]" v-operating3>
+            <img src="@/icons/messageIconheaderM2.png"
+                 @click="showMessageList = !showMessageList"
+                 v-show="!showMessageList"
+                 class="problemImg"
+                 alt="" >
+            <img src="@/icons/messageIconheaderM-hover.png"
+                 @click="showMessageList = !showMessageList"
+                 v-show="showMessageList"
+                 class="problemImg"
+                 alt="">
+            <!--下拉框-->
+            <div class="messageBase">
+              <message-table v-show="showMessageList" />
+            </div>
+          </div>
+          <!--问号-->
+          <div class="problemE"  :class="[{'active': showProblemList}]" v-operating2>
+            <img src="@/icons/problem2.png"
+                 alt=""
+                 class="problemImg"
+                 @click="showProblemList = !showProblemList">
+            <!--下拉框-->
+            <div class="newsBase">
+              <ul class="userOperate"  v-show="showProblemList">
+                <!--渲染指引-->
+                <li class="operateLi" @click="guide">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -49,9 +57,9 @@
                      </span>
                   </span>
                 </span>
-              </li>
-              <!--帮助中心-->
-              <li class="operateLi">
+                </li>
+                <!--帮助中心-->
+                <li class="operateLi">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -59,24 +67,24 @@
                      </span>
                   </span>
                 </span>
-              </li>
-            </ul>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-        <!--头像-->
-        <div class="userInfo" :class="[{'active': showUserList}]" v-operating>
-          <img :src="user.imgUrlMini"
-               alt=""
-               class="userImg"
-               style="width: 28px;"
-               @click="showUserList = !showUserList">
-          <!--:class="[{'show': showUserList}]"-->
-          <!--下拉框-->
-          <div class="newsBase" :class="[{'show': showUserList}]">
-            <ul class="userOperate" v-show="showUserList">
+          <!--头像-->
+          <div class="userInfo" :class="[{'active': showUserList}]" v-operating>
+            <img :src="user.imgUrlMini"
+                 alt=""
+                 class="userImg"
+                 style="width: 28px;"
+                 @click="showUserList = !showUserList">
+            <!--:class="[{'show': showUserList}]"-->
+            <!--下拉框-->
+            <div class="newsBase" :class="[{'show': showUserList}]">
+              <ul class="userOperate" v-show="showUserList">
 
-              <!--帐号-->
-              <li class="operateLi userName">
+                <!--帐号-->
+                <li class="operateLi userName">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -85,9 +93,9 @@
                       <img :src="userOperateList[0]['iconUrl']" alt="" class="iconUrl">
                   </span>
                 </span>
-              </li>
-              <!--剩余金币-->
-              <li class="operateLi balance">
+                </li>
+                <!--剩余金币-->
+                <li class="operateLi balance">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -100,12 +108,12 @@
                      </span>
                   </span>
                 </span>
-                <div class="btnU" @click="$router.push('/upTop')">
-                  <span>{{ uptop }}</span>
-                </div>
-              </li>
-              <!--剩余容量-->
-              <li class="operateLi balance" @click="$router.push('/upTop')">
+                  <div class="btnU" @click="$router.push('/upTop')">
+                    <span>{{ uptop }}</span>
+                  </div>
+                </li>
+                <!--剩余容量-->
+                <li class="operateLi balance" @click="$router.push('/upTop')">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -118,9 +126,9 @@
                      </span>
                   </span>
                 </span>
-              </li>
-              <!--基本信息-->
-              <li class="operateLi Pinfo" @click="$router.push('/Pinfo')">
+                </li>
+                <!--基本信息-->
+                <li class="operateLi Pinfo" @click="$router.push('/Pinfo')">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -128,9 +136,9 @@
                      </span>
                   </span>
                 </span>
-              </li>
-              <!--退出-->
-              <li class="operateLi quit" @click="quitFun">
+                </li>
+                <!--退出-->
+                <li class="operateLi quit" @click="quitFun">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -138,12 +146,14 @@
                      </span>
                   </span>
                 </span>
-              </li>
+                </li>
 
-            </ul>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
+
       <!--渲染指引-->
       <div class="guide-wrapper" v-if="guideShow">
         <!--第一步-->
@@ -282,7 +292,12 @@
         ],
         guideShow: false,
         guideShowStep: 1,
-        uptop: '充值'
+        uptop: '充值',
+        // 公告
+        bulletin: {
+          bulletinTit: '公告：',
+          bulletinVal: `1.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊。 2.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧…`,
+        }
       }
     },
     computed: {
@@ -450,11 +465,9 @@
   .header-wrapper {
     position: relative;
     z-index: 2;
-    height:80px;
-    width: calc(100vw - 175px);
+    height: 120px;
+    width: calc(100vw - 120px);
     min-width: 1625px;
-    background:rgba(33,41,51,1);
-    box-shadow:0px 2px 20px 0px rgba(33,41,51,1);
     .wrapper {
       height: 100%;
       display: flex;
@@ -463,219 +476,301 @@
       padding: 0px 50px;
       box-sizing: border-box;
       justify-content: space-between;
-      .r {
+      .oper {
         display: flex;
-        flex-wrap: wrap;
+        justify-content: space-between;
         align-items: center;
-        .userInfo,
-        .problemE,
-        .messageE {
-          position: relative;
-          .newsBase,
-          .messageBase {
-            position: absolute;
-            z-index: 9;
-            height:0px;
-            background:rgba(33,41,51,1);
-            box-shadow:0px 2px 20px 0px rgba(28,36,47,1);
-            transition: height 0.2s ease-out;
-          }
-          .newsBase {
-            width:250px;
-            right: 0px;
-            .userOperate {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              padding-left: 0px;
-              box-sizing: border-box;
-              .operateLi {
-                padding-left: 20px;
-                list-style: none;
-                width: 230px;
-                text-align: left;
-                cursor: pointer;
-                line-height: 50px;
-                /*padding: 8px 0px;*/
-                border-bottom: 1px solid rgba(28, 36, 47, 1);
-                height: 50px;
-                .con {
-                  .t {
-                    font-size:14px;
-                    font-weight:400;
-                    color:rgba(255,255,255,0.59);
-                  }
-                }
-                &.userName {
+        width: 500px;
+        .r {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          .userInfo,
+          .problemE,
+          .messageE {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background-color: rgba(255, 255, 255, 1);
+            box-shadow: 0px 2px 12px 0px rgba(27, 83, 244, 0.05);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .newsBase,
+            .messageBase {
+              position: absolute;
+              z-index: 9;
+              height:0px;
+              background:rgba(33,41,51,1);
+              box-shadow:0px 2px 20px 0px rgba(28,36,47,1);
+              transition: height 0.2s ease-out;
+            }
+            .newsBase {
+              width:250px;
+              right: 0px;
+              .userOperate {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding-left: 0px;
+                box-sizing: border-box;
+                .operateLi {
+                  padding-left: 20px;
+                  list-style: none;
+                  width: 230px;
+                  text-align: left;
+                  cursor: pointer;
+                  line-height: 50px;
+                  /*padding: 8px 0px;*/
+                  border-bottom: 1px solid rgba(28, 36, 47, 1);
+                  height: 50px;
                   .con {
                     .t {
-                      font-size: 14px;
-                      color: rgba(255, 255, 255, 0.9);
-                      line-height: 20px;
-
-                      .iconUrl {
-                        vertical-align: middle;
-                        margin-left: 4px;
-                      }
+                      font-size:14px;
+                      font-weight:400;
+                      color:rgba(255,255,255,0.59);
                     }
                   }
-                }
-                &.balance {
-                  position: relative;
-                  .con {
-                    .t {
-                      .sb {}
-                      .balanceNow {
-                        /*float: right;*/
-                        /*width: 82px;*/
-                        /*text-align: center;*/
-                        /*overflow: hidden;*/
-                        /*text-overflow: ellipsis;*/
-                        /*white-space: nowrap;*/
-                        .amount {
-                          font-size: 16px;
-                          /*font-weight: 400;*/
-                          /*vertical-align: text-bottom;*/
-                          color: rgba(229, 199, 138, 1);
-                          text-shadow: 0px 0px 2px RGBA(198, 194, 188, 1);
-                          /*width: 60px;*/
-                          display: inline-block;
-                          padding-left: 10px;
-                          /*overflow: hidden;*/
-                          /*text-overflow: ellipsis;*/
+                  &.userName {
+                    .con {
+                      .t {
+                        font-size: 14px;
+                        color: rgba(255, 255, 255, 0.9);
+                        line-height: 20px;
+
+                        .iconUrl {
+                          vertical-align: middle;
+                          margin-left: 4px;
                         }
                       }
                     }
                   }
-                  .btnU {
-                    position: absolute;
-                    top: 17px;
-                    right: 25px;
-                    width: 34px;
-                    height: 18px;
-                    background-color: rgba(255, 62, 77, 1);
-                    border-radius: 3px;
-                    text-align: center;
-                    cursor: pointer;
-                    span {
-                      font-size: 12px;
-                      font-weight: 500;
-                      color: rgba(255, 255, 255, 1);
-                      line-height: 16px;
-                      vertical-align: top;
+                  &.balance {
+                    position: relative;
+                    .con {
+                      .t {
+                        .sb {}
+                        .balanceNow {
+                          /*float: right;*/
+                          /*width: 82px;*/
+                          /*text-align: center;*/
+                          /*overflow: hidden;*/
+                          /*text-overflow: ellipsis;*/
+                          /*white-space: nowrap;*/
+                          .amount {
+                            font-size: 16px;
+                            /*font-weight: 400;*/
+                            /*vertical-align: text-bottom;*/
+                            color: rgba(229, 199, 138, 1);
+                            text-shadow: 0px 0px 2px RGBA(198, 194, 188, 1);
+                            /*width: 60px;*/
+                            display: inline-block;
+                            padding-left: 10px;
+                            /*overflow: hidden;*/
+                            /*text-overflow: ellipsis;*/
+                          }
+                        }
+                      }
+                    }
+                    .btnU {
+                      position: absolute;
+                      top: 17px;
+                      right: 25px;
+                      width: 34px;
+                      height: 18px;
+                      background-color: rgba(255, 62, 77, 1);
+                      border-radius: 3px;
+                      text-align: center;
+                      cursor: pointer;
+                      span {
+                        font-size: 12px;
+                        font-weight: 500;
+                        color: rgba(255, 255, 255, 1);
+                        line-height: 16px;
+                        vertical-align: top;
+                      }
                     }
                   }
-                }
-                &.quit {
-                  .con {
-                    .t {
+                  &.quit {
+                    .con {
+                      .t {
 
+                      }
                     }
                   }
                 }
               }
-            }
-            li:hover {
-              background: rgba(0, 97, 255, 0.2);
-            }
-          }
-          .messageBase {
-            width: 476px;
-            right: -140px;
-            .messageTable {
-
-            }
-
-          }
-        }
-        .userInfo {
-          width: 70px;
-          height: 80px;
-          box-sizing: border-box;
-          .userImg {
-            margin: 26px auto;
-            display: block!important;
-            cursor: pointer;
-          }
-          &.active {
-            background:linear-gradient(180deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.3) 50%,rgba(10,98,241,0.6) 100%);
-            .newsBase {
-              height: 254px;
-            }
-          }
-        }
-        .problemE,
-        .messageE {
-          right: 40px;
-          margin-left: 30px;
-          .problemImg {
-            cursor: pointer;
-            user-select: none;
-          }
-          .newsBase,
-          .messageBase {
-            top: 50px;
-          }
-          &.active {
-            .newsBase {
-              height: 103px;
+              li:hover {
+                background: rgba(0, 97, 255, 0.2);
+              }
             }
             .messageBase {
-              height: 400px;
+              width: 476px;
+              right: -140px;
+              .messageTable {
+
+              }
+
+            }
+          }
+          .userInfo {
+            width: 44px;
+            height: 44px;
+            box-sizing: border-box;
+            .userImg {
+              margin: 26px auto;
+              display: block!important;
+              cursor: pointer;
+            }
+            &.active {
+              background:linear-gradient(180deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.3) 50%,rgba(10,98,241,0.6) 100%);
+              .newsBase {
+                height: 254px;
+              }
+            }
+          }
+          .problemE,
+          .messageE {
+            right: 40px;
+            margin-left: 30px;
+            .problemImg {
+              cursor: pointer;
+              user-select: none;
+            }
+            .newsBase,
+            .messageBase {
+              top: 50px;
+            }
+            &.active {
+              .newsBase {
+                height: 103px;
+              }
+              .messageBase {
+                height: 400px;
+              }
+            }
+          }
+          .problem,
+          .news {
+            margin-right: 14px;
+            cursor: pointer;
+          }
+          .recharge {
+            margin-right: 81px;
+            .t {
+              font-size:14px;
+              font-weight:500;
+              color:rgba(255,255,255,0.59);
+              display: inline-block;
+              margin-right: 10px;
+              user-select: none;
+            }
+          }
+          .messageE {
+            &::after {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              content: '';
+              width: 8px;
+              height: 8px;
+              background: rgba(255, 62, 77, 0.8);
+              border-radius: 50%;
+            }
+          }
+          .problemE {
+            .newsBase {
+              width: 150px;
+              .operateLi {
+                width: 130px!important;
+              }
             }
           }
         }
-        .problem,
-        .news {
-          margin-right: 14px;
-          cursor: pointer;
-        }
-        .recharge {
-          margin-right: 81px;
-          .t {
-            font-size:14px;
-            font-weight:500;
-            color:rgba(255,255,255,0.59);
-            display: inline-block;
-            margin-right: 10px;
-            user-select: none;
+        .workbench {
+          display: flex;
+          flex-wrap: nowrap;
+          align-items: center;
+          width:219px;
+          height:44px;
+          border-radius:14px;
+          box-sizing: border-box;
+          background-color: rgba(27, 83, 244, 1);
+          box-shadow:0px 2px 12px 0px rgba(0,0,0,0.22);
+          /deep/.el-input__inner {
+            padding-left: 54px;
           }
-        }
-        .messageE {
-          &::after {
+          .switch {
             position: absolute;
-            top: -2px;
-            right: -2px;
-            content: '';
-            width: 8px;
-            height: 8px;
-            background: rgba(255, 62, 77, 0.8);
-            border-radius: 50%;
+
           }
         }
-        .problemE {
-          .newsBase {
-            width: 150px;
-            .operateLi {
-              width: 130px!important;
+        //下拉选择框
+        .workBench-optionBase {
+          /deep/.el-input.el-input--suffix {
+            margin-left: 0px;
+            .el-input__inner {
+              background-color: transparent;
+              color: rgba(255, 255, 255, 0.79);
+              outline: none;
+              border: 0px;
+              /*width: 122px;*/
+              /*padding-left: 0px;*/
+              /*box-sizing: content-box;*/
+            }
+            span.el-input__suffix {
+              left: 0px;
+              width: 60px;
+            }
+          }
+          &.haveBorder {
+            /deep/.el-input.el-input--suffix {
+              .el-input__inner {
+                border: 1px solid rgba(255, 255, 255, 0.79);
+                width: 240px;
+                padding-left: 20px;
+                border-radius: 8px;
+                box-sizing: border-box;
+              }
+              span.el-input__suffix {
+              }
             }
           }
         }
       }
-      .workbench {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        width:219px;
-        height:40px;
-        border-radius:15px;
-        border:2px solid rgba(47,55,66,1);
+      .bulletin {
+        width: 782px;
+        height: 44px;
+        background-color: rgba(255, 255, 255, 1);
+        box-shadow: 0px 2px 20px 0px rgba(27, 83, 244, 0.05);
+        border-radius: 14px;
+        padding: 0px 20px;
         box-sizing: border-box;
-        .workBench-icon {
-          cursor: pointer;
+        display: flex;
+        align-items: center;
+        .bulletin-icon {
+          vertical-align: center;
+          margin-right: 10px;
         }
-        /deep/.el-input__inner {
-          padding-left: 30px;
+        span {
+          display: inline-block;
+          font-size: 14px;
+          line-height: 44px;
+          font-family: PingFangSC-Semibold,PingFang SC;
+          vertical-align: text-bottom;
+          &.tit {
+            font-weight: 600;
+            color: rgba(22, 29, 37, 1);
+          }
+          &.val {
+            width: calc(100% - 100px);
+            font-weight: 400;
+            color: rgba(22, 29, 37, 0.6);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
       }
       .guide-wrapper {
