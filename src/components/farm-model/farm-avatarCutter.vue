@@ -50,7 +50,7 @@
           </div>
           <p class="downloadAgain" @click="fileImage">
             <span>{{ downloadAgain }}</span>
-            <img src="@/icons/fileAgain.png" alt="" class="imgAgain" @click="fileImage">
+            <img src="@/icons/fileAgain2.png" alt="" class="imgAgain" @click="fileImage">
           </p>
         </div>
         <!--右侧-->
@@ -408,7 +408,9 @@
     border: solid 1px #e8e8e8;
     background-repeat: round;
     background-image: url(../../icons/empty.png);
-    .container-box {position: relative;}
+    .container-box {
+      position: relative;
+    }
     .img-mask {
       position: absolute;
       top: 0;
@@ -418,7 +420,9 @@
       opacity: 0.3;
       background-color: white;
     }
-    img {width: 100%;height: 100%}
+    img {
+      width: 100%;height: 100%
+    }
     .select-box {
       position: absolute;
       top: 0;
@@ -426,7 +430,8 @@
       cursor: move;
     }
 
-    .x-line, .y-line {
+    .x-line,
+    .y-line {
       display: flex;
       justify-content: space-between;
       position: absolute;
@@ -520,8 +525,11 @@
       left: 0px;
       cursor: pointer;
       font-size: 14px;
-      color: rgba(255, 255, 255, 1);
       width: 100%;
+      span {
+        color: rgba(22, 29, 37, 1);
+      }
+
       .imgAgain {
         margin-top: 3px;
         float: right;
@@ -530,7 +538,9 @@
       }
     }
   }
-  .c-left--doing {background-image: url(../../icons/empty--pure.png);}
+  .c-left--doing {
+    background-image: url(../../icons/empty--pure.png);
+  }
   .c-right {
     flex: 1;
     position: relative;
@@ -554,7 +564,7 @@
     .dir {
       width: 120px;
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(22, 29, 37, 0.5);
       margin-top: 15px;
     }
     input[type=file] {

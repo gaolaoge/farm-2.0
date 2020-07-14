@@ -25,7 +25,7 @@
                    class="farm-form-input"
                    @keyup.enter="getList"
                    placeholder="输入场景名、任务ID">
-            <img src="@/icons/searchIcon.png"
+            <img src="@/icons/global-search-icon.png"
                  alt=""
                  class="searchIcon"
                  @click="getList">

@@ -7,7 +7,7 @@
                item.class,
                {notTriggerable: item.triggerable}
               ]'
-             v-for="item,index in btnGroup"
+             v-for="(item,index) in btnGroup"
              @click="uploadOperating(item['text'])"
              :key="index">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
@@ -25,7 +25,7 @@
                  @keyup.enter="getData"
                  :placeholder="placeholder">
           <!--搜索按钮-->
-          <img src="@/icons/searchIcon.png"
+          <img src="@/icons/global-search-icon.png"
                alt=""
                class="searchIcon"
                @click="getData">
@@ -41,29 +41,29 @@
         <el-table-column
           type="selection"
           align="right"
-          width="55" />
+          width="55"/>
 
         <el-table-column
           prop="name"
           label="项目名称"
           show-overflow-tooltip
-          width="400" />
+          width="400"/>
 
         <el-table-column
           prop="state"
           label="项目状态"
-          width="160" />
+          width="160"/>
 
         <el-table-column
           prop="now"
           label="当前项目"
-          width="168" />
+          width="168"/>
 
         <el-table-column
           prop="user"
           label="创建人"
           show-overflow-tooltip
-          width="180" />
+          width="180"/>
 
         <el-table-column
           prop="date"
@@ -92,7 +92,7 @@
                  class="name"
                  v-model="createProject.name"
                  :placeholder="createProject.placeholder">
-          <el-checkbox v-model="checked" label="设为当前项目" />
+          <el-checkbox v-model="checked" label="设为当前项目"/>
           <div class="btn-group">
             <div class="farm-btn cancel" @click="createCancelBtnFun">
               <span>{{ createProject.btnCancel }}</span>
@@ -110,7 +110,7 @@
 <script>
   export default {
     name: 'projectSetting',
-    data(){
+    data() {
       return {
         tableData: [
           {
@@ -152,41 +152,42 @@
     },
     watch: {
       'selectionList': {
-        handler: function(val){
-          if(!val.length) this.btnGroup[2]['triggerable'] = true
+        handler: function (val) {
+          if (!val.length) this.btnGroup[2]['triggerable'] = true
           else this.btnGroup[2]['triggerable'] = false
         }
       }
     },
     methods: {
-      handleSelectionChange(val){
+      handleSelectionChange(val) {
         this.selectionList = val
       },
-      getData(){
+      getData() {
 
       },
-      createCancelBtnFun(){
+      createCancelBtnFun() {
         this.createProject.name = ''
         this.createBaseShow = false
       },
-      createSaveBtnFun(){},
+      createSaveBtnFun() {
+      },
       // 操作按钮
-      uploadOperating(name){
-        switch(name){
+      uploadOperating(name) {
+        switch (name) {
           case '新建任务':
             this.createProjectFun()
             break
           case '删除':
-            if(!this.selectionList.length) return false
+            if (!this.selectionList.length) return false
             this.deleteFun()
         }
       },
       // 新建任务
-      createProjectFun(){
+      createProjectFun() {
         this.createBaseShow = true
       },
       // 删除
-      deleteFun(){
+      deleteFun() {
 
       }
     }
@@ -195,23 +196,27 @@
 
 <style lang="less" scoped>
   .projectSetting {
-    height: calc(100vh - 163px);
+    height: calc(100vh - 203px);
+
     .operating {
       padding: 30px 27px 10px;
       display: flex;
       justify-content: space-between;
+
       .btnGroup {
         display: flex;
         align-items: center;
       }
     }
   }
+
   .operateBtn {
     color: #0061ff;
     display: inline-block;
     margin-right: 10px;
     cursor: pointer;
   }
+
   .createProject {
     position: fixed;
     display: flex;
@@ -223,16 +228,19 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
+
     .createBase {
       width: 588px;
       height: 273px;
       background-color: rgba(28, 36, 47, 1);
       box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
       border-radius: 8px;
+
       .tit {
         position: relative;
         padding: 20px 0px;
         text-align: center;
+
         span {
           font-size: 18px;
           font-weight: 600;
@@ -240,6 +248,7 @@
           line-height: 25px;
           letter-spacing: 2px;
         }
+
         img {
           position: absolute;
           right: 20px;
@@ -247,8 +256,10 @@
           cursor: pointer;
         }
       }
+
       .con {
         padding: 0px 80px;
+
         .name {
           width: 428px;
           height: 36px;
@@ -261,6 +272,7 @@
           box-sizing: border-box;
           color: rgba(255, 255, 255, 1);
         }
+
         .btn-group {
           margin-top: 50px;
           text-align: right;
@@ -268,20 +280,21 @@
       }
     }
   }
+
   .notTriggerable {
     cursor: not-allowed;
-    color: rgba(255, 255, 255, 0.1);
+    color: rgba(22, 29, 37, 0.29);
+
     img {
       opacity: 0;
     }
-    &:hover {
-      background-color: #212933;
-      color: rgba(255, 255, 255, 0.1);
-    }
   }
 
-  /deep/.el-checkbox__label {
-    color: rgba(255, 255, 255, 0.6)!important;
+  /deep/ .el-checkbox__label {
+    color: rgba(255, 255, 255, 0.6) !important;
   }
-  /deep/.el-table .el-table__row:hover::after { display: none }
+
+  /deep/ .el-table .el-table__row:hover::after {
+    display: none
+  }
 </style>

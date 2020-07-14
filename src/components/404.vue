@@ -12,36 +12,41 @@
   // } from '@/api/api'
   export default {
     name: 'demo',
-    data(){
+    data() {
       return {
         text: '页面突然溜走了，可以手动刷新试试哦～',
         btn: '返回首页'
       }
     },
-    methods: {
-     
-    }
+    methods: {}
   }
 </script>
 
 <style scoped lang="less">
   .demo {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 8px;
+    margin: 0px 50px;
     user-select: none;
     display: flex;
     flex-direction: column;
     align-items: center;
+
     img {
       margin: 14vh -50px 50px 0px;
     }
+
     span {
       font-size: 16px;
       color: rgba(255, 255, 255, 0.59);
     }
+
     .btn {
       margin-top: 30px;
       width: 132px;
       height: 38px;
-      background: rgba(10,98,241,1);
+      background: rgba(10, 98, 241, 1);
       border-radius: 20px;
       font-size: 16px;
       color: rgba(255, 255, 255, 1);

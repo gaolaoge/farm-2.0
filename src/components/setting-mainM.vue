@@ -52,3 +52,9 @@
     }
   }
 </script>
+
+<style lang="less" scoped>
+  .settingM {
+    width: 100%;
+  }
+</style>

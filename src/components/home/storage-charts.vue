@@ -1,6 +1,5 @@
 <template>
   <div class="home-charts-wrapper">
-    {{ cDate }}
     <div ref="ec" class="ec"></div>
   </div>
 </template>
@@ -8,50 +7,59 @@
 <script>
   export default {
     name: 'home-charts',
-    data(){
+    data() {
       return {
         ec: null
       }
     },
     props: {
-      cData: {
-        type: Array
-      },
-      cDate: {
-        type: Array
-      }
+      // cData: {
+      //   type: Array
+      // },
+      // cDate: {
+      //   type: Array
+      // }
     },
     mounted() {
       this.init()
     },
     computed: {
-      maxNum(){
+      maxNum() {
         let m = Math.max.apply(null, this.cData)
-        if(m == 0){ return 2 }
-        else{ return m % 2 == 1 ? m + 1 : m }
+        if (m == 0) {
+          return 2
+        } else {
+          return m % 2 == 1 ? m + 1 : m
+        }
       }
     },
     methods: {
-      init(){
+      init() {
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
           title: {
             text: '75.0',
             textStyle: {
-              color: '#fff',
+              color: "#f40",
               fontSize: 22
             },
             subtext: '资产总容量',
             subtextStyle: {
-              color: '#909090',
+              color: 'blue',
             },
             itemGap: -10, // 主副标题距离
             left: 'center',
             top: '44'
           },
-//          legend: {
-//            orient : 'vertical',
-//          },
+          // legend: {
+          //   orient: 'vertical',
+          // },
+          grid: {
+            "top": 0,
+            "bottom": 0,
+            "left": 0,
+            "right": 0
+          },
           angleAxis: {
             max: 100, // 满分
             clockwise: true, // 逆时针
@@ -87,66 +95,48 @@
           },
           polar: {
             center: ['50%', '50%'],
-            radius: '128%' //图形大小
+            radius: '100%' //图形大小
           },
           series: [
-            { // 灰色环
+            // 灰色环
+            {
               type: 'bar',
               data: [
                 {
                   value: 100,
                   itemStyle: {
-                    color: 'RGBA(43, 50, 57, 1)',
-                    shadowColor: 'rgba(0, 0, 0, 0.2)',
-                    shadowBlur: 5,
-                    shadowOffsetY: 2
+                    color: 'rgba(0, 0, 0, 0.05)',
                   }
                 }
               ],
               coordinateSystem: 'polar',
               roundCap: true,
               barWidth: 10,
-              barGap: '-0', // 两环重叠
-              z: 4
+              barGap: '0', // 两环重叠
+              zlevel: 1
             },
-            { // 内环
+            // 内环
+            {
               type: 'bar',
               data: [
                 {
                   value: 70,
                   itemStyle: {
                     normal: {
-                      color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [{
-                        offset: 1,
-                        color: 'rgba(79, 65, 249, 1)'
-                      }, {
-                        offset: 0,
-                        color: 'rgba(56, 195, 254, 1)'
-                      }])
-                    }
-                  },
-                }
-              ],
-              coordinateSystem: 'polar',
-              roundCap: true,
-              barW1idth: 14,
-              barGap: '-0', // 两环重叠
-              z: 1,
-            },
-            { // 外环
-              type: 'bar',
-              data: [
-                {
-                  value: 70,
-                  itemStyle: {
-                    normal: {
-                      color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [{
-                        offset: 1,
-                        color: 'rgba(79, 65, 249, 0.2)'
-                      }, {
-                        offset: 0,
-                        color: 'rgba(56, 195, 254, 0.2)'
-                      }])
+                      color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                        {
+                          offset: 0,
+                          color: 'rgba(162, 203, 255, 1)'
+                        },
+                        {
+                          offset: 0.5,
+                          color: 'rgba(72, 144, 255, 1)'
+                        },
+                        {
+                          offset: 1,
+                          color: 'rgba(0, 75, 206, 1)'
+                        }
+                      ])
                     }
                   },
                 }
@@ -155,17 +145,71 @@
               roundCap: true,
               barWidth: 14,
               barGap: '0', // 两环重叠
-              z: 3,
+              zlevel: 1
             },
+            // 内环
+            {
+              type: 'bar',
+              data: [
+                {
+                  value: 30,
+                  itemStyle: {
+                    normal: {
+                      color: 'pink'
+                    }
+                  },
+                }
+              ],
+              coordinateSystem: 'polar',
+              roundCap: true,
+              barWidth: 14,
+              barGap: '-2', // 两环重叠
+              zlevel: 1
+            },
+            // 外环
+            // {
+            //   type: 'bar',
+            //   data: [
+            //     {
+            //       value: 70,
+            //       itemStyle: {
+            //         normal: {
+            //           color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [
+            //             {
+            //               offset: 0,
+            //               color: 'rgba(162, 203, 255, 0)'
+            //             },
+            //             {
+            //               offset: 0.5,
+            //               color: 'rgba(72, 144, 255, 0)'
+            //             },
+            //             {
+            //               offset: 1,
+            //               color: '#f40'
+            //             }
+            //           ]),
+            //           shadowColor: '#f40',
+            //           shadowBlur: 6,
+            //           opacity: 0.2,
+            //         }
+            //       },
+            //     }
+            //   ],
+            //   coordinateSystem: 'polar',
+            //   roundCap: true,
+            //   barWidth: 14,
+            //   barGap: '0', // 两环重叠
+            //   zlevel: 0
+            // },
           ]
         })
       }
     },
     watch: {
-      cData(val){
+      cData(val) {
         this.init()
       },
-      cDate(val){
+      cDate(val) {
         this.init()
         window.addEventListener("resize", this.ec.resize);
       }
@@ -175,9 +219,12 @@
 
 <style lang="less" scoped>
   .home-charts-wrapper {
+    width: 100%;
+    height: 100%;
+
     .ec {
       width: 100%;
-      height: 160px;
+      height: 100%;
     }
   }
 </style>

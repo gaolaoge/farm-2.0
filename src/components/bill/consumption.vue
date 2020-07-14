@@ -47,7 +47,7 @@
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
           </span>
-          <modelCalendar style="display: inline-block;" @changeSelectDate="changeFilterDate" />
+          <modelCalendar style="display: inline-block;" @changeSelectDate="changeFilterDate"/>
         </div>
         <!--查询-->
         <div class="filter-btn primary" @click="getList">
@@ -62,6 +62,8 @@
           {{ filter.exportBtn }}
         </div>
       </div>
+      <div class="l"/>
+
       <!--table-->
       <el-table
         :data="table.rechargeData"
@@ -76,73 +78,73 @@
           align="right"
           show-overflow-tooltip
           min-width="58"
-          width="58" />
+          width="58"/>
         <!--任务ID-->
         <el-table-column
           prop="id"
           label="任务ID"
           show-overflow-tooltip
-          width="160" />
+          width="160"/>
         <!--场景名-->
         <el-table-column
           prop="scenesName"
           label="场景名"
           show-overflow-tooltip
-          min-width="200" />
+          min-width="200"/>
         <!--状态-->
         <el-table-column
           prop="status"
           label="状态"
           show-overflow-tooltip
-          width="120" />
+          width="120"/>
         <!--所属项目-->
         <el-table-column
           prop="object"
           label="所属项目"
           show-overflow-tooltip
-          width="146" />
+          width="146"/>
         <!--渲染时长 -->
         <!--<el-table-column-->
-          <!--prop="time"-->
-          <!--label="渲染时长"-->
-          <!--show-overflow-tooltip-->
-          <!--width="160" />-->
+        <!--prop="time"-->
+        <!--label="渲染时长"-->
+        <!--show-overflow-tooltip-->
+        <!--width="160" />-->
         <!--总帧数-->
         <el-table-column
           prop="total"
           label="总帧数"
           show-overflow-tooltip
-          width="100" />
+          width="100"/>
         <!--消费类型-->
         <el-table-column
           prop="type"
           label="消费类型"
           show-overflow-tooltip
-          width="120" />
+          width="120"/>
         <!--费用（金币）-->
         <el-table-column
           prop="pay"
           label="费用（金币）"
           show-overflow-tooltip
-          width="120" />
+          width="120"/>
         <!--实付金币-->
         <!--<el-table-column-->
-          <!--prop="actualPay"-->
-          <!--label="实付金币"-->
-          <!--show-overflow-tooltip-->
-          <!--width="120" />-->
+        <!--prop="actualPay"-->
+        <!--label="实付金币"-->
+        <!--show-overflow-tooltip-->
+        <!--width="120" />-->
         <!--创建人-->
         <el-table-column
           prop="user"
           label="创建人"
           show-overflow-tooltip
-          width="140" />
+          width="140"/>
         <!--更新时间-->
         <el-table-column
           prop="upDate"
           label="更新时间"
           show-overflow-tooltip
-          width="200" />
+          width="200"/>
         <!--查看-->
         <el-table-column
           label="操作"
@@ -169,7 +171,7 @@
     <!--详情-->
     <el-dialog :visible.sync="dialogVisible"
                :modal-append-to-body="false"
-               :show-close=false >
+               :show-close=false>
       <more-dialog @closeDialog="closeDialog"
                    width="80vw"
                    :dialogTableType="dialogTableType"
@@ -199,7 +201,7 @@
 
   export default {
     name: 'consumption',
-    data(){
+    data() {
       return {
         table: {
           rechargeData: [
@@ -250,25 +252,25 @@
     },
     methods: {
       // 翻页
-      jump(val){
+      jump(val) {
         this.table.currentPage = val
         this.getList()
       },
       // 充值中心多选
-      handleSelectionChange(val){
+      handleSelectionChange(val) {
         this.table.selectionList = val
       },
       //筛选条件发生变化
-      filterHandler(value, row, column){
+      filterHandler(value, row, column) {
         console.log(value, row, column)
       },
       // 查看按钮
-      async seeMore(item){
+      async seeMore(item) {
         this.dialogTableType = item.type
         let uuId = item.id,
-            data
+          data
 
-        if(item.type == '渲染消费'){
+        if (item.type == '渲染消费') {
           data = await consumptionSeeMore(uuId)
           // this.renderDialogTableData = data.data.data
           this.renderDialogTableData = data.data.data.map(curr => {
@@ -285,7 +287,7 @@
           })
           this.dialogVisible = true
         }
-        if(item.type == '下载消费'){
+        if (item.type == '下载消费') {
           data = await upTopSeeMore(uuId)
           this.downloadDialogTableData = data.data.data
           this.dialogVisible = true
@@ -301,7 +303,7 @@
         let data = await getConsumptionTable(t)
         this.table.rechargeData = data.data.data.map(curr => {
           let tableStatus = ''
-          switch(curr.layerTaskStatus){
+          switch (curr.layerTaskStatus) {
             case 1:
               tableStatus = '等待'
               break
@@ -319,7 +321,7 @@
               break
           }
           let tableType = ''
-          switch(curr.patternOfConsumption){
+          switch (curr.patternOfConsumption) {
             case 1:
               tableType = '渲染消费'
               break
@@ -348,20 +350,20 @@
         this.table.outPutTableTotal = data.data.total
       },
       // 时间筛选条件修改
-      changeFilterDate(val){
-        [].forEach.call(val, (curr,index) => {
+      changeFilterDate(val) {
+        [].forEach.call(val, (curr, index) => {
           let [year, month, day] = curr.split('-'),
             r = getDate(year, month, day)
-          if(index == 0){
+          if (index == 0) {
             this.filter.inquireValS = r
-          }else{
+          } else {
             this.filter.inquireValV = r
           }
         })
       },
       // 重置
-      reset(){
-        Object.assign(this.filter,{
+      reset() {
+        Object.assign(this.filter, {
           taskIdVal: '',
           scenesVal: '',
           projectVal: '-1',
@@ -371,14 +373,14 @@
         this.getList()
       },
       // 导出记录
-      async exportTable(){
+      async exportTable() {
         let t = `layerNo=${this.filter.taskIdVal}&fileName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`,
-            data = await exportConsumptionTable(t)
+          data = await exportConsumptionTable(t)
         // 导出下载
-        exportDownloadFun(data, '消费记录','xlsx')
+        exportDownloadFun(data, '消费记录', 'xlsx')
       },
       //关闭消费详情
-      closeDialog(){
+      closeDialog() {
         this.dialogVisible = false
       }
     },
@@ -401,57 +403,71 @@
   .consumption-wrapper {
     overflow: hidden;
   }
+
   .page {
     margin: 4px 25px 30px;
   }
-  /deep/.el-table__body-wrapper {
-    height: calc(100vh - 557px);
+
+  /deep/ .el-table__body-wrapper {
+    height: calc(100vh - 606px);
   }
 
   .recharge-table {
     overflow: hidden;
+
     .filter {
       position: relative;
       height: 50px;
-      background: rgba(33, 41, 51, 0.59);
+      background-color: rgba(255, 255, 255, 1);
       border-radius: 4px;
       margin: 20px 10px 0px;
       width: calc(100% - 20px);
       padding: 0px 20px;
       box-sizing: border-box;
+
       .t {
         width: 200px;
       }
+
       .r {
         position: absolute;
         right: 0px;
       }
     }
+
+    .l {
+      margin-top: 8px;
+      background-color: rgba(22, 29, 37, 0.1);
+      height: 1px;
+    }
   }
+
   .operateBtn {
     font-size: 14px;
     font-weight: 400;
-    color: rgba(0,97,255,1);
+    color: rgba(0, 97, 255, 1);
     text-decoration: underline;
     cursor: pointer;
   }
 
-  /deep/.el-dialog {
+  /deep/ .el-dialog {
     width: 80vw;
-    margin-top: 5vh!important;
+    margin-top: 5vh !important;
   }
 
   @media screen and (orientation: portrait) {
-    /deep/.el-dialog__wrapper {
+    /deep/ .el-dialog__wrapper {
       width: 100vh;
     }
-    /deep/.el-table__body-wrapper {
+
+    /deep/ .el-table__body-wrapper {
       height: calc(100vw - 557px);
 
     }
-    /deep/.el-dialog {
+
+    /deep/ .el-dialog {
       width: 80vh;
-      margin-top: 5vw!important;
+      margin-top: 5vw !important;
     }
   }
 </style>

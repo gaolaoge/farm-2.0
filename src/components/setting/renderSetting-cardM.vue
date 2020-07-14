@@ -6,8 +6,8 @@
       <div class="vv">
         <el-switch
           v-model="value2"
-          inactive-color="RGBA(256, 1256, 256, 0.5)"
-          active-color="rgba(10, 98, 241, 1)" />
+          inactive-color="rgba(22, 29, 37, 0.3)"
+          active-color="rgba(10, 98, 241, 1)"/>
       </div>
       <span class="desc">（{{ isEditDesc }}）</span>
     </div>
@@ -59,7 +59,7 @@
 <script>
   export default {
     name: 'renderSetting',
-    data(){
+    data() {
       return {
         isEditLabel: '分析后参数修改',
         isEditDesc: '如果您需要在分析后修改场景文件中默认参数，请启用此项；',
@@ -86,22 +86,26 @@
 
 <style lang="less" scoped>
   .renderSetting {
-    height: calc(100vh - 163px);
+    height: calc(100vh - 203px);
     padding: 50px 30px;
     box-sizing: border-box;
+
     .farm-item {
       height: 36px;
       display: flex;
       align-items: center;
       margin-bottom: 14px;
+
       .label {
         width: 112px;
         margin-right: 10px;
+
         span {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.8);
+          color: rgba(22, 29, 37, 0.79);
         }
       }
+
       .vv {
         display: flex;
         align-items: center;
@@ -109,6 +113,7 @@
         height: 34px;
         margin-right: 10px;
       }
+
       .v {
         position: relative;
         display: flex;
@@ -119,19 +124,23 @@
         padding: 0px 20px;
         box-sizing: border-box;
         margin-right: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(22, 29, 37, 0.3);
+
         .unit,
         .val {
           font-size: 14px;
-          color:rgba(255, 255, 255, 0.6);
+          color: rgba(22, 29, 37, 1);
           line-height: 34px;
         }
+
         .val {
           opacity: 1;
+
           &.noShow {
             opacity: 0;
           }
         }
+
         input {
           position: absolute;
           outline: none;
@@ -143,14 +152,16 @@
           line-height: 34px;
           opacity: 0;
           font-family: 'SourceHanSansCN', 'Arial Bold';
+
           &.show {
             opacity: 1;
           }
         }
       }
+
       .desc {
         font-size: 14px;
-        color: rgba(255, 255, 255, 0.4);
+        color: rgba(22, 29, 37, 0.6);
       }
     }
   }

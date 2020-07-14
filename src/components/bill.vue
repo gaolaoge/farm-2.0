@@ -15,16 +15,21 @@
         </div>
       </div>
       <div class="data">
-        <div class="label">
-          {{ info.balanceLabel }}
+        <div class="a">
+          <div class="label">
+            {{ info.balanceLabel }}
+          </div>
+          <div class="balance">
+            {{ user.balance }}
+          </div>
         </div>
-        <div class="balance">
-          {{ user.balance }}
+        <div class="l"></div>
+        <div class="b">
+          <!--立即充值-->
+          <div class="btn" @click="$router.push('/upTop')"><span>{{ info.btn }}</span></div>
+          <!--立即开票-->
+          <div class="btn n" @click="$router.push('/invoiceImmediately')"><span>{{ info.btnn }}</span></div>
         </div>
-        <!--立即充值-->
-        <div class="btn" @click="$router.push('/upTop')"><span>{{ info.btn }}</span></div>
-        <!--立即开票-->
-        <div class="btn n" @click="$router.push('/invoiceImmediately')"><span>{{ info.btnn }}</span></div>
       </div>
     </div>
     <!--table-->
@@ -33,7 +38,7 @@
         <span class="navBtn"
               :class="[{'active': index == table.navListActiveIndex}]"
               @click="table.navListActiveIndex = index"
-              v-for="item,index in table.navList"
+              v-for="(item,index) in table.navList"
               :key="index">
           {{ item.text }}
         </span>
@@ -97,21 +102,21 @@
              class="rechargeTable"
              v-show="table.navListActiveIndex == 0">
           <!--充值中心表格-->
-          <recharge-centre />
+          <recharge-centre/>
         </div>
         <!--消费记录-->
         <div ref="consumptionTable"
              class="consumptionTable"
              v-show="table.navListActiveIndex == 1">
           <!--消费记录表格-->
-          <consumption />
+          <consumption/>
         </div>
         <!--开票记录-->
         <div ref="invoicingTable"
              class="invoicingTable"
              v-show="table.navListActiveIndex == 2">
           <!--开票记录表格-->
-          <invoicing />
+          <invoicing/>
         </div>
       </div>
     </div>
@@ -131,12 +136,12 @@
 
   export default {
     name: 'bill',
-    data(){
+    data() {
       return {
         info: {
           img: require('@/icons/n.png'),
           name: 'Terry Brewer',
-          levelIcon: require('@/icons/vipIcon2.png'),
+          levelIcon: require('@/icons/vipIcon.png'),
           levelText: '大众会员',
           balanceLabel: '账户余额(金币)：',
           balanceVal: 'null',
@@ -183,30 +188,46 @@
 <style lang="less" scoped>
   .bill-wrapper {
     overflow: hidden;
+    width: 100%;
+
     .personInfo {
       margin: 20px 50px;
-      width: 600px;
       height: 191px;
-      background-image: linear-gradient(-90deg, rgba(10,98,241,0) 0%, rgba(10,98,241,0.5) 95%, rgba(10,98,241,1) 100%);
+      background-color: rgba(255, 255, 255, 1);
+      box-shadow: 0px 4px 20px 0px rgba(27, 83, 244, 0.05);
+      border-radius: 14px;
       display: flex;
       align-items: center;
-      justify-content: space-around;
+      overflow: hidden;
+
       .info {
-        width: 100px;
+        width: 240px;
+        height: 100%;
+        background-color: RGBA(250, 251, 253, 1);
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: inset -15px 0px  10px -15px rgba(0, 0, 0, 0.11);
+
         .avatar {
           margin-bottom: 10px;
         }
+
         .name {
           font-size: 14px;
           font-weight: 600;
-          color: rgba(255, 255, 255, 0.8);
+          color: rgba(22, 29, 37, 1);
         }
+
         .level {
           margin-top: 5px;
+
           .i {
             width: 12px;
             margin-right: 3px;
           }
+
           span {
             font-size: 11px;
             font-weight: 400;
@@ -214,51 +235,86 @@
           }
         }
       }
+
       .data {
-        .label {
-          font-size: 14px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.6);
-          margin-bottom: 4px;
+        display: flex;
+
+        .a {
+          padding-left: 60px;
+          box-sizing: border-box;
+          width: 400px;
+
+          .label {
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(27, 83, 244, 1);
+            margin-bottom: 4px;
+          }
+
+          .balance {
+            font-size: 30px;
+            font-weight: 600;
+            color: rgba(27, 83, 244, 1);
+            line-height: 37px;
+          }
         }
-        .balance {
-          font-size: 28px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 1);
-          line-height: 40px;
-          margin-bottom: 24px;
+
+        .l {
+          width: 1px;
+          height: 80px;
+          background-color: rgba(22, 29, 37, 0.09);
+          user-select: none;
         }
+
+        .b {
+          width: 216px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
         .btn {
           width: 114px;
           height: 30px;
           background-color: rgba(0, 97, 255, 1);
           border: 1px solid rgba(0, 97, 255, 1);
-          box-shadow: 0px 1px 10px 0px rgba(22,29,37,0.2);
+          box-shadow: 0px 1px 10px 0px rgba(22, 29, 37, 0.2);
           text-align: center;
           border-radius: 6px;
           cursor: pointer;
           margin-bottom: 10px;
+
           span {
             font-size: 14px;
             font-weight: 500;
             color: rgba(255, 255, 255, 1);
             line-height: 30px;
           }
+
           &.n {
-            border: 1px solid rgba(255, 255, 255, 0.21);
-            background-color: transparent;
+            border: 1px solid rgba(22, 29, 37, 0.2);
+            background-color: rgba(248, 248, 248, 1);
+
+            span {
+              color: rgba(22, 29, 37, 1);
+            }
           }
         }
       }
+
+
+    }
+    .tableGroup {
       .remind {
         position: absolute;
         top: 0px;
         right: 0px;
+
         .t {
           .it {
             font-size: 13px;
             font-weight: 400;
-            color: rgba(229, 199, 138, 0.79);
+            color: rgba(22, 29, 37, 1);
             margin-right: 30px;
             line-height: 36px;
           }

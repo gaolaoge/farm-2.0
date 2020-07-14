@@ -1,7 +1,7 @@
 <template>
   <div class="infoTable-wrapper">
     <section class="f">
-        <!--头像模块-->
+      <!--头像模块-->
       <div class="avatarBase">
         <!--头像编辑-->
         <div class="avatarEdit" @click="avatarEditFun">
@@ -45,7 +45,7 @@
       <!--生日-->
       <div class="form-item">
         <span class="label">{{ info.birthdayLabel }}：</span>
-        <modelCalendar style="display: inline-block" />
+        <modelCalendar style="display: inline-block"/>
         <span class="remarks">{{ info.birthdayRemarks }}</span>
       </div>
       <!--邮箱-->
@@ -76,9 +76,10 @@
   import editPassword from '@/components/Pinfo/editInfo/editPassword'
   import editPhone from '@/components/Pinfo/editInfo/editPhone'
   import editName from '@/components/Pinfo/editInfo/editName'
+
   export default {
     name: 'infoTable',
-    data(){
+    data() {
       return {
         editBtn: '修改',
         editAvatar: '修改头像',
@@ -116,11 +117,11 @@
         this.showCutter = false
       },
       // 编辑头像
-      avatarEditFun(){
+      avatarEditFun() {
         let input = document.createElement('INPUT')
         input.type = 'file'
-        input.accept='.jpg,.jpeg,.png'
-        input.addEventListener('change',event => {
+        input.accept = '.jpg,.jpeg,.png'
+        input.addEventListener('change', event => {
           this.showCutter = true
           this.$refs.avatarEdit.fileChange(event)
         })
@@ -141,60 +142,78 @@
 <style lang="less" scoped>
   .infoTable-wrapper {
     display: flex;
-    background-color: #161d25;
+    background-color: rgba(255, 255, 255, 1);
     border-radius: 0px 0px 8px 8px;
     padding: 50px;
     box-sizing: border-box;
     height: calc(100vh - 160px);
+
     .f {
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
+
       .avatarBase {
         position: relative;
-        width: 120px;
-        height: 120px;
+        width: 140px;
+        height: 140px;
         overflow: hidden;
         margin-bottom: 50px;
+        background-color: RGBA(234, 239, 254, 1);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+
         .avatarEdit {
           position: absolute;
-          top: 0px;
-          left: 0px;
+          top: 10px;
+          left: 10px;
           width: 120px;
           height: 120px;
           border-radius: 50%;
           cursor: pointer;
           background-color: rgba(0, 0, 0, 0);
           text-align: center;
+
           span {
             font-size: 14px;
             line-height: 120px;
             color: rgba(255, 255, 255, 0);
           }
         }
+
         .avatarImg {
           width: 120px;
         }
+
         &:hover .avatarEdit {
           background-color: rgba(0, 0, 0, 0.7);
+
           span {
             color: rgba(255, 255, 255, 1);
           }
         }
       }
+
       .form-item {
         height: 20px;
         font-size: 14px;
         line-height: 20px;
-        width: 480px;
+        width: 510px;
         margin-bottom: 20px;
+
         .label {
-          color: rgba(255, 255, 255, 0.59);
+          color: rgba(22, 29, 37, 0.59);
         }
+
         .val {
-          color:rgba(255, 255, 255, 1);
+          color: rgba(22, 29, 37, 1);
+          text-shadow: 0px 0px 1px rgba(22, 29, 37, 0.6);
         }
+
         .editBtn {
           margin-left: 20px;
           font-size: 14px;
@@ -202,24 +221,29 @@
           line-height: 20px;
           cursor: pointer;
           opacity: 0.68;
+
           &:hover {
             opacity: 0.9;
           }
         }
+
         .remarks {
           font-size: 12px;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(22, 29, 37, 0.4);
           line-height: 17px;
           margin-left: 20px;
         }
-        /deep/.el-radio__input {
+
+        /deep/ .el-radio__input {
           transform: scale(0.7);
         }
-        /deep/.el-radio__label {
+
+        /deep/ .el-radio__label {
           padding-left: 4px;
         }
-        /deep/.is-checked > .el-radio__label {
-            color: rgba(255, 255, 255, 0.9);
+
+        /deep/ .is-checked > .el-radio__label {
+          color: rgba(22, 29, 37, 1);
         }
       }
     }

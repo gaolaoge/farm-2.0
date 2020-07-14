@@ -11,7 +11,7 @@
            v-show="table.navListActiveIndex == 0">
         <div class="farm-primary-form-btn"
              :class=item.class
-             v-for="item,index in btnGroup.uploadBtnGroup"
+             v-for="(item,index) in btnGroup.uploadBtnGroup"
              @click="uploadOperating(item['text'])"
              :key="index">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
@@ -30,7 +30,7 @@
                  @keyup.enter="searchUploadInput"
                  placeholder="输入场景名、任务ID">
           <!--搜索按钮-->
-          <img src="@/icons/searchIcon.png"
+          <img src="@/icons/global-search-icon.png"
                alt=""
                class="searchIcon"
                @click="searchUploadInput">
@@ -51,7 +51,7 @@
         <div class="farm-primary-form-btn"
              :class="item.class"
              @click="renderOperating(item['text'])"
-             v-for="item,index in btnGroup.renderBtnGroup"
+             v-for="(item,index) in btnGroup.renderBtnGroup"
              :key="index">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
           <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
@@ -72,7 +72,7 @@
                  @keyup.enter="searchRenderInput"
                  placeholder="输入场景名、任务ID">
           <!--搜索按钮-->
-          <img src="@/icons/searchIcon.png"
+          <img src="@/icons/global-search-icon.png"
                alt=""
                class="searchIcon"
                @click="searchRenderInput">
@@ -85,7 +85,7 @@
         <span class="navBtn"
               :class="[{'active': index == table.navListActiveIndex}]"
               @click="table.navListActiveIndex = index"
-              v-for="item,index in table.navList"
+              v-for="(item,index) in table.navList"
               :key="index">
           {{ item.text }} ( {{ item.num }} )
         </span>
@@ -100,7 +100,7 @@
           <upload-table @uploadTbaleTotalItem="uploadTbaleTotalItem"
                         @upLoadSeletedList="upLoadSeletedList"
                         @toRenderTable="table.navListActiveIndex = 1"
-                        ref="uploadMode" />
+                        ref="uploadMode"/>
         </div>
         <!--渲染下载-->
         <div ref="renderTable"
@@ -125,7 +125,7 @@
            @click="dialogTable.status = false"
            class="shutDialogIcon">
       <!--窗口主体-->
-      <archive-records @refreshTaskBase="x" ref="archiveTable" />
+      <archive-records @refreshTaskBase="x" ref="archiveTable"/>
     </el-dialog>
     <!--弹窗 新建任务-->
     <el-dialog :visible.sync="createTaskDialog"
@@ -151,7 +151,7 @@
 
   export default {
     name: 'task',
-    data(){
+    data() {
       return {
         table: {
           navList: [
@@ -264,26 +264,32 @@
     },
     methods: {
       // 上传分析 多选结果
-      upLoadSeletedList(val){
+      upLoadSeletedList(val) {
         let t = this.btnGroup
         t.uploadTableBtnDelete = true       // 上传分析 - 删除
         t.uploadTableBtnAgain = true        // 上传分析 - 重新分析
-        if(val.includes('上传中...')){ t.uploadTableBtnDelete = false; t.uploadTableBtnAgain = false }
-        if(val.includes('分析中')){ t.uploadTableBtnDelete = false; t.uploadTableBtnAgain = false }
-        if(val.includes('上传暂停')) t.uploadTableBtnAgain = false
-        if(val.includes('上传失败')) t.uploadTableBtnAgain = false
-        if(val.includes('已取消')) t.uploadTableBtnAgain = false
-        if(val.includes('已放弃')) t.uploadTableBtnAgain = false
+        if (val.includes('上传中...')) {
+          t.uploadTableBtnDelete = false;
+          t.uploadTableBtnAgain = false
+        }
+        if (val.includes('分析中')) {
+          t.uploadTableBtnDelete = false;
+          t.uploadTableBtnAgain = false
+        }
+        if (val.includes('上传暂停')) t.uploadTableBtnAgain = false
+        if (val.includes('上传失败')) t.uploadTableBtnAgain = false
+        if (val.includes('已取消')) t.uploadTableBtnAgain = false
+        if (val.includes('已放弃')) t.uploadTableBtnAgain = false
         // if(val.includes('分析警告')) ''
         // if(val.includes('待设置参数')) ''
         // if(val.includes('分析失败')) ''
-        if(!val.length){
+        if (!val.length) {
           t.uploadTableBtnDelete = false       // 上传分析 - 删除
           t.uploadTableBtnAgain = false        // 上传分析 - 重新分析
         }
       },
       // 渲染下载 多选结果
-      j(val){
+      j(val) {
         let t = this.btnGroup
         t.downloadTableBtnStart = true       // 渲染下载 - 开始
         t.downloadTableBtnPause = true       // 渲染下载 - 暂停
@@ -292,28 +298,28 @@
         t.downloadTableBtnRenderAll = true   // 渲染下载 - 全部渲染
         t.downloadTableBtnRenderAgain = true // 渲染下载 - 重新渲染
         t.downloadTableBtnArchive = true     // 渲染下载 - 归档
-        if(val.includes('渲染中')){
+        if (val.includes('渲染中')) {
           t.downloadTableBtnDelete = false
           t.downloadTableBtnStart = false
           // t.downloadTableBtnRenderAll = false
           t.downloadTableBtnArchive = false
         }
-        if(val.includes('渲染暂停')){
+        if (val.includes('渲染暂停')) {
           t.downloadTableBtnPause = false
           t.downloadTableBtnRenderAll = false
           t.downloadTableBtnArchive = false
         }
-        if(val.includes('待全部渲染')){
+        if (val.includes('待全部渲染')) {
           t.downloadTableBtnStart = false
           t.downloadTableBtnPause = false
           t.downloadTableBtnArchive = false
         }
-        if(val.includes('渲染完成')){
+        if (val.includes('渲染完成')) {
           t.downloadTableBtnStart = false
           t.downloadTableBtnPause = false
           t.downloadTableBtnRenderAll = false
         }
-        if(!val.length){
+        if (!val.length) {
           t.downloadTableBtnStart = false        // 渲染下载 - 开始
           t.downloadTableBtnPause = false       // 渲染下载 - 暂停
           t.downloadTableBtnDelete = false      // 渲染下载 - 删除
@@ -324,36 +330,36 @@
         }
       },
       // 【归档记录】触发重新获取数据
-      x(){
+      x() {
         this.$refs.renderMode.getList()
       },
       // 获取归档记录长度
-      getArchiveNum(val){
+      getArchiveNum(val) {
         this.btnGroup.archiveRecordsNum = val
         this.$refs.archiveTable.getList()
       },
-      uploadTbaleTotalItem(val){
+      uploadTbaleTotalItem(val) {
         this.table.navList[0]['num'] = val
       },
-      renderTbaleTotalItem(val){
+      renderTbaleTotalItem(val) {
         this.table.navList[1]['num'] = val
       },
       // 关闭新建任务弹窗
-      closeDialogFun(){
+      closeDialogFun() {
         this.createTaskDialog = false
       },
       // 上传分析 - 操作台
-      uploadOperating(ing){
-        switch(ing){
+      uploadOperating(ing) {
+        switch (ing) {
           case '新建任务':
             this.createTask()
             break
           case '删除':
-            if(!this.btnGroup.uploadTableBtnDelete) return false
+            if (!this.btnGroup.uploadTableBtnDelete) return false
             this.$refs.uploadMode.deleteItem()
             break
           case '重新分析':
-            if(!this.btnGroup.uploadTableBtnAgain) return false
+            if (!this.btnGroup.uploadTableBtnAgain) return false
             this.$refs.uploadMode.analyseAgainFun()
             break
           case '刷新':
@@ -362,36 +368,36 @@
         }
       },
       // 渲染下载 - 操作台
-      renderOperating(ing){
-        switch(ing){
+      renderOperating(ing) {
+        switch (ing) {
           case '新建任务':
             this.createTask()
             break
           case '开始':
-            if(!this.btnGroup.downloadTableBtnStart) return false
+            if (!this.btnGroup.downloadTableBtnStart) return false
             this.$refs.renderMode.startFun()
             break
           case '暂停':
-            if(!this.btnGroup.downloadTableBtnPause) return false
+            if (!this.btnGroup.downloadTableBtnPause) return false
             this.$refs.renderMode.pauseFun()
             break
           case '删除':
-            if(!this.btnGroup.downloadTableBtnDelete) return false
+            if (!this.btnGroup.downloadTableBtnDelete) return false
             this.$refs.renderMode.deleteFun()
             break
           case '下载完成帧':
             this.$refs.renderMode.downloadFils()
             break
           case '全部渲染':
-            if(!this.btnGroup.downloadTableBtnRenderAll) return false
+            if (!this.btnGroup.downloadTableBtnRenderAll) return false
             this.$refs.renderMode.renderAllFun()
             break
           case '重新渲染':
-            if(!this.btnGroup.downloadTableBtnRenderAgain) return false
+            if (!this.btnGroup.downloadTableBtnRenderAgain) return false
             this.$refs.renderMode.renderAgainFun()
             break
           case '归档':
-            if(!this.btnGroup.downloadTableBtnArchive) return false
+            if (!this.btnGroup.downloadTableBtnArchive) return false
             this.$refs.renderMode.archiveFun()
             break
           case '刷新':
@@ -400,15 +406,15 @@
         }
       },
       // 新建任务
-      createTask(){
+      createTask() {
         let inputDom = document.createElement('INPUT')
         inputDom.type = 'file'
         inputDom.accept = '.ma,.mb'
         inputDom.click()
-        inputDom.addEventListener('change',() => {
+        inputDom.addEventListener('change', () => {
 
-          if(inputDom.files.length == 1){
-            this.fileList= [{
+          if (inputDom.files.length == 1) {
+            this.fileList = [{
               sceneFile: inputDom.files[0],
               projectFileList: null,
               projectFileName: '',
@@ -425,49 +431,49 @@
         // this.$refs.renderMode.getList()
       },
       // 上传分析 - 关键字检索
-      searchUploadInput(){
+      searchUploadInput() {
         this.$refs.uploadMode.searchFun(this.btnGroup.searchInputUpload)
       },
       // 渲染下载 - 关键字检索
-      searchRenderInput(){
+      searchRenderInput() {
         this.$refs.renderMode.searchFun(this.btnGroup.searchInputDownload)
       },
     },
     watch: {
       'table.navListActiveIndex': {
-        handler: function(val){
+        handler: function (val) {
           sessionStorage.setItem('taskListActive', val)
         },
       }
     },
     mounted() {
-      if(sessionStorage.getItem('taskListActive') == '1') this.table.navListActiveIndex = 1
+      if (sessionStorage.getItem('taskListActive') == '1') this.table.navListActiveIndex = 1
       createTableIconList()
       let name = this.$route.params.name ? this.$route.params.name : null
-      if(!name) return false
-      switch(name){
+      if (!name) return false
+      switch (name) {
         case '待设置参数':
-          sessionStorage.setItem('taskListActive','0')
+          sessionStorage.setItem('taskListActive', '0')
           this.table.navListActiveIndex = 0
           this.$refs.uploadMode.getList(true)
           break
         case '渲染中':
-          sessionStorage.setItem('taskListActive','1')
+          sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(2)
           break
         case '待全部渲染':
-          sessionStorage.setItem('taskListActive','1')
+          sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(5)
           break
         case '渲染暂停':
-          sessionStorage.setItem('taskListActive','1')
+          sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(4)
           break
         case '渲染完成':
-          sessionStorage.setItem('taskListActive','1')
+          sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(3)
           break
@@ -479,14 +485,17 @@
 <style lang="less" scoped>
   .task-wrapper {
     overflow: hidden;
+    width: 100%;
+
     .btnGroup {
       display: flex;
       justify-content: space-between;
-      height:52px;
+      height: 52px;
       margin: 20px 50px;
       padding: 0px 30px;
-      background-color: rgba(22,29,37,1);
-      border-radius:8px;
+      background-color: rgba(255, 255, 255, 1);
+      border-radius: 8px;
+
       .uploadBtnGroup,
       .renderBtnGroup,
       .rightOPerate {
@@ -494,151 +503,137 @@
         display: flex;
         align-items: center;
       }
+
       .uploadBtnGroup {
         &.cannotDelete {
           .deleteBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
             img {
               opacity: 0;
             }
           }
         }
+
         &.cannotAgain {
           .againBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
           }
         }
       }
+
       .renderBtnGroup {
         &.cannotState {
           .startBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
             img {
               opacity: 0;
             }
           }
         }
+
         &.cannotPause {
           .pauseBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
             img {
               opacity: 0;
             }
           }
         }
+
         &.cannotDelete {
           .deleteBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
             img {
               opacity: 0;
             }
           }
         }
+
         &.cannotDownload {
           .downloadBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
             img {
               opacity: 0;
             }
           }
         }
+
         &.cannotRenderAll {
           .renderAllBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
             img {
               opacity: 0;
             }
           }
         }
+
         &.cannotRenderAgain {
           .renderAgainBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
             img {
               opacity: 0;
             }
           }
         }
+
         &.cannotArchive {
           .archiveBtn {
             cursor: no-drop;
-            color: rgba(256, 256, 256, 0.1);
-            &:hover {
-              background-color: #212933;
-              color: rgba(256, 256, 256, 0.1);
-            }
+            color: rgba(22, 29, 37, 0.29);
+
           }
         }
       }
     }
+
     .tableList {
-        min-height: 700px;
-        height: calc(100vh - 80px - 73px - 42px - 40px);
-        /*渲染下载*/
-        .progressBar {
-          vertical-align: middle;
-          margin-right: 10px;
-          display: inline-block;
-          position: relative;
-          width:110px;
-          height:6px;
-          background:rgba(255,255,255,0.5);
-          border-radius:3px;
-          &::after {
-            content: '';
-            position: absolute;
-            width: 40px;
-            height: 6px;
-            background: RGBA(0, 100, 252, 1);
-            border-radius: 3px;
-          }
-        }
-        .uploadTable,
-        .renderTable {
-          position: relative;
-          min-height: 700px;
-          height: 100%;
+      min-height: 700px;
+      height: calc(100vh - 120px - 73px - 42px - 40px);
+      /*渲染下载*/
+
+      .progressBar {
+        vertical-align: middle;
+        margin-right: 10px;
+        display: inline-block;
+        position: relative;
+        width: 110px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 3px;
+
+        &::after {
+          content: '';
+          position: absolute;
+          width: 40px;
+          height: 6px;
+          background: RGBA(0, 100, 252, 1);
+          border-radius: 3px;
         }
       }
+
+      .uploadTable,
+      .renderTable {
+        position: relative;
+        min-height: 700px;
+        height: 100%;
+      }
+    }
   }
 
   @media screen and (orientation: portrait) {

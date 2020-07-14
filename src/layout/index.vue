@@ -1,11 +1,13 @@
 <template>
   <div class="layout-wrapper">
-    <Navbar v-show="!login" />
+    <Navbar v-show="!login" class="navbar"/>
     <div class="main">
-      <Header v-show="!login" />
-      <appMain />
+      <Header v-show="!login"/>
+      <appMain/>
     </div>
-
+    <div class="mm" v-show="inHome">
+      <iv />
+    </div>
   </div>
 </template>
 
@@ -15,22 +17,33 @@
     Navbar,
     appMain
   } from './components'
-  import { mapState } from 'vuex'
+  import iv from '@/components/home/Info&Vip'
+  import {mapState} from 'vuex'
 
   export default {
     name: 'layout-wrapper',
-    data(){
+    data() {
       return {
-
+        inHome: false
       }
     },
     components: {
       Header,
       Navbar,
-      appMain
+      appMain,
+      iv
     },
     computed: {
       ...mapState(['login'])
+    },
+    watch: {
+      '$route': {
+        handler: function (val) {
+          if (val.name == 'home') this.inHome = true
+          else this.inHome = false
+        },
+        immediate: true
+      }
     }
   }
 </script>
@@ -39,12 +52,27 @@
   .layout-wrapper {
     background-color: rgba(241, 244, 249, 1);
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     height: 100vh;
     min-height: 810px;
     width: 100vw;
-    min-width: 1800px;
-    /*overflow: hidden;*/
+
+    .navbar {
+      flex-shrink: 0;
+    }
+
+    .main {
+      flex-grow: 1;
+      flex-shrink: 1;
+      width: calc(100vw - 120px);
+    }
+
+    .mm {
+      flex-shrink: 0;
+      width: 366px;
+      height: 100%;
+      padding: 20px 20px 0px 0px;
+    }
   }
 
   @media screen and (orientation: portrait) {

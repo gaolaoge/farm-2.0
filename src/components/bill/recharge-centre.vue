@@ -69,7 +69,7 @@
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
           </span>
-          <model-calendar style="display: inline-block;" @changeSelectDate="changeFilterDate" />
+          <model-calendar style="display: inline-block;" @changeSelectDate="changeFilterDate"/>
         </div>
         <!--查询-->
         <div class="filter-btn primary" @click="getList">
@@ -85,6 +85,8 @@
         </div>
       </div>
 
+      <div class="l" />
+
       <!--table-->
       <el-table
         :data="table.rechargeData"
@@ -99,14 +101,14 @@
           align="right"
           show-overflow-tooltip
           min-width="58"
-          width="58" />
+          width="58"/>
         <!--交易ID-->
         <el-table-column
           prop="id"
           label="交易ID"
           sortable
           show-overflow-tooltip
-          min-width="180" />
+          min-width="180"/>
         <!--交易状态-->
         <el-table-column
           prop="state"
@@ -120,26 +122,26 @@
           label="实际支付金额（元）"
           show-overflow-tooltip
           sortable
-          width="200" />
+          width="200"/>
         <!--充值到账（金币）-->
         <el-table-column
           prop="realArrive"
           label="充值到账（金币）"
           sortable
           show-overflow-tooltip
-          width="200" />
+          width="200"/>
         <!--充值说明 -->
         <el-table-column
           prop="directions"
           label="充值说明"
           show-overflow-tooltip
-          width="200" />
+          width="200"/>
         <!--充值方式-->
         <el-table-column
           prop="paymentMethod"
           label="充值方式"
           show-overflow-tooltip
-          width="120" />
+          width="120"/>
         <!--支付单号-->
         <el-table-column
           label="支付单号"
@@ -156,7 +158,7 @@
           prop="date"
           label="交易时间"
           show-overflow-tooltip
-          width="180" />
+          width="180"/>
         <!--操作-->
         <el-table-column
           label="操作"
@@ -181,7 +183,7 @@
         layout="prev, pager, next, jumper"
         @current-change="jump"
         :current-page.sync="table.currentPage"
-        :total="table.outPutTableTotal" />
+        :total="table.outPutTableTotal"/>
     </div>
   </div>
 </template>
@@ -201,7 +203,7 @@
 
   export default {
     name: 'recharge-centre',
-    data(){
+    data() {
       return {
         table: {
           rechargeData: [
@@ -294,7 +296,7 @@
       modelCalendar
     },
     methods: {
-      copySingleNumber(val){
+      copySingleNumber(val) {
         let oInput = document.createElement('INPUT')
         oInput.style.display = 'none'
         oInput.value = val
@@ -304,46 +306,46 @@
         document.body.removeChild(oInput)
       },
       // 充值中心多选
-      handleSelectionChange(val){
+      handleSelectionChange(val) {
         this.table.selectionList = val
       },
       //筛选条件发生变化
-      filterHandler(value, row, column){
+      filterHandler(value, row, column) {
         console.log(value, row, column)
       },
       // 时间筛选条件修改
-      changeFilterDate(val){
-        [].forEach.call(val, (curr,index) => {
+      changeFilterDate(val) {
+        [].forEach.call(val, (curr, index) => {
           let [year, month, day] = curr.split('-'),
-              r = getDate(year, month, day)
-          if(index == 0){
+            r = getDate(year, month, day)
+          if (index == 0) {
             this.filter.inquireValS = r
-          }else{
+          } else {
             this.filter.inquireValV = r
           }
         })
       },
       // 获取table数据
-      async getList(){
+      async getList() {
         let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&productOrderUuid=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
-            data = await getUpTopTable(t)
+          data = await getUpTopTable(t)
         this.table.outPutTableTotal = data.data.total
         this.table.rechargeData = data.data.data.map(curr => {
           curr.operate = '-'
-          switch(curr.paymentStatus){
+          switch (curr.paymentStatus) {
             case 1:
               curr.paymentStatus = '成功'
-              if(curr.actualPayment) curr.operate = '下载收据'
+              if (curr.actualPayment) curr.operate = '下载收据'
               break
             case 2:
               curr.paymentStatus = '失败'
               break
             case 3:
               curr.paymentStatus = '待付款'
-              if(curr.actualPayment) curr.operate = '待付款'
+              if (curr.actualPayment) curr.operate = '待付款'
               break
           }
-          if(!curr.actualPayment) curr.actualPayment = '-'
+          if (!curr.actualPayment) curr.actualPayment = '-'
           let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
           return {
             id: curr.outTradeNo,                // 交易ID
@@ -361,8 +363,8 @@
         })
       },
       // table 筛选条件重置
-      reset(){
-        Object.assign(this.filter,{
+      reset() {
+        Object.assign(this.filter, {
           tradingtatusVal: '-1',
           paymentMethodVal: '-1',
           markVal: '-1',
@@ -373,12 +375,12 @@
         this.getList()
       },
       // 翻页
-      jump(val){
+      jump(val) {
         this.table.currentPage = val
         this.getList()
       },
       // 导出记录
-      async exportTable(){
+      async exportTable() {
         // {
         //   paymentTitle: 1,   // 支付方式 1支付宝
         //   paymentStatus: 1,  // 交易状态:1成功，2失败；3待付款
@@ -389,12 +391,12 @@
         //   sortBy: ''         // 排序方式:0降序,1升序
         // }
         let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
-            data = await exportUpTopTable(t)
+          data = await exportUpTopTable(t)
         // 导出下载
-        exportDownloadFun(data, '充值记录','xlsx')
+        exportDownloadFun(data, '充值记录', 'xlsx')
       },
       // 操作
-      async operateFun(item){
+      async operateFun(item) {
         let u = {
           outTradeNo: item.singleNumber,
           updateTime: item.dateDefault,
@@ -402,10 +404,10 @@
           paymentTitle: item.paymentMethod == '支付宝' ? '1' : '2',
           account: JSON.parse(sessionStorage.getItem('info'))['account']
         }
-        let t =`outTradeNo=${u['outTradeNo']}&updateTime=${u['updateTime']}&actualPayment=${u['actualPayment']}&paymentTitle=${u['paymentTitle']}&account=${u['account']}`
-        if(item.operate == "下载收据"){
+        let t = `outTradeNo=${u['outTradeNo']}&updateTime=${u['updateTime']}&actualPayment=${u['actualPayment']}&paymentTitle=${u['paymentTitle']}&account=${u['account']}`
+        if (item.operate == "下载收据") {
           let data = await downloadReceipt(t)
-          exportDownloadFun(data, '收据','pdf')
+          exportDownloadFun(data, '收据', 'pdf')
         }
       }
     },
@@ -419,40 +421,52 @@
   .recharge-centre {
     overflow: hidden;
   }
+
   .page {
     margin: 4px 25px 30px;
   }
-  /deep/.el-table__body-wrapper {
-    height: calc(100vh - 557px);
+
+  /deep/ .el-table__body-wrapper {
+    height: calc(100vh - 606px);
   }
 
   .recharge-table {
     overflow: hidden;
+
     .filter {
       position: relative;
       height: 50px;
-      background: rgba(33, 41, 51, 0.59);
+      background: rgba(255, 255, 255, 0);
       border-radius: 4px;
       margin: 20px 10px 0px;
       width: calc(100% - 20px);
       padding: 0px 20px;
       box-sizing: border-box;
+
       .t {
         width: 200px;
       }
+
       .r {
         position: absolute;
         right: 0px;
       }
     }
+    .l {
+      margin-top: 8px;
+      background-color: rgba(22, 29, 37, 0.1);
+      height: 1px;
+    }
   }
+
   .download-tab {
     font-size: 14px;
     font-weight: 400;
-    color: rgba(0,97,255,1);
+    color: rgba(0, 97, 255, 1);
     text-decoration: underline;
     cursor: pointer;
   }
+
   .download-tab-none {
     font-size: 14px;
     font-weight: 400;
@@ -460,7 +474,7 @@
   }
 
   @media screen and (orientation: portrait) {
-    /deep/.el-table__body-wrapper {
+    /deep/ .el-table__body-wrapper {
       height: calc(100vw - 557px);
     }
   }

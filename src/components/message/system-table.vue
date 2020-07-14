@@ -2,7 +2,7 @@
   <div class="systemTable">
     <div class="btnList">
       <div class="btn"
-           v-for="item,index in btnList"
+           v-for="(item,index) in btnList"
            @click="changeNav(index)"
            :class="[{'active': index == activeBtnIndex}]"
            :key="index">
@@ -114,14 +114,14 @@
         display: inline-block;
         width: 68px;
         height: 24px;
-        background-color: rgba(39, 95, 239, 0.2);
+        background-color: rgba(248, 248, 248, 1);
         border-radius: 13px;
         text-align: center;
         margin: 0px 15px;
         cursor: pointer;
         span {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(22, 29, 37, 0.39);
           line-height: 24px;
         }
         &.active {
@@ -140,7 +140,7 @@
     }
   }
   /deep/.el-table__body-wrapper {
-    height: calc(100vh - 290px);
+    height: calc(100vh - 330px);
   }
   /deep/.el-table__row{
     td:nth-of-type(3) .cell {

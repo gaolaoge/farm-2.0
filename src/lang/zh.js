@@ -4,6 +4,7 @@ export default {
   login_page: {
     nav_phoneText: '短信验证登录',
     nav_accountText: '账号密码登录',
+    loginText: '登录',
     // 短信验证
     SMS_verif: {
       phone_placeholder: '请输入手机号',
@@ -18,7 +19,8 @@ export default {
       ac_placeholder: '请输入账号/手机号',
       ps_placeholder: '请输入密码',
       auto_login: '5天内自动登录',
-      forgetPw: '忘记密码?',
+      forgetPw: '忘记密码',
+      register: '注册',
     },
     // 忘记密码
     forgetMode: {
@@ -28,6 +30,8 @@ export default {
       code_placeholder: '请输入验证码',
       ps_new: '请输入新密码',
       ps_again: '请再次输入新密码',
+      return: '返回登录',
+      confirm: '确定'
     },
       // 注册
     register: {
@@ -42,9 +46,6 @@ export default {
       ph_placeholder: '请输入手机号',
       code_placeholder: '手机验证码',
       warnInfo: {
-        account: '',
-        password: '',
-        phone: '',
         code: '验证码未填写或填写格式错误'
       },
       prompt: {

@@ -47,6 +47,6 @@
 <style lang="less" scoped>
   .Pinfo-wrapper {
     overflow: hidden;
-
+    width: 100%;
   }
 </style>

@@ -60,5 +60,6 @@
 <style lang="less" scoped>
   .messageCenter {
     overflow: hidden;
+    width: 100%;
   }
 </style>

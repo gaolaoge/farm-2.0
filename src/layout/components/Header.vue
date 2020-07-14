@@ -1,5 +1,5 @@
 <template>
-  <div class="header-wrapper">
+  <div class="header-wrapper" :class="[{'non-home': !inHome}]">
     <div class="wrapper">
       <!--公告-->
       <div class="bulletin" v-show="bulletin.bulletinVal">
@@ -7,7 +7,6 @@
         <span class="tit">{{ bulletin.bulletinTit }}</span>
         <span class="val">{{ bulletin.bulletinVal }}</span>
       </div>
-
       <div class="oper">
         <!--选择分区-->
         <div class="workbench">
@@ -23,31 +22,31 @@
         </div>
         <div class="r">
           <!--消息-->
-          <div class="messageE" :class="[{'active': showMessageList}]" v-operating3>
+          <div class="messageE" :class="[{'active': showMessageList},{'isHome': inHome}]" v-operating3>
             <img src="@/icons/messageIconheaderM2.png"
                  @click="showMessageList = !showMessageList"
                  v-show="!showMessageList"
                  class="problemImg"
-                 alt="" >
+                 alt="">
             <img src="@/icons/messageIconheaderM-hover.png"
                  @click="showMessageList = !showMessageList"
                  v-show="showMessageList"
                  class="problemImg"
                  alt="">
             <!--下拉框-->
-            <div class="messageBase">
-              <message-table v-show="showMessageList" />
+            <div class="messageBase" :class="[{'inHome': !inHome}]">
+              <message-table v-show="showMessageList"/>
             </div>
           </div>
           <!--问号-->
-          <div class="problemE"  :class="[{'active': showProblemList}]" v-operating2>
+          <div class="problemE" :class="[{'active': showProblemList},{'isHome': inHome}]" v-operating2>
             <img src="@/icons/problem2.png"
                  alt=""
                  class="problemImg"
                  @click="showProblemList = !showProblemList">
             <!--下拉框-->
             <div class="newsBase">
-              <ul class="userOperate"  v-show="showProblemList">
+              <ul class="userOperate" v-show="showProblemList">
                 <!--渲染指引-->
                 <li class="operateLi" @click="guide">
                 <span class="con">
@@ -72,12 +71,11 @@
             </div>
           </div>
           <!--头像-->
-          <div class="userInfo" :class="[{'active': showUserList}]" v-operating>
+          <div class="userInfo" v-show="!inHome" :class="[{'active': showUserList}]" v-operating>
             <img :src="user.imgUrlMini"
                  alt=""
                  class="userImg"
-                 style="width: 28px;"
-                 @click="showUserList = !showUserList">
+                 style="width: 28px;">
             <!--:class="[{'show': showUserList}]"-->
             <!--下拉框-->
             <div class="newsBase" :class="[{'show': showUserList}]">
@@ -95,25 +93,25 @@
                 </span>
                 </li>
                 <!--剩余金币-->
-                <li class="operateLi balance">
-                <span class="con">
-                  <span class="t">
-                     <span class="sb">
-                       {{ userOperateList[1]['text'] }}
-                     </span>
-                     <span class="balanceNow" :title="userOperateList[1]['balance']">
-                       <span class="amount">
-                          {{ user.balance }}
+                <li class="operateLi balance" @click="$router.push('/upTop')">
+                  <span class="con">
+                    <span class="t">
+                       <span class="sb">
+                         {{ userOperateList[1]['text'] }}
                        </span>
-                     </span>
+                       <span class="balanceNow" :title="userOperateList[1]['balance']">
+                         <span class="amount">
+                            {{ user.balance }}
+                         </span>
+                       </span>
+                    </span>
                   </span>
-                </span>
                   <div class="btnU" @click="$router.push('/upTop')">
                     <span>{{ uptop }}</span>
                   </div>
                 </li>
                 <!--剩余容量-->
-                <li class="operateLi balance" @click="$router.push('/upTop')">
+                <li class="operateLi balance2">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -153,7 +151,6 @@
           </div>
         </div>
       </div>
-
       <!--渲染指引-->
       <div class="guide-wrapper" v-if="guideShow">
         <!--第一步-->
@@ -182,7 +179,8 @@
             <img src="@/assets/step-three.png" alt="" class="newMode">
             <img src="@/assets/step-three2.png" alt="" class="step-threeDialogue">
             <div class="step-btn">
-              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)" @click="guideShowStep = 2">
+              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)"
+                   @click="guideShowStep = 2">
               <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 4">
             </div>
           </div>
@@ -194,7 +192,8 @@
             <img src="@/assets/step-four.png" alt="" class="set">
             <img src="@/assets/step-four2.png" alt="" class="set2">
             <div class="step-btn">
-              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)" @click="guideShowStep = 3">
+              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)"
+                   @click="guideShowStep = 3">
               <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 5">
             </div>
           </div>
@@ -206,7 +205,8 @@
             <img src="@/assets/step-five.png" alt="" class="down">
             <img src="@/assets/step-five2.png" alt="" class="down2">
             <div class="step-btn">
-              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)" @click="guideShowStep = 4">
+              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)"
+                   @click="guideShowStep = 4">
               <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 6">
             </div>
           </div>
@@ -227,18 +227,19 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
+  import {mapState} from 'vuex'
   import {
     homeSelect,
     getInfo
   } from '@/api/api.js'
-  import { setInfo } from '@/assets/common'
+  import {setInfo} from '@/assets/common'
   import messageTable from '@/components/headerM/message-table'
 
   export default {
     name: 'headerM',
-    data(){
+    data() {
       return {
+        inHome: false,
         recharge: {
           info: '您当前余额不足，可能导致渲染失败，请尽快充值！',
           btn: '充值'
@@ -297,11 +298,11 @@
         bulletin: {
           bulletinTit: '公告：',
           bulletinVal: `1.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊。 2.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧…`,
-        }
+        },
       }
     },
     computed: {
-      ...mapState(['user','login']),
+      ...mapState(['user', 'login']),
     },
     mounted() {
       this.getList()
@@ -309,42 +310,51 @@
     },
     watch: {
       login: {
-        handler: function(val){
-          if(val) return false
+        handler: function (val) {
+          if (val) return false
           this.getList()
           this.userOperateList[0]['text'] = JSON.parse(sessionStorage.getItem('info'))['account']
           this.userOperateList[1]['balance'] = JSON.parse(sessionStorage.getItem('info'))['balance']
           // 新手教程
           setTimeout(() => {
-            if(localStorage.getItem(this.user.name) == 'false'){
-              this.guide(); localStorage.setItem(this.user.name, true) }
+            if (localStorage.getItem(this.user.name) == 'false') {
+              this.guide();
+              localStorage.setItem(this.user.name, true)
+            }
           }, 100)
         },
         // immediate: true
       },
       workBenchVal: {
-        handler: function(val){
+        handler: function (val) {
           this.$store.commit('changeZoneId', val)
-          sessionStorage.setItem('zoneUuid',val)
+          sessionStorage.setItem('zoneUuid', val)
         },
         immediate: true,
         deep: true
+      },
+      '$route': {
+        handler: function (val) {
+          if (val.name == 'home') this.inHome = true
+          else this.inHome = false
+        },
+        immediate: true
       }
     },
     methods: {
-      showGuide(){
+      showGuide() {
         this.guideShow = false
         this.guideShowStep = 1
       },
       // 退出
-      quitFun(){
+      quitFun() {
         this.$confirm('确认退出登录?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         })
           .then(() => {
-            sessionStorage.setItem('token','')
+            sessionStorage.setItem('token', '')
             this.$router.push('/login')
             this.$message({
               type: 'success',
@@ -360,11 +370,11 @@
 
       },
       // 工作台 下拉框
-      getList(){
+      getList() {
         homeSelect()
           .then(data => {
-            let d= data.data
-            if(d.code == 200){
+            let d = data.data
+            if (d.code == 200) {
               d.data.forEach(curr => {
                 this.workBenchList.push({
                   name: curr.zoneName,
@@ -377,81 +387,81 @@
           })
           .catch(error => console.log(`工作台下拉框获取报错，${error}`))
       },
-      async getUserInfo(){
+      async getUserInfo() {
         let data = await getInfo(),
-            d = data.data.data
-        if(data.data.code != 200) return false
+          d = data.data.data
+        if (data.data.code != 200) return false
         setInfo(data.data.data)
         this.userOperateList[0]['text'] = d.account
         this.userOperateList[1]['balance'] = d.goldBalance
       },
       // 渲染指引
-      guide(){
+      guide() {
         this.guideShow = true
       }
     },
     directives: {
       operating: {
-        bind(el,bindings,vnode){
+        bind(el, bindings, vnode) {
           let handler = e => {
-            if(el.contains(e.target)){
+            if (el.contains(e.target)) {
               // 点击事件触发在目标DOM内
-              if(e.target.classList.contains('amount') || e.target.classList.contains('Pinfo'))
-                vnode.context.showUserList = false
-            }else {
+              if (e.target.classList.contains('userImg')) vnode.context.showUserList ? vnode.context.showUserList = false : vnode.context.showUserList = true
+              if (e.target.classList.contains('balance') || e.target.classList.contains('Pinfo')) vnode.context.showUserList = false
+            } else {
               // 点击事件触发在目标DOM外
               // 且DOM处于显示状态
-              if(vnode.context.showUserList){
+              if (vnode.context.showUserList) {
                 vnode.context.showUserList = false
               }
             }
           }
           el.handler = handler
-          document.addEventListener('click',handler)
+          document.addEventListener('click', handler)
         },
-        unbind(el){
-          document.removeEventListener('click',el.handler)
+        unbind(el) {
+          document.removeEventListener('click', el.handler)
         }
       },
       operating2: {
-        bind(el,bindings,vnode){
+        bind(el, bindings, vnode) {
           let handler = e => {
-            if(el.contains(e.target)){
+            if (el.contains(e.target)) {
               // 点击事件触发在目标DOM内
-            }else {
+            } else {
               // 点击事件触发在目标DOM外
               // 且DOM处于显示状态
-              if(vnode.context.showProblemList){
+              if (vnode.context.showProblemList) {
                 vnode.context.showProblemList = false
               }
             }
           }
           el.handler = handler
-          document.addEventListener('click',handler)
+          document.addEventListener('click', handler)
         },
-        unbind(el){
-          document.removeEventListener('click',el.handler)
+        unbind(el) {
+          document.removeEventListener('click', el.handler)
         }
       },
       operating3: {
-        bind(el,bindings,vnode){
+        bind(el, bindings, vnode) {
           let handler = e => {
-            if(el.contains(e.target)){
+            if (el.contains(e.target)) {
               // 点击事件触发在目标DOM内
-              if(e.target.classList.contains('showMeAll'))
+              if (e.target.classList.contains('showMeAll'))
                 vnode.context.showMessageList = false
-            }else {
+            } else {
               // 点击事件触发在目标DOM外
               // 且DOM处于显示状态
-              if(vnode.context.showMessageList)
+              if (vnode.context.showMessageList)
                 vnode.context.showMessageList = false
             }
           }
           el.handler = handler
-          document.addEventListener('click',handler)
+          document.addEventListener('click', handler)
         },
-        unbind(el){
-          document.removeEventListener('click',el.handler)
+        unbind(el) {
+          document.removeEventListener('click', el.handler)
         }
       }
     },
@@ -466,25 +476,31 @@
     position: relative;
     z-index: 2;
     height: 120px;
-    width: calc(100vw - 120px);
-    min-width: 1625px;
+    width: 100%;
+    /*min-width: 1625px;*/
+
     .wrapper {
       height: 100%;
+      width: 100%;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
       padding: 0px 50px;
       box-sizing: border-box;
       justify-content: space-between;
+
       .oper {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 500px;
+        flex-shrink: 1;
+
         .r {
           display: flex;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
           align-items: center;
+
           .userInfo,
           .problemE,
           .messageE {
@@ -497,176 +513,166 @@
             display: flex;
             justify-content: center;
             align-items: center;
+
             .newsBase,
             .messageBase {
               position: absolute;
               z-index: 9;
-              height:0px;
-              background:rgba(33,41,51,1);
-              box-shadow:0px 2px 20px 0px rgba(28,36,47,1);
+              height: 0px;
+              background-color: rgba(255, 255, 255, 1);
+              box-shadow: 0px 2px 6px 0px rgba(27, 83, 244, 0.16);
               transition: height 0.2s ease-out;
             }
+
             .newsBase {
-              width:250px;
+              width: 250px;
               right: 0px;
+              border-radius: 4px;
+              overflow: hidden;
+
               .userOperate {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 padding-left: 0px;
                 box-sizing: border-box;
+
                 .operateLi {
+                  position: relative;
                   padding-left: 20px;
                   list-style: none;
                   width: 230px;
                   text-align: left;
                   cursor: pointer;
                   line-height: 50px;
-                  /*padding: 8px 0px;*/
-                  border-bottom: 1px solid rgba(28, 36, 47, 1);
                   height: 50px;
+
+                  &:nth-of-type(1) {
+                    border-bottom: 1px solid rgba(22, 29, 37, 0.04);
+                  }
+
                   .con {
                     .t {
-                      font-size:14px;
-                      font-weight:400;
-                      color:rgba(255,255,255,0.59);
+                      font-size: 14px;
+                      font-weight: 400;
+                      color: rgba(22, 29, 37, 0.6);
                     }
                   }
-                  &.userName {
-                    .con {
-                      .t {
-                        font-size: 14px;
-                        color: rgba(255, 255, 255, 0.9);
-                        line-height: 20px;
 
-                        .iconUrl {
-                          vertical-align: middle;
-                          margin-left: 4px;
-                        }
-                      }
-                    }
-                  }
-                  &.balance {
-                    position: relative;
-                    .con {
-                      .t {
-                        .sb {}
-                        .balanceNow {
-                          /*float: right;*/
-                          /*width: 82px;*/
-                          /*text-align: center;*/
-                          /*overflow: hidden;*/
-                          /*text-overflow: ellipsis;*/
-                          /*white-space: nowrap;*/
-                          .amount {
-                            font-size: 16px;
-                            /*font-weight: 400;*/
-                            /*vertical-align: text-bottom;*/
-                            color: rgba(229, 199, 138, 1);
-                            text-shadow: 0px 0px 2px RGBA(198, 194, 188, 1);
-                            /*width: 60px;*/
-                            display: inline-block;
-                            padding-left: 10px;
-                            /*overflow: hidden;*/
-                            /*text-overflow: ellipsis;*/
-                          }
-                        }
-                      }
-                    }
-                    .btnU {
-                      position: absolute;
-                      top: 17px;
-                      right: 25px;
-                      width: 34px;
-                      height: 18px;
-                      background-color: rgba(255, 62, 77, 1);
-                      border-radius: 3px;
-                      text-align: center;
-                      cursor: pointer;
-                      span {
-                        font-size: 12px;
-                        font-weight: 500;
-                        color: rgba(255, 255, 255, 1);
-                        line-height: 16px;
-                        vertical-align: top;
-                      }
-                    }
-                  }
-                  &.quit {
-                    .con {
-                      .t {
+                  .btnU {
+                    position: absolute;
+                    right: 10px;
+                    top: calc(50% - 12px);
+                    background-color: #0f46a1;
+                    width: 32px;
+                    height: 24px;
+                    display: flex;
+                    justify-content: center;
+                    border-radius: 4px;
+                    align-items: center;
+                    cursor: pointer;
 
-                      }
+                    span {
+                      color: #fff;
+                      font-size: 10px;
                     }
                   }
                 }
               }
+
               li:hover {
                 background: rgba(0, 97, 255, 0.2);
               }
             }
+
             .messageBase {
               width: 476px;
-              right: -140px;
-              .messageTable {
+              left: 0px;
+              border-radius: 6px;
+              overflow: hidden;
+              box-shadow: 0px 2px 6px 0px rgba(27, 83, 244, 0.16);
 
+              &.inHome {
+                right: 0px;
+                left: auto;
               }
-
             }
           }
+
           .userInfo {
             width: 44px;
             height: 44px;
             box-sizing: border-box;
+
             .userImg {
               margin: 26px auto;
-              display: block!important;
+              display: block !important;
               cursor: pointer;
             }
+
             &.active {
-              background:linear-gradient(180deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.3) 50%,rgba(10,98,241,0.6) 100%);
+
               .newsBase {
                 height: 254px;
               }
             }
           }
+
           .problemE,
-          .messageE {
-            right: 40px;
+          .messageE,
+          .userInfo {
             margin-left: 30px;
+
             .problemImg {
               cursor: pointer;
               user-select: none;
             }
+
             .newsBase,
             .messageBase {
               top: 50px;
             }
+
             &.active {
               .newsBase {
                 height: 103px;
               }
+
               .messageBase {
                 height: 400px;
               }
             }
+
+            &.isHome {
+              right: 0px;
+            }
           }
+
+          .userInfo.active {
+            .newsBase {
+              height: auto;
+            }
+          }
+
           .problem,
           .news {
             margin-right: 14px;
             cursor: pointer;
           }
+
           .recharge {
             margin-right: 81px;
+
             .t {
-              font-size:14px;
-              font-weight:500;
-              color:rgba(255,255,255,0.59);
+              font-size: 14px;
+              font-weight: 500;
+              color: rgba(255, 255, 255, 0.59);
               display: inline-block;
               margin-right: 10px;
               user-select: none;
             }
           }
+
           .messageE {
             &::after {
               position: absolute;
@@ -675,41 +681,47 @@
               content: '';
               width: 8px;
               height: 8px;
-              background: rgba(255, 62, 77, 0.8);
+              background-color: rgba(255, 62, 77, 0.8);
               border-radius: 50%;
             }
           }
+
           .problemE {
             .newsBase {
               width: 150px;
+
               .operateLi {
-                width: 130px!important;
+                width: 130px !important;
               }
             }
           }
         }
+
         .workbench {
           display: flex;
           flex-wrap: nowrap;
           align-items: center;
-          width:219px;
-          height:44px;
-          border-radius:14px;
+          width: 219px;
+          height: 44px;
+          border-radius: 14px;
           box-sizing: border-box;
           background-color: rgba(27, 83, 244, 1);
-          box-shadow:0px 2px 12px 0px rgba(0,0,0,0.22);
-          /deep/.el-input__inner {
+          box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.22);
+
+          /deep/ .el-input__inner {
             padding-left: 54px;
           }
+
           .switch {
             position: absolute;
-
           }
         }
+
         //下拉选择框
         .workBench-optionBase {
-          /deep/.el-input.el-input--suffix {
+          /deep/ .el-input.el-input--suffix {
             margin-left: 0px;
+
             .el-input__inner {
               background-color: transparent;
               color: rgba(255, 255, 255, 0.79);
@@ -719,13 +731,15 @@
               /*padding-left: 0px;*/
               /*box-sizing: content-box;*/
             }
+
             span.el-input__suffix {
               left: 0px;
               width: 60px;
             }
           }
+
           &.haveBorder {
-            /deep/.el-input.el-input--suffix {
+            /deep/ .el-input.el-input--suffix {
               .el-input__inner {
                 border: 1px solid rgba(255, 255, 255, 0.79);
                 width: 240px;
@@ -733,36 +747,43 @@
                 border-radius: 8px;
                 box-sizing: border-box;
               }
+
               span.el-input__suffix {
               }
             }
           }
         }
       }
+
       .bulletin {
-        width: 782px;
+        width: 1px;
         height: 44px;
         background-color: rgba(255, 255, 255, 1);
         box-shadow: 0px 2px 20px 0px rgba(27, 83, 244, 0.05);
         border-radius: 14px;
         padding: 0px 20px;
+        margin-right: 40px;
         box-sizing: border-box;
-        display: flex;
+        display: inline-flex;
         align-items: center;
+        flex-shrink: 1;
+        flex-grow: 1;
+
         .bulletin-icon {
           vertical-align: center;
           margin-right: 10px;
         }
+
         span {
-          display: inline-block;
           font-size: 14px;
-          line-height: 44px;
-          font-family: PingFangSC-Semibold,PingFang SC;
+          font-family: PingFangSC-Semibold, PingFang SC;
           vertical-align: text-bottom;
+
           &.tit {
             font-weight: 600;
             color: rgba(22, 29, 37, 1);
           }
+
           &.val {
             width: calc(100% - 100px);
             font-weight: 400;
@@ -773,6 +794,7 @@
           }
         }
       }
+
       .guide-wrapper {
         position: fixed;
         z-index: 999;
@@ -784,105 +806,128 @@
         display: flex;
         justify-content: center;
         align-items: center;
+
         .guide-step {
           position: relative;
           width: 100%;
           max-width: 1920px;
           height: 100%;
           max-height: 1080px;
+
           img {
             user-select: none;
           }
+
           .step-content {
             height: 100%;
             width: 100%;
             /*border: 1px solid ;*/
+
             .welcome {
               display: block;
               max-width: 74%;
               margin: 160px auto;
             }
+
             .newTesk {
               margin: 140px 0px 0px 200px;
             }
+
             .newTaskIntroduction {
               vertical-align: top;
               margin: 220px 0px 0px 60px;
             }
+
             .newMode {
               display: block;
               max-width: 74%;
               margin: 90px auto;
             }
+
             .step-threeDialogue {
               position: absolute;
               top: 400px;
               left: 760px;
             }
+
             .set {
               position: absolute;
               right: 10px;
             }
+
             .set2 {
               position: absolute;
               right: 890px;
               top: 590px;
             }
+
             .down {
               position: absolute;
               right: 10px;
             }
+
             .down2 {
               position: absolute;
               left: 430px;
               top: 440px;
             }
+
             .step-btn {
               display: inline-block;
               vertical-align: top;
+
               img {
                 cursor: pointer;
+
                 &.first {
                   cursor: auto;
                 }
+
                 &:nth-of-type(1) {
                   margin-right: 30px;
                 }
               }
             }
           }
-          .jump-btn {  // 跳过
+
+          .jump-btn { // 跳过
             position: absolute;
             z-index: 2;
             top: 40px;
             right: 40px;
             cursor: pointer;
           }
+
           .tl {
             position: absolute;
             top: 0px;
             left: 0px;
           }
+
           .tr {
             position: absolute;
             top: 0px;
             right: 0px;
           }
+
           .bl {
             position: absolute;
             bottom: 0px;
             left: 0px;
           }
+
           .br {
             position: absolute;
             bottom: 0px;
             right: 0px;
           }
+
           &.step-two {
             .step-btn {
               margin: 340px 0px 0px -200px;
             }
           }
+
           &.step-three {
             .step-btn {
               position: absolute;
@@ -890,6 +935,7 @@
               left: 1000px;
             }
           }
+
           &.step-four {
             .step-btn {
               position: absolute;
@@ -897,6 +943,7 @@
               right: 980px;
             }
           }
+
           &.step-five {
             .step-btn {
               position: absolute;
@@ -904,11 +951,16 @@
               left: 550px;
             }
           }
+
           &.step-six {
             cursor: pointer;
           }
         }
       }
+    }
+
+    &.non-home {
+      height: 80px;
     }
   }
 

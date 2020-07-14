@@ -9,7 +9,7 @@
           </span>
         </div>
         <div class="closeIcon">
-          <img src="@/icons/closeBtnIcon.png" alt="" @click="closeDrawer">
+          <img src="@/icons/icon_ close1.png" alt="" @click="closeDrawer">
         </div>
       </div>
       <div class="farm-drawer-body e">
@@ -50,24 +50,24 @@
         <div class="farm-drawer-body-item two">
           <!--分析进度-->
           <!--<div class="farm-drawer-item">-->
-            <!--<span class="farm-drawer-item-label">-->
-              <!--{{ details.labelProgress }}：-->
-            <!--</span>-->
-            <!--<span class="farm-drawer-item-val">-->
-              <!--{{ details.valProgress }}-->
-            <!--</span>-->
+          <!--<span class="farm-drawer-item-label">-->
+          <!--{{ details.labelProgress }}：-->
+          <!--</span>-->
+          <!--<span class="farm-drawer-item-val">-->
+          <!--{{ details.valProgress }}-->
+          <!--</span>-->
           <!--</div>-->
           <!--分析日志-->
           <!--<div class="farm-drawer-item">-->
-            <!--<span class="farm-drawer-item-label">-->
-              <!--{{ details.labelLog }}：-->
-            <!--</span>-->
-            <!--<span class="farm-drawer-item-val">-->
-              <!--{{ details.valLog }}-->
-            <!--</span>-->
+          <!--<span class="farm-drawer-item-label">-->
+          <!--{{ details.labelLog }}：-->
+          <!--</span>-->
+          <!--<span class="farm-drawer-item-val">-->
+          <!--{{ details.valLog }}-->
+          <!--</span>-->
           <!--</div>-->
           <div class="errorList" v-show="details.errorList[0]">
-            <div class="farm-drawer-list-item" v-for="item,index in details.errorList">
+            <div class="farm-drawer-list-item" v-for="(item,index) in details.errorList">
               <div class="icon">
                 <img src="@/icons/errorIcon.png" alt="">
               </div>
@@ -82,7 +82,7 @@
             </div>
           </div>
           <div class="warningList" v-show="details.warningList[0]">
-            <div class="farm-drawer-list-item" v-for="item,index in details.warningList">
+            <div class="farm-drawer-list-item" v-for="(item,index) in details.warningList">
               <div class="icon">
                 <img src="@/icons/warningIcon.png" alt="">
               </div>
@@ -126,7 +126,7 @@
           </span>
         </div>
         <div class="closeIcon">
-          <img src="@/icons/closeBtnIcon.png" alt="" @click="closeDrawer">
+          <img src="@/icons/icon_ close1.png" alt="" @click="closeDrawer">
         </div>
       </div>
       <div class="farm-drawer-body e">
@@ -145,7 +145,7 @@
               <el-switch
                 v-model="setting.num.singleChoiceVal"
                 @change="h"
-                inactive-color="RGBA(256, 1256, 256, 0.5)"
+                inactive-color="RGBA(200, 202, 203, 1)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value=1
                 inactive-value=0>
@@ -174,12 +174,12 @@
             <el-table-column
               type="selection"
               align="right"
-              width="55" />
+              width="55"/>
 
             <el-table-column
               prop="name"
               label="层名"
-              width="180" />
+              width="180"/>
             <!--帧范围-->
             <el-table-column
               label="帧范围"
@@ -260,7 +260,7 @@
               <template slot-scope="scope">
                 <el-select v-model="scope.row.format">
                   <el-option
-                    v-for="item,index in scope.row.formatList"
+                    v-for="(item,index) in scope.row.formatList"
                     :key="index"
                     :label="item.label"
                     :value="item.val">
@@ -275,7 +275,7 @@
               <template slot-scope="scope">
                 <el-select v-model="scope.row.camera">
                   <el-option
-                    v-for="item,index in scope.row.cameraList"
+                    v-for="(item,index) in scope.row.cameraList"
                     :key="index"
                     :label="item.label"
                     :value="item.val">
@@ -304,10 +304,10 @@
               <el-switch
                 v-model="setting.priority.topVal"
                 @change="val => {if(val == 1) setting.priority.selfVal = 0}"
-                inactive-color="RGBA(256, 1256, 256, 0.5)"
+                inactive-color="RGBA(200, 202, 203, 1)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
-                inactive-value='0' />
+                inactive-value='0'/>
               <span class="item-switch-label" :class="[{'active': setting.priority.topVal}]">
                 {{ setting.priority.topLabel }}
               </span>
@@ -317,10 +317,10 @@
               <el-switch
                 v-model="setting.priority.middleVal"
                 @change="val => {if(val == 1) setting.priority.selfVal = 0}"
-                inactive-color="RGBA(256, 1256, 256, 0.5)"
+                inactive-color="RGBA(200, 202, 203, 1)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
-                inactive-value='0' />
+                inactive-value='0'/>
               <span class="item-switch-label" :class="[{'active': setting.priority.middleVal}]">
                 {{ setting.priority.middleLabel }}
               </span>
@@ -330,10 +330,10 @@
               <el-switch
                 v-model="setting.priority.bottomVal"
                 @change="val => {if(val == 1) setting.priority.selfVal = 0}"
-                inactive-color="RGBA(256, 1256, 256, 0.5)"
+                inactive-color="RGBA(200, 202, 203, 1)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
-                inactive-value='0' />
+                inactive-value='0'/>
               <span class="item-switch-label" :class="[{'active': setting.priority.bottomVal}]">
                 {{ setting.priority.bottomLabel }}
               </span>
@@ -344,10 +344,10 @@
                 style="vertical-align: inherit"
                 v-model="setting.priority.selfVal"
                 @change="val => {if(val == 0) setting.priority.customize = ''}"
-                inactive-color="RGBA(256, 1256, 256, 0.5)"
+                inactive-color="RGBA(200, 202, 203, 1)"
                 active-color="rgba(10, 98, 241, 1)"
                 active-value='1'
-                inactive-value='0' />
+                inactive-value='0'/>
               <span class="item-switch-label"
                     :class="[{'active': setting.priority.selfVal}]"
                     style="vertical-align: inherit">
@@ -381,7 +381,8 @@
           </div>
           <div class="farm-drawer-body-item-d">
             <el-radio-group v-model="setting.mode.mode">
-              <el-radio :label="item.val" v-for="item,index in setting.mode.modeList" :key="index">{{ item.label }}</el-radio>
+              <el-radio :label="item.val" v-for="(item,index) in setting.mode.modeList" :key="index">{{ item.label }}
+              </el-radio>
             </el-radio-group>
           </div>
 
@@ -404,7 +405,7 @@
                          placeholder="选择已有项目名称"
                          class="workBench-optionBase haveBorder">
                 <el-option
-                  v-for="item,index in setting.other.viewList"
+                  v-for="(item,index) in setting.other.viewList"
                   :key="index"
                   :label="item.label"
                   :value="item.value">
@@ -447,7 +448,7 @@
               <el-slider v-model="setting.other.stopVal"
                          class="slider"
                          :min="1"
-                         :max="72" />
+                         :max="72"/>
               <input type="text"
                      class="sliderVal"
                      @blur="changeStopVal"
@@ -510,7 +511,7 @@
           </div>
         </div>
         <div class="closeIcon">
-          <img src="@/icons/closeBtnIcon.png" alt="" @click="closeDrawer">
+          <img src="@/icons/icon_ close1.png" alt="" @click="closeDrawer">
         </div>
       </div>
       <div class="farm-drawer-body r">
@@ -665,7 +666,7 @@
               <div class="operateBtn"
                    :class="[{'cannotTrigger': item.classState}]"
                    @click="operateFun(item.text)"
-                   v-for="item,index in result.operateBtnList"
+                   v-for="(item,index) in result.operateBtnList"
                    :key="index">
                 <img :src="item.imgUrl" alt="" v-if="item.imgUrl">
                 <span class="text">
@@ -685,7 +686,7 @@
             <div class="operateBtnBase more" v-show="result.showDetails">
               <div class="operateBtn"
                    @click="moreOperateFun(item.text)"
-                   v-for="item,index in result.operateMoreBtnList"
+                   v-for="(item,index) in result.operateMoreBtnList"
                    :key="index">
                 <img :src="item.imgUrl" alt="" v-if="item.imgUrl">
                 <span class="text">
@@ -722,7 +723,7 @@
                   align="right"
                   show-overflow-tooltip
                   min-width="58"
-                  width="58" />
+                  width="58"/>
                 <!--帧数-->
                 <el-table-column
                   label="帧数"
@@ -755,47 +756,47 @@
                   prop="prices"
                   label="渲染费用（金币）"
                   show-overflow-tooltip
-                  width="142" />
+                  width="142"/>
                 <!--渲染时长-->
                 <el-table-column
                   prop="direction"
                   label="渲染时长"
                   show-overflow-tooltip
-                  width="150" />
+                  width="150"/>
                 <!--渲染开始时间-->
                 <el-table-column
                   prop="startDate"
                   label="渲染开始时间"
                   sortable
                   show-overflow-tooltip
-                  width="180" />
+                  width="180"/>
                 <!--渲染结束时间-->
                 <el-table-column
                   prop="endDate"
                   label="渲染结束时间"
                   sortable
                   show-overflow-tooltip
-                  width="180" />
+                  width="180"/>
                 <!--CPU利用率-->
                 <!--<el-table-column-->
-                  <!--prop="percent"-->
-                  <!--label="CPU利用率"-->
-                  <!--show-overflow-tooltip-->
-                  <!--width="110" />-->
+                <!--prop="percent"-->
+                <!--label="CPU利用率"-->
+                <!--show-overflow-tooltip-->
+                <!--width="110" />-->
                 <!--内存峰值-->
                 <!--<el-table-column-->
-                  <!--prop="RAM"-->
-                  <!--label="内存峰值"-->
-                  <!--sortable-->
-                  <!--show-overflow-tooltip-->
-                  <!--width="120" />-->
+                <!--prop="RAM"-->
+                <!--label="内存峰值"-->
+                <!--sortable-->
+                <!--show-overflow-tooltip-->
+                <!--width="120" />-->
                 <!--下载次数-->
                 <el-table-column
                   prop="times"
                   label="下载次数"
                   sortable
                   show-overflow-tooltip
-                  width="140" />
+                  width="140"/>
                 <!--日志-->
                 <el-table-column
                   prop="log"
@@ -824,70 +825,70 @@
                 style="width: 100%">
 
                 <!--<el-table-column-->
-                  <!--type="selection"-->
-                  <!--align="right"-->
-                  <!--show-overflow-tooltip-->
-                  <!--min-width="58"-->
-                  <!--width="58" />-->
+                <!--type="selection"-->
+                <!--align="right"-->
+                <!--show-overflow-tooltip-->
+                <!--min-width="58"-->
+                <!--width="58" />-->
                 <!--帧数-->
                 <el-table-column
                   prop="num"
                   label="帧数"
                   sortable
                   show-overflow-tooltip
-                  width="120" />
+                  width="120"/>
                 <!--帧状态-->
                 <el-table-column
                   prop="status"
                   label="帧状态"
                   show-overflow-tooltip
-                  min-width="120" />
+                  min-width="120"/>
                 <!--渲染费用（金币）-->
                 <el-table-column
                   prop="prices"
                   label="渲染费用（金币）"
                   show-overflow-tooltip
-                  width="172" />
+                  width="172"/>
                 <!--渲染时长-->
                 <el-table-column
                   prop="direction"
                   label="渲染时长"
                   show-overflow-tooltip
-                  width="160" />
+                  width="160"/>
                 <!--渲染开始时间-->
                 <el-table-column
                   prop="startDate"
                   label="渲染开始时间"
                   sortable
                   show-overflow-tooltip
-                  width="180" />
+                  width="180"/>
                 <!--渲染结束时间-->
                 <el-table-column
                   prop="endDate"
                   label="渲染结束时间"
                   sortable
                   show-overflow-tooltip
-                  width="180" />
+                  width="180"/>
                 <!--CPU利用率-->
                 <!--<el-table-column-->
-                  <!--prop="percent"-->
-                  <!--label="CPU利用率"-->
-                  <!--show-overflow-tooltip-->
-                  <!--width="110" />-->
+                <!--prop="percent"-->
+                <!--label="CPU利用率"-->
+                <!--show-overflow-tooltip-->
+                <!--width="110" />-->
                 <!--内存峰值-->
                 <!--<el-table-column-->
-                  <!--prop="peak"-->
-                  <!--label="内存峰值"-->
-                  <!--sortable-->
-                  <!--show-overflow-tooltip-->
-                  <!--width="120" />-->
+                <!--prop="peak"-->
+                <!--label="内存峰值"-->
+                <!--sortable-->
+                <!--show-overflow-tooltip-->
+                <!--width="120" />-->
                 <!--下载次数-->
                 <el-table-column
                   prop="times"
                   label="下载次数"
                   sortable
                   show-overflow-tooltip
-                  width="140" />
+                  width="140"/>
 
               </el-table>
               <!--table 为空-->
@@ -908,7 +909,7 @@
             </div>
           </div>
           <div class="happen">
-            <div class="happen-item" v-for="item,index in result.happen" :key="index">
+            <div class="happen-item" v-for="(item,index) in result.happen" :key="index">
               <span class="label">
                 {{ item.text }}：
               </span>
@@ -954,7 +955,7 @@
     directives: {
       'el-table-infinite-scroll': elTableInfiniteScroll
     },
-    data(){
+    data() {
       return {
         details: {
           t: '分析结果',
@@ -1181,15 +1182,15 @@
           // 详情 table 数据
           detailsTableData: [
             // {
-              // num: null,      // 帧数
-              // cost: null,     // 渲染费用
-              // duration: '',   // 渲染时长
-              // startDate: '',  // 渲染开始时间
-              // endDate: '',    // 渲染结束时间
-              // price: '',      // 单价
-              // percent: '',    // CPU利用率
-              // peak: ''        // 内存峰值
-              // time: null       // 下载次数
+            // num: null,      // 帧数
+            // cost: null,     // 渲染费用
+            // duration: '',   // 渲染时长
+            // startDate: '',  // 渲染开始时间
+            // endDate: '',    // 渲染结束时间
+            // price: '',      // 单价
+            // percent: '',    // CPU利用率
+            // peak: ''        // 内存峰值
+            // time: null       // 下载次数
             // },
           ],
           // 主 table 多选结果
@@ -1241,7 +1242,7 @@
       },
       taskData: {
         type: Object,
-        default: function(){
+        default: function () {
           return {
             taskUuid: null
           }
@@ -1251,12 +1252,12 @@
       // required: true
     },
     watch: {
-      taskData: function(val){
-        if(val.rowId != null || this.typeInfo == 'upload-table') this.getData()
+      taskData: function (val) {
+        if (val.rowId != null || this.typeInfo == 'upload-table') this.getData()
       },
-      'setting.priority.selfVal': function(val){
+      'setting.priority.selfVal': function (val) {
         // 选中【单选】时取消【首帧】【中间帧】【末帧】，反之复原
-        if(val == 1){
+        if (val == 1) {
           this.setting.priority.topVal = 0
           this.setting.priority.middleVal = 0
           this.setting.priority.bottomVal = 0
@@ -1265,27 +1266,31 @@
     },
     methods: {
       // 上传分析 - 重新分析BTN
-      async renderAgainBtnFun(){
+      async renderAgainBtnFun() {
         let data = await analyseAgain([this.taskData.taskUuid])
-        if(data.data.code == 200){ messageFun('success','操作成功'); this.$emit('getListAgain'); this.closeDrawer() }
+        if (data.data.code == 200) {
+          messageFun('success', '操作成功');
+          this.$emit('getListAgain');
+          this.closeDrawer()
+        }
       },
       // 进入 - 获取详情
-      getData(){
+      getData() {
         this.loading = this.$loading({
           lock: true,
           text: '拼命加载中...',
           spinner: 'el-icon-loading',
           background: 'rgba(0, 0, 0, 0.7)'
         })
-        if(this.typeInfo == 'upload-table'){
+        if (this.typeInfo == 'upload-table') {
           this.getUpTopItemMore()
-        }else{
+        } else {
           this.getRenderItemMoreF()
         }
       },
       // 上传分析 -  获取详情
-      async getUpTopItemMore(){
-        Object.assign(this.details,{
+      async getUpTopItemMore() {
+        Object.assign(this.details, {
           valId: this.taskData.id,
           valName: this.taskData.scenesName,
           valCreateTime: this.taskData.creationTime,
@@ -1295,46 +1300,46 @@
         this.loading.close()
         this.details.status = data.data.data.status
         this.getItemList()
-        if(data.data.data.warningMessage){
+        if (data.data.data.warningMessage) {
           this.details.warningList = data.data.data.warningMessage.map(curr => {
             return {
               title: curr,
               content: ''
             }
           })
-        }else{
+        } else {
           this.details.warningList = []
         }
-        if(data.data.data.errorMessage){
+        if (data.data.data.errorMessage) {
           this.details.errorList = data.data.data.errorMessage.map(curr => {
             return {
               title: curr,
               content: ''
             }
           })
-        }else{
+        } else {
           this.details.errorList = []
         }
       },
       // 渲染下载 - 获取详情 - 渲染结果
-      getRenderItemMoreF(){
+      getRenderItemMoreF() {
         this.loading.close()
         this.getRenderItemMoreTableF()
       },
       // 渲染下载 - 详情 mainTable more
-      mainTableAddMoreItem(){
+      mainTableAddMoreItem() {
         this.getRenderItemMoreTableF()
       },
       // 渲染下载 - 详情 - 缩略图
-      async showMiniImg(row, column, event){
+      async showMiniImg(row, column, event) {
         this.result.statusData = row['status']
         let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&type=1`,
-            data = await downloadFrame(t)
+          data = await downloadFrame(t)
         this.result.miniImgHref = window.URL.createObjectURL(data.data)
 
       },
       // 渲染下载 - 详情 - 主table 获取列表
-      async getRenderItemMoreTableF(){
+      async getRenderItemMoreTableF() {
         // {
         //   TaskUuid: '',
         //   layerTaskUuid: '',
@@ -1343,11 +1348,11 @@
         //   pageSize: ''
         // }
         let parameter = `taskUuid=${this.taskData.FatherTaskUuId}&layerTaskUuid=${this.taskData.taskUuid}&keyword=${this.result.searchInpVal}&pageIndex=1&pageSize=999`,
-            data = await getRenderTSeeMore(parameter),
-            data_ = data.data.data
+          data = await getRenderTSeeMore(parameter),
+          data_ = data.data.data
         this.result.tableData = data_.frameList.map(curr => {
           let s = null
-          switch(curr.frameTaskStatus){
+          switch (curr.frameTaskStatus) {
             case 1:
               s = '等待中'
               break
@@ -1362,24 +1367,24 @@
               s = '渲染失败'
               break
             case 5:
-              if(curr.result == 7) s = '暂停（欠费）'
-              else if(curr.result == 6) s = '暂停（超时）'
-              else  s = '暂停'
+              if (curr.result == 7) s = '暂停（欠费）'
+              else if (curr.result == 6) s = '暂停（超时）'
+              else s = '暂停'
               break
           }
           return {
-              num: curr.isTest == 1 ? curr.frameNo + '（优先）' : curr.frameNo,      // 帧数
-              status: s,                                            // 帧状态
-              prices: curr.cost,                                    // 渲染费用（金币）
-              direction: consum(curr.useTime),                      // 渲染时长
-              startDate: createDateFun(new Date(curr.startTime)),   // 渲染开始时间
-              endDate: createDateFun(new Date(curr.endTime)),       // 渲染结束时间
-              percent: '-',                                         // CPU利用率
-              RAM: '-',                                             // 内存峰值
-              times: curr.downloadCount,                                           // 已下载次数
-              layerTaskUuid: curr.layerTaskUuid,                    // 层uuid
-              frameTaskUuid: curr.frameTaskUuid,                    // 帧uuid
-              taskTaskUuid: curr.taskUuid,                          // 主uuid
+            num: curr.isTest == 1 ? curr.frameNo + '（优先）' : curr.frameNo,      // 帧数
+            status: s,                                            // 帧状态
+            prices: curr.cost,                                    // 渲染费用（金币）
+            direction: consum(curr.useTime),                      // 渲染时长
+            startDate: createDateFun(new Date(curr.startTime)),   // 渲染开始时间
+            endDate: createDateFun(new Date(curr.endTime)),       // 渲染结束时间
+            percent: '-',                                         // CPU利用率
+            RAM: '-',                                             // 内存峰值
+            times: curr.downloadCount,                                           // 已下载次数
+            layerTaskUuid: curr.layerTaskUuid,                    // 层uuid
+            frameTaskUuid: curr.frameTaskUuid,                    // 帧uuid
+            taskTaskUuid: curr.taskUuid,                          // 主uuid
           }
         })
         this.result.happen[0]['num'] = data_.frameCount['running']
@@ -1387,13 +1392,13 @@
         this.result.happen[2]['num'] = data_.frameCount['pause']
         this.result.happen[3]['num'] = data_.frameCount['done']
         this.result.happen[4]['num'] = data_.frameCount['fail']
-        Object.assign(this.result.dataO,{
+        Object.assign(this.result.dataO, {
           costVal: data_.taskInfo['cost'].toFixed(3),
           totalVal: consum(data_.taskInfo['useTime']),
           averageVal: data_.frameCount['done'] ? consum(data_.taskInfo['useTime'] / data_.frameCount['done']) : '-'
         })
 
-        Object.assign(this.result.statusList,{
+        Object.assign(this.result.statusList, {
           taskIdVal: data_.taskInfo.taskNo,                                            // 任务ID
           scenesNameVal: data_.taskInfo.fileName,                                      // 场景名
           projectVal: data_.taskInfo.projectName,                                      // 所属项目
@@ -1410,9 +1415,9 @@
         this.showMiniImg(this.result.tableData[0])
       },
       //关闭抽屉
-      closeDrawer(){
+      closeDrawer() {
         this.settingBack()
-        Object.assign(this.setting.priority,{  // 优先渲染初始化
+        Object.assign(this.setting.priority, {  // 优先渲染初始化
           topVal: '1',
           middleVal: '1',
           bottomVal: '1',
@@ -1420,7 +1425,7 @@
           customize: ''
         })
         this.setting.mode.mode = '2002'        // 渲染模式初始化
-        Object.assign(this.setting.other,{     // 其它设置初始化
+        Object.assign(this.setting.other, {     // 其它设置初始化
           remindVal: 12,
           stopVal: 24,
           view: ''
@@ -1430,20 +1435,20 @@
         this.$emit('closeDrawer')
       },
       // 超时提醒改变
-      changeSliderVal(e){
+      changeSliderVal(e) {
         let n = Number(e.target.value)
-        if(n >= 1 && 72 >= n) {
+        if (n >= 1 && 72 >= n) {
           this.setting.other.remindVal = n
-        }else {
+        } else {
           this.setting.other.remindVal = 12
         }
       },
       // 超时停止改变
-      changeStopVal(e){
+      changeStopVal(e) {
         let n = Number(e.target.value)
-        if(n >= 1 && 72 >= n) {
+        if (n >= 1 && 72 >= n) {
           this.setting.other.stopVal = n
-        }else {
+        } else {
           this.setting.other.stopVal = 24
         }
       },
@@ -1457,100 +1462,137 @@
         return '';
       },
       // 帧范围修改
-      rangeChange(e,index,val,row) {
+      rangeChange(e, index, val, row) {
         // debugger
         row['rangeEdit'] = false
         row['range'] = val
-        if(!val){ this.rangeChangeErr('empty',index); return false }
-        if(!val.includes('-')){ this.rangeChangeErr('err',index); return false }
+        if (!val) {
+          this.rangeChangeErr('empty', index);
+          return false
+        }
+        if (!val.includes('-')) {
+          this.rangeChangeErr('err', index);
+          return false
+        }
         let h = Number(val.split('-')[0]),
-            f = Number(val.split('-')[1])
-        if(!/^[0-9]+$/.test(h) || !/^[0-9]+$/.test(f)){ this.rangeChangeErr('err',index); return false }
-        if(h >= 999 || f > 999){ this.rangeChangeErr('max',index); return false }
-        if(h >= f){ this.rangeChangeErr('err',index); return false }
+          f = Number(val.split('-')[1])
+        if (!/^[0-9]+$/.test(h) || !/^[0-9]+$/.test(f)) {
+          this.rangeChangeErr('err', index);
+          return false
+        }
+        if (h >= 999 || f > 999) {
+          this.rangeChangeErr('max', index);
+          return false
+        }
+        if (h >= f) {
+          this.rangeChangeErr('err', index);
+          return false
+        }
 
         row['rangeErr'] = false
-        if(this.setting.num.tableData.every(curr => !curr.rangeErr)) this.setting.num.randerError = false
+        if (this.setting.num.tableData.every(curr => !curr.rangeErr)) this.setting.num.randerError = false
         // 检查当前行【间隔帧】
-        this.numChange(null,index,row)
+        this.numChange(null, index, row)
       },
       // 帧范围修改报错
-      rangeChangeErr(type,index){
-        switch(type){
+      rangeChangeErr(type, index) {
+        switch (type) {
           case 'empty':
-            messageFun('error','请输入,例:1-10')
+            messageFun('error', '请输入,例:1-10')
             break
           case 'max':
-            messageFun('error','输入格式错误，帧范围为1-999')
+            messageFun('error', '输入格式错误，帧范围为1-999')
             break
           case 'err':
-            messageFun('error','输入格式错误，请输入,例:1-10')
+            messageFun('error', '输入格式错误，请输入,例:1-10')
         }
         this.setting.num.tableData[index]['rangeErr'] = true
         this.setting.num.randerError = true
       },
       // 间隔帧数修改
-      numChange(e,index,row) {
+      numChange(e, index, row) {
         // debugger
         row['numEdit'] = false
-        if(e) row['num'] = e.target.value
-        if(!row.num) row.num = 1
-        if(!/^[0-9]+$/.test(row.num)){ this.numChangeErr(row,'format'); return false }
-        if(!row.rangeErr){
+        if (e) row['num'] = e.target.value
+        if (!row.num) row.num = 1
+        if (!/^[0-9]+$/.test(row.num)) {
+          this.numChangeErr(row, 'format');
+          return false
+        }
+        if (!row.rangeErr) {
           let fa = row.range.split('-'),
-              h = Number(fa[0]),
-              f = Number(fa[1])
-          if(f - h < Number(row.num)){ this.numChangeErr(row,'range'); return false }
+            h = Number(fa[0]),
+            f = Number(fa[1])
+          if (f - h < Number(row.num)) {
+            this.numChangeErr(row, 'range');
+            return false
+          }
         }
         row.numErr = false
-        if(this.setting.num.tableData.every(curr => !curr.numErr)) this.setting.num.numError = false
+        if (this.setting.num.tableData.every(curr => !curr.numErr)) this.setting.num.numError = false
       },
       // 帧间隔修改报错
-      numChangeErr(row,type){
-        switch(type){
+      numChangeErr(row, type) {
+        switch (type) {
           case 'format':
-            messageFun('error','输入格式错误，请输入数字')
+            messageFun('error', '输入格式错误，请输入数字')
             break
           case 'range':
-            messageFun('error','帧间隔要小于最小帧和最大帧之差，以确保至少存在两个有效帧')
+            messageFun('error', '帧间隔要小于最小帧和最大帧之差，以确保至少存在两个有效帧')
         }
         row.numErr = true
         this.setting.num.numError = true
       },
       // 图像宽度修改
-      wChange(e,index) {
+      wChange(e, index) {
         this.setting.num.tableData[index]['wEdit'] = false
         this.setting.num.tableData[index]['w'] = e.target.value
       },
       // 图像高度修改
-      hChange(e,index) {
+      hChange(e, index) {
         this.setting.num.tableData[index]['hEdit'] = false
         this.setting.num.tableData[index]['h'] = e.target.value
       },
       // 主table多选事件
-      handleSelectionChange(val){
+      handleSelectionChange(val) {
         this.result.selectionResult = val
         let t = val.map(curr => curr.status)
         let s = this.result.operateBtnList[0],   // 开始
-            p = this.result.operateBtnList[1],   // 暂停
-            d = this.result.operateBtnList[2],   // 下载完成帧
-            a = this.result.operateBtnList[3]    // 重新渲染
-        if(t.length > 0 && t.every(item => ['暂停','暂停（超时）','暂停（欠费）'].includes(item))){ s['classState'] = false }else{ s['classState'] = true }
-        if(t.length > 0 && t.every(item => ['渲染成功','渲染失败'].includes(item))){ a['classState'] = false }else{ a['classState'] = true }
-        if(t.length > 0 && t.every(item => ['渲染中','等待中'].includes(item))){ p['classState'] = false }else{ p['classState'] = true }
-        if(t.length > 0){ d['classState'] = false }else{ d['classState'] = true }
+          p = this.result.operateBtnList[1],   // 暂停
+          d = this.result.operateBtnList[2],   // 下载完成帧
+          a = this.result.operateBtnList[3]    // 重新渲染
+        if (t.length > 0 && t.every(item => ['暂停', '暂停（超时）', '暂停（欠费）'].includes(item))) {
+          s['classState'] = false
+        } else {
+          s['classState'] = true
+        }
+        if (t.length > 0 && t.every(item => ['渲染成功', '渲染失败'].includes(item))) {
+          a['classState'] = false
+        } else {
+          a['classState'] = true
+        }
+        if (t.length > 0 && t.every(item => ['渲染中', '等待中'].includes(item))) {
+          p['classState'] = false
+        } else {
+          p['classState'] = true
+        }
+        if (t.length > 0) {
+          d['classState'] = false
+        } else {
+          d['classState'] = true
+        }
 
       },
       // 详情table多选事件
-      handleDetailsSelectionChange(val){
+      handleDetailsSelectionChange(val) {
         this.result.detailsSelectionResult = val
       },
       // 主table筛选条件改变
-      filterHandler(){
+      filterHandler() {
 
       },
       // 查看详情
-      async showMore(row){
+      async showMore(row) {
         this.result.showDetails = true
         let data = await getFrameHistoryTable(`layerTaskUuid=${row.layerTaskUuid}&frameTaskUuid=${row.frameTaskUuid}`)
         this.result.detailsTableData = data.data.data.frameTaskList.map(item => {
@@ -1571,10 +1613,10 @@
         })
         this.demo = data.data.data.log.reduce((total, curr) => {
           return total + `<p class="p">${curr}</p>`
-        },'')
+        }, '')
       },
       // 设置参数 - 其他设置 - 新建项目
-      createItem(){
+      createItem() {
         let newItemName = ''
         this.$prompt('', '新建项目', {
           confirmButtonText: '确定',
@@ -1582,7 +1624,7 @@
           inputPlaceholder: '请输入项目名称'
         })
           .then(
-            value  => {
+            value => {
               newItemName = value.value
               return addNewItem({
                 projectName: value.value,
@@ -1599,14 +1641,14 @@
           )
           .then(
             data => {
-              if(data.data.code == '201'){
+              if (data.data.code == '201') {
                 this.$message({
                   message: '创建项目成功',
                   type: 'success'
                 })
                 this.getItemList(newItemName)
               }
-              if(data.data.code == '101'){
+              if (data.data.code == '101') {
                 this.$message({
                   message: '创建失败，项目名已存在',
                   type: 'error'
@@ -1614,17 +1656,27 @@
               }
             }
           )
-          .catch(() => {})
+          .catch(() => {
+          })
       },
       // 设置参数 - table - 多选
-      settingTableItemChange(val){
+      settingTableItemChange(val) {
         this.setting.num.selected = val
       },
       // 设置参数 - 开始渲染
-      async startRenderFun(){
-        if(this.setting.priority.customizeInputError) { messageFun('error','自定义帧错误'); return false}
-        if(this.setting.num.randerError) { messageFun('error','帧范围设定存在错误'); return false}
-        if(this.setting.num.numError) { messageFun('error','帧间隔设定存在错误'); return false}
+      async startRenderFun() {
+        if (this.setting.priority.customizeInputError) {
+          messageFun('error', '自定义帧错误');
+          return false
+        }
+        if (this.setting.num.randerError) {
+          messageFun('error', '帧范围设定存在错误');
+          return false
+        }
+        if (this.setting.num.numError) {
+          messageFun('error', '帧间隔设定存在错误');
+          return false
+        }
 
         let layerSetSettingList = this.setting.num.selected.map(curr => {
           // id: '1',
@@ -1666,15 +1718,15 @@
           frameTimeoutStop: this.setting.other.stopVal,           // 超时停止
           layerSetSettingList
         })
-        if(data.data.code == 200){
+        if (data.data.code == 200) {
           this.closeDrawer()
           this.$emit('toRenderTable')
           this.$emit('getListAgain')
         }
       },
       // 渲染结果 - 主 - 操作
-      operateFun(action){
-        switch(action){
+      operateFun(action) {
+        switch (action) {
           case '开始':
             this.operateStart()
             break
@@ -1690,8 +1742,8 @@
         }
       },
       // 渲染结果 - 详情 - 操作
-      moreOperateFun(action){
-        switch(action){
+      moreOperateFun(action) {
+        switch (action) {
           case '返回':
             this.moreOperateBack()
             break
@@ -1701,41 +1753,51 @@
         }
       },
       // 渲染结果 - 主 - 操作 - 开始
-      async operateStart(){
-        if(this.result.operateBtnList[0]['classState']) return false
+      async operateStart() {
+        if (this.result.operateBtnList[0]['classState']) return false
         let data = await itemStart({
           "instructType": 11,
-          "frameUuidList" : this.result.selectionResult.map(curr => curr.frameTaskUuid)
+          "frameUuidList": this.result.selectionResult.map(curr => curr.frameTaskUuid)
         })
-        if(data.data.code == 200){ messageFun('success','操作成功'); this.getRenderItemMoreTableF() }
-        else if(data.data.code == 1001) messageFun('info','余额不足')
-        else messageFun('error','报错，操作失败')
+        if (data.data.code == 200) {
+          messageFun('success', '操作成功');
+          this.getRenderItemMoreTableF()
+        } else if (data.data.code == 1001) messageFun('info', '余额不足')
+        else messageFun('error', '报错，操作失败')
       },
       // 渲染结果 - 主 - 操作 - 暂停
-      async operatePause(){
-        if(this.result.operateBtnList[1]['classState']) return false
+      async operatePause() {
+        if (this.result.operateBtnList[1]['classState']) return false
         let data = await itemStart({
           "instructType": 22,
-          "frameUuidList" : this.result.selectionResult.map(curr => curr.frameTaskUuid)
+          "frameUuidList": this.result.selectionResult.map(curr => curr.frameTaskUuid)
         })
-        if(data.data.code == 200){ messageFun('success','操作成功'); this.getRenderItemMoreTableF() }else{ messageFun('error','报错，操作失败') }
+        if (data.data.code == 200) {
+          messageFun('success', '操作成功');
+          this.getRenderItemMoreTableF()
+        } else {
+          messageFun('error', '报错，操作失败')
+        }
       },
       // 渲染结果 - 主 - 操作 - 下载完成帧
-      async operateDownloadFrame(){
-        if(this.result.operateBtnList[2]['classState']) return false
+      async operateDownloadFrame() {
+        if (this.result.operateBtnList[2]['classState']) return false
         let data = await seeBalance()
-        if(data.data.code == 1001){ messageFun('error',`当前账户余额为${data.data.data}，请先进行充值！`); return false }
+        if (data.data.code == 1001) {
+          messageFun('error', `当前账户余额为${data.data.data}，请先进行充值！`);
+          return false
+        }
 
         this.result.selectionResult.forEach(async curr => {
-          if(curr.status != '渲染成功') return false
+          if (curr.status != '渲染成功') return false
           let t = `frameTaskUuid=${curr.frameTaskUuid}&layerTaskUuid=${curr.layerTaskUuid}&type=0`,
-              data = await downloadFrame(t)
+            data = await downloadFrame(t)
           exportDownloadFun(data, data.headers.file, '')
         })
       },
       // 渲染结果 - 主 - 操作 - 重新渲染
-      operateRenderAgain(){
-        if(this.result.operateBtnList[3]['classState']) return false
+      operateRenderAgain() {
+        if (this.result.operateBtnList[3]['classState']) return false
         this.$confirm('此操作将重新渲染选中项, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -1744,11 +1806,11 @@
             async () => {
               let dataList = []
               this.result.selectionResult.forEach(curr => {
-                if('selfIndex' in curr) return false
+                if ('selfIndex' in curr) return false
                 let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
-                if(dataListIndex == -1){
+                if (dataListIndex == -1) {
                   dataList.push(curr.frameTaskUuid)
-                }else{
+                } else {
                   dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
                 }
               })
@@ -1759,23 +1821,23 @@
                 }],
                 "frameUuidList": dataList
               })
-              if(data.data.code == 200) messageFun('success','操作成功')
+              if (data.data.code == 200) messageFun('success', '操作成功')
             },
-            () => messageFun('info','已取消操作')
+            () => messageFun('info', '已取消操作')
           )
-          .catch(() => messageFun('error','报错，操作失败'))
+          .catch(() => messageFun('error', '报错，操作失败'))
       },
       // 渲染结果 - 详情 - 操作 - 返回
-      moreOperateBack(){
+      moreOperateBack() {
         this.result.showDetails = false
       },
       // 渲染结果 - 详情 - 操作 - 下载日志
-      async moreOperateDownload(){
+      async moreOperateDownload() {
         let data = await downloadLog(`layerTaskUuid=${this.result.detailsTableData[0]['layerTaskUuid']}&frameTaskUuid=${this.result.detailsTableData[0]['frameTaskUuid']}`)
         exportDownloadFun(data, data.headers.file, 'text')
       },
       // 分析结果 - 进入设置参数
-      async setParameter(){
+      async setParameter() {
         const loading = this.$loading({
           lock: true,
           text: 'Loading',
@@ -1785,21 +1847,30 @@
         let data_ = await upTopTableSet(this.taskData.taskUuid)
         loading.close()
         let data = data_.data
-        if(data.code != 200){ messageFun('error','报错，数据请求失败'); return false }
-        this.$emit('changeTypeInfo','setting')
+        if (data.code != 200) {
+          messageFun('error', '报错，数据请求失败');
+          return false
+        }
+        this.$emit('changeTypeInfo', 'setting')
         this.setting.num.tableDataAll = data.data.layerSettingList.map(curr => {
-          let formatList = curr.format.map(item => {
-            return {
-              label: item.name,
-              val: item.value + '-' + item.name + '-' + item.codeUuid
-            }
-          })
-          let cameraList = curr.camera.map(item => {
-            return {
-              label: item,
-              val: item
-            }
-          })
+          let formatList = [],
+            cameraList = []
+          if (curr.format) {
+            formatList = curr.format.map(item => {
+              return {
+                label: item.name,
+                val: item.value + '-' + item.name + '-' + item.codeUuid
+              }
+            })
+          }
+          if (curr.camera) {
+            cameraList = curr.camera.map(item => {
+              return {
+                label: item,
+                val: item
+              }
+            })
+          }
           return {
             id: curr.layerUuid,
             name: curr.layerName,
@@ -1807,8 +1878,8 @@
             num: '1',
             w: curr.width,
             h: curr.height,
-            format: formatList[0]['val'],
-            camera: cameraList[0]['val'],
+            format: formatList.length ? formatList[0]['val'] : null,
+            camera: cameraList.length ? cameraList[0]['val'] : null,
             rangeEdit: false,         // 帧范围 - 状态切换 勿动
             rangeErr: false,          // 帧范围 - 报错切换 勿动
             numEdit: false,           // 间隔帧数 - 状态切换 勿动
@@ -1820,16 +1891,16 @@
           }
         })
         this.setting.num.tableData = [this.setting.num.tableDataAll[0]]
-        setTimeout(()=>{
+        setTimeout(() => {
           this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0], true)
-        },0)
+        }, 0)
       },
       // 设置参数 - 返回分析结果
-      settingBack(){
-        this.$emit('changeTypeInfo','upload-table')
+      settingBack() {
+        this.$emit('changeTypeInfo', 'upload-table')
       },
       // 设置参数 项目列表
-      getItemList(name){
+      getItemList(name) {
         getConsumptionSelectList()
           .then(data => {
             this.setting.other.viewList = data.data.data.map(curr => {
@@ -1839,9 +1910,9 @@
                 id: curr.taskProjectUuid
               }
             })
-            if(!name){
+            if (!name) {
               this.setting.other.view = this.setting.other.viewList[0]['value']
-            }else {
+            } else {
               let obj = this.setting.other.viewList.find(curr => {
                 return curr.label == name
               })
@@ -1851,36 +1922,48 @@
           })
       },
       // 设置参数 启动分层渲染按钮 改变
-      h(){
+      h() {
         let s = this.setting.num
         this.$refs.renderTable.clearSelection()
         s.selected = []
         s.singleChoiceVal == 1 ? s.tableData = s.tableDataAll : s.tableData = [s.tableDataAll[0]]
       },
       // 验证 自定义帧格式
-      verifFormat(){
+      verifFormat() {
         let val = this.setting.priority.customize
-        if(!val) { this.setting.priority.customizeInputError = false; return false }
+        if (!val) {
+          this.setting.priority.customizeInputError = false;
+          return false
+        }
 
-        let valList = val.replace(/，/g,',').split(',').filter(curr => curr != '')          // 输入帧
+        let valList = val.replace(/，/g, ',').split(',').filter(curr => curr != '')          // 输入帧
         console.log(valList)
 
-        if(valList.length > 3) { this.errFun('最多优先测试3帧'); return false }
-        if(!valList.every(curr => /^[0-9]+$/.test(Number(curr)))) { this.errFun('输入格式不正确，请重新输入'); return false }
+        if (valList.length > 3) {
+          this.errFun('最多优先测试3帧');
+          return false
+        }
+        if (!valList.every(curr => /^[0-9]+$/.test(Number(curr)))) {
+          this.errFun('输入格式不正确，请重新输入');
+          return false
+        }
 
         let range = this.setting.num.tableData[0].range,         // 帧范围
-            rangeH = Number(range.split('-')[0]),                // 首帧
-            rangeF = Number(range.split('-')[1]),                // 尾帧
-            interval = Number(this.setting.num.tableData[0].num),// 帧间隔
-            result = renderingRange(rangeH,rangeF,interval),     // 遍历帧范围
-            r = valList.every(curr => result.includes(Number(curr)))        // 【帧范围】是否完全包含【输入帧】
+          rangeH = Number(range.split('-')[0]),                // 首帧
+          rangeF = Number(range.split('-')[1]),                // 尾帧
+          interval = Number(this.setting.num.tableData[0].num),// 帧间隔
+          result = renderingRange(rangeH, rangeF, interval),     // 遍历帧范围
+          r = valList.every(curr => result.includes(Number(curr)))        // 【帧范围】是否完全包含【输入帧】
 
-        if(!r) { this.errFun('优先帧超出帧范围，请重新输入'); return false }
-        if(r) this.setting.priority.customizeInputError = false
+        if (!r) {
+          this.errFun('优先帧超出帧范围，请重新输入');
+          return false
+        }
+        if (r) this.setting.priority.customizeInputError = false
       },
       // 验证报错
-      errFun(text){
-        messageFun('error',text)
+      errFun(text) {
+        messageFun('error', text)
         this.setting.priority.customizeInputError = true
       }
     }
@@ -1889,18 +1972,21 @@
 
 <style lang="less" scoped>
   .rule {
-    color: rgba(229, 199, 138, 1);
+    color: rgba(27, 83, 244, 1);
     opacity: 0.8;
     cursor: pointer;
     text-decoration: underline;
     transition: opacity 0.2s;
+
     &:hover {
       opacity: 1;
     }
   }
+
   /*渲染层数开关*/
   .switchLayered {
     float: right;
+
     .switchLayeredText {
       font-size: 14px;
       font-weight: 400;
@@ -1908,63 +1994,75 @@
       vertical-align: middle;
       display: inline-block;
       margin-left: 4px;
+
       &.active {
-        color: rgba(255, 255, 255, 1);
+        color: rgba(22, 29, 37, 0.6);
       }
     }
+
     .mark {
       vertical-align: middle;
       margin-left: 2px;
       cursor: pointer;
     }
   }
+
   .farm-drawer-body-item-d {
     padding-top: 15px;
+
     .item-label {
       display: inline-block;
       font-size: 14px;
       font-weight: 400;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(22, 29, 37, 0.6);
       margin-right: 10px;
     }
+
     .item-switch {
       display: inline-block;
       vertical-align: top;
       margin-right: 30px;
+
       .item-switch-label {
         margin-left: 5px;
         display: inline-block;
         font-size: 14px;
         font-weight: 400;
-        color: rgba(255, 255, 255, 1);
+        color: rgba(22, 29, 37, 1);
         vertical-align: middle;
         opacity: 0.6;
         transition: opacity 0.2s;
+
         &.active {
           opacity: 1;
         }
       }
     }
+
     &.addPadding {
       padding-bottom: 15px;
     }
   }
+
   .s {
     .farm-drawer-body-item {
       margin-bottom: 10px;
     }
+
     .info {
       margin-left: 122px;
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255, 191, 0, 1);
+
       img {
         width: 13px;
         opacity: 0.59;
         vertical-align: middle;
         margin-right: 2px;
       }
-      font-size: 12px;
-      font-weight: 400;
-      color: rgba(229, 199, 138, 0.6);
     }
+
     .set {
       .farm-drawer-body {
         padding: 0px 9px;
@@ -1974,18 +2072,22 @@
             width: 110px;
             margin-right: 28px;
           }
+
           .mark {
             vertical-align: middle;
             cursor: pointer;
           }
+
           .farm-drawer-item-val {
 
           }
+
           .slider {
             display: inline-block;
             width: 240px;
             vertical-align: middle;
           }
+
           .createBtn {
             display: inline-block;
             margin-left: 4px;
@@ -1993,61 +2095,74 @@
             font-weight: 400;
             color: rgba(10, 98, 241, 1);
             cursor: pointer;
+
             .createIcon {
               width: 18px;
               vertical-align: middle;
               margin-left: 20px;
             }
           }
+
           &:nth-of-type(1) {
             margin-top: 15px;
           }
         }
       }
     }
+
     .b {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       height: 32px;
-      width: calc(100% - 40px);
-      padding: 0px 30px;
       box-sizing: border-box;
+      position: absolute;
+      bottom: 60px;
+      width: calc(100% - 40px);
+
       .btn {
-        border-radius: 8px;
+        border-radius: 6px;
         font-size: 14px;
         text-align: center;
         cursor: pointer;
+
         &:nth-of-type(1) {
           width: 102px;
           height: 30px;
           line-height: 30px;
-          border: 1px solid rgba(255, 255, 255, 0.6);
-          color: rgba(255, 255, 255, 0.79);
+          background-color: rgba(248, 248, 248, 1);
+          border: 1px solid rgba(22, 29, 37, 0.2);
+          margin-right: 20px;
         }
+
         &:nth-of-type(2) {
           width: 104px;
           height: 32px;
           background-color: rgba(10, 98, 241, 1);
-          color: rgba(255, 255,255, 1);
+          color: rgba(255, 255, 255, 1);
           line-height: 32px;
         }
       }
     }
+
     .farm-drawer-item {
       &:nth-last-of-type(1) {
         padding-bottom: 0px;
       }
     }
   }
+
   .farm-table-td-span {
     opacity: 0;
+
     &.show {
       opacity: 1;
     }
+
     &.err {
       color: tomato;
     }
   }
+
   .farm-table-td-input {
     position: absolute;
     left: 0px;
@@ -2060,31 +2175,37 @@
     background-color: transparent;
     outline: none;
     border: 0px;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(22, 29, 37, 0.79);
     font-size: 14px;
-    font-family: 'SourceHanSansCN','Arial Bold';
+    font-family: 'SourceHanSansCN', 'Arial Bold';
+
     &.show {
       opacity: 1;
     }
   }
+
   .r {
     display: flex;
+
     .info {
       display: flex;
       flex-direction: column;
       width: 260px;
       height: calc(100% - 20px);
       margin-right: 20px;
+
       .thumbnail {
         height: 220px;
         padding: 10px;
         box-sizing: border-box;
-        border-radius:4px;
+        border-radius: 4px;
         background-color: rgba(255, 255, 255, 0.05);
         margin-bottom: 23px;
+
         .img {
           width: 240px;
         }
+
         .status {
           position: relative;
           left: 21px;
@@ -2092,6 +2213,7 @@
           margin-top: 15px;
           font-size: 14px;
           font-weight: 400;
+
           &::before {
             content: '';
             position: absolute;
@@ -2101,55 +2223,69 @@
             height: 6px;
             border-radius: 50%;
           }
+
           &.wait {
             color: rgba(229, 199, 138, 1);
+
             &::before {
               background-color: rgba(229, 199, 138, 1);
             }
           }
+
           &.ing {
             color: rgba(9, 245, 150, 1);
+
             &::before {
               background-color: rgba(9, 245, 150, 1);
             }
           }
+
           &.done {
             color: rgba(0, 227, 255, 1);
+
             &::before {
               background-color: rgba(0, 227, 255, 1);
             }
           }
+
           &.pause {
             color: rgba(229, 199, 138, 1);
+
             &::before {
               background-color: rgba(229, 199, 138, 1);
             }
           }
+
           &.giveUp {
             color: rgba(249, 0, 35, 1);
+
             &::before {
               background-color: rgba(249, 0, 35, 1);
             }
           }
         }
       }
+
       .dataList {
         flex-grow: 1;
         padding: 20px;
         box-sizing: border-box;
-        border-radius:4px;
+        border-radius: 4px;
         background-color: rgba(255, 255, 255, 0.05);
+
         .item {
           margin-bottom: 15px;
+
           .label {
             display: inline-block;
-            width:70px;
+            width: 70px;
             height: 20px;
             font-size: 14px;
             font-weight: 400;
             color: rgba(255, 255, 255, 0.8);
             margin-right: 19px;
           }
+
           .val {
             vertical-align: top;
             display: inline-block;
@@ -2164,15 +2300,18 @@
         }
       }
     }
+
     .list {
       width: 841px;
       height: calc(100% - 20px);
+
       .table {
         padding: 10px;
         box-sizing: border-box;
-        border-radius:4px;
+        border-radius: 4px;
         height: calc(100vh - 234px);
         background-color: rgba(255, 255, 255, 0.05);
+
         .operateBtnBase {
           .operateBtn {
             display: inline-flex;
@@ -2183,30 +2322,37 @@
             box-sizing: border-box;
             cursor: pointer;
             margin-right: 10px;
+
             .text {
               font-size: 13px;
               font-weight: 400;
               color: rgba(0, 97, 255, 1);
               line-height: 18px;
             }
+
             img {
               width: 8px;
               margin-right: 4px;
               /*vertical-align: sub;*/
             }
+
             &.cannotTrigger {
               cursor: no-drop;
+
               img {
                 opacity: 0;
               }
+
               span {
                 color: rgba(255, 255, 255, 0.1);
               }
             }
           }
+
           .searchBase {
             position: relative;
             float: right;
+
             .search {
               width: 150px;
               height: 28px;
@@ -2218,6 +2364,7 @@
               padding-left: 24px;
               box-sizing: border-box;
             }
+
             .i {
               position: absolute;
               width: 12px;
@@ -2226,6 +2373,7 @@
               cursor: pointer;
             }
           }
+
           &.more {
             .operateBtn {
               img {
@@ -2235,16 +2383,19 @@
             }
           }
         }
+
         .tableBase {
           width: 100%;
           height: calc(100vh - 290px);
           display: flex;
           flex-direction: column;
           /*日志详情*/
+
           .log {
             display: flex;
             justify-content: center;
             margin-top: -316px;
+
             .tableDataNull {
               .tableDataNullText {
                 font-size: 14px;
@@ -2254,7 +2405,9 @@
               }
             }
           }
+
           /*日志*/
+
           .c {
             flex-shrink: 1;
             flex-grow: 1;
@@ -2265,43 +2418,47 @@
             box-sizing: border-box;
             /*max-height: calc(100vh - 500px);*/
             overflow-y: auto;
-            /deep/.p {
+
+            /deep/ .p {
               font-size: 13px;
               font-weight: 400;
               color: rgba(255, 255, 255, 0.59);
               line-height: 18px;
             }
+
             /*&::-webkit-scrollbar {*/
-              /*!*滚动条整体样式*!*/
-              /*width: 8px; !*高宽分别对应横竖滚动条的尺寸*!*/
-              /*height: 8px;*/
+            /*!*滚动条整体样式*!*/
+            /*width: 8px; !*高宽分别对应横竖滚动条的尺寸*!*/
+            /*height: 8px;*/
             /*}*/
             /*&::-webkit-scrollbar-thumb {*/
-              /*!*滚动条里面小方块*!*/
-              /*border-radius: 10px;*/
-              /*-webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);*/
-              /*background: #9e9797;*/
+            /*!*滚动条里面小方块*!*/
+            /*border-radius: 10px;*/
+            /*-webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);*/
+            /*background: #9e9797;*/
             /*}*/
             /*&::-webkit-scrollbar-track {*/
-              /*!*滚动条里面轨道*!*/
-              /*-webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);*/
-              /*border-radius: 10px;*/
-              /*background: rgb(226, 221, 221);*/
+            /*!*滚动条里面轨道*!*/
+            /*-webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);*/
+            /*border-radius: 10px;*/
+            /*background: rgb(226, 221, 221);*/
             /*}*/
           }
         }
       }
+
       .happen {
         margin-top: 20px;
         padding: 10px;
         box-sizing: border-box;
-        border-radius:4px;
+        border-radius: 4px;
         background-color: rgba(255, 255, 255, 0.05);
         display: flex;
         justify-content: space-around;
+
         .happen-item {
           .label,
-          .val{
+          .val {
             font-size: 14px;
             font-weight: 400;
             color: rgba(0, 228, 255, 0.8);
@@ -2311,6 +2468,7 @@
 
     }
   }
+
   .seeMore {
     font-size: 14px;
     font-weight: 400;
@@ -2318,13 +2476,16 @@
     text-decoration: underline;
     cursor: pointer;
   }
-  /deep/.el-table__empty-block {
+
+  /deep/ .el-table__empty-block {
     display: none;
     width: 100px;
   }
-  /deep/.customizeInput {
+
+  /deep/ .customizeInput {
     display: inline-block;
     width: 100px;
+
     input.el-input__inner {
       border: 0px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.29);
@@ -2336,10 +2497,12 @@
       margin-left: 10px;
       width: 100px;
       color: rgba(255, 255, 255, 0.8);
+
       &::-webkit-input-placeholder {
         color: rgba(255, 255, 255, 0.4);
       }
     }
+
     &.customizeInputError {
       input.el-input__inner {
         color: tomato;
@@ -2350,19 +2513,35 @@
   .wait {
     color: rgba(229, 199, 138, 1);
   }
+
   .ing {
     color: rgba(9, 245, 150, 1);
   }
+
   .suc {
     color: rgba(0, 227, 255, 1);
   }
+
   .pause {
     color: rgba(229, 199, 138, 1);
   }
+
   .fail {
     color: rgba(249, 0, 35, 1);
   }
+
   .null {
     height: 120px;
+  }
+
+  .set {
+    .haveBorder {
+      border: 1px solid rgba(22, 29, 37, 0.3);
+      border-radius: 6px;
+
+      /deep/ .el-input__inner {
+        width: 317px;
+      }
+    }
   }
 </style>

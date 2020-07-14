@@ -5,20 +5,21 @@ div {
 //充值按钮
 .rechargeBtn {
   display: inline-block;
-  width:70px;
-  height:28px;
-  border-radius:6px;
+  width: 70px;
+  height: 28px;
+  border-radius: 6px;
   text-align: center;
   cursor: pointer;
-  background:linear-gradient(90deg,rgba(82,206,229,1) 0%,rgba(35,96,190,1) 100%);
-  box-shadow: 0px 0px 3px 1px rgba(82,206,229,0.19);
-  font-size:14px;
-  font-weight:500;
-  line-height:28px;
-  color:rgba(255,255,255,1);
+  background: linear-gradient(90deg, rgba(82, 206, 229, 1) 0%, rgba(35, 96, 190, 1) 100%);
+  box-shadow: 0px 0px 3px 1px rgba(82, 206, 229, 0.19);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 28px;
+  color: rgba(255, 255, 255, 1);
   transition: all 0.2s;
+
   &:hover {
-    box-shadow: 0px 0px 8px 1px rgba(82,206,229,0.39);
+    box-shadow: 0px 0px 8px 1px rgba(82, 206, 229, 0.39);
   }
 
 }
@@ -27,27 +28,31 @@ div {
 .el-cascader {
   .el-input__inner {
     background-color: transparent;
-    border: 0px;
-    color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(22, 29, 37, 0);
   }
+
   &.i {
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 8px;
     height: 36px;
     width: 218px;
-      .el-input--suffix {
+
+    .el-input--suffix {
+      height: 36px;
+
+      .el-input__inner {
         height: 36px;
-        .el-input__inner {
-          height: 36px;
-        }
-        .el-input__suffix-inner {
-          .el-select__caret.el-input__icon.el-icon-arrow-up {
-            line-height: 36px;
-          }
+      }
+
+      .el-input__suffix-inner {
+        .el-select__caret.el-input__icon.el-icon-arrow-up {
+          line-height: 36px;
         }
       }
+    }
   }
 }
+
 .el-cascader {
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 8px;
@@ -68,16 +73,19 @@ div {
   margin-bottom: 20px;
   color: #fff;
   outline: none;
+
   &::-webkit-input-placeholder { /* WebKit browsers */
-    color:rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 14px;
   }
+
   &::-moz-placeholder { /* Mozilla Firefox 19+ */
-    color:rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 14px;
   }
+
   &::-ms-input-placeholder { /* Internet Explorer 10+ */
-    color:rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.6);
     font-size: 14px;
   }
 }
@@ -86,71 +94,95 @@ div {
 .el-table {
   background-color: transparent;
   overflow: initial;
+
   th,
   tr {
     background-color: transparent;
+
     td,
     th {
-      border-bottom: 0px!important;
+      border-bottom: 0px !important;
+
       .cell {
-        font-size:14px;
-        font-weight:400;
-        color:rgba(255,255,255,0.6);
+        font-size: 14px;
+        font-weight: 400;
+        color: rgba(22, 29, 37, 0.79);
         background-color: transparent;
       }
     }
   }
+
   &::before {
     height: 0px;
   }
+
   .el-table__row {
     position: relative;
     z-index: 1;
-    background:rgba(10,98,241,0.04);
-    border-radius:8px;
+    background-color: rgba(250, 252, 255, 1);
+    border-radius: 8px;
+    box-shadow: 0px 0px 1px 1px rgba(241, 244, 249, 1);
+
     &:hover {
       td {
-        background: rgba(20, 29, 38, 1)!important;
+        background-color: rgba(255, 255, 255, 1) !important;
+
+        .cell {
+          color: rgba(22, 29, 37, 1);
+        }
       }
-      &::after {
-        position: absolute;
-        left: 0;
-        z-index: 1;
-        height: 47px;
-        content: '';
-        box-shadow: 0px 1px 20px 0px rgba(10,98,241,0.6);
-        border-radius: 8px!important;
-        border: 1px solid rgba(0,97,255,1)!important;
-        pointer-events: none;
-      }
+
+      //&::after {
+      //  position: absolute;
+      //  left: 0;
+      //  z-index: 1;
+      //  height: 47px;
+      //  content: '';
+      //  box-shadow: inset 0px 1px 1px 1px rgba(27, 83, 244, 1);
+      //  border-radius: 8px !important;
+      //  //border: 1px solid rgba(0, 97, 255, 1) !important;
+      //  pointer-events: none;
+      //}
     }
+
     &.farmTableSelected {
+      box-shadow: 0px 0px 1px 1px rgba(27, 83, 244, 1);
+
       td {
-        background-color: rgba(0, 97, 255, 1);
-        &:nth-of-type(1){
+        background-color: rgba(255, 255, 255, 1);
+
+        .cell {
+          color: rgba(22, 29, 37, 1);
+        }
+
+        &:nth-of-type(1) {
           border-radius: 8px 0px 0px 8px;
         }
       }
+
       &:hover {
         td {
-          background: rgba(0, 97, 255, 1)!important;
+          //background: rgba(0, 97, 255, 1) !important;
         }
-        &::after {
-          position: absolute;
-          left: 0;
-          z-index: 2;
-          height: 47px;
-          content: '';
-          box-shadow: none;
-          border-radius: 8px!important;
-          border: 0px!important;
-          pointer-events: none;
-        }
+
+        //&::after {
+        //  position: absolute;
+        //  left: 0;
+        //  z-index: 2;
+        //  height: 47px;
+        //  content: '';
+        //  box-shadow: none;
+        //  border-radius: 8px !important;
+        //  border: 0px !important;
+        //  pointer-events: none;
+        //}
       }
     }
+
     &.style-row {
-      td:nth-of-type(1){
+      td:nth-of-type(1) {
         position: relative;
+
         &::before {
           content: '';
           position: absolute;
@@ -163,50 +195,60 @@ div {
         }
       }
     }
+
     &.warning-row {
-      td:nth-of-type(1){
+      td:nth-of-type(1) {
         &::before {
-          background: rgba(229,199,138,1);
+          background: rgba(229, 199, 138, 1);
         }
       }
     }
+
     &.error-row {
-      td:nth-of-type(1){
+      td:nth-of-type(1) {
         &::before {
-          background:rgba(249,0,35,1);
+          background: rgba(249, 0, 35, 1);
         }
       }
     }
+
     &.wait-row {
-      td:nth-of-type(1){
+      td:nth-of-type(1) {
         &::before {
-          background:rgba(0,228,255,1);
+          background: rgba(0, 228, 255, 1);
         }
       }
     }
+
     &.son-row {
-      background-color: rgba(24, 38, 57, 1);
+      background-color: rgba(255, 255, 255, 1);
     }
   }
+
   &.mini-table {
     .el-table__body {
       border-collapse: separate;
       border-spacing: 0px;
     }
+
     td {
       padding: 6px 0px;
     }
+
     .warning-row {
-      background: RGBA(44, 51, 62, 1);
+      background-color: rgba(255, 255, 255, 1);
     }
+
     .success-row {
-      background: RGBA(38, 45, 56, 1);
+      background-color: rgba(248, 248, 248, 1);
     }
+
     tr:hover {
       &::after {
         display: none;
       }
     }
+
     .el-table__body-wrapper {
       max-height: 152px;
       //overflow-x: scroll;
@@ -215,16 +257,19 @@ div {
         width: 4px; /*高宽分别对应横竖滚动条的尺寸*/
         height: 4px;
       }
+
       &::-webkit-scrollbar-thumb {
         /*滚动条里面小方块*/
         border-radius: 10px;
         -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
         background-color: rgba(102, 89, 89, 0.2);
+
         &:hover {
           -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.4);
           background-color: rgba(102, 89, 89, 0.4);
         }
       }
+
       &::-webkit-scrollbar-track {
         /*滚动条里面轨道*/
         -webkit-box-shadow: inset 0 0 5px rgba(52, 59, 67, 0.2);
@@ -241,6 +286,7 @@ div {
     height: calc(100vh - 328px);
   }
 }
+
 .task-table-seeMore-details {
   .el-table__body-wrapper {
     height: auto;
@@ -257,16 +303,19 @@ div {
     width: 8px; /*高宽分别对应横竖滚动条的尺寸*/
     height: 8px;
   }
+
   &::-webkit-scrollbar-thumb {
     /*滚动条里面小方块*/
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
     background-color: rgba(102, 89, 89, 0.2);
+
     &:hover {
       -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.4);
       background-color: rgba(102, 89, 89, 0.4);
     }
   }
+
   &::-webkit-scrollbar-track {
     /*滚动条里面轨道*/
     -webkit-box-shadow: inset 0 0 5px rgba(52, 59, 67, 0.2);
@@ -274,30 +323,36 @@ div {
     background: rgba(52, 59, 67, 0.2);
   }
 }
+
 .el-table__body {
-  border-collapse:separate;
-  border-spacing:0px 10px;
+  border-collapse: separate;
+  border-spacing: 0px 10px;
 }
+
 thead {
   .is-leaf {
     overflow: initial;
+
     .cell {
       overflow: initial;
+
       &::after {
         content: '';
         position: absolute;
         top: 5px;
         right: 0px;
         width: 2px;
-        height:14px;
+        height: 14px;
         background-color: rgba(255, 255, 255, 0.19);
       }
+
       //排序
       .caret-wrapper {
         position: absolute;
         z-index: 1;
         top: -5px;
         right: 0px;
+
         .sort-caret.ascending {
           position: absolute;
           right: 0px;
@@ -307,10 +362,12 @@ thead {
           font-size: 0px;
           border: 0px;
           color: rgba(10, 98, 241, 0.29);
+
           .k {
             font-size: 10px;
           }
         }
+
         .sort-caret.descending {
           position: absolute;
           right: 0px;
@@ -321,12 +378,14 @@ thead {
           border: 0px;
           color: rgba(10, 98, 241, 0.29);
           transform: rotate(180deg);
+
           .k {
             font-size: 10px;
           }
         }
 
       }
+
       //下拉操作
       .el-table__column-filter-trigger {
         position: absolute;
@@ -334,16 +393,19 @@ thead {
         right: 8px;
       }
     }
+
     &.ascending {
       i.sort-caret.ascending {
-        color: rgba(10, 98, 241, 1)!important;
+        color: rgba(10, 98, 241, 1) !important;
       }
     }
+
     &.descending {
       i.sort-caret.descending {
-        color: rgba(10, 98, 241, 1)!important;
+        color: rgba(10, 98, 241, 1) !important;
       }
     }
+
     &:nth-of-type(1),
     &:nth-last-of-type(2) {
       .cell {
@@ -354,6 +416,7 @@ thead {
     }
   }
 }
+
 .u.el-table {
   .el-table__row {
     &:hover {
@@ -363,6 +426,7 @@ thead {
     }
   }
 }
+
 .r.el-table {
   .el-table__row {
     &:hover {
@@ -372,6 +436,7 @@ thead {
     }
   }
 }
+
 //渲染输出
 .o.el-table {
   .el-table__row {
@@ -382,6 +447,7 @@ thead {
     }
   }
 }
+
 //账单-消费记录
 .k.el-table {
   .el-table__row {
@@ -392,6 +458,7 @@ thead {
     }
   }
 }
+
 //任务-渲染结果
 .v.el-table {
   .el-table__row {
@@ -402,6 +469,7 @@ thead {
     }
   }
 }
+
 //任务-渲染结果
 .vv.el-table {
   .el-table__row {
@@ -412,6 +480,7 @@ thead {
     }
   }
 }
+
 //任务-归档记录
 .gd.el-table {
   .el-table__row {
@@ -422,6 +491,7 @@ thead {
     }
   }
 }
+
 .dialogTable {
   .el-table__row {
     &:hover {
@@ -438,70 +508,84 @@ thead {
   padding: 0px 15px;
   margin-right: 10px;
   cursor: pointer;
-  height:24px;
-  border-radius:5px;
-  font-size:13px;
-  font-weight:400;
-  line-height:24px;
+  height: 24px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 24px;
   text-align: center;
-  background:rgba(33,41,51,1);
-  color:rgba(0,97,255,1);
+  background-color: rgba(248, 248, 248, 1);
+  border: 1px solid rgba(22, 29, 37, 0.1);
+  color: rgba(22, 29, 37, 0.79);
+
   .btnIcon {
     vertical-align: middle;
     height: 12px;
+
     &.default {
       display: inline-block;
     }
+
     &.hover {
       display: none;
     }
   }
+
   &:hover {
-    background:rgba(0,97,255,1);
-    color: rgba(255, 255, 255, 1);
+    background-color: rgba(248, 248, 248, 1);
+    //color: rgba(22, 29, 37, 0.29);
+
     .btnIcon {
       &.default {
         display: none;
       }
+
       &.hover {
         display: inline-block;
       }
     }
   }
 }
+
 .farm-btn {
   width: 74px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: 6px;
   display: inline-block;
   text-align: center;
-  margin-left: 30px;
+  margin-left: 20px;
   cursor: pointer;
   transition: all 0.1s;
+
   span {
     font-size: 14px;
     line-height: 30px;
-    color: rgba(255, 255, 255, 0.4);
     transition: all 0.1s;
   }
+
   &.save {
-    background-color: rgba(10, 98, 241, 0.4);
-    border: 1px solid rgba(10, 98, 241, 0.4);
+    background-color: rgba(27, 83, 244, 1);
+    border: 1px solid rgba(27, 83, 244, 1);
+
+    span {
+      color: rgba(255, 255, 255, 1);
+    }
+
     &:hover {
-      background-color: rgba(10, 98, 241, 1);
-      border: 1px solid rgba(10, 98, 241, 1);
-      span {
-        color: rgba(255, 255, 255, 0.8);
-      }
+
     }
   }
+
   &.cancel {
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(22, 29, 37, 0.2);
+    background-color: rgba(248, 248, 248, 1);
+
+    span {
+      color: rgba(22, 29, 37, 0.79);
+    }
+
     &:hover {
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      span {
-        color: rgba(255, 255, 255, 0.8);
-      }
+
     }
   }
 }
@@ -510,21 +594,26 @@ thead {
   position: relative;
   //form-input
   .farm-form-input {
-    width:280px;
-    height:32px;
-    border-radius:8px;
-    border: 2px solid rgba(0,97,255,0.3);
+    width: 280px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(22, 29, 37, 0.1);
     box-sizing: border-box;
-    box-shadow: 0px 0px 3px 1px rgba(0,97,255,0.1);
-    background-color: transparent;
+    box-shadow: 0px 0px 3px 1px rgba(0, 97, 255, 0.1);
+    background-color: rgba(248, 248, 248, 1);
     outline: none;
     padding-left: 40px;
-    color: rgba(256,256,256,0.8);
+    color: rgba(22, 29, 37, 1);
+
+    &::-webkit-input-placeholder {
+      color: rgba(22, 29, 37, 0.25);
+    }
+
     &:hover {
-      border: 2px solid rgba(0,97,255,0.5);
-      box-shadow: 0px 0px 3px 1px rgba(0,97,255,0.3);
+      box-shadow: 0px 0px 3px 1px rgba(0, 97, 255, 0.3);
     }
   }
+
   .searchIcon {
     position: absolute;
     left: 16px;
@@ -548,31 +637,35 @@ thead {
       font-size: 14px;
       font-weight: 400;
       line-height: 36px;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(22, 29, 37, 0.8);
       margin-right: 10px;
     }
+
     .farm-form-item-input {
       height: 36px;
       border-radius: 8px;
       width: 220px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(22, 29, 37, 0.4);
       outline: none;
       background-color: transparent;
       padding-left: 20px;
       box-sizing: border-box;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(22, 29, 37, 1);
     }
+
     .farm-form-item-val {
       width: 100%;
       line-height: 36px;
       margin-left: 37px;
       vertical-align: text-top;
+
       .text {
         font-size: 20px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(22, 29, 37, 1);
       }
     }
+
     &:nth-last-of-type(1) {
       margin-bottom: 0px;
     }
@@ -583,15 +676,18 @@ thead {
 //dialog
 .el-dialog {
   background-color: rgba(28, 36, 47, 1);
-  box-shadow:0px 1px 30px 0px rgba(16,20,27,1);
-  border-radius:8px;
+  box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
+  border-radius: 8px;
   margin-bottom: 0px;
+
   .el-dialog__header {
     padding: 0px;
   }
+
   .el-dialog__body {
     padding: 20px;
     position: relative;
+
     .shutDialogIcon {
       position: absolute;
       right: 20px;
@@ -600,6 +696,7 @@ thead {
       opacity: 0.6;
       cursor: pointer;
       transition: all 0.2s;
+
       &:hover {
         opacity: 1;
       }
@@ -609,70 +706,85 @@ thead {
 
 //分页
 .el-pagination.is-background {
-  color:rgba(0,97,255,1);
+  color: rgba(0, 97, 255, 1);
+
   .btn-prev,
   .btn-next {
-    color: rgba(0,97,255,0.9);
-    background-color: rgba(0,97,255,0.04);
-    box-shadow: 0px 0px 1px 1px rgba(0,97,255,0.6);
+    color: rgba(0, 97, 255, 0.9);
+    background-color: rgba(255, 255, 255, 1);
+    box-shadow: 0px 0px 1px 1px rgba(0, 97, 255, 0.6);
   }
+
   ul.el-pager {
     li {
-      color: rgba(0,97,255,0.9);
-      background-color: rgba(0,97,255,0.04);
-      box-shadow: 0px 0px 1px 1px rgba(0,97,255,0.6);
+      color: rgba(0, 97, 255, 0.9);
+      background-color: rgba(255, 255, 255, 1);
+      box-shadow: 0px 0px 1px 1px rgba(0, 97, 255, 0.6);
     }
+
     li.more {
-      background-color: rgba(0,97,255,0);
-      box-shadow: 0px 0px 1px 1px rgba(0,97,255,0);
+      background-color: rgba(0, 97, 255, 0);
+      box-shadow: 0px 0px 1px 1px rgba(0, 97, 255, 0);
     }
+
     li.active {
-      background-color: rgba(0, 97, 255, 1)!important;
-      color: rgba(256, 256, 256, 0.8)!important;
+      background-color: rgba(0, 97, 255, 1) !important;
+      color: rgba(256, 256, 256, 0.8) !important;
     }
   }
 }
+
 .el-pagination__jump {
-  color: rgba(0,97,255,0.9);
+  color: rgba(0, 97, 255, 0.9);
+
   .el-pagination__editor.el-input {
     width: 35px;
     margin: 0px 8px;
     box-sizing: border-box;
+
     .el-input__inner {
-      background-color: rgba(0,97,255,0.04);
+      background-color: rgba(255, 255, 255, 1);
       border: 0px;
-      box-shadow: 0px 0px 1px 1px rgba(0,97,255,0.6);
-      color: rgba(0,97,255,0.9);
+      box-shadow: 0px 0px 1px 1px rgba(0, 97, 255, 0.6);
+      color: rgba(0, 97, 255, 0.9);
     }
   }
 }
 
 //table 下拉操作
 .el-table-filter {
-  background-color: rgba(22,29,37,1);
-  box-shadow: 0px 1px 10px 0px rgba(0,97,255,0.3);
+  background-color: rgba(22, 29, 37, 1);
+  box-shadow: 0px 1px 10px 0px rgba(0, 97, 255, 0.3);
   border-radius: 4px;
-  border: 1px solid rgba(10,98,241,0.6);
+  border: 1px solid rgba(10, 98, 241, 0.6);
+
   .el-table-filter__wrap {
     max-height: initial;
+
     .el-checkbox-group.el-table-filter__checkbox-group {
       padding: 15px 15px 0px 15px;
+
       label.el-checkbox {
         margin-bottom: 17px;
+
         &:nth-last-of-type(1) {
           margin-bottom: 5px;
         }
+
         .el-checkbox__label {
           color: rgba(255, 255, 255, 0.6);
         }
       }
     }
   }
+
   .el-table-filter__bottom {
     border: 0px;
     padding-left: 15px;
+
     button {
-      color: rgba(256,256,256,0.8);
+      color: rgba(256, 256, 256, 0.8);
+
       &:hover {
         color: #409EFF;
       }
@@ -684,33 +796,36 @@ thead {
 .el-table--border td,
 .el-table--border th,
 .el-table__body-wrapper
-.el-table--border.is-scrolling-left~.el-table__fixed{
+.el-table--border.is-scrolling-left ~ .el-table__fixed {
   border-right: 1px solid transparent;
 }
+
 .el-table--border,
 .el-table--group {
   border: 0px;
 }
+
 td {
-  border-right: 0px!important;
+  border-right: 0px !important;
 }
+
 .el-table::before,
 .el-table--border::after {
-  background-color: transparent!important;
+  background-color: transparent !important;
 }
 
 //多选框
 .el-checkbox__input {
   .el-checkbox__inner {
     background-color: transparent;
-    border: 1px solid rgba(256,256,256,0.5);
+    border: 1px solid rgba(22, 29, 37, 0.5);
   }
 }
 
 .el-table__header-wrapper {
-  th:nth-of-type(1){
+  th:nth-of-type(1) {
     .cell {
-      padding-right: 13px!important;
+      padding-right: 13px !important;
     }
   }
 }
@@ -722,31 +837,38 @@ td {
       content: ''
     }
   }
+
   .el-icon-arrow-down {
-    transform: scale(1)!important;
+    transform: scale(1) !important;
+
     .iconshaixuan,
     .iconshaixuan1 {
       font-size: 18px;
       vertical-align: sub;
     }
+
     .iconshaixuan {
       display: inline-block;
-      color: rgba(10, 98, 241, 0.6)!important;
+      color: rgba(10, 98, 241, 0.6) !important;
     }
+
     .iconshaixuan1 {
       display: none;
     }
+
     &.el-icon-arrow-up {
       .iconshaixuan {
         display: none;
       }
+
       .iconshaixuan1 {
-        color: RGBA(13, 98, 236, 0.8)!important;
+        color: RGBA(13, 98, 236, 0.8) !important;
         display: inline-block;
       }
     }
   }
-  th>.cell.highlight {
+
+  th > .cell.highlight {
     color: rgba(255, 255, 255, 0.6);
   }
 }
@@ -754,11 +876,13 @@ td {
 //table 展开
 .cell {
   .el-table__indent {
-    padding-left: 0px!important;
+    padding-left: 0px !important;
   }
+
   .el-table__placeholder {
     width: 0px;
   }
+
   .el-table__expand-icon {
     position: absolute;
     left: -68px;
@@ -769,8 +893,9 @@ td {
 
 //抽屉
 .el-drawer {
-  background:rgba(33,41,51,1);
-  box-shadow:0px 2px 20px 0px rgba(28,36,47,1);
+  background: rgba(33, 41, 51, 1);
+  box-shadow: 0px 2px 20px 0px rgba(28, 36, 47, 1);
+
   .drawer {
     font-size: 14px;
     color: #fff;
@@ -783,37 +908,44 @@ td {
   display: flex;
   flex-direction: column;
   z-index: 1;
-  top: 80px;
+  top: 84px;
   right: -100vw;
   width: 42vw;
   min-width: 800px;
-  height: calc(100vh - 80px);
-  background: rgba(33,41,51,1);
-  box-shadow: 0px 2px 20px 0px rgba(28, 36, 47, 1);
+  height: calc(100% - 80px);
+  background-color: rgba(255, 255, 255, 1);
+  //background-color: rgba(100, 100, 100, 1);
+  box-shadow: 8px 2px 20px 0px rgba(27, 83, 244, 0.2);
   transition: right 0.3s ease-in-out;
+
   .farm-drawer-title {
     position: relative;
     padding: 20px 0px;
     display: flex;
     justify-content: space-between;
+
     .drawer-t {
       width: 130px;
       height: 34px;
-      background: linear-gradient(-90deg,rgba(10,98,241,0) 0%,rgba(10,98,241,0.5) 90%,rgba(10,98,241,1) 100%);
+      background-image: linear-gradient(180deg, rgba(27, 83, 244, 1) 0%, rgba(27, 83, 244, 0.8) 90%, rgba(27, 83, 244, 1) 100%);
+
       .drawer-text {
         display: inline-block;
         padding-left: 50px;
         font-size: 16px;
         line-height: 34px;
-        color: rgba(255,255,255,1);
+        color: rgba(255, 255, 255, 1);
       }
     }
+
     .dataList {
       display: flex;
       align-items: center;
       margin-left: -280px;
+
       .li {
         margin-right: 20px;
+
         .label,
         .val {
           font-size: 14px;
@@ -823,20 +955,24 @@ td {
         }
       }
     }
+
     .closeIcon {
       margin-top: 10px;
       margin-right: 20px;
       cursor: pointer;
+
       img {
-        width: 14px;
+        width: 18px;
       }
     }
   }
+
   .farm-drawer-body {
     flex-grow: 1;
     padding: 0px 20px;
+
     .farm-drawer-body-item {
-      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.3);
       border-radius: 4px;
       margin-bottom: 20px;
       padding: 20px 30px;
@@ -844,28 +980,34 @@ td {
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
+
       &.one {
         height: 165px;
       }
+
       &.two {
         height: calc(100vh - 360px);
       }
+
       &.three {
         max-height: 240px;
         overflow: hidden;
       }
+
       //键值对
       .farm-drawer-item {
-        font-size:14px;
-        font-weight:400;
-        color:rgba(255, 255, 255, 0.8);
-        line-height:20px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
         padding-bottom: 15px;
+
         .farm-drawer-item-label {
           position: relative;
           display: inline-block;
+          color: rgba(22, 29, 37, 0.8);
           width: 70px;
           margin-right: 5px;
+
           &.star {
             &::before {
               position: absolute;
@@ -875,61 +1017,71 @@ td {
             }
           }
         }
+
         .farm-drawer-item-val {
-          color:rgba(255, 255, 255, 0.6);
+          color: rgba(22, 29, 37, 0.6);
         }
       }
+
       //警示爆红区
       .errorList,
       .warningList {
         min-height: 83px;
         box-sizing: border-box;
-        border-radius:4px;
+        border-radius: 4px;
         margin-bottom: 10px;
         padding: 15px 40px;
         overflow-y: scroll;
         flex-grow: 1;
+
         .farm-drawer-list-item {
           margin-bottom: 15px;
           display: flex;
+
           .icon {
             vertical-align: top;
+
             img {
               width: 20px;
             }
           }
+
           .text {
             margin-left: 15px;
+
             .t {
               display: block;
               font-size: 14px;
               font-weight: 500;
-              color:rgba(255, 255, 255, 0.8);
               line-height: 20px;
               margin-bottom: 9px;
             }
+
             .c {
               font-size: 14px;
               font-weight: 400;
-              color: rgba(255, 255, 255, 0.6);
               line-height: 22px;
             }
           }
-          &:nth-last-of-type(1){
+
+          &:nth-last-of-type(1) {
             margin-bottom: 0px;
           }
         }
+
         &::-webkit-scrollbar {
           /*滚动条整体样式*/
           width: 8px; /*高宽分别对应横竖滚动条的尺寸*/
           height: 8px;
         }
+
         &::-webkit-scrollbar-thumb {
           /*滚动条里面小方块*/
           border-radius: 10px;
           -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
           background: #9e9797;
         }
+
         &::-webkit-scrollbar-track {
           /*滚动条里面轨道*/
           -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
@@ -937,18 +1089,37 @@ td {
           background: rgba(226, 221, 221, 0.2);
         }
       }
+
       .errorList {
-        background-color: rgba(255,106,115,0.08);
-        border: 1px solid rgba(255,106,115,0.16);
+        background-color: rgba(255, 106, 115, 0.08);
+        border: 1px solid rgba(255, 106, 115, 0.16);
+        .text {
+          .t {
+            color: RGBA(255, 106, 115, 1);
+          }
+          .c {
+            color: RGBA(255, 106, 115, 0.8);
+          }
+        }
       }
+
       .warningList {
-        background: rgba(229, 199, 138, 0.08);
+        background-color: rgba(229, 199, 138, 0.08);
         border: 1px solid rgba(229, 199, 138, 0.16);
+        .text {
+          .t {
+            color: RGBA(229, 199, 138, 1);
+          }
+          .c {
+            color: RGBA(229, 199, 138, 0.8);
+          }
+        }
       }
+
       //操作按钮
       .farm-drawer-btn {
         height: 32px;
-        background: rgba(10,98,241,1);
+        background: rgba(10, 98, 241, 1);
         border-radius: 4px;
         font-size: 14px;
         font-weight: 500;
@@ -958,35 +1129,40 @@ td {
         cursor: pointer;
         margin-top: 4px;
       }
+
       //标头
       .farm-drawer-body-item-header {
         .farm-drawer-body-item-header-main {
           font-size: 14px;
           font-weight: 600;
-          color: rgba(255, 255, 255, 1);
+          color: rgba(22, 29, 37, 1);
         }
+
         .farm-drawer-body-item-header-assist {
           font-size: 14px;
           font-weight: 400;
-          color: rgba(255, 255, 255, 0.8);
+          color: rgba(22, 29, 37, 0.8);
         }
       }
     }
+
     &.e {
       //min-height: 783px;
       //overflow-y: scroll;
     }
   }
+
   &.active {
     right: 0px;
   }
+
   &.r {
     width: 1161px;
   }
 }
 
 .el-switch__core {
-  border-color: rgba(0, 0, 0, 0)!important;
+  border-color: rgba(0, 0, 0, 0) !important;
 }
 
 //单选
@@ -996,26 +1172,29 @@ td {
     .el-radio__input {
       width: 16px;
       height: 16px;
+
       .el-radio__inner {
         width: 16px;
         height: 16px;
         background-color: transparent;
-        border-color: rgba(256, 256, 256, 0.6);
+        border-color: rgba(22, 29, 37, 1);
         transition: all 0.2s;
       }
     }
+
     //文本
     .el-radio__label {
       vertical-align: middle;
       font-size: 14px;
       font-weight: 400;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(22, 29, 37, 0.6);
     }
 
     &.is-checked {
       .el-radio__input {
         .el-radio__inner {
-          border-color: rgba(256, 256, 256, 1);
+          border-color: rgba(22, 29, 37, 0.6);
+
           &::after {
             width: 7px;
             height: 7px;
@@ -1031,45 +1210,50 @@ td {
 //滑块
 .el-slider.slider {
   .el-slider__runway {
-    height:4px;
-    background:rgba(255, 255, 255, 0.19);
+    height: 4px;
+    background-color: rgba(22, 29, 37, 0.3);
+
     .el-slider__bar {
       background-color: rgba(10, 98, 241, 1);
     }
+
     .el-slider__button-wrapper {
       .el-tooltip.el-slider__button {
         height: 8px;
         width: 8px;
-        border:4px solid rgba(10,98,241,1);
+        border: 4px solid rgba(10, 98, 241, 1);
       }
     }
   }
 }
+
 //滑块输入框
 .sliderVal {
-  width:33px;
-  height:27px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.19);
+  width: 33px;
+  height: 27px;
+  border-radius: 6px;
+  border: 1px solid rgba(22, 29, 37, 0.3);
   text-align: center;
   background-color: transparent;
   outline: none;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(22, 29, 37, 1);
   margin-left: 20px;
 }
 
 //tooltip
 .el-tooltip__popper.t {
   width: 300px;
-  background: rgba(28,36,47,1);
-  box-shadow: 0px 2px 6px 0px rgba(255,255,255,0.08), 0px 1px 2px -4px rgba(255,255,255,0.12);
+  background: rgba(28, 36, 47, 1);
+  box-shadow: 0px 2px 6px 0px rgba(255, 255, 255, 0.08), 0px 1px 2px -4px rgba(255, 255, 255, 0.12);
   padding: 10px 24px;
+
   &.is-dark {
     font-size: 12px;
     font-weight: 400;
     color: rgba(229, 199, 138, 0.59);
     line-height: 18px;
   }
+
   &.mini {
     width: 200px;
   }
@@ -1078,16 +1262,18 @@ td {
 .filter {
   display: flex;
   align-items: center;
+
   .filter-item {
     .filter-item-label {
       font-size: 13px;
       font-weight: 400;
-      color: rgba(255, 255, 255, 0.59);
+      color: rgba(22, 29, 37, 0.59);
     }
+
     .filter-item-i {
       margin-right: 20px;
       background-color: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(22, 29, 37, 0.19);
       height: 30px;
       width: 130px;
       border-radius: 4px;
@@ -1095,36 +1281,44 @@ td {
       box-sizing: border-box;
       color: rgba(255, 255, 255, 1);
       outline: none;
+
       &.filter-item-time {
         width: 200px;
       }
+
       &.filter-item-select {
         width: 200px;
         padding-left: 0px;
+
         .el-input__inner {
           height: 30px;
         }
+
         .el-input__icon {
           line-height: 30px;
         }
       }
+
       &.filter-item-select-mini {
         width: 130px;
       }
     }
   }
+
   .filter-btn {
     height: 28px;
     text-align: center;
     line-height: 28px;
     border-radius: 4px;
-    border: 1px solid rgba(0, 97, 255, 0.5);
+    border: 1px solid rgba(22, 29, 37, 0.2);
     font-size: 13px;
     font-weight: 500;
-    color: rgba(0, 97, 255, 1);
+    color: rgba(22, 29, 37, 1);
     cursor: pointer;
     margin-right: 20px;
     padding: 0px 20px;
+    background-color: rgba(248, 248, 248, 1);
+
     &.primary {
       height: 30px;
       line-height: 30px;
@@ -1140,14 +1334,16 @@ td {
 .el-message {
   width: 438px;
   height: 40px;
-  background: rgba(28,36,47,1);
-  box-shadow: 0px 1px 20px 0px rgba(10,98,241,0.8);
+  background: rgba(28, 36, 47, 1);
+  box-shadow: 0px 1px 20px 0px rgba(10, 98, 241, 0.8);
   border-radius: 8px;
-  border: 0px!important;
-  top: 10vh!important;
+  border: 0px !important;
+  top: 10vh !important;
+
   .el-message__content {
     color: rgba(255, 255, 255, 1)
   }
+
   .el-message__icon {
     font-size: 16px;
     margin-right: 5px;
@@ -1161,13 +1357,16 @@ td {
   background: rgba(28, 36, 47, 1);
   border-radius: 8px;
   border: 1px solid rgba(42, 55, 73, 1);
+
   .el-message-box__title {
     font-weight: 400;
     color: rgba(255, 255, 255, 0.8);
   }
+
   .el-message-box__content {
     padding: 10px 30px;
     height: 70px;
+
     .el-message-box__container {
       .el-message-box__message {
         font-size: 14px;
@@ -1176,44 +1375,55 @@ td {
         line-height: 26px;
       }
     }
+
     .el-message-box__input {
       input {
         border-radius: 8px;
         color: rgba(255, 255, 255, 1);
-        border: 1px solid rgba(255,255,255, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.6);
         background-color: transparent;
       }
     }
   }
+
   .el-message-box__btns {
     padding: 30px;
+
     .el-button {
       width: 76px;
       height: 32px;
       border-radius: 8px;
       margin-left: 20px;
       border: 1px solid rgba(255, 255, 255, 0.4);
+
       &.el-button--default {
         background-color: transparent;
+
         span {
           color: rgba(255, 255, 255, 0.59);
         }
       }
+
       &.el-button--primary {
         background-color: rgba(53, 130, 254, 1);
         border: 1px solid rgba(53, 130, 254, 0.8);
+
         span {
           color: rgba(255, 255, 255, 0.79);
         }
+
         &:hover {
           border: 1px solid rgba(53, 130, 254, 1);
+
           span {
             color: rgba(255, 255, 255, 0.79);
           }
         }
       }
+
       &:hover {
         border: 1px solid rgba(255, 255, 255, 0.6);
+
         span {
           color: rgba(255, 255, 255, 0.79);
         }
@@ -1231,6 +1441,7 @@ td {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
+
   span {
     font-size: 14px;
     font-weight: 400;
@@ -1243,6 +1454,7 @@ td {
   .el-progress-bar {
     .el-progress-bar__outer {
       background-color: rgba(255, 255, 255, 0.5);
+
       .el-progress-bar__inner {
         background-color: rgba(0, 97, 255, 1);
       }
@@ -1263,12 +1475,14 @@ td {
     width: 8px;
     height: 8px;
   }
+
   &::-webkit-scrollbar-thumb {
     /*滚动条里面小方块*/
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
     background: #9e9797;
   }
+
   &::-webkit-scrollbar-track {
     /*滚动条里面轨道*/
     -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
@@ -1286,26 +1500,32 @@ td {
   box-shadow: 0px 2px 20px 0px rgba(28, 36, 47, 1);
   //margin-left: -32px;
   width: 219px;
+
   .el-select-dropdown__list {
     padding: 0px 0px 0px;
+
     .el-select-dropdown__item {
       height: 42px;
+
       span {
         line-height: 42px;
         font-size: 13px;
-        color:rgba(255, 255, 255, 0.6);
+        color: rgba(255, 255, 255, 0.6);
       }
+
       &.selected {
         span {
           font-weight: 600;
-          color:rgba(255, 255, 255, 0.8);
+          color: rgba(255, 255, 255, 0.8);
         }
       }
+
       &.hover {
         background: rgba(0, 97, 255, 0.2);
       }
     }
   }
+
   .popper__arrow {
     display: none;
   }
@@ -1324,14 +1544,16 @@ td {
       height: calc(100vw - 328px);
     }
   }
+
   .el-table__body-wrapper {
     height: calc(100vw - 346px);
   }
+
   //抽屉
   .farm-drawer {
     right: -100vh;
     width: 42vh;
-    height: calc(100vw - 80px);
+    height: calc(100vw - 120px);
 
     .farm-drawer-body {
       .farm-drawer-body-item.two {
@@ -1339,6 +1561,7 @@ td {
       }
     }
   }
+
   //提示信息
   .el-message {
     top: 10vw !important;
@@ -1357,6 +1580,7 @@ td {
   user-select: none;
   align-items: center;
   justify-content: center;
+
   &::after {
     content: '';
     position: absolute;
@@ -1367,26 +1591,30 @@ td {
     opacity: 0.6;
     background-color: rgba(0, 0, 0, 0.5);
   }
+
   .container {
     position: absolute;
     z-index: 2;
     padding: 20px;
     box-sizing: border-box;
-    background-color: rgba(28,36, 47, 1);
+    background-color: rgba(255, 255, 255, 1);
     box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
     border-radius: 8px;
     overflow: hidden;
+
     .title {
       position: relative;
-      text-align: center;
       line-height: 25px;
+      font-size: 14px;
       letter-spacing: 2px;
       margin-bottom: 37px;
+
       span {
         font-size: 18px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 1);
+        color: rgba(22, 29, 37, 1);
       }
+
       .shutImg {
         position: absolute;
         right: 0px;
@@ -1402,24 +1630,28 @@ td {
 .tableGroup {
   position: relative;
   margin: 20px 50px;
+
   .navList {
     position: relative;
+
     .navBtn {
       display: inline-block;
       font-size: 16px;
-      color: rgba(255,255,255,0.6);
+      color: rgba(22, 29, 37, 0.49);
       padding: 10px 30px;
       cursor: pointer;
+
       &.active {
-        background-color: rgba(22, 29, 37, 1);
+        background-color: rgba(255, 255, 255, 1);
         border-radius: 8px 8px 0px 0px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.9);
+        color: rgba(27, 83, 244, 1);
       }
     }
   }
+
   .tableList {
-    background-color: rgba(22, 29, 37, 1);
+    background-color: rgba(255, 255, 255, 1);
     border-radius: 0px 0px 8px 8px;
   }
 }

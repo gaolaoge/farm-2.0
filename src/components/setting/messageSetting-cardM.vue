@@ -76,7 +76,7 @@
 
 <style lang="less" scoped>
   .messageSetting {
-    height: calc(100vh - 163px);
+    height: calc(100vh - 203px);
     padding: 10px;
     box-sizing: border-box;
   }

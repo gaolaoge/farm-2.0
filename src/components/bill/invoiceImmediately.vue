@@ -163,6 +163,7 @@
 
 <style lang="less" scoped>
   .invoiceImmediately {
+    width: 100%;
     .t {
       height: calc(100vh - 163px);
       overflow-y: auto;

@@ -4,9 +4,12 @@
     <div class="btnGroup">
       <!--我的上传操作-->
       <div class="myUploadBtnGroup" v-show="table.navListActiveIndex == 0">
-        <div class="farm-primary-form-btn" v-for="item,index in btnGroup.myUploadBtnGroup" :key="index" @click="operating(item['text'])">
-          <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default" :style="{'transform': item.css }">
-          <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover" :style="{'transform': item.css }">
+        <div class="farm-primary-form-btn" v-for="(item,index) in btnGroup.myUploadBtnGroup" :key="index"
+             @click="operating(item['text'])">
+          <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default"
+               :style="{'transform': item.css }">
+          <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover"
+               :style="{'transform': item.css }">
           <span>
             {{ item['text'] }}
           </span>
@@ -19,7 +22,7 @@
         <!--更多List-->
         <div class="moreBtnList" v-show="btnGroup.showMoreBtnList">
           <ul class="moreBtnUl">
-            <li v-for="item,index in btnGroup.moreBtnList" :key="index" class="moreBtnItem">
+            <li v-for="(item,index) in btnGroup.moreBtnList" :key="index" class="moreBtnItem">
               <span class="moreBtnItemSpan">{{ item }}</span>
             </li>
           </ul>
@@ -30,16 +33,19 @@
                :class="[
                  {'l': btnGroup.howToCreateIindex == '0'},
                  {'r': btnGroup.howToCreateIindex == '1'}
-               ]" />
+               ]"/>
           <span :class="[{'showAll': btnGroup.howToCreateIindex == '0'}]" @click="btnGroup.howToCreateIindex = '0'">{{ btnGroup.howToCreateBtn[0] }}</span>
           <span :class="[{'showAll': btnGroup.howToCreateIindex == '1'}]" @click="btnGroup.howToCreateIindex = '1'">{{ btnGroup.howToCreateBtn[1] }}</span>
         </div>
       </div>
       <!--渲染输出操作-->
       <div class="outPutBtnGroup" v-show="table.navListActiveIndex == 1">
-        <div class="farm-primary-form-btn" v-for="item,index in btnGroup.outPutBtnGroup" :key="index" @click="operating(item['text'])">
-          <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default" :style="{'transform': item.css }">
-          <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover" :style="{'transform': item.css }">
+        <div class="farm-primary-form-btn" v-for="(item,index) in btnGroup.outPutBtnGroup" :key="index"
+             @click="operating(item['text'])">
+          <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default"
+               :style="{'transform': item.css }">
+          <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover"
+               :style="{'transform': item.css }">
           <span>
             {{ item['text'] }}
           </span>
@@ -52,7 +58,7 @@
                  v-model="searchInputVal"
                  @keyup.enter="searchFun"
                  placeholder="文件名">
-          <img src="@/icons/searchIcon.png"
+          <img src="@/icons/global-search-icon.png"
                alt=""
                class="searchIcon"
                @click="searchFun">
@@ -65,7 +71,7 @@
         <span class="navBtn"
               :class="[{'active': index == table.navListActiveIndex}]"
               @click="table.navListActiveIndex = index"
-              v-for="item,index in table.navList"
+              v-for="(item,index) in table.navList"
               :key="index">
           {{ item }}
         </span>
@@ -77,7 +83,7 @@
       <div class="tableList">
         <!--我的上传-->
         <div class="myUploadTable" v-show="table.navListActiveIndex == 0">
-          <my-upload ref="myUploadTable" />
+          <my-upload ref="myUploadTable"/>
         </div>
         <!--渲染输出-->
         <div class="outPutTable" v-show="table.navListActiveIndex == 1">
@@ -92,11 +98,11 @@
 <script>
   import outPutRender from '@/components/assets/outPutRender'
   import myUpload from '@/components/assets/myUpload'
-  import { createTableIconList } from '@/assets/common.js'
+  import {createTableIconList} from '@/assets/common.js'
 
   export default {
     name: 'assets',
-    data(){
+    data() {
       return {
         btnGroup: {
           myUploadBtnGroup: [
@@ -150,23 +156,23 @@
     },
     directives: {
       operating: {
-        bind(el, bindings, vnode){
+        bind(el, bindings, vnode) {
           let handler = e => {
-            if(el.contains(e.target)){
-              if(!vnode.context.btnGroup.showMoreBtnList) vnode.context.btnGroup.showMoreBtnList = true
+            if (el.contains(e.target)) {
+              if (!vnode.context.btnGroup.showMoreBtnList) vnode.context.btnGroup.showMoreBtnList = true
               else vnode.context.btnGroup.showMoreBtnList = false
-            }else{
-              if(e.target.classList.contains('moreBtnItemSpan')) return false
-              if(e.target.classList.contains('moreBtnItem')) return false
-              if(e.target.classList.contains('moreBtnUl')) return false
-              if(vnode.context.btnGroup.showMoreBtnList) vnode.context.btnGroup.showMoreBtnList = false
+            } else {
+              if (e.target.classList.contains('moreBtnItemSpan')) return false
+              if (e.target.classList.contains('moreBtnItem')) return false
+              if (e.target.classList.contains('moreBtnUl')) return false
+              if (vnode.context.btnGroup.showMoreBtnList) vnode.context.btnGroup.showMoreBtnList = false
             }
           }
 
           el.handler = handler
           document.addEventListener('click', handler)
         },
-        unbind(el){
+        unbind(el) {
           document.removeEventListener('click', el.handler)
         }
       }
@@ -179,15 +185,15 @@
       createTableIconList()
     },
     methods: {
-      searchFun(){
+      searchFun() {
         this.$refs.outPutTable.getList()
       },
-      clearInput(){
+      clearInput() {
         this.searchInputVal = ''
       },
       // 操作
-      operating(active){
-        switch(active){
+      operating(active) {
+        switch (active) {
           case '下载':
             this.$refs.outPutTable.downloadFun()
             break
@@ -203,14 +209,17 @@
 <style lang="less" scoped>
   .assets-wrapper {
     overflow: hidden;
+    width: 100%;
+
     .btnGroup {
       display: flex;
       justify-content: space-between;
-      height:52px;
+      height: 52px;
       margin: 20px 50px;
       padding: 0px 30px;
-      background-color: rgba(22,29,37,1);
-      border-radius:8px;
+      background-color: rgba(255, 255, 255, 1);
+      border-radius: 8px;
+
       .myUploadBtnGroup,
       .outPutBtnGroup,
       .rightOPerate {
@@ -220,48 +229,56 @@
         align-items: center;
       }
     }
+
     .info {
-        position: absolute;
-        top: 0px;
-        right: 30px;
-        font-size: 12px;
-        line-height: 41px;
-        font-weight: 400;
-        color: rgba(229, 199, 138, 0.6);
-        user-select: none;
-      }
+      position: absolute;
+      top: 0px;
+      right: 30px;
+      font-size: 12px;
+      line-height: 41px;
+      font-weight: 400;
+      color: rgba(229, 199, 138, 0.6);
+      user-select: none;
+    }
+
     .tableList {
       /*min-height: 700px;*/
       /*height: calc(100vh - 80px - 72px - 42px - 40px);*/
       /*渲染下载*/
+
       .outPutTable {
         position: relative;
         /*min-height: 663px;*/
         /*height: 100%;*/
       }
     }
+
     .more-btn {
-      width:  69px;
+      width: 69px;
       height: 22px;
       margin-right: 10px;
-      background-color: rgba(33, 41, 51, 1);
-      border: 1px solid rgba(33, 41, 51, 1);
+      background-color: rgba(248, 248, 248, 1);
+      border: 1px solid rgba(22, 29, 37, 0.1);
       border-radius: 5px;
       text-align: center;
       cursor: pointer;
+
       span {
         font-size: 13px;
         color: rgba(0, 97, 255, 1);
       }
+
       img {
-        vertical-align:baseline;
+        vertical-align: baseline;
         margin-left: 4px;
         width: 10px;
       }
+
       &:hover {
         border: 1px solid rgba(0, 97, 255, 0.4);
       }
     }
+
     .moreBtnList {
       position: absolute;
       z-index: 2;
@@ -273,15 +290,18 @@
       box-shadow: 0px 1px 8px 0px rgba(0, 97, 255, 0.2);
       border-radius: 4px;
       border: 1px solid rgba(0, 97, 255, 0.5);
+
       ul {
         padding: 6px 0px;
         box-sizing: border-box;
         cursor: pointer;
+
         .moreBtnItem {
           height: 25px;
           padding: 4px 14px;
           box-sizing: border-box;
           margin-bottom: 2px;
+
           span {
             display: inline-block;
             font-size: 12px;
@@ -289,12 +309,14 @@
             line-height: 17px;
             user-select: none;
           }
+
           &:hover {
             background-color: rgba(28, 36, 47, 1);
           }
         }
       }
     }
+
     .howToCreate {
       position: relative;
       display: flex;
@@ -307,6 +329,7 @@
       background-color: rgba(33, 41, 51, 1);
       border-radius: 5px;
       border: 1px solid rgba(39, 95, 239, 0.2);
+
       .bgi {
         position: absolute;
         top: 2px;
@@ -314,27 +337,32 @@
         height: 20px;
         background-color: rgba(39, 95, 239, 1);
         border-radius: 4px;
+
         &.l {
           left: 2px;
         }
+
         &.r {
           right: 2px;
         }
       }
+
       span {
         position: relative;
         font-size: 12px;
         color: rgba(255, 255, 255, 0.6);
-        line-height:17px;
+        line-height: 17px;
         white-space: nowrap;
         overflow: hidden;
         width: 25px;
         cursor: pointer;
         user-select: none;
+
         &.showAll {
           width: 96px;
         }
       }
+
       &:hover {
         border: 1px solid rgba(39, 95, 239, 0.4);
       }

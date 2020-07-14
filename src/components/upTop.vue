@@ -389,6 +389,7 @@
 
 <style lang="less" scoped>
   .upTop {
+    width: 100%;
     overflow: hidden;
     .tableList {
         padding: 30px;
@@ -399,7 +400,7 @@
             position: relative;
             width: 260px;
             height: 174px;
-            background: rgba(28,36,47,1);
+            background-color: rgba(28, 36, 47, 0.4);
             border-radius: 8px;
             margin-right: 30px;
             overflow: hidden;
@@ -408,7 +409,7 @@
             .gold {
               width: 260px;
               height: 100px;
-              background: rgba(32, 41, 53, 1);
+              background: rgba(32, 41, 53, 0.1);
               .unit {
                 display: inline-block;
                 font-size: 16px;
@@ -461,6 +462,7 @@
           height: 71px;
           border-radius: 4px;
           border: 1px solid rgba(255, 255, 255, 0.46);
+          background-color: rgba(0, 97, 255, 0.36);
           display: inline-flex;
           justify-content: center;
           align-items: center;
@@ -497,7 +499,7 @@
           .l {
             font-size: 14px;
             font-weight: 400;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(22, 29, 37, 0.8);
             line-height: 24px;
           }
         }
@@ -513,7 +515,7 @@
         /*z-index: ;*/
         width: 1316px;
         height: 313px;
-        background: rgba(30, 38, 47, 1);
+        background-color: rgba(30, 38, 47, 1);
         border-radius: 10px;
         border: 1px solid rgba(255, 255, 255, 0.2);
         margin-bottom: 30px;

@@ -11,8 +11,8 @@ export default new Vuex.Store({
       imgUrl: require('@/assets/userImg.png'),
       imgUrlMini: require('@/assets/userImgMini.png'),
       token: '',
-      balance: '0.000',
-      payAmount: '0.000',
+      balance: '0.000',     // 余额
+      payAmount: '0.000',   //
       goldCoins: '0.000',
       consumption: '0.00'
       // grade: '铂金会员'
