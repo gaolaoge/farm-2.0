@@ -3,9 +3,9 @@
     <canvas ref="canvas" class="canvas" :width="screenWidth" :height="screenHeight"/>
     <img src="@/icons/login-logo.png" alt="" class="img_logo">
     <div class="vv">
-      <section :class="[{'registeredPage': navActive == 2}]">
+      <section>
         <!--登录-->
-        <aside class="logIn">
+        <aside class="logIn" v-show="navActive == 1">
           <!--登录模块-->
           <div class="loginMode" v-show="login.mode == 'login'">
             <!--登录方式导航-->
@@ -76,7 +76,8 @@
               {{ $t('login_page.SMS_verif.auto_login') }}
             </span>
               <!--登录按钮-->
-              <div class="btnLogin" :class="[{'canBeClick': login.phoneForm.phoneVerif && login.phoneForm.codeVerif}]" @click="phoneLoginFun">
+              <div class="btnLogin" :class="[{'canBeClick': login.phoneForm.phoneVerif && login.phoneForm.codeVerif}]"
+                   @click="phoneLoginFun">
                 <span>{{ $t('login_page.loginText') }}</span>
               </div>
             </div>
@@ -84,44 +85,57 @@
             <div class="accountForm" v-show="login.nav.activeIndex == 2">
               <input type="password" style="display: none"/>
               <!--帐号-->
-              <input v-model="login.accountForm.account"
-                     :placeholder="$t('login_page.account_verif.ac_placeholder')"
-                     class="farm-input"/>
+              <div class="b">
+                <input v-model="login.accountForm.account"
+                       :placeholder="$t('login_page.account_verif.ac_placeholder')"
+                       ref="accountForm_account"
+                       @blur="accouVerif('login')"
+                       @focus="login.formStatus.account = null"
+                       class="farm-input"
+                       :class="[{'inputError': login.formStatus.account === false}]"/>
+                <span class="warnInfo" v-show="login.formStatus.account === false">{{ login.warnInfo.account }}</span>
+                <img src="@/icons/login-success.png" class="i"
+                     v-show="login.formStatus.account === true">
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.formStatus.account === false"
+                     @click="loginDeleteInput('accountForm','account')">
+              </div>
               <!--密码-->
-              <input v-model="login.accountForm.password"
-                     ref="pwinput"
-                     :placeholder="$t('login_page.account_verif.ps_placeholder')"
-                     @keyup.enter="accountloginFun"
-                     autocomplete="new-password"
-                     type="password"
-                     class="farm-input"/>
-              <div class="swicthPWI">
-                <img src="@/icons/openPW.png" alt="" v-show="login.accountForm.passwordEye"
-                     @click="login.accountForm.passwordEye = false">
-                <img src="@/icons/shuPW.png" alt="" v-show="!login.accountForm.passwordEye"
-                     @click="login.accountForm.passwordEye = true">
+              <div class="b">
+                <input v-model="login.accountForm.password"
+                       ref="accountForm_password"
+                       :placeholder="$t('login_page.account_verif.ps_placeholder')"
+                       @keyup.enter="accountloginFun"
+                       @focus="login.formStatus.password = null"
+                       autocomplete="new-password"
+                       type="password"
+                       class="farm-input"/>
+                <div class="swicthPWI">
+                  <img src="@/icons/openPW.png" alt="" v-show="login.accountForm.passwordEye"
+                       @click="login.accountForm.passwordEye = false">
+                  <img src="@/icons/shuPW.png" alt="" v-show="!login.accountForm.passwordEye"
+                       @click="login.accountForm.passwordEye = true">
+                </div>
+                <span class="warnInfo" v-show="login.formStatus.password === false">{{ login.warnInfo.password }}</span>
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.formStatus.password === false"
+                     @click="loginDeleteInput('accountForm','password')">
               </div>
               <!--5天内自动登录-->
               <el-switch
                 v-model="login.accountForm.isAutoLogin">
               </el-switch>
-              <span class="switchLabel">
-              {{ $t('login_page.account_verif.auto_login') }}
-            </span>
+              <span class="switchLabel">{{ $t('login_page.account_verif.auto_login') }}</span>
               <!--忘记密码-->
               <span class="w">
-              <span @click="login.mode = 'findBack'">
-                {{ $t('login_page.account_verif.forgetPw') }}
+                <span @click="login.mode = 'findBack'">{{ $t('login_page.account_verif.forgetPw') }}</span>
+                |
+                <span @click="navActive = 2">{{ $t('login_page.account_verif.register') }}</span>
               </span>
-              |
-              <span @click="navActive = 2">
-                {{ $t('login_page.account_verif.register') }}
-              </span>
-            </span>
-
               <!--登录按钮-->
-              <div class="btnLogin" @click="accountloginFun">
-                <span><span>{{ $t('login_page.loginText') }}</span></span>
+              <div class="btnLogin" :class="[{'canBeClick': login.formStatus.account && !login.formStatus.password}]"
+                   @click="accountloginFun">
+                <span>{{ $t('login_page.loginText') }}</span>
               </div>
             </div>
           </div>
@@ -129,34 +143,53 @@
           <div class="findBack" v-show="login.mode == 'findBack'">
             <!--返回登陆btn-->
             <div class="loginNav">
-            <span class="forgetPW active">
-              {{ $t('login_page.forgetMode.tit') }}
-            </span>
+              <span class="forgetPW active">{{ $t('login_page.forgetMode.tit') }}</span>
             </div>
-            <!--验证手机号-->
+            <!--验证身份-->
             <div class="f" v-show="login.forgetMode.step == 'one'">
               <!--手机号-->
-              <input v-model="login.forgetMode.phone"
-                     autofocus
-                     :placeholder="$t('login_page.forgetMode.phone_placeholder')"
-                     @blur="findBackPhoneVerif"
-                     class="farm-input"/>
+              <div class="b">
+                <input v-model="login.forgetMode.phone"
+                       autofocus
+                       :placeholder="$t('login_page.forgetMode.phone_placeholder')"
+                       @blur="findBackPhoneVerif"
+                       @focus="login.forgetMode.phoneFormat = null"
+                       ref="forgetMode_phone"
+                       class="farm-input"
+                       :class="[{'inputError': login.forgetMode.phoneFormat === false}]"/>
+                <span class="warnInfo" v-show="login.forgetMode.phoneFormat === false">{{ login.forgetMode.warnInfo.phone }}</span>
+                <img src="@/icons/login-success.png" class="i"
+                     v-show="login.forgetMode.phoneFormat === true">
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.forgetMode.phoneFormat === false"
+                     @click="loginDeleteInput('forgetMode','phone')">
+              </div>
               <!--验证码-->
-              <input v-model="login.forgetMode.code"
-                     :placeholder="$t('login_page.forgetMode.code_placeholder')"
-                     ref="passwordInput"
-                     @blur="findBackCodeVerif"
-                     class="farm-input"/>
-              <!--验证-->
-              <div class="verif">
-                <div class="btn"
-                     @click="findBackGetCode"
-                     v-show="login.forgetMode.verifShow">
-                  {{ $t('login_page.forgetMode.btn') }}
+              <div class="b">
+                <input v-model="login.forgetMode.code"
+                       :placeholder="$t('login_page.forgetMode.code_placeholder')"
+                       ref="forgetMode_code"
+                       @blur="findBackCodeVerif"
+                       @focus="login.forgetMode.codeFormat = null"
+                       class="farm-input"
+                       :class="[{'inputError': login.forgetMode.codeFormat === false}]"/>
+                <span class="warnInfo" v-show="login.forgetMode.codeFormat === false">{{ login.forgetMode.warnInfo.code }}</span>
+                <img src="@/icons/login-success.png" class="i"
+                     v-show="login.forgetMode.codeFormat === true">
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.forgetMode.codeFormat === false"
+                     @click="loginDeleteInput('forgetMode','code')">
+                <!--验证-->
+                <div class="verif">
+                  <div class="btn"
+                       @click="findBackGetCode"
+                       v-show="login.forgetMode.verifShow">
+                    {{ $t('login_page.forgetMode.btn') }}
+                  </div>
+                  <span class="delayDate" v-show="!login.forgetMode.verifShow">
+                  {{ login.forgetMode.countdown }}
+                </span>
                 </div>
-                <span class="delayDate" v-show="!login.forgetMode.verifShow">
-                {{ login.forgetMode.countdown }}
-              </span>
               </div>
               <!--返回登录-->
               <div class="returnToLogin" @click="login.mode = 'login'">{{ $t('login_page.forgetMode.return') }}</div>
@@ -205,9 +238,8 @@
           </div>
         </aside>
         <!--注册-->
-        <aside class="registered">
+        <aside class="registered" v-show="navActive == 2">
           <div class="registeredForm">
-
             <!--返回登录-->
             <div class="rl">
               <span>{{ $t('login_page.register.rl1') }}</span>
@@ -216,7 +248,8 @@
             <!--帐号-->
             <div class="u">
               <input v-model="registered.form.account" :placeholder="$t('login_page.register.ac_placeholder')"
-                     @blur="accouVerif" @focus="inputGetFocus('account')" ref="accountRegister" class="farm-input"/>
+                     @blur="accouVerif('register')" @focus="inputGetFocus('account')" ref="accountRegister"
+                     class="farm-input"/>
               <span class="warnInfo" v-show="registered.status.account === false && !registered.status.accountInit">{{ registered.warnInfo.account }}</span>
               <img src="@/icons/login-success.png" class="i"
                    v-show="registered.status.account === true && !registered.status.accountInit">
@@ -381,6 +414,13 @@
             isAutoLogin: true,
             passwordEye: false
           },
+          formStatus: {
+            account: null,
+            password: null,
+            phone: null,
+            code: null,
+            accountInit: false
+          },
           forgetMode: {
             phone: '',
             code: '',
@@ -391,15 +431,20 @@
             passwordEye: false,
             passwordEyeAgain: false,
             step: 'one',
-            phoneFormat: false,
-            codeFormat: false,
-            newPassWordFormat: false,
-            newPassWordAgainFormat: false,
-            intervalFun: null
+            phoneFormat: null,
+            codeFormat: null,
+            newPassWordFormat: null,
+            newPassWordAgainFormat: null,
+            intervalFun: null,
+            warnInfo: {
+              phone: ''
+            }
           },
           warnInfo: {
-            code: '',
-            phone: ''
+            code: this.$t('login_page.message.codeTypeErr_two'),
+            phone: '',
+            account: '',
+            password: this.$t('login_page.message.ps_err')
           }
         },
         registered: {
@@ -564,10 +609,18 @@
         ctx.closePath()
         ctx.fill()
       },
-      // 注册-帐号验证
-      async accouVerif() {
-        let rfa = this.registered.form.account,
+      // 注册 - 帐号格式验证
+      async accouVerif(obj) {
+        let rfa, rs, w
+        if (obj == 'register') {
+          rfa = this.registered.form.account
           rs = this.registered.status
+          w = this.registered.warnInfo
+        } else if (obj == 'login') {
+          rfa = this.login.accountForm.account
+          rs = this.login.formStatus
+          w = this.login.warnInfo
+        }
         rs.accountInit = false
         // 为空
         if (!rfa) {
@@ -576,25 +629,34 @@
         }
         // 验证帐号长度
         if (!/^[\w\W]{8,14}$/.test(rfa)) {
-          this.registered.warnInfo.account = this.$t('login_page.message.ac_verif_one');
-          rs.account = false;
+          w.account = this.$t('login_page.message.ac_verif_one')
+          rs.account = false
           return false
         }
         // 验证帐号格式
         let reg = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5]+$)/,
           reg2 = /^[\u4E00-\u9FA5\w]+$/
         if (!reg.test(rfa) || !reg2.test(rfa)) {
-          this.registered.warnInfo.account = this.$t('login_page.message.ac_verif_two');
-          rs.account = false;
+          w.account = this.$t('login_page.message.ac_verif_two')
+          rs.account = false
           return false
         }
         // 验证帐号是否可用
         let data = await registerAccount(rfa)
-        // 验证是否存在
-        if (data.data.code == 4031) rs.account = true
-        else {
-          rs.account = false;
-          this.registered.warnInfo.account = this.$t('login_page.message.ac_verif_three')
+        if (data.data.code == 4031) {
+          // 账号未被注册
+          if (obj == 'register') rs.account = true
+          else {
+            rs.account = false
+            w.account = this.$t('login_page.message.ac_verif_four')
+          }
+        } else {
+          // 账号已被注册
+          if (obj == 'login') rs.account = true
+          else {
+            rs.account = false
+            w.account = this.$t('login_page.message.ac_verif_three')
+          }
         }
       },
       // 注册-密码验证
@@ -738,7 +800,7 @@
           return false
         }
         if (!this.reg.phoneReg.test(f.phone)) {
-          this.login.warnInfo.phone = $t('login_page.SMS_verif.phone_warnInfo')
+          this.login.warnInfo.phone = this.$t('login_page.SMS_verif.phone_warnInfo')
           f.phoneVerif = false
           return false
         }
@@ -748,6 +810,7 @@
       loginDeleteInput(list, item) {
         this.login[list][item] = ''
         this.$refs[list + '_' + item].focus()
+        this.login.formStatus[item] = null
       },
       // 短信登录-验证验证码
       phoneCodeVerif() {
@@ -766,6 +829,7 @@
       },
       // 帐号 登录
       async accountloginFun() {
+        if (this.login.formStatus.password === false) return false
         let {account, password, isAutoLogin} = this.login.accountForm
         // 验证
         if (!account || !password) {
@@ -775,14 +839,14 @@
         try {
           let data = await accountLogin({account, password, isAutoLogin})
           if (data.data.code == '4032') {
-            messageFun('error', this.$t('login_page.message.ps_err'));
+            this.login.formStatus.password = false
             return false
           }
           sessionStorage.setItem('token', data.data.data.token)
           this.autoLogin(isAutoLogin, '', account, data.data.data.token)
           this.getUserInfo()
         } catch (err) {
-          console.log('登录失败, ' + err)
+          console.log('登录连接失败, ' + err)
         }
       },
       // 登录 手机号验证
@@ -797,7 +861,7 @@
         }
         if (data.data.code == 10001)
           this.login.warnInfo.phone = this.$t('login_page.message.need_to_register')
-          f.phoneVerif = false
+        f.phoneVerif = false
       },
       // 手机号验证事件60秒延迟
       delayFun(obj) {
@@ -827,7 +891,7 @@
       async phoneLoginFun() {
         let {v, phone, code, isAutoLogin, phoneVerif, codeVerif} = this.login.phoneForm
         // 若手机号或验证码未通过格式验证，直接忽略
-        if(!phoneVerif || !codeVerif) return false
+        if (!phoneVerif || !codeVerif) return false
         // 检验是否已发送验证短信
         if (!v) {
           this.login.warnInfo.code = this.$t('login_page.message.no_sms')
@@ -845,27 +909,25 @@
         sessionStorage.setItem('token', data.data.data.token)
         this.getUserInfo()
       },
-      // 找回密码 验证手机号是否有效
+      // 找回密码 验证手机号格式是否有效
       findBackPhoneVerif() {
         let f = this.login.forgetMode
+        if (!f.phone) return false
         if (!this.reg.phoneReg.test(f.phone)) {
-          messageFun('error', this.$t('login_page.message.phoneTypeErr_one'));
-          f.phoneFormat = false;
+          f.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_one')
+          f.phoneFormat = false
           return false
         }
         f.phoneFormat = true
       },
-      // 找回密码 验证验证码是否有效
+      // 找回密码 验证验证码格式
       findBackCodeVerif() {
         let f = this.login.forgetMode
-        if (!f.phoneFormat) return false
-        if (!f.code) {
-          f.phoneFormat = false;
-          return false
-        }
+        // 若手机号格式不正确或验证码未空，不进行验证
+        if (!f.phoneFormat || !f.code) return false
         if (!this.reg.codeReg.test(f.code)) {
-          messageFun('error', this.$t('login_page.message.codeTypeErr_three'));
-          f.codeFormat = false;
+          f.warnInfo.code = this.$t('login_page.message.codeTypeErr_three')
+          f.codeFormat = false
           return false
         }
         f.codeFormat = true
@@ -873,18 +935,24 @@
       // 找回密码 获取验证码
       async findBackGetCode() {
         let f = this.login.forgetMode
-        console.log(f.phoneFormat)
         if (!f.phoneFormat) return false
         let data = await getPhoneVeriFG(f.phone)
+        if (data.data.code == '4031') {
+          f.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_four')
+          f.phoneFormat = false
+        } else {
+          // 验证码已发送
+        }
         this.delayFun('findBack')
       },
-      // 找回密码 验证验证码
+      // 找回密码 验证验证码是否为真
       async verificationCode() {
         let f = this.login.forgetMode
         if (!f.phoneFormat || !f.codeFormat) return false
         let data = await getVeriVal(`phone=${f.phone}&code=${f.code}`)
         if (data.data.code == 4034) {
-          messageFun('error', this.$t('login_page.message.code_err_two'));
+          f.warnInfo.code = this.$t('login_page.message.code_err_two')
+          f.codeFormat = false
           return false
         } else if (data.data.code == 200) {
           f.step = 'two'
@@ -984,9 +1052,9 @@
     watch: {
       'login.accountForm.passwordEye': function (val) {
         if (val) {
-          this.$refs.pwinput.type = "text"
+          this.$refs.accountForm_password.type = "text"
         } else {
-          this.$refs.pwinput.type = 'password'
+          this.$refs.accountForm_password.type = 'password'
         }
       },
       'login.forgetMode.passwordEye': function (val) {
@@ -1093,8 +1161,12 @@
 
             .swicthPWI {
               position: absolute;
-              margin-top: -46px;
+              top: 0px;
               right: 10px;
+              height: 40px;
+              display: flex;
+              align-items: center;
+              cursor: pointer;
             }
 
             .w {
@@ -1109,270 +1181,267 @@
               right: 10px;
               height: 40px;
             }
+          }
+        }
 
-            .b {
-              position: relative;
+        .returnToLogin {
+          float: right;
+          color: rgba(22, 29, 37, 1);
+          font-size: 12px;
+          cursor: pointer;
+        }
+
+        .b {
+          position: relative;
+
+          .i {
+            position: absolute;
+            width: 14px;
+            right: -20px;
+            top: 14px;
+            cursor: pointer;
+          }
+        }
+
+        .farm-input {
+          margin-bottom: 30px;
+        }
+
+        .warnInfo {
+          user-select: none;
+          position: absolute;
+          left: 0px;
+          bottom: 9px;
+          font-size: 11px;
+          color: rgba(255, 62, 77, 0.79);
+          line-height: 16px;
+          width: 400px;
+        }
+      }
+
+      .registered {
+        flex-shrink: 0;
+        width: 480px;
+        padding: 60px 80px;
+        box-sizing: border-box;
+
+        .label {
+          font-size: 18px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 1);
+          text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.2);
+          margin-bottom: 30px;
+        }
+
+        .farm-input {
+          margin-bottom: 30px;
+          height: 36px !important;
+        }
+
+        .c {
+          margin-bottom: 20px;
+
+          label {
+            font-size: 14px;
+            color: rgba(22, 29, 37, 0.4);
+          }
+
+          .radio {
+            vertical-align: super;
+            margin-left: 30px;
+
+            /deep/ .el-radio .el-radio__label {
+              font-size: 14px;
+            }
+          }
+        }
+
+        .registeredForm {
+          .u,
+          .v {
+            position: relative;
+
+            .swicthPWI {
+              position: absolute;
+              top: 0px;
+              right: 10px;
+              height: 36px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
             }
 
-            .farm-input {
-              margin-bottom: 30px;
+            .warnInfo {
+              user-select: none;
+              position: absolute;
+              left: 0px;
+              bottom: 9px;
+              font-size: 11px;
+              color: rgba(255, 62, 77, 0.79);
+              line-height: 16px;
+              width: 400px;
             }
 
             .i {
               position: absolute;
               width: 14px;
               right: -20px;
-              top: 14px;
-              cursor: pointer;
+              top: 10px;
+
+              &.canClick {
+                cursor: pointer;
+              }
             }
           }
 
-          .returnToLogin {
+          .rl {
+            position: relative;
             text-align: right;
-            color: rgba(22, 29, 37, 1);
-            font-size: 12px;
+            margin-bottom: 10px;
+            z-index: 1;
+
+            span {
+              font-size: 12px;
+
+              &:nth-of-type(1) {
+                color: rgba(22, 29, 37, 1);
+              }
+
+              &:nth-of-type(2) {
+                color: rgba(27, 83, 244, 1);
+                cursor: pointer;
+              }
+            }
+          }
+        }
+
+        .protocol {
+          position: relative;
+          padding-bottom: 28px;
+          font-size: 12px;
+
+          .protocolIcon {
+            vertical-align: sub;
             cursor: pointer;
           }
 
-          .warnInfo {
-            user-select: none;
-            position: absolute;
-            left: 0px;
-            bottom: 9px;
-            font-size: 11px;
-            color: rgba(255, 62, 77, 0.79);
-            line-height: 16px;
-            width: 400px;
+          .r {
+            color: rgba(22, 29, 37, 1);
+          }
+
+          .protocolLetter {
+            color: rgba(22, 113, 255, 0.8);
+            cursor: pointer;
+
+            &:hover {
+              color: rgba(22, 113, 255, 1)
+            }
           }
         }
 
-        .registered {
-          flex-shrink: 0;
-          width: 480px;
-          padding: 60px 80px;
-          box-sizing: border-box;
+        /*注册模块-btn*/
 
-          .label {
-            font-size: 18px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 1);
-            text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.2);
-            margin-bottom: 30px;
+        .btnLogin {
+          margin-top: 0px;
+          width: 320px;
+          height: 36px;
+          background-color: rgba(240, 240, 240, 1);
+          border-radius: 6px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          opacity: 1;
+          cursor: not-allowed;
+
+          span {
+            user-select: none;
+            font-size: 16px;
+            color: rgba(22, 29, 37, 0.39);
           }
 
-          .farm-input {
-            margin-bottom: 30px;
-            height: 36px !important;
-          }
-
-          .c {
-            margin-bottom: 20px;
-
-            label {
-              font-size: 14px;
-              color: rgba(22, 29, 37, 0.4);
-            }
-
-            .radio {
-              vertical-align: super;
-              margin-left: 30px;
-
-              /deep/ .el-radio .el-radio__label {
-                font-size: 14px;
-              }
-            }
-          }
-
-          .registeredForm {
-            .u,
-            .v {
-              position: relative;
-
-              .swicthPWI {
-                position: absolute;
-                top: 0px;
-                right: 10px;
-                height: 36px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-              }
-
-              .warnInfo {
-                user-select: none;
-                position: absolute;
-                left: 0px;
-                bottom: 9px;
-                font-size: 11px;
-                color: rgba(255, 62, 77, 0.79);
-                line-height: 16px;
-                width: 400px;
-              }
-
-              .i {
-                position: absolute;
-                width: 14px;
-                right: -20px;
-                top: 10px;
-
-                &.canClick {
-                  cursor: pointer;
-                }
-              }
-            }
-
-            .rl {
-              position: relative;
-              text-align: right;
-              margin-bottom: 10px;
-              z-index: 1;
-
-              span {
-                font-size: 12px;
-
-                &:nth-of-type(1) {
-                  color: rgba(22, 29, 37, 1);
-                }
-
-                &:nth-of-type(2) {
-                  color: rgba(27, 83, 244, 1);
-                  cursor: pointer;
-                }
-              }
-            }
-          }
-
-          .protocol {
-            position: relative;
-            padding-bottom: 28px;
-            font-size: 12px;
-
-            .protocolIcon {
-              vertical-align: sub;
-              cursor: pointer;
-            }
-
-            .r {
-              color: rgba(22, 29, 37, 1);
-            }
-
-            .protocolLetter {
-              color: rgba(22, 113, 255, 0.8);
-              cursor: pointer;
-
-              &:hover {
-                color: rgba(22, 113, 255, 1)
-              }
-            }
-          }
-
-          /*注册模块-btn*/
-
-          .btnLogin {
-            margin-top: 0px;
-            width: 320px;
-            height: 36px;
-            background-color: rgba(240, 240, 240, 1);
-            border-radius: 6px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 1;
-            cursor: not-allowed;
+          &.canClick {
+            cursor: pointer;
+            background-color: RGBA(14, 71, 161, 1);
 
             span {
-              user-select: none;
-              font-size: 16px;
-              color: rgba(22, 29, 37, 0.39);
-            }
-
-            &.canClick {
-              cursor: pointer;
-              background-color: RGBA(14, 71, 161, 1);
-
-              span {
-                color: rgba(255, 255, 255, 1);
-              }
-            }
-          }
-
-          /*滑动条*/
-
-          .drag {
-            width: 343px;
-            height: 20px;
-            position: relative;
-            background-color: rgba(255, 255, 255, 0.1711);
-            border-radius: 8px;
-            margin-bottom: 18px;
-            margin-left: 10px;
-            /*已划过部分*/
-
-            .bg {
-              width: 10px;
-              height: 20px;
-              position: absolute;
-              background-color: #0f46a1;
-              border-radius: 8px 0px 0px 8px;
-            }
-
-            /*文本*/
-
-            .text {
-              position: absolute;
-              width: 100%;
-              height: 100%;
-              text-align: center;
-              user-select: none;
-              font-size: 12px;
-              font-weight: 400;
-              color: rgba(255, 255, 255, 0.79);
-              line-height: 20px;
-            }
-
-            /*拖动按钮*/
-
-            .btn {
-              position: absolute;
-              top: -3px;
-              cursor: move;
-              text-align: center;
-              user-select: none;
-              border-radius: 50%;
-              width: 26px;
-              height: 26px;
-              background-color: rgba(255, 255, 255, 1);
+              color: rgba(255, 255, 255, 1);
             }
           }
         }
 
-        &.registeredPage {
-          margin-left: -480px;
+        /*滑动条*/
+
+        .drag {
+          width: 343px;
+          height: 20px;
+          position: relative;
+          background-color: rgba(255, 255, 255, 0.1711);
+          border-radius: 8px;
+          margin-bottom: 18px;
+          margin-left: 10px;
+          /*已划过部分*/
+
+          .bg {
+            width: 10px;
+            height: 20px;
+            position: absolute;
+            background-color: #0f46a1;
+            border-radius: 8px 0px 0px 8px;
+          }
+
+          /*文本*/
+
+          .text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            user-select: none;
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.79);
+            line-height: 20px;
+          }
+
+          /*拖动按钮*/
+
+          .btn {
+            position: absolute;
+            top: -3px;
+            cursor: move;
+            text-align: center;
+            user-select: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            background-color: rgba(255, 255, 255, 1);
+          }
         }
       }
 
-      .promptList {
-        position: fixed;
-        top: 0px;
-        left: calc(50% + 246px);
-        top: calc(50% - 218px);
+    }
 
-        .prompt {
-          display: block;
-          width: 400px;
-          margin-bottom: 32px;
-          border-radius: 4px;
-          padding: 10px;
-          font-size: 12px;
-          line-height: 1.2;
-          min-width: 10px;
-          background: #303133;
-          color: rgba(255, 255, 255, 1);
-          opacity: 0;
+    .promptList {
+      position: fixed;
+      top: 0px;
+      left: calc(50% + 246px);
+      top: calc(50% - 218px);
 
-          &.show {
-            opacity: 1;
-          }
+      .prompt {
+        display: block;
+        width: 400px;
+        margin-bottom: 32px;
+        border-radius: 4px;
+        padding: 10px;
+        font-size: 12px;
+        line-height: 1.2;
+        min-width: 10px;
+        background: #303133;
+        color: rgba(255, 255, 255, 1);
+        opacity: 0;
+
+        &.show {
+          opacity: 1;
         }
       }
     }
@@ -1414,8 +1483,10 @@
     position: relative;
 
     .verif {
-      top: 70px;
+      top: 0px;
       right: 10px;
+      height: 40px;
+      cursor: pointer;
     }
   }
 
@@ -1437,8 +1508,9 @@
     &.canBeClick {
       cursor: pointer;
       background-color: rgba(22, 113, 255, 0.8);
+
       span {
-        color: rgba(255,255,255,1);
+        color: rgba(255, 255, 255, 1);
       }
     }
   }
