@@ -1,16 +1,8 @@
 <template>
   <div class="login-wrapper">
+    <canvas ref="canvas" class="canvas" :width="screenWidth" :height="screenHeight"/>
     <img src="@/icons/login-logo.png" alt="" class="img_logo">
     <div class="vv">
-      <!--    <nav>-->
-      <!--      <img src="@/icons/findBack.png"-->
-      <!--           alt="返回登录"-->
-      <!--           class="findBack"-->
-      <!--           v-show="login.mode == 'findBack' && navActive == 1"-->
-      <!--           @click="login.mode = 'login'">-->
-      <!--      <span class="li" :class="[{'active': navActive == 1}]" @click="navActive = 1"></span>-->
-      <!--      <span class="li" :class="[{'active': navActive == 2}]" @click="navActive = 2"></span>-->
-      <!--    </nav>-->
       <section :class="[{'registeredPage': navActive == 2}]">
         <!--登录-->
         <aside class="logIn">
@@ -37,19 +29,28 @@
                        autofocus
                        :placeholder="$t('login_page.SMS_verif.phone_placeholder')"
                        @blur="jk"
-                       @focus="login.phoneForm.phoneVerif = true"
+                       @focus="login.phoneForm.phoneVerif = null"
+                       ref="phoneForm_phone"
                        class="farm-input"
-                       :class="[{'inputError': !login.phoneForm.phoneVerif}]"/>
-                <span class="warnInfo" v-show="">{{ $t('login_page.SMS_verif.phone_warnInfo') }}</span>
+                       :class="[{'inputError': login.phoneForm.phoneVerif === false}]"/>
+                <span class="warnInfo" v-show="login.phoneForm.phoneVerif === false">{{ login.warnInfo.phone }}</span>
+                <img src="@/icons/login-success.png" class="i"
+                     v-show="login.phoneForm.phoneVerif === true">
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.phoneForm.phoneVerif === false"
+                     @click="loginDeleteInput('phoneForm','phone')">
               </div>
               <!--验证码-->
               <div class="b">
                 <input v-model="login.phoneForm.code"
                        :placeholder="$t('login_page.SMS_verif.code_placeholder')"
-                       ref="passwordInput"
+                       ref="phoneForm_code"
                        type="text"
-                       class="farm-input"/>
-                <!--验证-->
+                       @blur="phoneCodeVerif"
+                       @focus="login.phoneForm.codeVerif = null"
+                       class="farm-input"
+                       :class="[{'inputError': login.phoneForm.codeVerif === false}]"/>
+                <!--获取验证码-->
                 <div class="verif">
                   <div class="btn"
                        @click="verifPhone"
@@ -60,6 +61,12 @@
                   {{ login.phoneForm.countdown }}
                 </span>
                 </div>
+                <span class="warnInfo" v-show="login.phoneForm.codeVerif === false">{{ login.warnInfo.code }}</span>
+                <img src="@/icons/login-success.png" class="i"
+                     v-show="login.phoneForm.codeVerif === true">
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.phoneForm.codeVerif === false"
+                     @click="loginDeleteInput('phoneForm','code')">
               </div>
               <!--5天内自动登录-->
               <el-switch v-model="login.phoneForm.autoLogin"
@@ -69,7 +76,7 @@
               {{ $t('login_page.SMS_verif.auto_login') }}
             </span>
               <!--登录按钮-->
-              <div class="btnLogin" @click="phoneLoginFun">
+              <div class="btnLogin" :class="[{'canBeClick': login.phoneForm.phoneVerif && login.phoneForm.codeVerif}]" @click="phoneLoginFun">
                 <span>{{ $t('login_page.loginText') }}</span>
               </div>
             </div>
@@ -197,26 +204,15 @@
             </div>
           </div>
         </aside>
-        <!--切换-->
-        <!--      <aside class="info"-->
-        <!--             :class="[{'loginPage': navActive == 1}]">-->
-        <!--        <img src="@/icons/registeredIcon.png"-->
-        <!--             alt=""-->
-        <!--             @click="navActive = 1"-->
-        <!--             v-show="navActive == 2">-->
-        <!--        <img src="@/icons/loginIcon.png"-->
-        <!--             alt=""-->
-        <!--             @click="navActive = 2"-->
-        <!--             v-show="navActive == 1">-->
-        <!--      </aside>-->
         <!--注册-->
         <aside class="registered">
-          <!--登录btn-->
-          <div style="color: #fff; font-size: 14px" @click="navActive = 1">btn</div>
-          <h6 class="label">
-            {{ $t('login_page.register.label') }}
-          </h6>
           <div class="registeredForm">
+
+            <!--返回登录-->
+            <div class="rl">
+              <span>{{ $t('login_page.register.rl1') }}</span>
+              <span @click="navActive = 1">{{ $t('login_page.register.rl2') }}</span>
+            </div>
             <!--帐号-->
             <div class="u">
               <input v-model="registered.form.account" :placeholder="$t('login_page.register.ac_placeholder')"
@@ -231,8 +227,11 @@
             <!--密码-->
             <div class="u">
               <input v-model="registered.form.password" type="password"
-                     :placeholder="$t('login_page.register.ps_placeholder')" @blur="passwVerifTurn"
-                     @focus="inputGetFocus('password')" ref="passwordRegister" class="farm-input"/>
+                     :placeholder="$t('login_page.register.ps_placeholder')"
+                     @blur="passwVerifTurn"
+                     @focus="inputGetFocus('password')"
+                     ref="passwordRegister"
+                     class="farm-input"/>
               <div class="swicthPWI">
                 <img src="@/icons/openPW.png" alt="" v-show="registered.passwordEye" @click="changePSType(false)">
                 <img src="@/icons/shuPW.png" alt="" v-show="!registered.passwordEye" @click="changePSType(true)">
@@ -261,8 +260,12 @@
                      :placeholder="$t('login_page.register.code_placeholder')"
                      @blur="codeVerif"
                      @focus="registered.status.code = null"
+                     ref="codeRegister"
                      class="farm-input"/>
               <span class="warnInfo" v-show="registered.status.code === false">{{ registered.warnInfo.code }}</span>
+              <img src="@/icons/login-success.png" class="i" v-show="registered.status.code === true">
+              <img src="@/icons/login-error .png" class="i canClick" v-show="registered.status.code === false"
+                   @click="deleteInput('code')">
               <div class="verif">
                 <div class="btn"
                      :class="[{'canClick': registered.status.phone}]"
@@ -284,30 +287,32 @@
             <!--<div class="btn" ref="btn" />-->
             <!--</div>-->
             <div class="c">
-              <label>{{ $t('login_page.register.type') }}</label>
+              <label>{{ $t('login_page.register.type') }}：</label>
               <el-radio-group v-model="registered.form.type" class="radio">
                 <el-radio :label="$t('login_page.register.typeRadio')[0]"></el-radio>
                 <el-radio :label="$t('login_page.register.typeRadio')[1]"></el-radio>
               </el-radio-group>
+
             </div>
             <!--协议-->
-            <div class="protocol">
-              <img src="@/icons/df.png" alt="" class="protocolIcon" v-show="!registered.tick"
-                   @click="registered.tick = true">
-              <img src="@/icons/dfg.png" alt="" class="protocolIcon" v-show="registered.tick"
-                   @click="registered.tick = false">
-              <span class="r">
-              {{ $t('login_page.register.text1') }}
-            </span>
-              <span class="protocolLetter" @click="showPDF">
-              {{ $t('login_page.register.text2') }}
-            </span>
+            <div class="v">
+              <div class="protocol">
+                <img src="@/icons/df.png" alt="" class="protocolIcon" v-show="!registered.tick"
+                     @click="registered.tick = true">
+                <img src="@/icons/dfg.png" alt="" class="protocolIcon" v-show="registered.tick"
+                     @click="registered.tick = false">
+                <span class="r">{{ $t('login_page.register.text1') }}</span>
+                <span class="protocolLetter" @click="showPDF">{{ $t('login_page.register.text2') }}</span>
+              </div>
+              <span class="warnInfo" v-show="registered.status.tick === false && registered.tick === false">
+                {{ registered.warnInfo.tick }}
+              </span>
             </div>
-            <!--注册-->
+            <!--注册btn-->
             <div class="btnLogin"
                  :class="[{'canClick': this.registered.status.account && this.registered.status.password && this.registered.status.phone && this.registered.status.code }]"
                  @click="registerFun">
-              <img src="@/icons/login.png" alt="">
+              <span>{{ $t('login_page.register.label') }}</span>
             </div>
           </div>
         </aside>
@@ -316,6 +321,11 @@
         <span class="prompt" :class="[{show: registered.status.accountInit}]">{{ $t('login_page.register.prompt.account') }}</span>
         <span class="prompt" :class="[{show: registered.status.passwordInit}]">{{ $t('login_page.register.prompt.password') }}</span>
       </div>
+    </div>
+    <!--备案-->
+    <div class="record_">
+      <span>{{ $t('login_page.record.text1') }}</span>
+      <span>{{ $t('login_page.record.text2') }}</span>
     </div>
   </div>
 
@@ -360,7 +370,8 @@
             verifShow: true,
             countdown: '60s',
             intervalFun: null,
-            phoneVerif: false,
+            phoneVerif: null,
+            codeVerif: null,
           },
           accountForm: {
             account: 'gaoge1834',
@@ -385,6 +396,10 @@
             newPassWordFormat: false,
             newPassWordAgainFormat: false,
             intervalFun: null
+          },
+          warnInfo: {
+            code: '',
+            phone: ''
           }
         },
         registered: {
@@ -397,6 +412,7 @@
             account: '',
             password: '',
             phone: '',
+            tick: '',
             code: this.$t('login_page.register.warnInfo.code')
           },
           clickEye: false,          // 刚刚点击了密码展示状态切换
@@ -412,6 +428,7 @@
             password: null,
             phone: null,
             code: null,
+            tick: null,
             accountInit: false,
             passwordInit: false,
             phoneInit: false
@@ -425,11 +442,24 @@
           passwordReg1: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)/,
           passwordReg2: /^\w{8,18}$/
         },
-        pdf: null
+        pdf: null,
+        screenWidth: '',
+        screenHeight: ''
       }
     },
     mounted() {
       this.$store.commit('changeLogin', true)
+
+      this.screenWidth = document.body.clientWidth
+      this.screenHeight = document.body.clientHeight
+
+      setTimeout(() => this.setCanvas(), 10)
+
+      window.addEventListener('resize', () => {
+        this.screenWidth = document.body.clientWidth
+        this.screenHeight = document.body.clientHeight
+        setTimeout(() => this.setCanvas(), 0)
+      })
 
       // //一、定义一个获取DOM元素的方法
       // let box = this.$refs.drag,//容器
@@ -516,19 +546,23 @@
 
     },
     methods: {
-      // 登录 - 验证手机号格式
-      jk() {
-        let f = this.login.phoneForm
-        if (!f.phone) {
-          f.phoneVerif = false;
-          return false
-        }
-        if (!this.reg.phoneReg.test(f.phone)) {
-          messageFun('error', this.$t('login_page.message.phoneTypeErr_one'));
-          f.phoneVerif = false;
-          return false
-        }
-        f.phoneVerif = true
+      // 创建画布
+      setCanvas() {
+        let canvas = document.getElementsByClassName('canvas')[0]
+        if (!canvas.getContext) return
+        let ctx = canvas.getContext('2d')
+
+        ctx.beginPath()
+        let bgi = ctx.createLinearGradient(0, 0, this.screenWidth, this.screenHeight / 2)
+        bgi.addColorStop(1, 'rgba(162, 203, 255, 1)')
+        bgi.addColorStop(0, 'rgba(0, 75, 206, 1)')
+        ctx.fillStyle = bgi
+        ctx.moveTo(0, 0)
+        ctx.lineTo(this.screenWidth, 0)
+        ctx.lineTo(this.screenWidth, this.screenHeight / 3)
+        ctx.lineTo(0, this.screenHeight / 2)
+        ctx.closePath()
+        ctx.fill()
       },
       // 注册-帐号验证
       async accouVerif() {
@@ -567,7 +601,9 @@
       passwVerifTurn() {
         setTimeout(this.passwVerif, 200)
       },
+      // 注册-密码验证
       passwVerif() {
+        // 操作为打开密码预览，则不做校验动作
         if (this.registered.clickEye) {
           this.registered.clickEye = false;
           return false
@@ -575,15 +611,24 @@
         let t = this.registered.form.password,
           s = this.registered.status
         s.passwordInit = false
+        // 若密码值为空，不显示校验结果icon提示
         if (!t) {
-          s.password = null;
+          s.password = null
           return false
         }
-        if (!this.reg.passwordReg1.test(t) || !this.reg.passwordReg2.test(t)) {
+        // 验证密码长度
+        if (!this.reg.passwordReg2.test(t)) {
+          this.registered.warnInfo.password = this.$t('login_page.message.ps_verif_two')
+          s.password = false
+          return false
+        }
+        // 验证密码复杂度
+        if (!this.reg.passwordReg1.test(t)) {
           this.registered.warnInfo.password = this.$t('login_page.message.ps_verif_one')
           s.password = false
           return false
         }
+        // 密码正确
         s.password = true
       },
       // 注册-切换密码显示状态
@@ -628,14 +673,20 @@
       // 注册-验证验证码
       codeVerif() {
         let r = this.registered
-        if (!r.form.code || !r.codeObtained) {
-          r.status.code = null;
+        // 若未填写验证码 不做校验
+        if (!r.form.code) {
+          r.status.code = null
           return false
         }
+        // 校验
         if (/^\d{6}$/.test(r.form.code)) r.status.code = true
-        else r.status.code = false
+        else {
+          // '请正确输入验证码'
+          this.registered.warnInfo.code = this.$t('login_page.message.codeTypeErr_two')
+          r.status.code = false
+        }
       },
-      // 注册 input获得焦点
+      // 注册 input获得焦点后
       inputGetFocus(item) {
         this.registered.status[item + 'Init'] = true
         this.registered.warnInfo[item] = ''
@@ -652,12 +703,16 @@
         let rf = this.registered.form,
           rs = this.registered.status
         if (!rs.account || !rs.password || !rs.phone || !rs.code) return false
-        if (!/^[0-9]{6}$/.test(rf.code)) {
-          messageFun('error', this.$t('login_page.message.codeTypeErr_one'));
+        // 请阅读用户服务协议
+        if (!this.registered.tick) {
+          this.registered.warnInfo.tick = this.$t('login_page.message.tickTypeErr_one')
+          rs.tick = false
           return false
         }
-        if (!this.registered.tick) {
-          messageFun('info', this.$t('login_page.message.tickTypeErr_one'));
+        // 未获取验证码
+        if (!this.registered.codeObtained) {
+          this.registered.warnInfo.code = this.$t('login_page.message.codeTypeErr_three')
+          rs.code = false
           return false
         }
         let data = await register(rf)
@@ -672,7 +727,42 @@
             rf = {account: '', password: '', phone: '', code: ''}
             rs = {account: false, password: false, phone: false}
           }.bind(this), 800)
-        } else messageFun('error', this.$t('login_page.message.registerErr'))
+        } else if (data.data.code == '4032') messageFun('error', this.$t('login_page.message.registerCodeErr'))
+        else messageFun('error', this.$t('login_page.message.registerErr'))
+      },
+      // 短信验证登录 - 验证手机格式
+      jk() {
+        let f = this.login.phoneForm
+        if (!f.phone) {
+          f.phoneVerif = null
+          return false
+        }
+        if (!this.reg.phoneReg.test(f.phone)) {
+          this.login.warnInfo.phone = $t('login_page.SMS_verif.phone_warnInfo')
+          f.phoneVerif = false
+          return false
+        }
+        f.phoneVerif = true
+      },
+      // 登录 点击errIcon
+      loginDeleteInput(list, item) {
+        this.login[list][item] = ''
+        this.$refs[list + '_' + item].focus()
+      },
+      // 短信登录-验证验证码
+      phoneCodeVerif() {
+        let r = this.login.phoneForm
+        // 若未填写验证码 不做校验
+        if (!r.code) {
+          r.codeVerif = null
+          return false
+        }
+        // 校验
+        if (/^\d{6}$/.test(r.code)) r.codeVerif = true
+        else {
+          // '请正确输入验证码'
+          r.codeVerif = false
+        }
       },
       // 帐号 登录
       async accountloginFun() {
@@ -698,17 +788,16 @@
       // 登录 手机号验证
       async verifPhone() {
         let f = this.login.phoneForm
-        if (!f.phoneVerif) {
-          messageFun('error', this.$t('login_page.message.ph_err'));
-          return false
-        }
+        if (!f.phoneVerif) return false
         this.delayFun('login')
         let data = await phoneVerif(f.phone)
         if (data.data.code == 200) {
           f.v = true;
           messageFun('info', this.$t('login_page.message.code_is_coming'))
         }
-        if (data.data.code == 10001) messageFun('error', this.$t('login_page.message.need_to_register'))
+        if (data.data.code == 10001)
+          this.login.warnInfo.phone = this.$t('login_page.message.need_to_register')
+          f.phoneVerif = false
       },
       // 手机号验证事件60秒延迟
       delayFun(obj) {
@@ -734,24 +823,18 @@
           }
         }, 1000)
       },
-      // 登录 手机号登录
+      // 短信登录 登录btn
       async phoneLoginFun() {
-        let {v, phone, code, isAutoLogin} = this.login.phoneForm
-        // 已验证
+        let {v, phone, code, isAutoLogin, phoneVerif, codeVerif} = this.login.phoneForm
+        // 若手机号或验证码未通过格式验证，直接忽略
+        if(!phoneVerif || !codeVerif) return false
+        // 检验是否已发送验证短信
         if (!v) {
-          messageFun('error', this.$t('login_page.message.no_sms'));
+          this.login.warnInfo.code = this.$t('login_page.message.no_sms')
+          this.login.phoneForm.codeVerif = false
           return false
         }
-        // 手机号
-        if (!this.reg.phoneReg.test(phone)) {
-          messageFun('error', this.$t('login_page.message.phoneTypeErr_three'));
-          return false
-        }
-        // 验证码
-        if (!this.reg.codeReg.test(code)) {
-          messageFun('error', this.$t('login_page.message.codeTypeErr_two'));
-          return false
-        }
+        // 判断验证码是否正确
         let data = await phoneLogin({phone, code, isAutoLogin})
         if (data.data.code == 4032) {
           messageFun('error', this.$t('login_page.message.code_err'));
@@ -942,6 +1025,7 @@
 <style lang="less" scoped>
   .login-wrapper {
     position: relative;
+
     .img_logo {
       position: absolute;
       top: -40px;
@@ -949,10 +1033,11 @@
       width: 80px;
       z-index: 9;
     }
+
     .vv {
+      position: relative;
       width: 480px;
       height: 533px;
-      /*background-color: rgba(22, 29, 37, 1);*/
       background-color: rgba(255, 255, 255, 1);
       box-shadow: 0px 2px 40px 0px rgba(22, 29, 37, 0.15);
       border-radius: 12px;
@@ -973,7 +1058,6 @@
         .logIn {
           flex-shrink: 0;
           width: 480px;
-          /*background-color: RGBA(15, 70, 161, 1);*/
           padding: 105px 80px 60px;
           box-sizing: border-box;
 
@@ -1008,7 +1092,9 @@
             }
 
             .swicthPWI {
+              position: absolute;
               margin-top: -46px;
+              right: 10px;
             }
 
             .w {
@@ -1021,18 +1107,42 @@
 
             .verif {
               right: 10px;
-              top: 10px;
+              height: 40px;
             }
 
             .b {
               position: relative;
             }
+
+            .farm-input {
+              margin-bottom: 30px;
+            }
+
+            .i {
+              position: absolute;
+              width: 14px;
+              right: -20px;
+              top: 14px;
+              cursor: pointer;
+            }
           }
+
           .returnToLogin {
             text-align: right;
             color: rgba(22, 29, 37, 1);
             font-size: 12px;
             cursor: pointer;
+          }
+
+          .warnInfo {
+            user-select: none;
+            position: absolute;
+            left: 0px;
+            bottom: 9px;
+            font-size: 11px;
+            color: rgba(255, 62, 77, 0.79);
+            line-height: 16px;
+            width: 400px;
           }
         }
 
@@ -1051,18 +1161,16 @@
           }
 
           .farm-input {
-            /*margin-bottom: 12px;*/
-            margin-bottom: 27px;
-            height: 25px !important;
+            margin-bottom: 30px;
+            height: 36px !important;
           }
 
           .c {
-            margin-top: 4px;
             margin-bottom: 20px;
 
             label {
               font-size: 14px;
-              color: rgba(255, 255, 255, 0.4);
+              color: rgba(22, 29, 37, 0.4);
             }
 
             .radio {
@@ -1082,16 +1190,18 @@
 
               .swicthPWI {
                 position: absolute;
-                right: 0px;
-                /*top: 14px;*/
-                top: 7px;
+                top: 0px;
+                right: 10px;
+                height: 36px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
               }
 
               .warnInfo {
                 user-select: none;
                 position: absolute;
                 left: 0px;
-                /*bottom: -6px;*/
                 bottom: 9px;
                 font-size: 11px;
                 color: rgba(255, 62, 77, 0.79);
@@ -1103,10 +1213,29 @@
                 position: absolute;
                 width: 14px;
                 right: -20px;
-                /*top: 14px;*/
-                top: 7px;
+                top: 10px;
 
                 &.canClick {
+                  cursor: pointer;
+                }
+              }
+            }
+
+            .rl {
+              position: relative;
+              text-align: right;
+              margin-bottom: 10px;
+              z-index: 1;
+
+              span {
+                font-size: 12px;
+
+                &:nth-of-type(1) {
+                  color: rgba(22, 29, 37, 1);
+                }
+
+                &:nth-of-type(2) {
+                  color: rgba(27, 83, 244, 1);
                   cursor: pointer;
                 }
               }
@@ -1114,8 +1243,9 @@
           }
 
           .protocol {
+            position: relative;
+            padding-bottom: 28px;
             font-size: 12px;
-            font-weight: 400;
 
             .protocolIcon {
               vertical-align: sub;
@@ -1123,11 +1253,11 @@
             }
 
             .r {
-              color: rgba(255, 255, 255, 0.5);
+              color: rgba(22, 29, 37, 1);
             }
 
             .protocolLetter {
-              color: rgba(22, 113, 255, 0.5);
+              color: rgba(22, 113, 255, 0.8);
               cursor: pointer;
 
               &:hover {
@@ -1139,25 +1269,30 @@
           /*注册模块-btn*/
 
           .btnLogin {
-            margin-top: 14px;
-            width: 100%;
-            height: 44px;
-            background-color: RGBA(13, 71, 163, 0.5);
-            border-radius: 22px;
+            margin-top: 0px;
+            width: 320px;
+            height: 36px;
+            background-color: rgba(240, 240, 240, 1);
+            border-radius: 6px;
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 1;
             cursor: not-allowed;
 
-            img {
+            span {
               user-select: none;
-              -webkit-user-drag: none;
+              font-size: 16px;
+              color: rgba(22, 29, 37, 0.39);
             }
 
             &.canClick {
               cursor: pointer;
               background-color: RGBA(14, 71, 161, 1);
+
+              span {
+                color: rgba(255, 255, 255, 1);
+              }
             }
           }
 
@@ -1219,13 +1354,13 @@
       .promptList {
         position: fixed;
         top: 0px;
-        left: calc(50% + 300px);
-        top: calc(50% - 142px);
+        left: calc(50% + 246px);
+        top: calc(50% - 218px);
 
         .prompt {
           display: block;
           width: 400px;
-          margin-bottom: 18px;
+          margin-bottom: 32px;
           border-radius: 4px;
           padding: 10px;
           font-size: 12px;
@@ -1250,6 +1385,11 @@
 
   .verif {
     position: absolute;
+    right: 10px;
+    top: 0px;
+    height: 36px;
+    display: flex;
+    align-items: center;
 
     .btn {
       font-size: 14px;
@@ -1265,18 +1405,8 @@
     .delayDate {
       font-size: 14px;
       text-align: center;
-      color: rgba(255, 255, 255, 1);
+      color: rgba(22, 29, 37, 0.8);
 
-    }
-  }
-
-  .v {
-    position: relative;
-
-    .verif {
-      /*top: 10px;*/
-      top: 3px;
-      right: 10px;
     }
   }
 
@@ -1295,7 +1425,6 @@
     height: 36px;
     background-color: rgba(240, 240, 240, 1);
     border-radius: 6px;
-    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1304,12 +1433,14 @@
       font-size: 16px;
       color: rgba(22, 29, 37, 0.39);
     }
-  }
 
-  .swicthPWI {
-    position: absolute;
-    right: 0px;
-    cursor: pointer;
+    &.canBeClick {
+      cursor: pointer;
+      background-color: rgba(22, 113, 255, 0.8);
+      span {
+        color: rgba(255,255,255,1);
+      }
+    }
   }
 
   .kj {
@@ -1346,4 +1477,27 @@
       color: rgba(22, 29, 37, 0.4);
     }
   }
+
+  .record_ {
+    position: absolute;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    span {
+      font-size: 12px;
+      color: rgba(22, 29, 37, 0.4);
+      line-height: 22px;
+    }
+  }
+
+  .canvas {
+    position: fixed;
+    z-index: 0;
+    top: 0px;
+    left: 0px;
+
+  }
+
 </style>
