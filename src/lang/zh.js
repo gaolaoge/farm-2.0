@@ -26,6 +26,7 @@ export default {
     forgetMode: {
       tit: '找回密码',
       btn: '获取验证码',
+      btnAgain: '确认修改',
       phone_placeholder: '请输入手机号',
       code_placeholder: '请输入验证码',
       ps_new: '请输入新密码',

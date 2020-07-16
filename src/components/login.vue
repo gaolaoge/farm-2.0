@@ -194,7 +194,9 @@
               <!--返回登录-->
               <div class="returnToLogin" @click="login.mode = 'login'">{{ $t('login_page.forgetMode.return') }}</div>
               <!--按钮-->
-              <div class="btnLogin" @click="verificationCode">
+              <div class="btnLogin"
+                   :class="[{'canBeClick': login.forgetMode.codeFormat && login.forgetMode.phoneFormat}]"
+                   @click="verificationCode">
                 <span>{{ $t('login_page.forgetMode.confirm') }}</span>
               </div>
             </div>
@@ -204,35 +206,57 @@
               <div class="kj">
                 <input v-model="login.forgetMode.newPassWord"
                        @blur="psFormat"
+                       @focus="login.formStatus.newPassWord = null"
                        type="password"
-                       ref="newPW"
+                       ref="forgetMode_newPassWord"
                        :placeholder="$t('login_page.forgetMode.ps_new')"
                        class="farm-input"/>
+                <!--查看密码-->
                 <div class="swicthPWI">
                   <img src="@/icons/openPW.png" alt="" v-show="login.forgetMode.passwordEye"
                        @click="login.forgetMode.passwordEye = false">
                   <img src="@/icons/shuPW.png" alt="" v-show="!login.forgetMode.passwordEye"
                        @click="login.forgetMode.passwordEye = true">
                 </div>
+                <span class="warnInfo" v-show="login.formStatus.newPassWord === false">
+                  {{ login.forgetMode.warnInfo.newPassWord }}
+                </span>
+                <img src="@/icons/login-success.png" class="i"
+                     v-show="login.formStatus.newPassWord === true">
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.formStatus.newPassWord === false"
+                     @click="loginDeleteInput('forgetMode','newPassWord')">
               </div>
               <!--再次输入新密码-->
               <div class="kj">
                 <input v-model="login.forgetMode.newPassWordAgain"
                        @blur="npsFormat"
+                       @focus="login.formStatus.newPassWordAgain = null"
                        type="password"
-                       ref="newPWA"
+                       ref="forgetMode_newPassWordAgain"
                        :placeholder="$t('login_page.forgetMode.ps_again')"
                        class="farm-input"/>
+                <!--查看密码-->
                 <div class="swicthPWI">
                   <img src="@/icons/openPW.png" alt="" v-show="login.forgetMode.passwordEyeAgain"
                        @click="login.forgetMode.passwordEyeAgain = false">
                   <img src="@/icons/shuPW.png" alt="" v-show="!login.forgetMode.passwordEyeAgain"
                        @click="login.forgetMode.passwordEyeAgain = true">
                 </div>
+                <span class="warnInfo" v-show="login.formStatus.newPassWordAgain === false">
+                  {{ login.forgetMode.warnInfo.newPassWordAgain }}
+                </span>
+                <img src="@/icons/login-success.png" class="i"
+                     v-show="login.formStatus.newPassWordAgain === true">
+                <img src="@/icons/login-error .png" class="i canClick"
+                     v-show="login.formStatus.newPassWordAgain === false"
+                     @click="loginDeleteInput('forgetMode','newPassWordAgain')">
               </div>
               <!--按钮-->
-              <div class="btnLogin" @click="c">
-                <img src="@/icons/login.png" alt="">
+              <div class="btnLogin"
+                   :class="[{'canBeClick': login.formStatus.newPassWord && login.formStatus.newPassWordAgain}]"
+                   @click="c">
+                <span>{{ $t('login_page.forgetMode.btnAgain') }}</span>
               </div>
             </div>
           </div>
@@ -419,7 +443,9 @@
             password: null,
             phone: null,
             code: null,
-            accountInit: false
+            accountInit: false,
+            newPassWord: null,
+            newPassWordAgain: null,
           },
           forgetMode: {
             phone: '',
@@ -433,11 +459,13 @@
             step: 'one',
             phoneFormat: null,
             codeFormat: null,
-            newPassWordFormat: null,
-            newPassWordAgainFormat: null,
+
             intervalFun: null,
+            codeObtained: false,               // 已获取验证码
             warnInfo: {
-              phone: ''
+              phone: '',
+              newPassWord: '',
+              newPassWordAgain: ''
             }
           },
           warnInfo: {
@@ -460,7 +488,7 @@
             tick: '',
             code: this.$t('login_page.register.warnInfo.code')
           },
-          clickEye: false,          // 刚刚点击了密码展示状态切换
+          clickEye: false,                   // 刚刚点击了密码展示状态切换
           form: {
             account: '',
             password: '',
@@ -478,9 +506,9 @@
             passwordInit: false,
             phoneInit: false
           },
-          codeObtained: false,      // 已获取验证码
+          codeObtained: false,               // 已获取验证码
         },
-        // sliderVerification: false         //注册滑块验证
+        // sliderVerification: false         // 注册滑块验证
         reg: {
           phoneReg: /^1(3|4|5|6|7|8|9)\d{9}$/,
           codeReg: /^\d{6}$/,
@@ -925,8 +953,9 @@
         let f = this.login.forgetMode
         // 若手机号格式不正确或验证码未空，不进行验证
         if (!f.phoneFormat || !f.code) return false
+        // 验证码格式不正确
         if (!this.reg.codeReg.test(f.code)) {
-          f.warnInfo.code = this.$t('login_page.message.codeTypeErr_three')
+          f.warnInfo.code = this.$t('login_page.message.codeTypeErr_two')
           f.codeFormat = false
           return false
         }
@@ -942,13 +971,21 @@
           f.phoneFormat = false
         } else {
           // 验证码已发送
+          f.codeObtained = true
         }
         this.delayFun('findBack')
       },
-      // 找回密码 验证验证码是否为真
+      // 找回密码 确定btn 验证验证码是否为真
       async verificationCode() {
         let f = this.login.forgetMode
+        // 若手机号或验证码未填写 不向下操作
         if (!f.phoneFormat || !f.codeFormat) return false
+        // 若没获取验证码 报错
+        if (!f.codeObtained) {
+          f.warnInfo.code = this.$t('login_page.message.codeTypeErr_three')
+          f.codeFormat = false
+          return false
+        }
         let data = await getVeriVal(`phone=${f.phone}&code=${f.code}`)
         if (data.data.code == 4034) {
           f.warnInfo.code = this.$t('login_page.message.code_err_two')
@@ -958,25 +995,30 @@
           f.step = 'two'
         } else messageFun('error', this.$t('login_page.message.verifErr'))
       },
-      // 找回密码 验证密码
+      // 找回密码 验证新密码
       psFormat() {
-        let t = this.login.forgetMode
+        let t = this.login.forgetMode,
+          f = this.login.formStatus
         if (!this.reg.passwordReg1.test(t.newPassWord) || !this.reg.passwordReg2.test(t.newPassWord)) {
-          messageFun('error', this.$t('login_page.message.psTypeErr_one'))
-          t.newPassWordFormat = false
+          t.warnInfo.newPassWord = this.$t('login_page.message.psTypeErr_one')
+          f.newPassWord = false
           return false
         }
-        t.newPassWordFormat = true
+        f.newPassWord = true
+        this.npsFormat()
       },
-      // 找回密码 验证密码
+      // 找回密码 验证第二次输入新密码
       npsFormat() {
-        let t = this.login.forgetMode
+        let t = this.login.forgetMode,
+          f = this.login.formStatus
+        // 若一或二次输入框未输入 不做验证
+        if (!t.newPassWord || !t.newPassWordAgain) return false
         if (t.newPassWord !== t.newPassWordAgain) {
-          messageFun('error', this.$t('login_page.message.psTypeErr_two'))
-          t.newPassWordAgainFormat = false
+          t.warnInfo.newPassWordAgain = this.$t('login_page.message.psTypeErr_two')
+          f.newPassWordAgain = false
           return false
         }
-        t.newPassWordAgainFormat = true
+        f.newPassWordAgain = true
       },
       // 找回密码 验证密码
       async c() {
@@ -1059,16 +1101,16 @@
       },
       'login.forgetMode.passwordEye': function (val) {
         if (val) {
-          this.$refs.newPW.type = "text"
+          this.$refs.forgetMode_newPassWord.type = "text"
         } else {
-          this.$refs.newPW.type = 'password'
+          this.$refs.forgetMode_newPassWord.type = 'password'
         }
       },
       'login.forgetMode.passwordEyeAgain': function (val) {
         if (val) {
-          this.$refs.newPWA.type = "text"
+          this.$refs.forgetMode_newPassWordAgain.type = "text"
         } else {
-          this.$refs.newPWA.type = 'password'
+          this.$refs.forgetMode_newPassWordAgain.type = 'password'
         }
       },
       'registered.passwordEye': function (val) {
@@ -1520,10 +1562,24 @@
 
     .swicthPWI {
       position: absolute;
-      right: 0px;
-      top: 20px;
+      right: 10px;
+      top: 0px;
+      cursor: pointer;
+      height: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    .i {
+      position: absolute;
+      top: 14px;
+      right: -20px;
+      display: flex;
+      align-items: center;
+      width: 14px;
       cursor: pointer;
     }
+
   }
 
   .inputError {
