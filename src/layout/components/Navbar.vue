@@ -77,7 +77,7 @@
         ],
         systemList: [
           {
-            link: '/statistics',
+            link: '/statisticsM',
             iconUrl: require('@/icons/console-icon-statistics-h.png'),
             iconsUrlDefault: require('@/icons/console-icon-statistics.png'),
             text: '统计',

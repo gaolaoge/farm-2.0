@@ -1,6 +1,6 @@
 <template>
   <div class="home-charts-wrapper">
-    <div ref="ec" class="ec"></div>
+    <div ref="ec" class="ec" />
   </div>
 </template>
 

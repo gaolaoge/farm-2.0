@@ -74,6 +74,11 @@ const router = new Router({
       path: '/setting',
       name: 'setting',
       component: () => import('@/components/setting-mainM')
+    },
+    {
+      path: '/statisticsM',
+      name: 'statisticsM',
+      component: () => import('@/components/statistics-mainM')
     }
   ]
 })

@@ -93,5 +93,14 @@ export default {
       text1: '京ICP备11017824号-4 / 京ICP证130164号 北京市公安局朝阳分局备案编号:110105000501',
       text2: 'Copyright © 2018-2020 国家电影云制作服务平台'
     }
+  },
+  // 统计页
+  statistics_mainM: {
+    // 任务数统计
+    taskData: {
+      name: '任务数统计',
+      navLi_one: '新增任务数统计',
+      navLi_two: '累计任务数统计'
+    }
   }
 }
