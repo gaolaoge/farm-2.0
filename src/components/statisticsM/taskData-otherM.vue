@@ -5,18 +5,22 @@
         <!--名称-->
         <span class="name fc">{{ $t('statistics_mainM.taskData.name') }}</span>
         <!--新增任务数统计-->
-        <span class="navLi fc" :class="[{'active': navIndex == 0}]">{{ $t('statistics_mainM.taskData.navLi_one') }}</span>
+        <span class="navLi fc"
+              :class="[{'active': navIndex == 0}]">{{ $t('statistics_mainM.taskData.navLi_one') }}</span>
         <!--累计任务数统计-->
-        <span class="navLi fc" :class="[{'active': navIndex == 1}]">{{ $t('statistics_mainM.taskData.navLi_two') }}</span>
+        <span class="navLi fc"
+              :class="[{'active': navIndex == 1}]">{{ $t('statistics_mainM.taskData.navLi_two') }}</span>
       </div>
-      <div class="c">
+      <div class="c filter">
         <!--时间区间-->
-        <span class="date fc bl">2020-05-29～2020-06-04</span>
+        <div class="filter-item">
+          <calendar @changeSelectDate="changeSelectDate" @changeSelect="dateInterval = 'customize'" ref="selectDateM"/>
+        </div>
         <!--下拉框-->
         <div class="select bl">
-          <el-select v-model="value" placeholder="请选择">
+          <el-select v-model="dateInterval" placeholder="请选择" @change="$refs.selectDateM.setDateInterval(dateInterval)">
             <el-option
-              v-for="item in options"
+              v-for="item in dateIntervalList"
               :key="item.value"
               :label="item.label"
               :value="item.value">
@@ -38,106 +42,99 @@
           </el-option>
         </el-select>
       </div>
-      <div class="ec" ref="ec" />
+      <div class="ec" ref="ec"/>
     </section>
   </div>
 </template>
 
 <script>
+  import calendar from '@/components/farm-model/farm-calendar.vue'
+
   export default {
     name: '',
     data() {
       return {
         navIndex: 0,
         ec: null,
-        options: [
+        dateIntervalList: [
+          {
+            value: 'nearlySevenDays',
+            label: '近7天'
+          },
+          {
+            value: 'nearlyThirtyDays',
+            label: '近30天'
+          },
+          {
+            value: 'customize',
+            label: '自定义'
+          }
+        ],
+        itemList: [
           {
             value: '选项1',
             label: '近7天'
           },
           {
-            value: '选项2',
-            label: '双皮奶'
+            value: '近30天',
+            label: '近30天'
           },
           {
-            value: '选项3',
-            label: '蚵仔煎'
+            value: '自定义',
+            label: '自定义'
           }
         ],
-        value: '选项1',
+        dateInterval: 'nearlySevenDays',
         value1: '选项1',
+        startDate: '',
+        endDate: '',
       }
     },
-    // watch: {
-    //   cData(val) {
-    //     this.init()
-    //   },
-    //   cDate(val) {
-    //     this.init()
-    //     window.addEventListener("resize", this.ec.resize);
-    //   }
-    // },
-    mounted(){
+    watch: {
+      startDate() {
+        this.$emit('monitorVal', [this.startDate, this.endDate])
+      },
+      endDate() {
+        this.$emit('monitorVal', [this.startDate, this.endDate])
+      }
+      //   cData(val) {
+      //     this.init()
+      //   },
+      //   cDate(val) {
+      //     this.init()
+      //     window.addEventListener("resize", this.ec.resize);
+      //   }
+    },
+    mounted() {
       this.init()
       window.addEventListener('resize', this.ec.resize)
+      this.$refs.selectDateM.setDateInterval(this.dateInterval)
     },
     methods: {
-      init(){
+      init() {
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
-          animation: false,
-          title: {
-            left: 'center',
-            text: '触屏 tooltip 和 dataZoom 示例',
-            subtext: '"tootip" and "dataZoom" on mobile device',
-          },
-          legend: {
-            top: 'bottom',
-            data: ['意向']
-          },
           tooltip: {
-            triggerOn: 'none',
-            position: function (pt) {
-              return [pt[0], 130];
-            }
-          },
-          toolbox: {
-            left: 'center',
-            itemSize: 25,
-            top: 55,
-            feature: {
-              dataZoom: {
-                yAxisIndex: 'none'
-              },
-              restore: {}
-            }
+            trigger: 'axis',
+            axisPointer: {
+              type: 'cross',
+            },
+            backgroundColor: 'rgba(27, 83, 244, 0.59)'
           },
           xAxis: {
             type: 'time',
-            // boundaryGap: [0, 0],
-            axisPointer: {
-              value: '2016-10-7',
-              snap: true,
-              lineStyle: {
-                color: '#004E52',
-                opacity: 0.5,
-                width: 2
-              },
-              label: {
-                show: true,
-                formatter: function (params) {
-                  return this.$echarts.format.formatTime('yyyy-MM-dd', params.value);
-                },
-                backgroundColor: '#004E52'
-              },
-              handle: {
-                show: true,
-                color: '#004E52'
-              }
-            },
+            maxInterval: 3600 * 24 * 1000,
             splitLine: {
               show: false
-            }
+            },
+            axisLabel: {
+              color: 'rgba(22, 29, 37, 0.4)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgba(22, 29, 37, 0.1)'
+              }
+            },
           },
           yAxis: {
             type: 'value',
@@ -148,87 +145,98 @@
               show: false
             },
             axisLabel: {
-              inside: true,
-              formatter: '{value}\n'
+              inside: false,
+              formatter: '{value}',
+              color: 'rgba(22, 29, 37, 0.4)'
+            },
+            axisLine: {
+              lineStyle: {
+                color: 'rgba(22, 29, 37, 0.1)'
+              }
             },
             z: 10
           },
           grid: {
-            top: 110,
-            left: 15,
-            right: 15,
-            height: 160
+            top: 50,
+            left: 26,
+            right: 26,
           },
-          dataZoom: [{
-            type: 'inside',
-            throttle: 50
-          }],
           series: [
             {
               name: '模拟数据',
               type: 'line',
-              smooth: true,
-              symbol: 'circle',
+              smooth: true,         // 是否平滑曲线显示
+              symbol: 'circle',     // 标记的样式
               symbolSize: 5,
               sampling: 'average',
               itemStyle: {
-                color: '#8ec6ad'
+                color: 'rgba(255, 191, 0, 1)'
               },
-              stack: 'a',
               areaStyle: {
-                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                  offset: 0,
-                  color: '#8ec6ad'
-                }, {
-                  offset: 1,
-                  color: '#ffe'
-                }])
+                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgba(255, 191, 0, 0.2)'
+                  },
+                  {
+                    offset: 1,
+                    color: 'rgba(255, 191, 0, 0)'
+                  }
+                ])
               },
               data: [
-                {date: '2020-01-01', data: 12},
-                {date: '2020-01-02', data: 12},
-                {date: '2020-01-03', data: 12},
-                {date: '2020-01-04', data: 22},
-                {date: '2020-01-05', data: 12},
-                {date: '2020-01-06', data: 12},
-                {date: '2020-01-07', data: 12},
-                {date: '2020-01-08', data: 12},
+                ['2020-01-01', 12],
+                ['2020-01-02', 53],
+                ['2020-01-03', 12],
+                ['2020-01-04', 52],
+                ['2020-01-05', 12],
+                ['2020-01-06', 22],
+                ['2020-01-07', 12],
               ]
             },
             {
               name: '模拟数据',
               type: 'line',
               smooth: true,
-              stack: 'a',
               symbol: 'circle',
               symbolSize: 5,
               sampling: 'average',
               itemStyle: {
-                color: '#d68262'
+                color: 'rgba(27, 83, 244, 0.9)'
               },
               areaStyle: {
-                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                  offset: 0,
-                  color: '#d68262'
-                }, {
-                  offset: 1,
-                  color: '#ffe'
-                }])
+                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: 'rgba(0, 75, 206, 0.6)'
+                  },
+                  {
+                    offset: 1,
+                    color: 'rgba(162, 203, 255, 0.2)'
+                  }
+                ])
               },
               data: [
-                {date: '2020-01-01', data: 123},
-                {date: '2020-01-02', data: 12},
-                {date: '2020-01-03', data: 232},
-                {date: '2020-01-04', data: 22},
-                {date: '2020-01-05', data: 12},
-                {date: '2020-01-06', data: 122},
-                {date: '2020-01-07', data: 12},
-                {date: '2020-01-08', data: 127},
+                ['2020-01-01', 52],
+                ['2020-01-02', 15],
+                ['2020-01-03', 12],
+                ['2020-01-04', 72],
+                ['2020-01-05', 32],
+                ['2020-01-06', 22],
+                ['2020-01-07', 12],
               ]
             }
           ]
         })
-      }
+      },
+      // 日期选择模块选择结果
+      changeSelectDate([startDate, endDate]) {
+        this.startDate = startDate
+        this.endDate = endDate
+      },
+    },
+    components: {
+      calendar
     }
   }
 </script>

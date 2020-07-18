@@ -346,6 +346,8 @@
             background: rgba(255, 255, 255, 1);
             box-shadow: 0px 2px 20px 0px rgba(27, 83, 244, 0.05);
             border-radius: 14px;
+            cursor: pointer;
+            overflow: hidden;
 
             .n {
               font-size: 40px;
@@ -375,15 +377,37 @@
               }
             }
 
+            &::before {
+              position: absolute;
+              content: '';
+              width: 182px;
+              height: 119px;
+              border-radius: 50%;
+              opacity: 0.1;
+              filter: blur(15px);
+            }
+
             &:nth-of-type(1) {
               .name::before {
                 background-color: rgba(255, 62, 77, 1);
+              }
+
+              &::before {
+                bottom: -20px;
+                right: -20px;
+                background-image: linear-gradient(180deg, rgba(253, 190, 94, 1) 0%, rgba(253, 94, 90, 1) 100%);
               }
             }
 
             &:nth-of-type(2) {
               .name::before {
+                top: 4px;
+                right: -8px;
                 background-color: rgba(27, 83, 244, 1);
+              }
+
+              &::before {
+                background-image: linear-gradient(180deg, rgba(55, 199, 225, 1) 0%, rgba(44, 145, 245, 1) 100%);
               }
             }
 
@@ -391,11 +415,19 @@
               .name::before {
                 background-color: rgba(158, 152, 226, 1);
               }
+
+              &::before {
+                background-image: linear-gradient(45deg, rgba(75, 167, 156, 1) 0%, rgba(143, 236, 222, 1) 100%);
+              }
             }
 
             &:nth-of-type(4) {
               .name::before {
                 background-color: rgba(255, 191, 0, 1);
+              }
+
+              &::before {
+                background-image: linear-gradient(315deg, rgba(83, 108, 255, 1) 0%, rgba(144, 121, 255, 1) 100%);
               }
             }
 
@@ -404,6 +436,12 @@
 
               .name::before {
                 background-color: rgba(70, 203, 93, 1);
+              }
+
+              &::before {
+                bottom: 0px;
+                right: 0px;
+                background-image: linear-gradient(180deg, rgba(109, 212, 0, 1) 0%, rgba(247, 181, 0, 1) 100%);
               }
             }
           }

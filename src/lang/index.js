@@ -7,8 +7,6 @@ import zh from './zh'
 
 Vue.use(VueI18n)
 
-console.log(VueI18n)
-
 const messages = {
   en: {
     ...en

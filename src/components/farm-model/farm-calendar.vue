@@ -31,7 +31,7 @@
         </div>
         <div class="btn-item">
           <!--确定-->
-          <div class="btn-correct btn" @click="correctDateVal">
+          <div class="btn-correct btn" @click="s">
             {{ correct }}
           </div>
           <!--取消-->
@@ -44,27 +44,28 @@
       <div class="calendarTab">
         <div class="adjust">
           <span class="yearAdjust">
-            <img src="@/icons/enter.png" alt="" @click="changeYear('previous')">
+            <img src="@/icons/enter2.png" alt="" @click="changeYear('previous')">
             <span class="o">
               {{ yearNow }}年
             </span>
-            <img src="@/icons/enter.png" alt="" @click="changeYear('next')">
+            <img src="@/icons/enter2.png" alt="" @click="changeYear('next')">
           </span>
           <span class="monthAdjust">
-            <img src="@/icons/enter.png" alt="" @click="changeMonth('previous')">
+            <img src="@/icons/enter2.png" alt="" @click="changeMonth('previous')">
             <span class="o">
               {{ monthNow }}月
             </span>
-            <img src="@/icons/enter.png" alt="" @click="changeMonth('next')">
+            <img src="@/icons/enter2.png" alt="" @click="changeMonth('next')">
           </span>
         </div>
         <div class="dayList">
           <span v-for="(item,index) in visibeDays"
                 :key="index" class="day"
-                @click="selectSpanDate(item)"
+                @click="!isFuture(item) ? selectSpanDate(item) : false"
                 :class="[
                   {'n': !isCurrentMonth(item)},
-                  {'t': isToday(item)}
+                  {'t': isToday(item)},
+                  {'f': isFuture(item)}
                 ]">
             {{ item.getDate() }}
           </span>
@@ -88,7 +89,8 @@
         t: '自定义时间',
         operating: false,
         // 日历选中月份
-        checkTimesTamp: new Date(),
+        checkTimesTamp: new Date(new Date().toDateString()),
+        todayTimesTamp: new Date(new Date().toDateString()),
         selectDate: 'start',
         startDate: null,
         endDate: null,
@@ -96,8 +98,9 @@
         endLabel: '结束',
         correct: '确定',
         cancel: '取消',
-        // 起始时间时间戳
-        startTimestamp: new Date(),
+        // 起始、结束时间时间戳
+        startTimestamp: null,
+        endTimestamp: null,
         u: null
       }
     },
@@ -112,6 +115,7 @@
               }
               if (e.target.innerText == '确定') {
                 vnode.context.blur()
+                vnode.context.selectDate = 'start'
               }
             } else {
               if (vnode.context.operating) {
@@ -122,16 +126,12 @@
           el.handler = handler
           document.addEventListener('click', handler)
         },
-        unbind(el) {
+        unbind(el, bindings, vnode) {
           document.removeEventListener('click', el.handler)
         }
       }
     },
     computed: {
-      // 最终结果
-      // dateResult(){
-      //   return
-      // },
       // 今日
       formatDate() {
         let {year, month, day} = createCalendar(this.checkTimesTamp)
@@ -150,10 +150,10 @@
       // 生成日历
       visibeDays() {
         let {year, month} = createCalendar(this.checkTimesTamp),
-          firDay = getDate(year, month, 1),    //当月1号时间戳
-          firDayWeek = firDay.getDay(),      //当月1号星期
+          firDay = getDate(year, month, 1),    // 当月1号时间戳
+          firDayWeek = firDay.getDay(),        // 当月1号星期
           p = 60 * 60 * 1000 * 24,
-          startDay = firDay - firDayWeek * p,//当组日历的第一天
+          startDay = firDay - firDayWeek * p,  // 当组日历的第一天
           arr = []
         // 每组日历显示42天
         for (let i = 0; i < 42; i++) {
@@ -173,13 +173,8 @@
             this.startDate = t
             break
           case 'end':
-            // 判断开始日期小于结束日期
-            if (this.startTimestamp < date) {
-              this.endDate = t
-            } else {
-              //结束日期小于开始日期
-
-            }
+            this.endTimestamp = date
+            this.endDate = t
             break
         }
       },
@@ -195,13 +190,17 @@
       blur() {
         this.operating = false
       },
-      // 判断是否为当月日期
+      // 判断item是否在选中月份内
       isCurrentMonth(date) {
         return this.checkTimesTamp.getMonth() == date.getMonth() && this.checkTimesTamp.getFullYear() == date.getFullYear()
       },
-      // 判断是否时当天日期
+      // 判断item是否为当天
       isToday(date) {
-        return this.checkTimesTamp.getMonth() == date.getMonth() && this.checkTimesTamp.getFullYear() == date.getFullYear() && this.checkTimesTamp.getDate() == date.getDate()
+        return this.todayTimesTamp.getMonth() == date.getMonth() && this.todayTimesTamp.getFullYear() == date.getFullYear() && this.todayTimesTamp.getDate() == date.getDate()
+      },
+      // 判断是否是未来日期
+      isFuture(date) {
+        return this.todayTimesTamp.getTime() < date.getTime()
       },
       // 修改日历年份
       changeYear(dir) {
@@ -234,9 +233,43 @@
         }
       },
       // 日期确定选择
+      s() {
+        this.$emit('changeSelect')
+        this.correctDateVal()
+      },
       correctDateVal() {
-        this.u = this.startDate + ' ~ ' + this.endDate
-        this.$emit('changeSelectDate', [this.startDate, this.endDate])
+        let s, e
+        if (this.startTimestamp <= this.endTimestamp) {
+          s = this.startDate
+          e = this.endDate
+        } else {
+          s = this.endDate
+          e = this.startDate
+        }
+        this.u = s + ' ~ ' + e
+        this.$emit('changeSelectDate', [s, e])
+      },
+      // 设置日期区间
+      setDateInterval(dateInterval) {
+        let num = 1000 * 60 * 60 * 24,
+          todayNum = new Date().getTime()
+        // 设置开始日期
+        switch (dateInterval) {
+          case 'nearlySevenDays':
+            this.selectSpanDate(new Date(todayNum - 6 * num))
+            break
+          case 'nearlyThirtyDays':
+            this.selectSpanDate(new Date(todayNum - 29 * num))
+            break
+          case 'customize':  // 无需操作
+            break
+        }
+        // 设置结束结束日期 当日
+        this.selectDate = 'end'
+        this.selectSpanDate(this.todayTimesTamp)  // new Date()
+
+        this.selectDate = 'start'
+        this.correctDateVal()     // 选定
       }
     },
     mounted() {
@@ -276,7 +309,7 @@
         .ti {
           font-size: 14px;
           font-weight: 400;
-          color: rgba(255, 255, 255, 0.8);
+          color: rgba(22, 29, 37, 0.8);
           text-align: center;
           padding: 15px 0px;
           user-select: none;
@@ -369,9 +402,15 @@
 
           .yearAdjust,
           .monthAdjust {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 62px;
+
             img {
-              vertical-align: top;
               cursor: pointer;
+              width: 4px;
+              margin: 0px 3px;
 
               &:nth-of-type(1) {
                 transform: rotate(180deg);
@@ -381,7 +420,6 @@
             .o {
               user-select: none;
               font-size: 12px;
-              font-weight: 400;
               color: rgba(22, 29, 37, 0.59);
             }
           }
@@ -406,6 +444,10 @@
 
             &.n {
               color: rgba(22, 29, 37, 0.3);
+
+              &:hover {
+                color: rgba(22, 29, 37, 0.3) !important;
+              }
             }
 
             &.t,
@@ -413,6 +455,15 @@
               background-image: linear-gradient(225deg, rgba(142, 192, 255, 1) 0%, rgba(27, 83, 244, 1) 100%);
               border-radius: 50%;
               color: rgba(255, 255, 255, 1);
+            }
+
+            &.f {
+              cursor: no-drop;
+
+              &:hover {
+                background-image: none;
+                color: rgba(22, 29, 37, 1);
+              }
             }
           }
         }

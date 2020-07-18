@@ -1,7 +1,7 @@
 <template>
   <div class="statisticsM-wrapper">
     <!--任务数据统计-->
-    <taskData/>
+    <taskData @monitorVal="monitorVal" ref="taskData" />
     <!--帧数统计-->
     <numberOfFrames/>
     <!--消费统计-->
@@ -16,13 +16,28 @@
   import numberOfFrames from '@/components/statisticsM/numberOfFrames-otherM'
   import consumption from '@/components/statisticsM/consumption-otherM'
   import taskStatus from '@/components/statisticsM/taskStatus-otherM'
+  import {
+    createCalendar
+  } from '@/assets/common.js'
 
   export default {
     name: 'statisticsM-wrapper',
     data() {
       return {}
     },
-    methods: {},
+    methods: {
+      // 通过日期选择器修改区间 监听结果是否匹配下拉框选项
+      monitorVal([s, e]) {
+        let {year, month, day} = createCalendar(new Date()),
+          t = `${year}-${month}-${day}`
+        if (t != e) this.$refs.taskData.dateInterval = 'customize'
+        let num = 1000 * 60 * 60 * 24
+        let {year: y, month: m, day: d} = createCalendar(new Date(new Date().getTime() - 6 * num))
+        let {year: y2, month: m2, day: d2} = createCalendar(new Date(new Date().getTime() - 29 * num))
+        if (s == `${y}-${m}-${d}`) this.$refs.taskData.dateInterval = 'nearlySevenDays'
+        if (s == `${y2}-${m2}-${d2}`) this.$refs.taskData.dateInterval = 'nearlyThirtyDays'
+      }
+    },
     components: {
       taskData,
       numberOfFrames,
@@ -40,7 +55,7 @@
       width: calc(50% - 10px);
       height: calc(50% - 10px);
       border-radius: 14px;
-      overflow: hidden;
+      /*overflow: hidden;*/
       display: flex;
       flex-direction: column;
 
@@ -102,6 +117,7 @@
           position: relative;
           padding: 0px 17px;
           cursor: pointer;
+          height: 100%;
         }
 
         .select {
@@ -130,15 +146,47 @@
             background-color: rgba(22, 29, 37, 0.15);
           }
         }
+
+        .filter .filter-item .filter-item-i {
+          border: 1px solid rgba(0, 0, 0, 0);
+          margin-right: 0px;
+          cursor: pointer;
+        }
       }
+
       section {
         position: relative;
         flex-shrink: 1;
         flex-grow: 1;
         height: 1px;
+
         .selectData {
           position: absolute;
+          z-index: 9;
+          width: 100%;
+
+          /deep/ .el-select {
+            padding: 10px 15px;
+
+            .el-input__inner {
+              height: 25px;
+              width: 120px;
+              background: rgba(248, 248, 248, 1);
+              border-radius: 2px;
+              border: 1px solid rgba(22, 29, 37, 0.1);
+            }
+
+            .el-input__suffix {
+              display: flex;
+              align-items: center;
+
+              .el-input__suffix-inner {
+
+              }
+            }
+          }
         }
+
         .ec {
           height: 100%;
         }
