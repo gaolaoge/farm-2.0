@@ -1,13 +1,13 @@
 <template>
   <div class="statisticsM-wrapper">
     <!--任务数据统计-->
-    <taskData @monitorVal="monitorVal" ref="taskData" />
+    <taskData ref="taskData" @monitorVal="monitorVal" @fullScreen="fullScreen" v-show="showTaskData" />
     <!--帧数统计-->
-    <numberOfFrames/>
+    <numberOfFrames ref="numOfFrames" v-show="showNumOfFrames" />
     <!--消费统计-->
-    <consumption/>
+    <consumption ref="consumption" v-show="showConsumption" />
     <!--任务状态统计-->
-    <taskStatus/>
+    <taskStatus ref="taskStatus" v-show="showTaskStatus" />
   </div>
 </template>
 
@@ -23,19 +23,30 @@
   export default {
     name: 'statisticsM-wrapper',
     data() {
-      return {}
+      return {
+        screen: {
+          showTaskData: true,
+          showNumOfFrames: true,
+          showConsumption: true,
+          showTaskStatus: true
+        },
+      }
     },
     methods: {
       // 通过日期选择器修改区间 监听结果是否匹配下拉框选项
-      monitorVal([s, e]) {
+      monitorVal([s, e, dom]) {
         let {year, month, day} = createCalendar(new Date()),
           t = `${year}-${month}-${day}`
-        if (t != e) this.$refs.taskData.dateInterval = 'customize'
+        if (t != e) this.$refs[dom].dateInterval = 'customize'
         let num = 1000 * 60 * 60 * 24
         let {year: y, month: m, day: d} = createCalendar(new Date(new Date().getTime() - 6 * num))
         let {year: y2, month: m2, day: d2} = createCalendar(new Date(new Date().getTime() - 29 * num))
-        if (s == `${y}-${m}-${d}`) this.$refs.taskData.dateInterval = 'nearlySevenDays'
-        if (s == `${y2}-${m2}-${d2}`) this.$refs.taskData.dateInterval = 'nearlyThirtyDays'
+        if (s == `${y}-${m}-${d}`) this.$refs[dom].dateInterval = 'nearlySevenDays'
+        if (s == `${y2}-${m2}-${d2}`) this.$refs[dom].dateInterval = 'nearlyThirtyDays'
+      },
+      // 全屏
+      fullScreen(screen){
+        this.screen
       }
     },
     components: {

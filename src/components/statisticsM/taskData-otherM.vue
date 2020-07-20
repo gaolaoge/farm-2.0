@@ -28,7 +28,9 @@
           </el-select>
         </div>
         <!--全屏-->
-        <span class="bigger fc bl"><img src="@/icons/bigger.png" alt=""></span>
+        <span class="bigger fc bl">
+          <img src="@/icons/bigger.png" alt="" @click="$emit('fullScreen', 'taskData')">
+        </span>
       </div>
     </div>
     <section>
@@ -92,10 +94,10 @@
     },
     watch: {
       startDate() {
-        this.$emit('monitorVal', [this.startDate, this.endDate])
+        this.$emit('monitorVal', [this.startDate, this.endDate, 'taskData'])
       },
       endDate() {
-        this.$emit('monitorVal', [this.startDate, this.endDate])
+        this.$emit('monitorVal', [this.startDate, this.endDate, 'taskData'])
       }
       //   cData(val) {
       //     this.init()
@@ -111,6 +113,7 @@
       this.$refs.selectDateM.setDateInterval(this.dateInterval)
     },
     methods: {
+      // echarts 初始化
       init() {
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
@@ -234,6 +237,7 @@
         this.startDate = startDate
         this.endDate = endDate
       },
+
     },
     components: {
       calendar
