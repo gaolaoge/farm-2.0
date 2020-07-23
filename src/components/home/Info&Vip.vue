@@ -46,10 +46,19 @@
       <div class="line"></div>
       <!--存储统计-->
       <div class="echarts">
+        <div class="tt">
+          <span class="main">{{ echartsT.main }}</span>
+          <span class="mini">{{ echartsT.mini }}</span>
+        </div>
         <storageCharts class="storage-charts"/>
       </div>
     </div>
-    <div class="vip"></div>
+    <div class="recharge">
+      <img src="@/assets/recharge-home-icon.png" alt="" class="l">
+      <p class="p">{{ recharge.p1 }}</p>
+      <p class="p">{{ recharge.p2 }}</p>
+      <div class="btn" @click="$router.push('/upTop')">{{ recharge.btn }}</div>
+    </div>
   </div>
 </template>
 
@@ -76,12 +85,21 @@
           {
             text: '退出登录'
           }
-        ]
+        ],
+        echartsT: {
+          main: '存储统计',
+          mini: '/容量GB'
+        },
+        recharge: {
+          p1: '想要更多的充值优惠么？',
+          p2: '快点而点击进来查看详情吧！',
+          btn: '立即充值'
+        }
       }
     },
     methods: {
       // 操作
-      operateFun(active){
+      operateFun(active) {
         switch (active) {
           case '基本信息':
             this.$router.push('/Pinfo')
@@ -92,14 +110,14 @@
         }
       },
       // 退出
-      quitFun(){
+      quitFun() {
         this.$confirm('确认退出登录?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         })
           .then(() => {
-            sessionStorage.setItem('token','')
+            sessionStorage.setItem('token', '')
             this.$router.push('/login')
             this.$message({
               type: 'success',
@@ -120,25 +138,25 @@
     },
     directives: {
       operating: {
-        bind(el,bindings,vnode){
+        bind(el, bindings, vnode) {
           let handler = e => {
-            if(el.contains(e.target)){
+            if (el.contains(e.target)) {
               // 点击事件触发在目标DOM内
-              if(e.target.classList.contains('active')) vnode.context.isShowMe = false
+              if (e.target.classList.contains('active')) vnode.context.isShowMe = false
               else vnode.context.isShowMe = true
-            }else {
+            } else {
               // 点击事件触发在目标DOM外
               // 且DOM处于显示状态
-              if(vnode.context.isShowMe){
+              if (vnode.context.isShowMe) {
                 vnode.context.isShowMe = false
               }
             }
           }
           el.handler = handler
-          document.addEventListener('click',handler)
+          document.addEventListener('click', handler)
         },
-        unbind(el){
-          document.removeEventListener('click',el.handler)
+        unbind(el) {
+          document.removeEventListener('click', el.handler)
         }
       }
     },
@@ -154,6 +172,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
     .userInfo {
       width: 366px;
       height: calc(100% - 340px);
@@ -245,6 +264,7 @@
               .to {
                 width: 10px;
               }
+
               .bo {
                 right: 0px;
               }
@@ -353,18 +373,73 @@
       }
 
       .echarts {
+        position: relative;
         width: 266px;
         height: 288px;
         background-color: rgba(27, 83, 244, 0.04);
         border-radius: 10px;
+
+        .tt {
+          position: relative;
+          width: 100%;
+          text-align: center;
+          .main {
+            font-size: 20px;
+            font-family: SourceHanSansCN-Regular, SourceHanSansCN;
+            color: rgba(22, 29, 37, 1);
+            font-weight: 700;
+            line-height: 20px;
+          }
+
+          .mini {
+            font-size: 12px;
+            font-family: SourceHanSansCN-Regular, SourceHanSansCN;
+            color: rgba(22, 29, 37, 0.59);
+            line-height: 18px;
+          }
+        }
       }
     }
-    .vip {
+
+    .recharge {
+      position: relative;
       width: 366px;
       height: 300px;
       background-color: rgba(255, 255, 255, 1);
       box-shadow: 0px 4px 20px 0px rgba(27, 83, 244, 0.05);
       border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .l {
+        position: relative;
+        top: -34px;
+        margin-bottom: -20px;
+      }
+
+      .p {
+        font-size: 14px;
+        font-family: SourceHanSansCN-Medium, SourceHanSansCN;
+        font-weight: 500;
+        color: rgba(22, 29, 37, 1);
+        line-height: 26px;
+      }
+
+      .btn {
+        margin-top: 8px;
+        width: 272px;
+        height: 44px;
+        background-color: RGBA(26, 84, 246, 1);
+        color: #fff;
+        font-size: 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+      }
     }
   }
 </style>

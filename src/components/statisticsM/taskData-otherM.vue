@@ -28,9 +28,14 @@
           </el-select>
         </div>
         <!--全屏-->
-        <span class="bigger fc bl">
-          <img src="@/icons/bigger.png" alt="" @click="$emit('fullScreen', 'taskData')">
+        <span class="bigger fc bl" v-show="fullBtn">
+          <img src="@/icons/bigger.png" alt="" @click="f">
         </span>
+        <!--返回-->
+        <div class="farm-primary-form-btn" v-show="!fullBtn" @click="e">
+          <img src="@/icons/back_icon-black.png" alt="">
+          <span>返回{{  }}</span>
+        </div>
       </div>
     </div>
     <section>
@@ -90,6 +95,7 @@
         value1: '选项1',
         startDate: '',
         endDate: '',
+        fullBtn: true
       }
     },
     watch: {
@@ -237,7 +243,18 @@
         this.startDate = startDate
         this.endDate = endDate
       },
-
+      // 全屏
+      f(){
+        this.$emit('fullScreen', 'showTaskData')
+        setTimeout(this.ec.resize, 120)
+        this.fullBtn = false
+      },
+      // 取消全屏
+      e(){
+        this.$emit('miniScreen')
+        setTimeout(this.ec.resize, 120)
+        this.fullBtn = true
+      }
     },
     components: {
       calendar

@@ -394,7 +394,7 @@
     registerAccount,
     registerPhone,
     accountLogin,
-    phoneVerif,
+    phoneVerifFun,
     phoneLogin,
     getInfo,
     registerTelephone,
@@ -882,14 +882,14 @@
         let f = this.login.phoneForm
         if (!f.phoneVerif) return false
         this.delayFun('login')
-        let data = await phoneVerif(f.phone)
+        let data = await phoneVerifFun(f.phone)
         if (data.data.code == 200) {
-          f.v = true;
+          f.v = true
           messageFun('info', this.$t('login_page.message.code_is_coming'))
-        }
-        if (data.data.code == 10001)
+        }else if (data.data.code == 10001){
           this.login.warnInfo.phone = this.$t('login_page.message.need_to_register')
-        f.phoneVerif = false
+          f.phoneVerif = false
+        }
       },
       // 手机号验证事件60秒延迟
       delayFun(obj) {
@@ -1022,13 +1022,14 @@
       },
       // 找回密码 验证密码
       async c() {
-        let t = this.login.forgetMode
-        if (!t.newPassWordFormat || !t.newPassWordAgainFormat) return false
+        let t = this.login.formStatus,
+          f = this.login.forgetMode
+        if (!t.newPassWord || !t.newPassWordAgain) return false
         let data = await editPS({
-          phone: t.phone,
-          code: t.code,
-          password: t.newPassWord,
-          repeatPassword: t.newPassWordAgain
+          phone: f.phone,
+          code: f.code,
+          password: f.newPassWord,
+          repeatPassword: f.newPassWordAgain
         })
         if (data.data.code == 200) {
           messageFun('success', this.$t('login_page.message.edit_suc'))

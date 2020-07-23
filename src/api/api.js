@@ -21,7 +21,7 @@ export function register(data){
 // 登录页 - 注册 手机验证码
 export function registerTelephone(data){
   return api({
-    url: `/auth/phoneOwnVerify/${data}`,
+    url: `/auth/sendPhoneCode4CheckOwn/${data}`,
     method: 'GET'
   })
 }
@@ -52,9 +52,9 @@ export function accountLogin(data){
 }
 
 // 登录页 - 手机号登录 短信验证
-export function phoneVerif(data){
+export function phoneVerifFun(data){
   return api({
-    url: `/auth/sendCode/${data}`,
+    url: `/auth/sendPhoneCode4Login/${data}`,
     method: 'GET'
   })
 }
@@ -71,7 +71,7 @@ export function phoneLogin(data){
 // 登录页-找回密码 获取手机号验证码
 export function getPhoneVeriFG(data){
   return api({
-    url: `/auth/sendChangePasswordCode/${data}`,
+    url: `/auth/sendPhoneCode4ChangePassword/${data}`,
     method: 'GET'
   })
 }
@@ -79,7 +79,7 @@ export function getPhoneVeriFG(data){
 // 登录页-找回密码 验证验证码
 export function getVeriVal(data){
   return api({
-    url: `/auth/changePasswordCheckoutCode?${data}`,
+    url: `/auth/checkPhoneCode4ChangePassword?${data}`,
     method: 'GET'
   })
 }
@@ -87,7 +87,7 @@ export function getVeriVal(data){
 // 登录页-找回密码 修改密码
 export function editPS(data){
   return api({
-    url: `/auth/changePassword`,
+    url: `/auth/changePasswordByPhone`,
     method: 'PUT',
     data
   })

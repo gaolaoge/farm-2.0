@@ -5,7 +5,7 @@
         <span class="navBtn"
               :class="[{'active': index == table.navListActiveIndex}]"
               @click="table.navListActiveIndex = index"
-              v-for="item,index in table.navList"
+              v-for="(item,index) in table.navList"
               :key="index">
           {{ item.text }}
         </span>

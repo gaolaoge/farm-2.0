@@ -504,22 +504,21 @@ thead {
 
 //form-btn
 .farm-primary-form-btn {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   padding: 0px 15px;
   margin-right: 10px;
   cursor: pointer;
   height: 24px;
   border-radius: 5px;
   font-size: 13px;
-  font-weight: 400;
-  line-height: 24px;
-  text-align: center;
   background-color: rgba(248, 248, 248, 1);
   border: 1px solid rgba(22, 29, 37, 0.1);
   color: rgba(22, 29, 37, 0.79);
 
   .btnIcon {
-    vertical-align: middle;
+    margin-right: 4px;
     height: 12px;
 
     &.default {
@@ -532,8 +531,8 @@ thead {
   }
 
   &:hover {
-    background-color: rgba(248, 248, 248, 1);
-    //color: rgba(22, 29, 37, 0.29);
+    background-color: rgba(27, 83, 244, 1);
+    color: rgba(255, 255, 255, 1);
 
     .btnIcon {
       &.default {
@@ -675,7 +674,7 @@ thead {
 
 //dialog
 .el-dialog {
-  background-color: rgba(28, 36, 47, 1);
+  background-color: rgba(241, 244, 249, 1);
   box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
   border-radius: 8px;
   margin-bottom: 0px;
@@ -696,6 +695,10 @@ thead {
       opacity: 0.6;
       cursor: pointer;
       transition: all 0.2s;
+
+      &.mini {
+        width: 12px;
+      }
 
       &:hover {
         opacity: 1;
@@ -1338,19 +1341,28 @@ td {
 .el-message {
   width: 438px;
   height: 40px;
-  background: rgba(28, 36, 47, 1);
-  box-shadow: 0px 1px 20px 0px rgba(10, 98, 241, 0.8);
-  border-radius: 8px;
-  border: 0px !important;
-  top: 10vh !important;
+  border-radius: 3px;
+  //top: 120px !important;
 
   .el-message__content {
-    color: rgba(255, 255, 255, 1)
+    color: rgba(0, 0, 0, 0.6)
   }
 
   .el-message__icon {
     font-size: 16px;
     margin-right: 5px;
+  }
+
+  &.el-message--error {
+    border: 1px solid rgba(245, 34, 45, 0.3);
+  }
+
+  &.el-message--success {
+    border: 1px solid rgba(82, 196, 26, 0.3);
+  }
+
+  &.el-message--warn {
+    border: 1px solid rgba(250, 173, 20, 0.3);
   }
 }
 
@@ -1603,7 +1615,6 @@ td {
     padding: 20px;
     box-sizing: border-box;
     background-color: rgba(255, 255, 255, 1);
-    box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
     border-radius: 8px;
     overflow: hidden;
 

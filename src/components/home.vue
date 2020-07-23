@@ -52,33 +52,43 @@
           {{ recentProjects.label }}
         </header>
         <div class="g">
-          <ul>
-            <li v-for="(item,index) in recentList" :key="index" class="itemLi">
+          <ul class="ul" :style="{left: -423 * recentShowIndex + 'px'}">
+            <li v-for="(item,index) in recentList"
+                :key="index"
+                class="itemLi"
+                :class="[{'active': recentIndex == index}]"
+                @click="recentIndex = index">
               <div class="a">
                 <div class="avatarBox">
-                  <img src="" alt="">
+                  <img src="@/assets/demo.jpeg" alt="">
                 </div>
                 <div class="t">
-                  <h6>{{ item.name }}</h6>
-                  <span class="date">{{ item.date }}</span>
+                  <h6>{{ item.name || 'null'}}</h6>
+                  <span class="date">{{ item.date || 'null-null-null'}}</span>
                 </div>
               </div>
               <div class="l">
-                <span>分析中：{{ item.analysis_ing }}</span>
-                <span>分析失败：{{ item.analysis_err }}</span>
-                <span>分析警告：{{ item.analysis_warn }}</span>
-                <span>待设置参数：{{ item.toBeSet }}</span>
-                <span>渲染中：{{ item.render_ing }}</span>
-                <span>待全部渲染：{{ item.toBeRenderAll }}</span>
-                <span>渲染失败：{{ item.render_err }}</span>
-                <span>渲染完成：{{ item.render_done }}</span>
+                <span>分析中：{{ item.analysis_ing || 'null' }}</span>
+                <span>分析失败：{{ item.analysis_err || 'null' }}</span>
+                <span>分析警告：{{ item.analysis_warn || 'null' }}</span>
+                <span>待设置参数：{{ item.toBeSet || 'null' }}</span>
+                <span>渲染中：{{ item.render_ing || 'null' }}</span>
+                <span>待全部渲染：{{ item.toBeRenderAll || 'null' }}</span>
+                <span>渲染失败：{{ item.render_err || 'null' }}</span>
+                <span>渲染完成：{{ item.render_done || 'null' }}</span>
               </div>
             </li>
           </ul>
           <div class="occlusion"></div>
           <div class="btnList">
-            <div class="btnL btn"><img src="" alt=""></div>
-            <div class="btnR btn"><img src="" alt=""></div>
+            <div class="btnL btn">
+              <img src="@/icons/recentLeftA.png" alt="" class="c" v-show="recentShowIndex > 0" @click="recentShowIndex --">
+              <img src="@/icons/recentLeft.png" alt="" v-show="recentShowIndex == 0">
+            </div>
+            <div class="btnR btn">
+              <img src="@/icons/recentRightA.png" alt="" class="c" v-show="recentList.length - 4 > recentShowIndex" @click="recentShowIndex ++">
+              <img src="@/icons/recentRight.png" alt="" v-show="recentList.length - 4 == recentShowIndex">
+            </div>
           </div>
         </div>
       </div>
@@ -100,8 +110,7 @@
   import newTask from '@/components/home/new-task'
   import {
     homeT,
-    echartsData,
-    getInfo
+    echartsData
   } from '@/api/api.js'
   import {
     messageFun,
@@ -193,8 +202,10 @@
             render_err: '2',
             render_done: '9'
           },
-          {}, {}, {}
-        ]
+          {}, {}, {},{},{}
+        ],
+        recentIndex: 0,        // 近期项目相中项
+        recentShowIndex: 0,    // 近期项目显示位第一索引
       }
     },
     computed: {
@@ -221,7 +232,7 @@
           if (val[0].num != 0) this.taskStatus.haveNewItem = true
         },
         immediate: true
-      }
+      },
     },
     components: {
       HomeCharts,
@@ -619,10 +630,11 @@
               margin-right: 20px;
               width: 403px;
               height: 222px;
-              background-color: rgba(27, 83, 244, 0.15);
+              background-color: rgba(27, 83, 244, 0.9);
               border-radius: 18px;
               padding: 20px;
               box-sizing: border-box;
+              opacity: 0.2;
 
               .a {
                 display: flex;
@@ -695,8 +707,9 @@
                 }
               }
 
-              &:hover {
-                background-color: rgba(27, 83, 244, 0.9);
+              &:hover,
+              &.active {
+                opacity: 1;
               }
             }
           }
@@ -727,6 +740,13 @@
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 1);
             box-shadow: 0px 2px 8px 0px rgba(27, 83, 244, 0.15);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .c {
+              cursor: pointer;
+            }
           }
         }
       }

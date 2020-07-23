@@ -171,13 +171,13 @@
             {
               text: '新建任务',
               class: 'addMoreBtn',
-              initialIcon: require('@/icons/addIcon-Blue.png'),
-              selectedIcon: require('@/icons/addIcon-Whit.png')
+              initialIcon: require('@/icons/addIcon-black.png'),
+              selectedIcon: require('@/icons/addIcon-white.png')
             },
             {
               text: '删除',
               class: 'deleteBtn',
-              initialIcon: require('@/icons/deleteIcon-blue.png'),
+              initialIcon: require('@/icons/deleteIcon-black.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
             {
@@ -193,25 +193,25 @@
             {
               text: '新建任务',
               class: 'addMoreBtn',
-              initialIcon: require('@/icons/addIcon-Blue.png'),
-              selectedIcon: require('@/icons/addIcon-Whit.png')
+              initialIcon: require('@/icons/addIcon-black.png'),
+              selectedIcon: require('@/icons/addIcon-white.png')
             },
             {
               text: '开始',
               class: 'startBtn',
-              initialIcon: require('@/icons/playIcon-blue.png'),
+              initialIcon: require('@/icons/playIcon-black.png'),
               selectedIcon: require('@/icons/playIcon-white.png')
             },
             {
               text: '暂停',
               class: 'pauseBtn',
-              initialIcon: require('@/icons/pauseIcon-blue.png'),
+              initialIcon: require('@/icons/pauseIcon-black.png'),
               selectedIcon: require('@/icons/pauseIcon-white.png')
             },
             {
               text: '删除',
               class: 'deleteBtn',
-              initialIcon: require('@/icons/deleteIcon-blue.png'),
+              initialIcon: require('@/icons/deleteIcon-black.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
             {
@@ -505,98 +505,53 @@
       }
 
       .uploadBtnGroup {
-        &.cannotDelete {
-          .deleteBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-
-            img {
-              opacity: 0;
-            }
-          }
-        }
-
+        &.cannotDelete,
         &.cannotAgain {
+          .deleteBtn,
           .againBtn {
             cursor: no-drop;
             color: rgba(22, 29, 37, 0.29);
+            background-color: rgba(255, 255, 255, 1);
 
+            .default {
+              display: inline-block;
+              opacity: 0.29;
+            }
+
+            .hover {
+              display: none;
+            }
           }
         }
       }
 
       .renderBtnGroup {
-        &.cannotState {
-          .startBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-
-            img {
-              opacity: 0;
-            }
-          }
-        }
-
-        &.cannotPause {
-          .pauseBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-
-            img {
-              opacity: 0;
-            }
-          }
-        }
-
-        &.cannotDelete {
-          .deleteBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-
-            img {
-              opacity: 0;
-            }
-          }
-        }
-
-        &.cannotDownload {
-          .downloadBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-
-            img {
-              opacity: 0;
-            }
-          }
-        }
-
-        &.cannotRenderAll {
-          .renderAllBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-
-            img {
-              opacity: 0;
-            }
-          }
-        }
-
-        &.cannotRenderAgain {
-          .renderAgainBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-
-            img {
-              opacity: 0;
-            }
-          }
-        }
-
+        &.cannotState,
+        &.cannotPause,
+        &.cannotDelete,
+        &.cannotDownload,
+        &.cannotRenderAll,
+        &.cannotRenderAgain,
         &.cannotArchive {
+          .startBtn,
+          .pauseBtn,
+          .deleteBtn,
+          .downloadBtn,
+          .renderAllBtn,
+          .renderAgainBtn,
           .archiveBtn {
             cursor: no-drop;
             color: rgba(22, 29, 37, 0.29);
+            background-color: rgba(255, 255, 255, 1);
 
+            .default {
+              display: inline-block;
+              opacity: 0.29;
+            }
+
+            .hover {
+              display: none;
+            }
           }
         }
       }

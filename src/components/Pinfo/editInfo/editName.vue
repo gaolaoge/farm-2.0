@@ -18,9 +18,15 @@
 </template>
 
 <script>
+  import {
+    editBasicInfo
+  } from '@/api/editInfo-api.js'
+  import {
+    messageFun
+  } from '@/assets/common.js'
   export default {
     name: 'editName',
-    data(){
+    data() {
       return {
         title: '更改昵称',
         placeHolder: '输入新的昵称',
@@ -29,11 +35,23 @@
     },
     methods: {
       // 关闭
-      cancelFun(){
+      async cancelFun() {
+        let data = await editBasicInfo({
+            "nickname": this.name,
+            "headImg": null,
+            "sex": null,
+            "birthday": null,
+        })
+        if(data.data.code == 200) {
+          this.$store.commit('changeName', this.name)
+          messageFun('success', '修改成功')
+        }else if(data.data.code == 999){
+          messageFun('warning', '本月更新次数已用完')
+        }
         this.$emit('cancel')
       },
       // 确定
-      enterFun(){
+      enterFun() {
         this.cancelFun()
       }
     }
@@ -46,6 +64,7 @@
       width: 574px;
       height: 207px;
     }
+
     .content {
       .btn-group {
         position: absolute;
@@ -53,5 +72,26 @@
         right: 20px;
       }
     }
+  }
+
+  .farm-input {
+    border: 1px solid rgba(22, 29, 37, 0.2);
+    border-radius: 6px;
+    color: rgba(22, 29, 37, 1);
+    padding-left: 20px;
+    box-sizing: border-box;
+
+    &::-webkit-input-placeholder { /* WebKit browsers */
+      color: rgba(22, 29, 37, 0.4);
+    }
+
+    &::-moz-placeholder { /* Mozilla Firefox 19+ */
+      color: rgba(22, 29, 37, 0.4);
+    }
+
+    &:-ms-input-placeholder { /* Internet Explorer 10+ */
+      color: rgba(22, 29, 37, 0.4);
+    }
+
   }
 </style>

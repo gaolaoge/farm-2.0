@@ -126,13 +126,13 @@
           {
             text: '新建任务',
             class: 'addMoreBtn',
-            initialIcon: require('@/icons/addIcon-Blue.png'),
-            selectedIcon: require('@/icons/addIcon-Whit.png')
+            initialIcon: require('@/icons/addIcon-black.png'),
+            selectedIcon: require('@/icons/addIcon-white.png')
           },
           {
             text: '删除',
             class: 'deleteBtn',
-            initialIcon: require('@/icons/deleteIcon-blue.png'),
+            initialIcon: require('@/icons/deleteIcon-black.png'),
             selectedIcon: require('@/icons/deleteIcon-white.png'),
             triggerable: true
           }
@@ -153,8 +153,8 @@
     watch: {
       'selectionList': {
         handler: function (val) {
-          if (!val.length) this.btnGroup[2]['triggerable'] = true
-          else this.btnGroup[2]['triggerable'] = false
+          if (!val.length) this.btnGroup[1]['triggerable'] = true
+          else this.btnGroup[1]['triggerable'] = false
         }
       }
     },
@@ -281,12 +281,19 @@
     }
   }
 
-  .notTriggerable {
-    cursor: not-allowed;
+  .notTriggerable,
+  .notTriggerable:hover {
+    cursor: no-drop;
     color: rgba(22, 29, 37, 0.29);
+    background-color: rgba(255, 255, 255, 1);
 
-    img {
-      opacity: 0;
+    .default {
+      display: inline-block;
+      opacity: 0.29;
+    }
+
+    .hover {
+      display: none;
     }
   }
 

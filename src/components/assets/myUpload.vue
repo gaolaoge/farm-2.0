@@ -8,7 +8,7 @@
          v-loading.fullscreen.lock="fullscreenLoading">
       <!--面包屑-->
       <div class="bread">
-        <span v-for="item,index in bread.list"
+        <span v-for="(item,index) in bread.list"
               :key="index"
               @click="navChange(item.name)"
               class="h">
@@ -418,42 +418,9 @@
     height: calc(100vh - 395px);
   }
 
-  .outPut-table {
-    overflow: hidden;
-    .bread {
-      height: 27px;
-      background: rgba(33, 41, 51, 0.59);
-      border-radius: 4px;
-      margin: 20px 10px 0px;
-      width: calc(100% - 20px);
-      padding: 0px 20px;
-      box-sizing: border-box;
-      .h {
-        display: inline-block;
-        font-size: 12px;
-        line-height: 27px;
-        font-weight: 400;
-        color: rgba(255, 255, 255, 0.6);
-        margin-right: 2px;
-        cursor: pointer;
-        .img {
-          vertical-align: middle;
-          margin-left: 2px;
-        }
-        &:nth-last-of-type(1) {
-          color: rgba(255, 255, 255, 1);
-          .img {
-            display: none;
-          }
-        }
-      }
-    }
-  }
+
 
   .page {
-    /*position: po;*/
-    /*bottom: 30px;*/
-    /*left: 25px;*/
     margin: 4px 25px 30px;
   }
   .outPut-wrapper {

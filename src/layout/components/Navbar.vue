@@ -20,8 +20,9 @@
         </li>
       </ul>
     </div>
-    <div class="addTask"><img src="@/icons/addIcon-Whit.png" alt="" class="addTaskIcon"></div>
-    <!--    <img src="@/icons/addTask.png" class="addTask" alt="">-->
+    <div class="addTask" @click="createTask">
+      <img src="@/icons/addIcon-Whit.png" alt="" class="addTaskIcon">
+    </div>
     <div class="systemList">
       <ul>
         <li v-for="(item,index) in systemList"
@@ -41,10 +42,19 @@
         </li>
       </ul>
     </div>
+    <!--弹窗 新建任务-->
+    <el-dialog :visible.sync="createTaskDialog"
+               :show-close=false
+               top="8vh"
+               width="1100px">
+      <newTask @closeDialogFun="closeDialogFun"
+               :filelist="fileList"/>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+  import newTask from '@/components/home/new-task'
   export default {
     name: 'Navbar',
     data() {
@@ -91,14 +101,44 @@
             align: 'bottom'
           }
         ],
-        navActive: 0
+        navActive: 0,
+        createTaskDialog: false,
+        fileList: []
       }
+    },
+    components: {
+      newTask
     },
     methods: {
       jump(index, url) {
         this.navActive = index
         this.$router.push(url)
       },
+      // 新建任务
+      createTask() {
+        let inputDom = document.createElement('INPUT')
+        inputDom.type = 'file'
+        inputDom.accept = '.ma,.mb'
+        inputDom.click()
+        inputDom.addEventListener('change', () => {
+          if (inputDom.files.length == 1) {
+            this.fileList = [{
+              sceneFile: inputDom.files[0],
+              projectFileList: null,
+              projectFileName: '',
+              inputStatus: false,
+              path: '',
+              id: Math.floor(Math.random() * 100000000000000)
+            }]
+            this.createTaskDialog = true
+          }
+        })
+      },
+      // 关闭新建任务弹窗
+      closeDialogFun() {
+        this.createTaskDialog = false
+      },
+
     },
     mounted() {
 
@@ -239,7 +279,7 @@
 
     .addTask {
       position: absolute;
-      top: 600px;
+      top: 530px;
       left: 64px;
       width: 80px;
       height: 80px;

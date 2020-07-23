@@ -10,7 +10,7 @@
       <div class="oper">
         <!--选择分区-->
         <div class="workbench">
-          <img src="@/icons/switch-icon.png" alt="" class="switch">
+          <div class="switch"><img src="@/icons/switch-icon.png" alt=""></div>
           <el-select v-model="workBenchVal" class="workBench-optionBase">
             <el-option
               v-for="(item,index) in workBenchList"
@@ -58,7 +58,7 @@
                 </span>
                 </li>
                 <!--帮助中心-->
-                <li class="operateLi">
+                <li class="operateLi" @click="w">
                 <span class="con">
                   <span class="t">
                      <span class="sb">
@@ -342,6 +342,10 @@
       }
     },
     methods: {
+      // 跳转到帮助网站
+      w() {
+        window.open('http://223.80.107.190:8081', '_blank')
+      },
       showGuide() {
         this.guideShow = false
         this.guideShowStep = 1
@@ -698,6 +702,7 @@
         }
 
         .workbench {
+          position: relative;
           display: flex;
           flex-wrap: nowrap;
           align-items: center;
@@ -714,6 +719,16 @@
 
           .switch {
             position: absolute;
+            left: 4px;
+            width: 40px;
+            height: 38px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+
           }
         }
 
@@ -735,6 +750,10 @@
             span.el-input__suffix {
               left: 0px;
               width: 60px;
+
+              .el-input__suffix-inner {
+                opacity: 0;
+              }
             }
           }
 

@@ -5,41 +5,41 @@ import {
 import store from '../store'
 
 // 读取时间戳
-const createCalendar = function(date) {
+const createCalendar = function (date) {
   let year = date.getFullYear(),
-      month = date.getMonth() > 8 ? date.getMonth() + 1 : '0' + ( date.getMonth() + 1 ),
-      day = date.getDate() > 9 ? date.getDate() : '0' + date.getDate(),
-      hour = date.getHours() > 9 ? date.getHours() : '0' + date.getHours(),
-      minutes = date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes(),
-      seconds = date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()
-  return { year, month, day, hour, minutes, seconds }
+    month = date.getMonth() > 8 ? date.getMonth() + 1 : '0' + (date.getMonth() + 1),
+    day = date.getDate() > 9 ? date.getDate() : '0' + date.getDate(),
+    hour = date.getHours() > 9 ? date.getHours() : '0' + date.getHours(),
+    minutes = date.getMinutes() > 9 ? date.getMinutes() : '0' + date.getMinutes(),
+    seconds = date.getSeconds() > 9 ? date.getSeconds() : '0' + date.getSeconds()
+  return {year, month, day, hour, minutes, seconds}
 }
 
 // 获得日期时间
-const createDateFun = function(date) {
-  if(date.getFullYear() == '1970') return '-'
-  let { year, month, day, hour, minutes, seconds } = createCalendar(date)
+const createDateFun = function (date) {
+  if (date.getFullYear() == '1970') return '-'
+  let {year, month, day, hour, minutes, seconds} = createCalendar(date)
   return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
 }
 
 // 耗时
-const consum = function(time){
+const consum = function (time) {
   let result = ''
-  if(time >= 1000) {
-    let day = parseInt(time / (24*60*60*1000)),
-        hour = parseInt((time % (24*60*60*1000)) / (60*60*1000)),
-        minute = parseInt(((time % (24*60*60*1000)) % (60*60*1000)) / (60*1000)),
-        second = parseInt((((time % (24*60*60*1000)) % (60*60*1000)) % (60*1000)) / 1000)
-    if(day != 0) {
+  if (time >= 1000) {
+    let day = parseInt(time / (24 * 60 * 60 * 1000)),
+      hour = parseInt((time % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)),
+      minute = parseInt(((time % (24 * 60 * 60 * 1000)) % (60 * 60 * 1000)) / (60 * 1000)),
+      second = parseInt((((time % (24 * 60 * 60 * 1000)) % (60 * 60 * 1000)) % (60 * 1000)) / 1000)
+    if (day != 0) {
       result += day + '天'
     }
-    if(hour != 0 || result != '') {
+    if (hour != 0 || result != '') {
       result += hour + '小时'
     }
-    if(minute != 0 || result != '') {
+    if (minute != 0 || result != '') {
       result += minute + '分'
     }
-    if(second != 0 || result != '') {
+    if (second != 0 || result != '') {
       result += second + '秒'
     }
   }
@@ -47,16 +47,16 @@ const consum = function(time){
 }
 
 // 获得时间戳
-const getDate = (year,month,day) => {
-  return new Date(year,month - 1,day)
+const getDate = (year, month, day) => {
+  return new Date(year, month - 1, day)
 }
 
 // 下载
 const exportDownloadFun = (data, name, type, isProtocal) => {
   // arguments isProtocal=>用户协议
   let blob = null
-  if(type == 'xlsx'){
-    blob = new Blob([data.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  if (type == 'xlsx') {
+    blob = new Blob([data.data], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})
     const a = document.createElement("A"),
       url = window.URL.createObjectURL(blob),
       filename = name + '.xlsx'
@@ -64,18 +64,18 @@ const exportDownloadFun = (data, name, type, isProtocal) => {
     a.download = filename
     a.click()
     window.URL.revokeObjectURL(url)
-  }else if(type == 'pdf'){
-    let url = window.URL.createObjectURL(new Blob([data.data],{type: `application/pdf;charset-UTF-8`})),
-        link = document.createElement('A')
+  } else if (type == 'pdf') {
+    let url = window.URL.createObjectURL(new Blob([data.data], {type: `application/pdf;charset-UTF-8`})),
+      link = document.createElement('A')
     link.style.display = 'none'
-    if(isProtocal) link.setAttribute('target','_blank')
+    if (isProtocal) link.setAttribute('target', '_blank')
     link.href = url
-    if(!isProtocal) link.setAttribute('download', name + '.pdf')
+    if (!isProtocal) link.setAttribute('download', name + '.pdf')
     document.body.appendChild(link)
     link.click()
-  }else {
-    let url = window.URL.createObjectURL(new Blob([data.data],{'type': data.headers['content-type']})),
-        a = document.createElement('A')
+  } else {
+    let url = window.URL.createObjectURL(new Blob([data.data], {'type': data.headers['content-type']})),
+      a = document.createElement('A')
     a.style.display = 'none'
     a.target = '_blank'
     a.href = url
@@ -85,10 +85,10 @@ const exportDownloadFun = (data, name, type, isProtocal) => {
 }
 
 // table 筛选icon样式
-const createTableIconList = function(){
+const createTableIconList = function () {
   setTimeout(() => {
     // 筛选图标
-    if(document.getElementsByClassName('iconshaixuan').length) return false
+    if (document.getElementsByClassName('iconshaixuan').length) return false
     let t = [...document.getElementsByClassName('el-icon-arrow-down')]
     t.forEach(curr => {
       let i = document.createElement('I'),
@@ -123,11 +123,11 @@ const createTableIconList = function(){
       img.src = require('@/icons/iii.png')
       curr.appendChild(img)
     })
-  },0)
+  }, 0)
 }
 
 // message 信息
-const messageFun = function(type,message){
+const messageFun = function (type, message) {
   return Message({
     message: message,
     type: type,
@@ -137,10 +137,10 @@ const messageFun = function(type,message){
 }
 
 // 渲染帧范围
-const renderingRange = function(min,max,interval){
+const renderingRange = function (min, max, interval) {
   let a = [min],
-      m = min + interval
-  while(m <= max){
+    m = min + interval
+  while (m <= max) {
     a.push(m)
     m += interval
   }
@@ -148,8 +148,8 @@ const renderingRange = function(min,max,interval){
 }
 
 //
-const itemDownloadStatus = function(num){
-  switch(num){
+const itemDownloadStatus = function (num) {
+  switch (num) {
     case 1:
       return '等待'
       break
@@ -186,22 +186,28 @@ const UuidFun = function () {
   return uuid
 }
 
-const setInfo = function(data) {
-  sessionStorage.setItem('info',JSON.stringify({
+const setInfo = function (data) {
+  sessionStorage.setItem('info', JSON.stringify({
     account: data.account,
     phone: data.phone,
     level: data.vipLevel,
     balance: data.goldBalance
   }))
-  store.commit('changeUserName',data.account)                                           // 帐号
-  store.commit('changeUserBalance',data.goldBalance.toFixed(3))            // 现余额
-  store.commit('changePayAmount',data.cumulativeRecharge.toFixed(3))       // 累计支付金额
-  store.commit('changeGoldCoins',data.totalArrival.toFixed(3))             // 累计到账金币
-  store.commit('changeConsumption',data.cumulativeConsume.toFixed(2))      // 累计消费金币
+  store.commit('changeName', data.nickname)                                            // 昵称
+  store.commit('changeAccount', data.account)                                          // 帐号
+  store.commit('changePhone', data.phone)                                              // 手机号
+  store.commit('changeLevel', data.vipLevel)                                           // 会员等级
+  store.commit('changeBirthday', data.birthday)                                        // 生日
+  store.commit('changeEmail', data.email)                                              // email
+  store.commit('changeSex', data.sex)                                                  // 性别
+  store.commit('changeUserBalance', data.goldBalance.toFixed(3))            // 现余额
+  store.commit('changePayAmount', data.cumulativeRecharge.toFixed(3))       // 累计支付金额
+  store.commit('changeGoldCoins', data.totalArrival.toFixed(3))             // 累计到账金币
+  store.commit('changeConsumption', data.cumulativeConsume.toFixed(2))      // 累计消费金币
 }
 
 // 判断是否为IE等版本
-const IEVersion = function() {
+const IEVersion = function () {
   var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
   var isIE = userAgent.indexOf("compatible") > -1 && userAgent.indexOf("MSIE") > -1; //判断是否IE<11浏览器
   var isEdge = userAgent.indexOf("Edge") > -1 && !isIE; //判断是否IE的Edge浏览器

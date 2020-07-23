@@ -1,13 +1,14 @@
 <template>
-  <div class="statisticsM-wrapper">
+  <div class="statisticsM-wrapper" :class="[{'fullItem': fullItem}]">
     <!--任务数据统计-->
-    <taskData ref="taskData" @monitorVal="monitorVal" @fullScreen="fullScreen" v-show="showTaskData" />
+    <taskData ref="taskData" @monitorVal="monitorVal" @fullScreen="fullScreen" @miniScreen="miniScreen"
+              v-show="screen.showTaskData"/>
     <!--帧数统计-->
-    <numberOfFrames ref="numOfFrames" v-show="showNumOfFrames" />
+    <numberOfFrames ref="numOfFrames" v-show="screen.showNumOfFrames"/>
     <!--消费统计-->
-    <consumption ref="consumption" v-show="showConsumption" />
+    <consumption ref="consumption" v-show="screen.showConsumption"/>
     <!--任务状态统计-->
-    <taskStatus ref="taskStatus" v-show="showTaskStatus" />
+    <taskStatus ref="taskStatus" v-show="screen.showTaskStatus"/>
   </div>
 </template>
 
@@ -19,11 +20,15 @@
   import {
     createCalendar
   } from '@/assets/common.js'
+  import {
+    getQueryConditions
+  } from '@/api/statistics-api.js'
 
   export default {
     name: 'statisticsM-wrapper',
     data() {
       return {
+        fullItem: false,
         screen: {
           showTaskData: true,
           showNumOfFrames: true,
@@ -45,9 +50,25 @@
         if (s == `${y2}-${m2}-${d2}`) this.$refs[dom].dateInterval = 'nearlyThirtyDays'
       },
       // 全屏
-      fullScreen(screen){
-        this.screen
+      fullScreen(selectScreen) {
+        this.fullItem = true
+        for (let i in this.screen) {
+          if (i == selectScreen) this.screen[i] = true
+          else this.screen[i] = false
+        }
+      },
+      // 取消全屏
+      miniScreen(){
+        this.fullItem = false
+        for (let i in this.screen) if (!this.screen[i]) this.screen[i] = true
       }
+    },
+    mounted() {
+      // 获取图表条件历史记录
+      getQueryConditions()
+        .then(data => {
+          console.log(data)
+        })
     },
     components: {
       taskData,
@@ -69,6 +90,7 @@
       /*overflow: hidden;*/
       display: flex;
       flex-direction: column;
+      transition: all 0.1s;
 
       .header {
         height: 35px;
@@ -214,5 +236,12 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-content: space-between;
+
+    &.fullItem {
+      .echartsM {
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
 </style>

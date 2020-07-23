@@ -21,7 +21,9 @@
       // }
     },
     mounted() {
-      this.init()
+      setTimeout(() => {
+        this.init()
+      }, 400)
     },
     computed: {
       maxNum() {
@@ -40,16 +42,16 @@
           title: {
             text: '75.0',
             textStyle: {
-              color: "#f40",
+              color: "rgba(22, 29, 37, 1)",
               fontSize: 22
             },
             subtext: '资产总容量',
             subtextStyle: {
-              color: 'blue',
+              color: 'rgba(22, 29, 37, 0.59)',
             },
-            itemGap: -10, // 主副标题距离
+            itemGap: 10, // 主副标题距离
             left: 'center',
-            top: '44'
+            top: '120'
           },
           // legend: {
           //   orient: 'vertical',
@@ -121,6 +123,7 @@
               data: [
                 {
                   value: 70,
+                  name: 'gaoge',
                   itemStyle: {
                     normal: {
                       color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [
@@ -211,7 +214,7 @@
       },
       cDate(val) {
         this.init()
-        window.addEventListener("resize", this.ec.resize);
+        window.addEventListener("resize", this.ec.resize)
       }
     }
   }

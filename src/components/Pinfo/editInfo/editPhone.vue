@@ -8,7 +8,7 @@
       <!--选择验证方式-->
       <div class="content" v-show="step == 'chooseVerificationMethod'">
         <ul>
-          <li v-for="item,index in verificationList"
+          <li v-for="(item,index) in verificationList"
               :key="index"
               @click="chooseFun(item)"
               class="veri">
@@ -140,9 +140,9 @@
 <script>
   export default {
     name: 'editPhone',
-    data(){
+    data() {
       return {
-        step: 'choosePhone',
+        step: 'chooseVerificationMethod',
         title: '更换手机',
         verificationList: [
           {
@@ -201,16 +201,16 @@
       }
     },
     methods: {
-      cancelFun(){
+      cancelFun() {
         this.step = 'chooseVerificationMethod'
         this.title = '更换手机'
         this.$emit('cancel')
       },
-      chooseFun(item){
+      chooseFun(item) {
         this.step = item.f
         this.title = item.tit
       },
-      saveFun(){
+      saveFun() {
         this.step = 'success'
       }
     }
@@ -222,33 +222,39 @@
     .container {
       width: 638px;
       height: 432px;
+
       .content {
         .veri {
           height: 105px;
           display: flex;
           align-items: center;
+
           img {
             width: 50px;
             height: 50px;
             margin-left: 30px;
           }
+
           .t {
             position: relative;
             flex-grow: 1;
             margin-left: 10px;
+
             h6 {
               font-size: 16px;
               font-weight: 600;
-              color: rgba(255, 255, 255, 0.8);
+              color: rgba(22, 29, 37, 0.8);
               line-height: 22px;
               margin-bottom: 5px;
             }
+
             span {
               font-size: 12px;
-              color: rgba(255, 255, 255, 0.6);
+              color: rgba(22, 29, 37, 0.6);
               line-height: 17px;
             }
           }
+
           .btn {
             width: 76px;
             height: 32px;
@@ -256,6 +262,7 @@
             border-radius: 8px;
             text-align: center;
             margin-right: 30px;
+
             span {
               font-size: 14px;
               color: rgba(255, 255, 255, 1);
@@ -263,6 +270,7 @@
               cursor: pointer;
             }
           }
+
           &:nth-of-type(1) .t::after,
           &:nth-of-type(2) .t::after {
             position: absolute;
@@ -276,6 +284,7 @@
         }
       }
     }
+
     .choosePhone,
     .chooseEmail,
     .choosePassword {
@@ -283,10 +292,12 @@
       flex-direction: column;
       align-items: center;
     }
+
     .farm-item {
       width: 300px;
       height: 36px;
       margin-bottom: 20px;
+
       .phone {
         span {
           font-size: 14px;
@@ -294,6 +305,7 @@
           line-height: 36px;
         }
       }
+
       .getCode {
         display: inline-block;
         width: 90px;
@@ -304,29 +316,40 @@
         margin-left: 8px;
         cursor: pointer;
         text-align: center;
+
         span {
           font-size: 14px;
           color: rgba(39, 95, 239, 1);
           line-height: 34px;
         }
       }
+
       .phone,
       .farm-input {
         border-radius: 8px;
         height: 36px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(22, 29, 37, 0.2);
         padding-left: 20px;
         box-sizing: border-box;
+        color: rgba(22, 29, 37, 0.8);
+
+        span {
+          color: rgba(22, 29, 37, 0.6);
+        }
+
         &.code {
           width: 200px;
         }
+
         &.oldPhoneCodeError,
         &.newPhoneCodeError,
         &.passWordCodeError {
           border: 1px solid rgba(255, 62, 77, 1);
+
           & + .getCode,
           & + .g {
             position: relative;
+
             &::after {
               position: absolute;
               bottom: -20px;
@@ -337,6 +360,7 @@
               line-height: 17px;
             }
           }
+
           & + .g {
             bottom: 21px;
             left: 210px;
@@ -344,17 +368,21 @@
         }
       }
     }
+
     .x {
       margin-top: 50px;
     }
+
     .success {
       display: flex;
       align-items: center;
       flex-direction: column;
+
       img {
         margin-top: 43px;
         margin-bottom: 23px;
       }
+
       .tit {
         font-size: 20px;
         font-weight: 500;
@@ -363,11 +391,13 @@
         letter-spacing: 2px;
         margin-bottom: 10px;
       }
+
       .dire {
         font-size: 12px;
         color: rgba(255, 255, 255, 0.6);
         line-height: 17px;
       }
+
       .btnn {
         width: 154px;
         height: 32px;
@@ -377,11 +407,13 @@
         cursor: pointer;
         margin-top: 60px;
         opacity: 0.78;
+
         span {
           font-size: 14px;
           color: rgba(39, 95, 239, 1);
           line-height: 32px;
         }
+
         &:hover {
           opacity: 1;
         }

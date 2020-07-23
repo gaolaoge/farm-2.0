@@ -54,7 +54,7 @@
 <script>
   export default {
     name: 'editEmail',
-    data(){
+    data() {
       return {
         title: '更换邮箱',
         emailVal: '',
@@ -74,11 +74,11 @@
       }
     },
     methods: {
-      cancelFun(){
+      cancelFun() {
         this.editing = true
         this.$emit('cancel')
       },
-      saveFun(){
+      saveFun() {
         this.editing = false
       }
     }
@@ -91,22 +91,27 @@
       width: 574px;
       height: 507px;
     }
+
     .content {
       display: flex;
       align-items: center;
       flex-direction: column;
+
       .x {
         margin-top: 70px;
       }
     }
+
     .success {
       display: flex;
       align-items: center;
       flex-direction: column;
+
       img {
         margin-top: 74px;
         margin-bottom: 23px;
       }
+
       .tit {
         font-size: 20px;
         font-weight: 500;
@@ -115,11 +120,13 @@
         letter-spacing: 2px;
         margin-bottom: 10px;
       }
+
       .dire {
         font-size: 12px;
         color: rgba(255, 255, 255, 0.6);
         line-height: 17px;
       }
+
       .btnn {
         width: 154px;
         height: 32px;
@@ -129,27 +136,32 @@
         cursor: pointer;
         margin-top: 60px;
         opacity: 0.78;
+
         span {
           font-size: 14px;
           color: rgba(39, 95, 239, 1);
           line-height: 32px;
         }
+
         &:hover {
           opacity: 1;
         }
       }
     }
+
     .farm-item {
       width: 300px;
       height: 36px;
       margin-bottom: 20px;
+
       .phone {
         span {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(22, 29, 37, 0.6);
           line-height: 36px;
         }
       }
+
       .getCode {
         display: inline-block;
         width: 90px;
@@ -160,21 +172,37 @@
         margin-left: 8px;
         cursor: pointer;
         text-align: center;
+
         span {
           font-size: 14px;
           color: rgba(39, 95, 239, 1);
           line-height: 36px;
         }
       }
+
       .phone,
       .farm-input {
         border-radius: 8px;
         height: 36px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(22, 29, 37, 0.2);
         padding-left: 20px;
         box-sizing: border-box;
+        color: rgba(22, 29, 37, 1);
+
         &.code {
           width: 200px;
+        }
+
+        &::-webkit-input-placeholder { /* WebKit browsers */
+          color: rgba(22, 29, 37, 0.4);
+        }
+
+        &::-moz-placeholder { /* Mozilla Firefox 19+ */
+          color: rgba(22, 29, 37, 0.4);
+        }
+
+        &:-ms-input-placeholder { /* Internet Explorer 10+ */
+          color: rgba(22, 29, 37, 0.4);
         }
       }
     }

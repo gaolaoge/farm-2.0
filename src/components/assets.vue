@@ -107,17 +107,17 @@
         btnGroup: {
           myUploadBtnGroup: [
             {
-              initialIcon: require('@/icons/u-blue.png'),
+              initialIcon: require('@/icons/u-black.png'),
               selectedIcon: require('@/icons/u-white.png'),
               text: '上传'
             },
             {
-              initialIcon: require('@/icons/addIcon-Blue.png'),
-              selectedIcon: require('@/icons/addIcon-Whit.png'),
+              initialIcon: require('@/icons/addIcon-black.png'),
+              selectedIcon: require('@/icons/addIcon-white.png'),
               text: '新建文件夹'
             },
             {
-              initialIcon: require('@/icons/u-blue.png'),
+              initialIcon: require('@/icons/u-black.png'),
               selectedIcon: require('@/icons/u-white.png'),
               text: '下载',
               css: 'rotate(180deg)'
@@ -137,7 +137,7 @@
             }
           ],
           moreBtnText: '更多',
-          moreBtnIcon: require('@/icons/g-blue.png'),
+          moreBtnIcon: require('@/icons/more-btn.png'),
           moreBtnList: ['移动到', '复制到', '重命名', '解压', '删除'],
           showMoreBtnList: false,
           howToCreateBtn: ['手动创建资产目录', '自动创建资产目录'],
@@ -260,16 +260,17 @@
       background-color: rgba(248, 248, 248, 1);
       border: 1px solid rgba(22, 29, 37, 0.1);
       border-radius: 5px;
-      text-align: center;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
       span {
         font-size: 13px;
-        color: rgba(0, 97, 255, 1);
+        color: rgba(22, 29, 37, 0.79);
       }
 
       img {
-        vertical-align: baseline;
         margin-left: 4px;
         width: 10px;
       }
@@ -326,13 +327,12 @@
       box-sizing: border-box;
       width: 162px;
       height: 24px;
-      background-color: rgba(33, 41, 51, 1);
+      background-color: rgba(248, 248, 248, 1);
       border-radius: 5px;
-      border: 1px solid rgba(39, 95, 239, 0.2);
+      border: 1px solid rgba(22, 29, 37, 0.1);
 
       .bgi {
         position: absolute;
-        top: 2px;
         width: 116px;
         height: 20px;
         background-color: rgba(39, 95, 239, 1);
@@ -350,7 +350,7 @@
       span {
         position: relative;
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(22, 29, 37, 0.79);
         line-height: 17px;
         white-space: nowrap;
         overflow: hidden;
@@ -360,11 +360,51 @@
 
         &.showAll {
           width: 96px;
+          color: rgba(255, 255, 255, 1);
         }
       }
 
       &:hover {
         border: 1px solid rgba(39, 95, 239, 0.4);
+      }
+    }
+  }
+</style>
+
+<style lang="less">
+  .outPut-table {
+    overflow: hidden;
+
+    .bread {
+      height: 27px;
+      border-radius: 4px;
+      margin: 20px 10px 0px;
+      width: calc(100% - 20px);
+      padding: 0px 20px;
+      box-sizing: border-box;
+      border-bottom: 1px solid rgba(22, 29, 37, 0.09);
+
+      .h {
+        display: inline-block;
+        font-size: 12px;
+        line-height: 27px;
+        font-weight: 400;
+        color: rgba(22, 29, 37, 0.6);
+        margin-right: 2px;
+        cursor: pointer;
+
+        .img {
+          vertical-align: middle;
+          margin-left: 2px;
+        }
+
+        &:nth-last-of-type(1) {
+          color: rgba(22, 29, 37, 1);
+
+          .img {
+            display: none;
+          }
+        }
       }
     }
   }

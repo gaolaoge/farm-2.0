@@ -4,21 +4,19 @@
       <!--头像模块-->
       <div class="avatarBase">
         <!--头像编辑-->
-        <div class="avatarEdit" @click="avatarEditFun">
-          <span>{{ editAvatar }}</span>
-        </div>
+        <div class="avatarEdit" @click="avatarEditFun"><span>{{ editAvatar }}</span></div>
         <!--头像-->
         <img src="@/assets/avaterImg.png" alt="" class="avatarImg">
       </div>
       <!--账号-->
       <div class="form-item">
         <span class="label">{{ info.accountLabel }}：</span>
-        <span class="val">{{ info.accountVal }}</span>
+        <span class="val">{{ user.account }}</span>
       </div>
       <!--昵称-->
       <div class="form-item">
         <span class="label">{{ info.nameLabel }}：</span>
-        <span class="val">{{ info.nameVal }}</span>
+        <span class="val">{{ user.name }}</span>
         <span class="editBtn" @click="editNameMoudle = true">{{ editBtn }}</span>
       </div>
       <!--密码-->
@@ -30,15 +28,15 @@
       <!--手机-->
       <div class="form-item">
         <span class="label">{{ info.phoneNumLabel }}：</span>
-        <span class="val">{{ info.phoneNumVal }}</span>
+        <span class="val">{{ String(user.phone).substr(0, 3) + '****' + String(user.phone).substr(7,11) }}</span>
         <span class="editBtn" @click="editPhoneMoudle = true">{{ editBtn }}</span>
       </div>
       <!--性别-->
       <div class="form-item">
         <span class="label">{{ info.sexLabel }}：</span>
         <el-radio-group v-model="info.sexVal">
-          <el-radio label="男" value="男"></el-radio>
-          <el-radio label="女" value="女"></el-radio>
+          <el-radio label="男" value="nan" />
+          <el-radio label="女" value="0" />
         </el-radio-group>
         <span class="remarks">{{ info.sexRemarks }}</span>
       </div>
@@ -51,7 +49,7 @@
       <!--邮箱-->
       <div class="form-item">
         <span class="label">{{ info.emailLabel }}：</span>
-        <span class="val">{{ info.emailVal }}</span>
+        <span class="val">{{ user.email || 'null' }}</span>
         <span class="editBtn" @click="editEmailMoudle = true">{{ editBtn }}</span>
         <span class="remarks">{{ info.emailRemarks }}</span>
       </div>
@@ -76,6 +74,7 @@
   import editPassword from '@/components/Pinfo/editInfo/editPassword'
   import editPhone from '@/components/Pinfo/editInfo/editPhone'
   import editName from '@/components/Pinfo/editInfo/editName'
+  import {mapState} from 'vuex'
 
   export default {
     name: 'infoTable',
@@ -85,19 +84,16 @@
         editAvatar: '修改头像',
         info: {
           accountLabel: '账号',
-          accountVal: 'Admin',
           nameLabel: '昵称',
-          nameVal: 'User name',
           passwordLabel: '密码',
           passwordVal: '**************',
           phoneNumLabel: '手机',
-          phoneNumVal: '185****7163',
+          // phoneNumVal: '185****7163',
           sexLabel: '性别',
-          sexVal: '男',
+          sexVal: 'nan',
           birthdayLabel: '生日',
           birthdayVal: 'Admin',
           emailLabel: '邮箱',
-          emailVal: '183412808@163.com',
           sexRemarks: '（*填写赠送5金币）',
           birthdayRemarks: '（*填写赠送5金币）',
           emailRemarks: '（用于更换手机～还有5金币赠送）'
@@ -135,7 +131,10 @@
       editPassword,
       editPhone,
       editName
-    }
+    },
+    computed: {
+      ...mapState(['user']),
+    },
   }
 </script>
 

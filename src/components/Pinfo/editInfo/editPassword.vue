@@ -10,23 +10,54 @@
         <!--手机号-->
         <div class="farm-item">
           <div class="phone">
-            <span>{{ phonePlaceholder }}</span>
+            <span>{{ String(user.phone).substr(0, 3) + '****' + String(user.phone).substr(7,11) }}</span>
           </div>
         </div>
         <!--验证码-->
         <div class="farm-item">
-          <input type="text" class="farm-input code" v-model="codeVal" :placeholder="codePlaceholder">
-          <div class="getCode">
+          <input type="text"
+                 class="farm-input code"
+                 :class="[{'error': status.code === false}]"
+                 v-model="codeVal"
+                 :placeholder="codePlaceholder"
+                 @blur="verifCode"
+                 @focus="status.code = null">
+          <div class="getCode" @click="getCode">
             <span>{{ codeLabel }}</span>
           </div>
+          <span class="errorInfo" v-show="status.code === false">{{ codeTypeErr }}</span>
         </div>
         <!--新密码-->
         <div class="farm-item">
-          <input type="text" class="farm-input" v-model="passWordVal" :placeholder="passWordPlaceholder">
+          <input type="password"
+                 ref="passWordVal"
+                 class="farm-input"
+                 v-model="passWordVal"
+                 :placeholder="passWordPlaceholder"
+                 @blur="verifPS"
+                 @focus="status.ps = null">
+          <span class="errorInfo" v-show="status.ps === false">{{ psTypeErr }}</span>
+          <img src="@/icons/login-success.png" class="i"
+               v-show="status.ps == true">
+          <img src="@/icons/login-error .png" class="i canClick"
+               v-show="status.ps == false"
+               @click="deleteInput('passWordVal')">
         </div>
         <!--再次输入-->
         <div class="farm-item">
-          <input type="text" class="farm-input" v-model="passWordAgainVal" :placeholder="passWordAgainPlaceholder">
+          <input type="password"
+                 ref="passWordAgainVal"
+                 class="farm-input"
+                 v-model="passWordAgainVal"
+                 :placeholder="passWordAgainPlaceholder"
+                 @blur="verifPSA"
+                 @focus="status.psa = null">
+          <span class="errorInfo" v-show="status.psa === false">{{ psaTypeErr }}</span>
+          <img src="@/icons/login-success.png" class="i"
+               v-show="status.psa == true">
+          <img src="@/icons/login-error .png" class="i canClick"
+               v-show="status.psa == false"
+               @click="deleteInput('passWordAgainVal')">
         </div>
         <div class="x">
           <div class="farm-btn cancel" @click="cancelFun">
@@ -49,16 +80,24 @@
 </template>
 
 <script>
+  import {
+    getCodeFromPS,
+    editPassWord
+  } from '@/api/editInfo-api.js'
+  import {
+    messageFun
+  } from "@/assets/common.js"
+  import {mapState} from 'vuex'
+
   export default {
     name: 'editPassword',
-    data(){
+    data() {
       return {
         title: '更换密码',
         passWordVal: '',
         passWordPlaceholder: '新密码',
         passWordAgainVal: '',
         passWordAgainPlaceholder: '再次确认密码',
-        phonePlaceholder: '185****7163',
         codeVal: '',
         codePlaceholder: '验证码',
         codeLabel: '获取验证码',
@@ -67,17 +106,107 @@
         editing: true,
         successTit: '更换密码成功',
         dire: '3s 后自动返回“个人资料”',
-        btnn: '完成'
-
+        btnn: '完成',
+        codeTypeErr: '',
+        psTypeErr: '',
+        psaTypeErr: '',
+        status: {
+          code: null,
+          ps: null,
+          psa: null
+        }
       }
     },
+    computed: {
+      ...mapState(['user'])
+    },
+    watch: {
+
+    },
     methods: {
-      cancelFun(){
+      cancelFun() {
         this.editing = true
         this.$emit('cancel')
       },
-      saveFun(){
-        this.editing = false
+      // 确定修改btn
+      async saveFun() {
+        if(!this.status.code || !this.status.ps || !this.status.psa) return false
+        let data = await editPassWord({
+          password: this.passWordVal,
+          code: this.codeVal
+        })
+        if(data.data.code == 999){
+          messageFun('error', '未知错误')
+        }else if(data.data.code == 4043){
+          messageFun('error', '验证码已过期')
+        }else if(data.data.code == 200){
+          this.status = {
+            code: null,
+            ps: null,
+            psa: null
+          }
+          this.passWordVal = ''
+          this.passWordAgainVal = ''
+          this.codeVal = ''
+          messageFun('success', '修改成功')
+          this.editing = false
+        }
+      },
+      // 获取验证码
+      async getCode() {
+        let data = await getCodeFromPS()
+        if (data.data.code == 200) messageFun('success', '验证码已发送，请注意查收')
+      },
+      // 验证验证码格式
+      verifCode(){
+        // 为空
+        if(!this.codeVal){
+          this.status.code = null
+          return false
+        }
+        if(/^\d{6}$/.test(this.codeVal)){
+          this.status.code = true
+        }else{
+          this.codeTypeErr = '验证码格式错误'
+          this.status.code = false
+        }
+      },
+      // 验证第一个密码
+      verifPS(){
+        // 为空
+        if(!this.passWordVal){
+          this.status.ps = null
+          return false
+        }
+        if(!/^\w{8,18}$/.test(this.passWordVal)){
+          this.psTypeErr = '请输入8-18个字符'
+          this.status.ps = false
+          return false
+        }
+        if(!/^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)/.test(this.passWordVal)){
+          this.psTypeErr = '请至少包含大小写字母、数字、特殊字符中任意2种字符'
+          this.status.ps = false
+          return false
+        }
+        this.status.ps = true
+      },
+      // 验证第二个密码
+      verifPSA(){
+        if(!this.passWordAgainVal || !this.status.ps){
+          this.status.psa = null
+          return false
+        }
+        if(this.passWordAgainVal != this.passWordVal){
+          this.status.psa = false
+          this.psaTypeErr = '两次密码输入不一致，请重新输入'
+          return false
+        }
+        this.status.psa = true
+      },
+      // 检验报错删除input
+      deleteInput(ee){
+        this[ee] = ''
+        this.$refs[ee].focus()
       }
     }
   }
@@ -89,35 +218,42 @@
       width: 574px;
       height: 507px;
     }
+
     .content {
       display: flex;
       align-items: center;
       flex-direction: column;
+
       .x {
         margin-top: 70px;
       }
     }
+
     .success {
       display: flex;
       align-items: center;
       flex-direction: column;
+
       img {
         margin-top: 74px;
         margin-bottom: 23px;
       }
+
       .tit {
         font-size: 20px;
         font-weight: 500;
-        color: rgba(255, 255, 255, 1);
+        color: rgba(22, 29, 37, 0.8);
         line-height: 28px;
         letter-spacing: 2px;
         margin-bottom: 10px;
       }
+
       .dire {
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(22, 29, 37, 0.6);
         line-height: 17px;
       }
+
       .btnn {
         width: 154px;
         height: 32px;
@@ -127,27 +263,33 @@
         cursor: pointer;
         margin-top: 60px;
         opacity: 0.78;
+
         span {
           font-size: 14px;
           color: rgba(39, 95, 239, 1);
           line-height: 32px;
         }
+
         &:hover {
           opacity: 1;
         }
       }
     }
+
     .farm-item {
+      position: relative;
       width: 300px;
       height: 36px;
       margin-bottom: 20px;
+
       .phone {
         span {
           font-size: 14px;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(22, 29, 37, 0.6);
           line-height: 36px;
         }
       }
+
       .getCode {
         display: inline-block;
         width: 90px;
@@ -158,21 +300,54 @@
         margin-left: 8px;
         cursor: pointer;
         text-align: center;
+
         span {
           font-size: 14px;
           color: rgba(39, 95, 239, 1);
           line-height: 36px;
         }
       }
+
       .phone,
       .farm-input {
         border-radius: 8px;
         height: 36px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(22, 29, 37, 0.2);
+        color: rgba(22, 29, 37, 0.8);
         padding-left: 20px;
         box-sizing: border-box;
+
         &.code {
           width: 200px;
+        }
+
+        &::-webkit-input-placeholder { /* WebKit browsers */
+          color: rgba(22, 29, 37, 0.4);
+        }
+
+        &::-moz-placeholder { /* Mozilla Firefox 19+ */
+          color: rgba(22, 29, 37, 0.4);
+        }
+
+        &:-ms-input-placeholder { /* Internet Explorer 10+ */
+          color: rgba(22, 29, 37, 0.4);
+        }
+      }
+
+      .errorInfo {
+        position: absolute;
+        width: 300px;
+        left: 0px;
+        top: 36px;
+        color: rgba(255, 62, 77, 0.79);
+        font-size: 12px;
+      }
+      .i {
+        position: absolute;
+        right: -24px;
+        top: 8px;
+        &.canClick {
+          cursor: pointer;
         }
       }
     }
