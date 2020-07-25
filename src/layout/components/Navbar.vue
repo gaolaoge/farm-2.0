@@ -1,5 +1,19 @@
 <template>
   <div class="Navbar-wrapper">
+    <svg height="100%" width="130" class="svg">
+      <defs>
+        <radialGradient id="gg" x1="0" y1="0" x2="0" y2="100%">
+          <stop offset="0%" style="stop-color:rgba(27,83,244,0.05)"></stop>
+          <stop offset="100%" style="stop-color:rgba(27,83,244,0.01)"></stop>
+        </radialGradient>
+        <filter id="f3" x="-110%" y="-110%" width="400%" height="400%">
+          <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0"></feOffset>
+          <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10"></feGaussianBlur>
+          <feBlend in="SourceGraphic" in2="blurOut" mode="multiply"></feBlend>
+        </filter>
+      </defs>
+      <path :d="d" stroke="url(#gg)" stroke-width="5" fill="rgba(255,255,255,1)"/>
+    </svg>
     <img src="@/icons/logo2.png" alt="" class="mainLogo" @click="$router.push('/')">
     <div class="navList">
       <ul>
@@ -55,6 +69,7 @@
 
 <script>
   import newTask from '@/components/home/new-task'
+
   export default {
     name: 'Navbar',
     data() {
@@ -103,7 +118,8 @@
         ],
         navActive: 0,
         createTaskDialog: false,
-        fileList: []
+        fileList: [],
+        d: null
       }
     },
     components: {
@@ -138,10 +154,14 @@
       closeDialogFun() {
         this.createTaskDialog = false
       },
-
+      // 背景 svg
+      createSVG() {
+        this.d = `M 0 0 H 100 A 20 20 0 0 1 120 20 V 552 C 120 567 123 569 114 598 C 104 627 52 632 52 676 C 51 735 120 723 120 786 V ${document.body.clientHeight - 20} A 20 20 0 0 1 100 ${document.body.clientHeight} H 0 Z`
+      }
     },
     mounted() {
-
+      this.createSVG()
+      window.addEventListener('resize', this.createSVG)
     },
     watch: {
       '$route.name': {
@@ -173,14 +193,20 @@
     width: 120px;
     height: 100vh;
     min-height: 810px;
-    background-color: rgba(255, 255, 255, 1);
     border-radius: 0px 20px 20px 0px;
-    box-shadow: 4px 0px 20px 0px rgba(27, 83, 244, 0.05);
     display: flex;
     flex-direction: column;
     align-items: center;
 
+    .svg {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+
     img.mainLogo {
+      position: relative;
+      z-index: 1;
       flex-shrink: 0;
       width: 56px;
       margin-top: 30px;
@@ -274,12 +300,12 @@
 
     .systemList {
       position: absolute;
-      bottom: 40px;
+      bottom: 10px;
     }
 
     .addTask {
       position: absolute;
-      top: 530px;
+      top: 640px;
       left: 64px;
       width: 80px;
       height: 80px;

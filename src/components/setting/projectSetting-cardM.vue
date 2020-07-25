@@ -44,29 +44,29 @@
           width="55"/>
 
         <el-table-column
-          prop="name"
+          prop="projectName"
           label="项目名称"
           show-overflow-tooltip
           width="400"/>
 
         <el-table-column
-          prop="state"
+          prop="projectStatus"
           label="项目状态"
           width="160"/>
 
         <el-table-column
-          prop="now"
+          prop="isDefault"
           label="当前项目"
           width="168"/>
 
         <el-table-column
-          prop="user"
+          prop="customerName"
           label="创建人"
           show-overflow-tooltip
           width="180"/>
 
         <el-table-column
-          prop="date"
+          prop="createTime"
           label="创建时间"
           show-overflow-tooltip/>
 
@@ -80,6 +80,15 @@
 
       </el-table>
     </div>
+
+    <el-pagination
+      background
+      layout="prev, pager, next, jumper"
+      :current-page.sync="page.index"
+      @current-change="jump"
+      :total="page.total">
+    </el-pagination>
+
     <!--新建项目dialog-->
     <div class="createProject" v-show="createBaseShow">
       <div class="createBase">
@@ -92,7 +101,7 @@
                  class="name"
                  v-model="createProject.name"
                  :placeholder="createProject.placeholder">
-          <el-checkbox v-model="checked" label="设为当前项目"/>
+          <el-checkbox v-model="createProject.checked" label="设为当前项目"/>
           <div class="btn-group">
             <div class="farm-btn cancel" @click="createCancelBtnFun">
               <span>{{ createProject.btnCancel }}</span>
@@ -108,23 +117,33 @@
 </template>
 
 <script>
+  import {
+    getObjectList,
+    createTask,
+    deleteTask
+  } from '@/api/setting-api.js'
+  import {
+    messageFun,
+    createDateFun
+  } from "@/assets/common"
+
   export default {
     name: 'projectSetting',
     data() {
       return {
         tableData: [
-          {
-            name: '默认项目认项认项认项认项认项一',
-            state: '启用',
-            now: '是',
-            user: '系统默认创建',
-            date: '2020-03-03 00:00:00'
-          }
+          // {
+          //   'createTime'      创建时间
+          //   'projectName'     项目名称
+          //   'customerName'    创建人
+          //   'isDefault':      当前项目 0否 1是
+          //   'projectStatus'   项目状态 0不启用 1启用
+          // },
         ],
         tableOperateBtn: ['编辑', '设为当前项目'],
         btnGroup: [
           {
-            text: '新建任务',
+            text: '新建项目',
             class: 'addMoreBtn',
             initialIcon: require('@/icons/addIcon-black.png'),
             selectedIcon: require('@/icons/addIcon-white.png')
@@ -137,17 +156,23 @@
             triggerable: true
           }
         ],
-        searchInputVal: '',
+        searchInputVal: '',           // 检索关键字
         placeholder: '输入项目名称',
         createProject: {
           tit: '新建项目',
           name: '',
+          checked: false,
           placeholder: '请输入项目名称',
           btnCancel: '取消',
           btnSave: '确定'
         },
         createBaseShow: false,
-        selectionList: []
+        selectionList: [],
+        page: {
+          index: 0,
+          size: 10,
+          total: 0
+        }
       }
     },
     watch: {
@@ -162,19 +187,62 @@
       handleSelectionChange(val) {
         this.selectionList = val
       },
+      // 关键字搜索
       getData() {
-
+        this.getList(this.searchInputVal, 1, this.page.size)
       },
+      // 获得list
+      async getList(keyword, pageIndex, pageSize) {
+        let data = await getObjectList(`keyword=${keyword}&pageIndex=${pageIndex}&pageSize=${pageSize}`)
+        if (data.data.code != 200) {
+          messageFun('error', '获取数据失败')
+          return false
+        }
+        this.page.total = data.data.total
+        this.tableData = data.data.data.map(curr => {
+          // {
+          //   createBy: "1"
+          //   createTime: 1586999761039
+          //   customerUuid: "1"
+          //   dataStatus: 1
+          //   id: 1
+          //   isDefault: 0
+          //   projectName: "项目一"
+          //   projectOverview: "这是一个测试项目"
+          //   projectStatus: 1
+          //   taskProjectUuid: "1"
+          //   thumbnail: null
+          //   updateBy: "1"
+          //   updateTime: 1591689369051
+          // }
+          return {
+            'id': curr.taskProjectUuid,
+            'createTime': createDateFun(new Date(curr.createTime)),
+            'projectName': curr.projectName,
+            'customerName': curr.customerName,
+            'isDefault': curr.isDefault == 0 ? '否' : '是',
+            'projectStatus': curr.projectStatus == 0 ? '禁用' : '启用'
+          }
+        })
+      },
+      // 新建任务-关闭
       createCancelBtnFun() {
         this.createProject.name = ''
         this.createBaseShow = false
       },
-      createSaveBtnFun() {
+      // 新建任务-保存
+      async createSaveBtnFun() {
+        let c = this.createProject
+        if(!c.name) return false
+        let data = await createTask({
+          'projectName': c.name,
+          'isDefault': c.checked
+        })
       },
       // 操作按钮
       uploadOperating(name) {
         switch (name) {
-          case '新建任务':
+          case '新建项目':
             this.createProjectFun()
             break
           case '删除':
@@ -182,14 +250,27 @@
             this.deleteFun()
         }
       },
-      // 新建任务
+      // 新建项目
       createProjectFun() {
         this.createBaseShow = true
       },
       // 删除
-      deleteFun() {
-
-      }
+      async deleteFun() {
+        let data = await deleteTask({'projectList': this.selectionList.map(curr => curr.id)})
+        if(data.data.code == 201){
+          messageFun('success', '操作成功')
+          this.getList(this.searchInputVal, this.page.index + 1, this.page.size)
+        }else if(data.data.code == 1000){
+          messageFun('error', '操作失败')
+        }
+      },
+      // 跳页
+      jump(val) {
+        this.getList(this.searchInputVal, val, this.page.size)
+      },
+    },
+    mounted() {
+      this.getList('', 1, this.page.size)
     }
   }
 </script>
@@ -232,27 +313,29 @@
     .createBase {
       width: 588px;
       height: 273px;
-      background-color: rgba(28, 36, 47, 1);
+      background-color: rgba(255, 255, 255, 1);
       box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
       border-radius: 8px;
+      overflow: hidden;
 
       .tit {
-        position: relative;
-        padding: 20px 0px;
+        height: 36px;
         text-align: center;
+        background-color: rgba(241, 244, 249, 1);
+        box-shadow: 0px 1px 6px 0px rgba(27, 83, 244, 0.3);
+        padding: 0px 30px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
         span {
-          font-size: 18px;
+          font-size: 14px;
           font-weight: 600;
-          color: rgba(255, 255, 255, 1);
-          line-height: 25px;
-          letter-spacing: 2px;
+          color: rgba(22, 29, 37, 1);
         }
 
         img {
-          position: absolute;
-          right: 20px;
-          width: 18px;
           cursor: pointer;
         }
       }
@@ -264,13 +347,13 @@
           width: 428px;
           height: 36px;
           border-radius: 8px;
-          border: 1px solid rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(22, 29, 37, 0.4);
           background-color: transparent;
           outline: none;
           margin: 20px 0px;
           padding-left: 20px;
           box-sizing: border-box;
-          color: rgba(255, 255, 255, 1);
+          color: rgba(22, 29, 37, 1);
         }
 
         .btn-group {
@@ -295,10 +378,6 @@
     .hover {
       display: none;
     }
-  }
-
-  /deep/ .el-checkbox__label {
-    color: rgba(255, 255, 255, 0.6) !important;
   }
 
   /deep/ .el-table .el-table__row:hover::after {

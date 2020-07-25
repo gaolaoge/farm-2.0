@@ -407,7 +407,7 @@
     bottom: 25px;
     font-size: 12px;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(22, 29, 37, 0.6);
     line-height: 32px;
     .ll {
       color: rgba(0, 97, 255, 1);
@@ -416,6 +416,9 @@
 
   /deep/.el-table__body-wrapper {
     height: calc(100vh - 395px);
+    tr {
+      cursor: pointer;
+    }
   }
 
 
