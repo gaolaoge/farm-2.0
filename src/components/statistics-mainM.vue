@@ -231,7 +231,7 @@
 <style lang="less" scoped>
   .statisticsM-wrapper {
     width: 100%;
-    padding: 0px 50px 20px;
+    padding: 0px 20px 20px 50px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;

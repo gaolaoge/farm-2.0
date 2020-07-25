@@ -6,7 +6,12 @@
       <appMain/>
     </div>
     <div class="mm" v-show="inHome">
-      <iv />
+      <iv/>
+    </div>
+    <div class="gz" v-show="showGZ">
+      <img src="@/icons/gz-black.png" alt="" class="d">
+      <img src="@/icons/gz-blue.png" alt="" class="h">
+      <span>传输列表</span>
     </div>
   </div>
 </template>
@@ -24,7 +29,8 @@
     name: 'layout-wrapper',
     data() {
       return {
-        inHome: false
+        inHome: false,
+        showGZ: false
       }
     },
     components: {
@@ -41,6 +47,8 @@
         handler: function (val) {
           if (val.name == 'home') this.inHome = true
           else this.inHome = false
+          if(val.name == 'assets' || val.name == 'task') this.showGZ = true
+          else this.showGZ = false
         },
         immediate: true
       }
@@ -50,6 +58,7 @@
 
 <style lang="less" scoped>
   .layout-wrapper {
+    position: relative;
     background-color: rgba(241, 244, 249, 1);
     display: flex;
     flex-wrap: nowrap;
@@ -72,6 +81,47 @@
       width: 366px;
       height: 100%;
       padding: 20px 20px 0px 0px;
+    }
+
+    .gz {
+      position: fixed;
+      bottom: 20px;
+      right: 40px;
+      width: 86px;
+      height: 24px;
+      border-radius: 2px;
+      border: 1px solid rgba(22, 29, 37, 0.19);
+      background-color: rgba(255, 255, 255, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      span {
+        font-size: 12px;
+        font-family: PingFangSC-Regular, PingFang SC;
+        color: rgba(22, 29, 37, 0.8);
+      }
+
+      .h {
+        display: none;
+      }
+
+      &:hover {
+        border: 1px solid rgba(27, 83, 244, 0.19);
+
+        span {
+          color: rgba(27, 83, 244, 1);
+        }
+
+        .d {
+          display: none;
+        }
+
+        .h {
+          display: inline-block;
+        }
+      }
     }
   }
 

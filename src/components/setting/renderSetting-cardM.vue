@@ -86,7 +86,6 @@
 
 <style lang="less" scoped>
   .renderSetting {
-    height: calc(100vh - 203px);
     padding: 50px 30px;
     box-sizing: border-box;
 

@@ -486,12 +486,14 @@
   .task-wrapper {
     overflow: hidden;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 
     .btnGroup {
       display: flex;
       justify-content: space-between;
       height: 52px;
-      margin: 20px 50px;
+      margin: 20px 20px 20px 50px;
       padding: 0px 30px;
       background-color: rgba(255, 255, 255, 1);
       border-radius: 8px;
@@ -557,9 +559,15 @@
       }
     }
 
+    .tableGroup {
+      flex-grow: 1;
+      margin: 0px 20px 20px 50px;
+      display: flex;
+      flex-direction: column;
+    }
+
     .tableList {
-      min-height: 700px;
-      height: calc(100vh - 120px - 73px - 42px - 40px);
+      flex-grow: 1;
       /*渲染下载*/
 
       .progressBar {
@@ -585,9 +593,12 @@
       .uploadTable,
       .renderTable {
         position: relative;
-        min-height: 700px;
         height: 100%;
       }
+    }
+
+    /deep/.el-dialog {
+      background-color: rgba(238,242,249,1);
     }
   }
 

@@ -57,4 +57,12 @@
   .settingM {
     width: 100%;
   }
+  .tableGroup {
+    height: calc(100% - 20px);
+    display: flex;
+    flex-direction: column;
+    .tableList {
+      flex-grow: 1;
+    }
+  }
 </style>

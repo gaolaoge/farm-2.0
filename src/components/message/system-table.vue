@@ -108,6 +108,9 @@
     overflow: hidden;
     padding: 10px;
     box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     .btnList {
       padding: 10px 0px;
       .btn {
@@ -133,10 +136,10 @@
       }
     }
     .table {
-
+      flex-grow: 1;
     }
     .page {
-      margin: 4px 25px 30px;
+      margin: 0px 25px 30px;
     }
   }
   /deep/.el-table__body-wrapper {

@@ -399,9 +399,14 @@
     width: 100%;
     overflow: hidden;
 
+    .tableGroup {
+      height: 100%;
+    }
+
     .tableList {
       padding: 30px;
       margin-bottom: 20px;
+      box-sizing: border-box;
 
       .g {
         display: flex;
@@ -535,6 +540,7 @@
       &:nth-last-of-type(1) {
         margin-bottom: 0px;
         border-radius: 8px;
+        height: 198px;
       }
     }
 

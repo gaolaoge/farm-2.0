@@ -481,7 +481,6 @@
     z-index: 2;
     height: 120px;
     width: 100%;
-    /*min-width: 1625px;*/
 
     .wrapper {
       height: 100%;
@@ -489,7 +488,7 @@
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
-      padding: 0px 50px;
+      padding: 0px 20px 0px 50px;
       box-sizing: border-box;
       justify-content: space-between;
 

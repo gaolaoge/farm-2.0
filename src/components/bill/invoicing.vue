@@ -383,7 +383,7 @@
   }
 
   /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 597px);
+    height: calc(100vh - 550px);
   }
 
   .invoicing-table {

@@ -215,7 +215,7 @@
       display: flex;
       justify-content: space-between;
       height: 52px;
-      margin: 20px 50px;
+      margin: 20px 20px 20px 50px;
       padding: 0px 30px;
       background-color: rgba(255, 255, 255, 1);
       border-radius: 8px;
@@ -233,7 +233,7 @@
     .info {
       position: absolute;
       top: 0px;
-      right: 30px;
+      right: 0px;
       font-size: 12px;
       line-height: 41px;
       font-weight: 400;

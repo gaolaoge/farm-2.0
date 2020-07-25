@@ -5,7 +5,7 @@
         <span class="navBtn"
               :class="[{'active': index == table.navListActiveIndex}]"
               @click="table.navListActiveIndex = index"
-              v-for="item,index in table.navList"
+              v-for="(item,index) in table.navList"
               :key="index">
           {{ item.text }}
         </span>
@@ -61,5 +61,15 @@
   .messageCenter {
     overflow: hidden;
     width: 100%;
+    .tableGroup {
+      height: calc(100% - 20px);
+      .tableList {
+        height: calc(100% - 44px);
+        .rechargeTable,
+        .consumptionTable {
+          height: 100%;
+        }
+      }
+    }
   }
 </style>

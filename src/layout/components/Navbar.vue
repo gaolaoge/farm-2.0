@@ -192,7 +192,7 @@
     position: relative;
     width: 120px;
     height: 100vh;
-    min-height: 810px;
+    min-height: 950px;
     border-radius: 0px 20px 20px 0px;
     display: flex;
     flex-direction: column;

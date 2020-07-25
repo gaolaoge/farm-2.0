@@ -33,8 +33,9 @@
         </span>
         <!--返回-->
         <div class="farm-primary-form-btn" v-show="!fullBtn" @click="e">
-          <img src="@/icons/back_icon-black.png" alt="">
-          <span>返回{{  }}</span>
+          <img src="@/icons/back_icon-black.png" alt="" class="btnIcon default">
+          <img src="@/icons/back_icon-white.png" alt="" class="btnIcon hover">
+          <span>返回</span>
         </div>
       </div>
     </div>

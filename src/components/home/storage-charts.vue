@@ -23,7 +23,7 @@
     mounted() {
       setTimeout(() => {
         this.init()
-      }, 400)
+      }, 800)
     },
     computed: {
       maxNum() {
