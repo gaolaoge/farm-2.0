@@ -4,12 +4,12 @@
       <div class="f">
         <!--头像-->
         <div class="avatar">
-          <img :src="info.avatarUrl" alt="">
+          <img :src="user.avatar" alt="">
         </div>
         <!--账号&等级-->
         <div class="nl">
-          <div class="name">{{ info.name }}</div>
-          <div class="level"><img src="@/icons/vipIcon.png" alt="">{{ info.level }}</div>
+          <div class="name">{{ user.name }}</div>
+          <div class="level"><img src="@/icons/vipIcon.png" alt="">{{ user.level }}</div>
         </div>
         <!--下拉框-->
         <div class="list" v-operating>
@@ -40,7 +40,7 @@
       <div class="t">
         <div class="capacityItem item">
           <span class="label">{{ info.capacityLabel }}：</span>
-          <span class="val">{{ user.balance }}</span>
+          <span class="val">{{ user.haveCapacity }} GB</span>
         </div>
       </div>
       <div class="line"></div>
@@ -71,9 +71,6 @@
     data() {
       return {
         info: {
-          avatarUrl: require('@/assets/userImg.png'),
-          name: 'Celia Greer',
-          level: '钻石会员',
           balanceLabel: '金币余额',
           capacityLabel: '剩余容量',
         },

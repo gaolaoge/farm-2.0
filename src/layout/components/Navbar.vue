@@ -79,25 +79,25 @@
             link: '/',
             iconUrl: require('@/icons/console-icon-home-h.png'),
             iconsUrlDefault: require('@/icons/console-icon-home.png'),
-            text: '首页'
+            text: this.$t('navbar')[0]
           },
           {
             link: '/task',
             iconUrl: require('@/icons/console-icon-task-h.png'),
             iconsUrlDefault: require('@/icons/console-icon-task.png'),
-            text: '任务'
+            text: this.$t('navbar')[1]
           },
           {
             link: '/assets',
             iconUrl: require('@/icons/console-icon-assets-h.png'),
             iconsUrlDefault: require('@/icons/console-icon-assets.png'),
-            text: '资产'
+            text: this.$t('navbar')[2]
           },
           {
             link: '/bill',
             iconUrl: require('@/icons/console-icon-bill-h.png'),
             iconsUrlDefault: require('@/icons/console-icon-bill.png'),
-            text: '账单'
+            text: this.$t('navbar')[3]
           }
         ],
         systemList: [
@@ -105,14 +105,14 @@
             link: '/statisticsM',
             iconUrl: require('@/icons/console-icon-statistics-h.png'),
             iconsUrlDefault: require('@/icons/console-icon-statistics.png'),
-            text: '统计',
+            text: this.$t('navbar')[4],
             align: 'bottom'
           },
           {
             link: '/setting',
             iconUrl: require('@/icons/console-icon-set-h.png'),
             iconsUrlDefault: require('@/icons/console-icon-set.png'),
-            text: '设置',
+            text: this.$t('navbar')[5],
             align: 'bottom'
           }
         ],

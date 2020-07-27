@@ -6,7 +6,7 @@
         <!--头像编辑-->
         <div class="avatarEdit" @click="avatarEditFun"><span>{{ editAvatar }}</span></div>
         <!--头像-->
-        <img src="@/assets/avaterImg.png" alt="" class="avatarImg">
+        <img :src="user.avatar" alt="" class="avatarImg">
       </div>
       <!--账号-->
       <div class="form-item">
@@ -34,16 +34,17 @@
       <!--性别-->
       <div class="form-item">
         <span class="label">{{ info.sexLabel }}：</span>
-        <el-radio-group v-model="info.sexVal">
-          <el-radio label="男" value="nan" />
-          <el-radio label="女" value="0" />
+        <el-radio-group v-model="info.sexVal" @change="changeSex">
+          <el-radio :label=1>{{ info.sexRadio[0] }}</el-radio>
+          <el-radio :label=0>{{ info.sexRadio[1] }}</el-radio>
         </el-radio-group>
         <span class="remarks">{{ info.sexRemarks }}</span>
       </div>
       <!--生日-->
       <div class="form-item">
         <span class="label">{{ info.birthdayLabel }}：</span>
-        <modelCalendar style="display: inline-block"/>
+        <modelCalendar style="display: inline-block"
+                       @changeSelectDate="changeBirthdayDate" />
         <span class="remarks">{{ info.birthdayRemarks }}</span>
       </div>
       <!--邮箱-->
@@ -74,7 +75,19 @@
   import editPassword from '@/components/Pinfo/editInfo/editPassword'
   import editPhone from '@/components/Pinfo/editInfo/editPhone'
   import editName from '@/components/Pinfo/editInfo/editName'
-  import {mapState} from 'vuex'
+  import {
+    mapState
+  } from 'vuex'
+  import {
+    editBasicInfo
+  } from '@/api/editInfo-api'
+  import {
+    getInfo
+  } from '@/api/api'
+  import {
+    messageFun,
+    setInfo
+  } from '@/assets/common.js'
 
   export default {
     name: 'infoTable',
@@ -90,7 +103,8 @@
           phoneNumLabel: '手机',
           // phoneNumVal: '185****7163',
           sexLabel: '性别',
-          sexVal: 'nan',
+          sexVal: null,
+          sexRadio: ['男', '女'],
           birthdayLabel: '生日',
           birthdayVal: 'Admin',
           emailLabel: '邮箱',
@@ -107,9 +121,50 @@
       }
     },
     methods: {
+      // 修改生日
+      async changeBirthdayDate(val) {
+        let data = await editBasicInfo({
+          "nickname": null,
+          "headImg": null,
+          "sex": null,
+          "birthday": val,
+        })
+        if (data.data.code == 200) {
+          this.$store.commit('changeBirthday', val)
+          messageFun('success', this.$t('message.editSuc'))
+        } else if (data.data.code == 999) {
+          messageFun('warning', this.$t('message.noTimes'))
+        }
+      },
+      // 修改性别
+      async changeSex() {
+        let data = await editBasicInfo({
+          "nickname": null,
+          "headImg": null,
+          "sex": this.info.sexVal,
+          "birthday": null,
+        })
+        if (data.data.code == 200) {
+          this.$store.commit('changeSex', this.info.sexVal)
+          messageFun('success', this.$t('message.editSuc'))
+        } else if (data.data.code == 999) {
+          messageFun('warning', this.$t('message.noTimes'))
+        }
+      },
       // 上传裁剪好的头像
-      uploadAvatar(src) {
-        this.imgSrc = src
+      async uploadAvatar(src) {
+        let data = await editBasicInfo({
+          "nickname": null,
+          "headImg": src,
+          "sex": null,
+          "birthday": null,
+        })
+        if (data.data.code == 200) {
+          this.$store.commit('changeAvatar', src)
+          messageFun('success', this.$t('message.editSuc'))
+        } else if (data.data.code == 999) {
+          messageFun('warning', this.$t('message.noTimes'))
+        }
         this.showCutter = false
       },
       // 编辑头像
@@ -135,6 +190,9 @@
     computed: {
       ...mapState(['user']),
     },
+    mounted() {
+      this.info.sexVal = this.user.sex
+    }
   }
 </script>
 
@@ -186,6 +244,7 @@
 
         .avatarImg {
           width: 120px;
+          border-radius: 50%;
         }
 
         &:hover .avatarEdit {

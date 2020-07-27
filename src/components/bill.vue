@@ -3,14 +3,14 @@
     <!--公共部分-->
     <div class="personInfo">
       <div class="info">
-        <img :src="info.img" alt="" class="avatar">
+        <img :src="user.avatar" alt="" class="avatar">
         <div class="name">
           {{ user.name }}
         </div>
         <div class="level">
           <img :src="info.levelIcon" alt="" class="i">
           <span>
-            {{ info.levelText }}
+            {{ user.level }}
           </span>
         </div>
       </div>
@@ -139,10 +139,7 @@
     data() {
       return {
         info: {
-          img: require('@/icons/n.png'),
-          name: 'Terry Brewer',
           levelIcon: require('@/icons/vipIcon.png'),
-          levelText: '大众会员',
           balanceLabel: '账户余额(金币)：',
           balanceVal: 'null',
           btn: '立即充值',
@@ -214,6 +211,8 @@
 
         .avatar {
           margin-bottom: 10px;
+          width: 86px;
+          border-radius: 50%;
         }
 
         .name {

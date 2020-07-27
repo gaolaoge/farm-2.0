@@ -109,6 +109,7 @@
           background-color: rgba(27, 83, 244, 1);
           font-size: 14px;
           user-select: none;
+          border-radius: 14px 0px 0px;
         }
 
         .navLi {

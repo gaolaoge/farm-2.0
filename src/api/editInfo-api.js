@@ -27,11 +27,27 @@ export function editPassWord(data) {
   })
 }
 
-// 修改邮箱 - 验证码
-export function getCodeFromEmail(data) {
+// 修改邮箱 - 获取手机验证码
+export function getPhoneCodeFromEmail() {
   return api({
     url: '/customer/sendPhoneCode4ChangeEmail',
     method: 'GET',
+  })
+}
+
+// 修改邮箱 - 获取新邮箱验证码
+export function getEmailCodeFromEmail(data) {
+  return api({
+    url: `/customer/sendEmailCode4CheckOwn/${data}`,
+    method: 'GET'
+  })
+}
+
+// 修改邮箱 - 修改
+export function editEmail(data) {
+  return api({
+    url: `/customer/changeEmailByPhoneCode`,
+    method: 'PUT',
     data
   })
 }

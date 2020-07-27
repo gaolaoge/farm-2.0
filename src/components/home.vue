@@ -6,7 +6,7 @@
     <div class="firRow">
       <!--任务状态-->
       <div class="taskStatus">
-        <header class="label">{{ taskStatus.label }}</header>
+        <header class="label">{{ $t('home.taskStatus.label') }}</header>
         <div class="statusList">
           <div class="item"
                v-for="(item,index) in taskStatus.list"
@@ -22,15 +22,15 @@
       <!--echarts-->
       <div class="pastWeek">
         <header class="label">
-          {{ pastWeek.label }}
-          <span class="miniUnit">{{ pastWeek.miniLabel }}</span>
+          {{ $t('home.pastWeek.label') }}
+          <span class="miniUnit">{{ $t('home.pastWeek.miniLabel') }}</span>
         </header>
         <HomeCharts class="HomeCharts" :cData="chartsData" :cDate="chartsDate"/>
       </div>
       <!--数据统计-->
       <div class="statistics">
         <header class="label">
-          {{ statistics.label }}
+          {{ $t('home.statistics.label') }}
         </header>
         <section class="s">
           <div class="sw" v-for="(item,index) in statistics.list" :key="index">
@@ -49,7 +49,7 @@
     <div class="thiRow">
       <div class="recentProjects">
         <header class="label">
-          {{ recentProjects.label }}
+          {{ $t('home.recentProjects.label') }}
         </header>
         <div class="g">
           <ul class="ul" :style="{left: -423 * recentShowIndex + 'px'}">
@@ -122,62 +122,45 @@
     data() {
       return {
         taskStatus: {
-          label: '任务状态',
           list: [
             {
-              name: '待设置参数',
+              name: this.$t('home.taskStatus.list')[0],
               num: 0
             },
             {
-              name: '渲染中',
+              name: this.$t('home.taskStatus.list')[1],
               num: 0
             },
             {
-              name: '待全部渲染',
+              name: this.$t('home.taskStatus.list')[2],
               num: 0
             },
             {
-              name: '渲染暂停',
+              name: this.$t('home.taskStatus.list')[3],
               num: 0
             },
             {
-              name: '渲染完成',
+              name: this.$t('home.taskStatus.list')[4],
               num: 0
             },
-            // {
-            //   name: 'null',
-            //   num: 0
-            // }
           ],
-          messageText: '您有待设置参数任务，请尽快完成哦~',
           haveNewItem: false
         },
         statistics: {
-          label: '数据统计',
           list: [
             {
-              text: '累计消费',
+              text: this.$t('home.statistics.list.text')[0],
               num: '0',
-              unit: '金币',
+              unit: this.$t('home.statistics.list.unit')[0],
               iconImg: require('@/icons/gold.png')
             },
             {
-              text: '累计渲染用时',
+              text: this.$t('home.statistics.list.text')[1],
               num: '0',
-              unit: '小时',
+              unit: this.$t('home.statistics.list.unit')[1],
               iconImg: require('@/icons/time.png')
             }
           ]
-        },
-        pastWeek: {
-          label: '近七天任务',
-          miniLabel: '/单位：个'
-        },
-        vip: {
-          label: '存储统计'
-        },
-        recentProjects: {
-          label: '近期项目'
         },
         showNewTask: false,
         chartsData: [],

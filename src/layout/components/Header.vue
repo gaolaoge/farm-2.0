@@ -7,7 +7,7 @@
         <span class="tit">{{ bulletin.bulletinTit }}</span>
         <span class="val">{{ bulletin.bulletinVal }}</span>
       </div>
-      <div class="oper">
+      <div class="oper" :class="[{'inhome': inHome}]">
         <!--选择分区-->
         <div class="workbench">
           <div class="switch"><img src="@/icons/switch-icon.png" alt=""></div>
@@ -72,10 +72,9 @@
           </div>
           <!--头像-->
           <div class="userInfo" v-show="!inHome" :class="[{'active': showUserList}]" v-operating>
-            <img :src="user.imgUrlMini"
+            <img :src="user.avatar"
                  alt=""
-                 class="userImg"
-                 style="width: 28px;">
+                 class="userImg">
             <!--:class="[{'show': showUserList}]"-->
             <!--下拉框-->
             <div class="newsBase" :class="[{'show': showUserList}]">
@@ -99,7 +98,7 @@
                        <span class="sb">
                          {{ userOperateList[1]['text'] }}
                        </span>
-                       <span class="balanceNow" :title="userOperateList[1]['balance']">
+                       <span class="balanceNow">
                          <span class="amount">
                             {{ user.balance }}
                          </span>
@@ -117,9 +116,9 @@
                      <span class="sb">
                        {{ userOperateList[2]['text'] }}
                      </span>
-                     <span class="balanceNow" :title="userOperateList[2]['balance']">
+                     <span class="balanceNow">
                        <span class="amount">
-                          {{ user.balance }}
+                          {{ user.haveCapacity }} GB
                        </span>
                      </span>
                   </span>
@@ -240,17 +239,12 @@
     data() {
       return {
         inHome: false,
-        recharge: {
-          info: '您当前余额不足，可能导致渲染失败，请尽快充值！',
-          btn: '充值'
-        },
         workBenchList: [
           // {
           //   name: '影视版CPU 1区',
           //   val: '影视版CPU 1区'
           // }
         ],
-        // workBenchName: '当前工作台',
         workBenchVal: '',
         // showNews: false                      // 展示消息
         showUserList: false,                    // 个人信息下拉
@@ -258,45 +252,43 @@
         showMessageList: false,                 // 消息下拉
         userOperateList: [
           {
-            text: '',
+            text: this.$t('header.userOLT')[0],
             moreClass: 'userName',
             iconUrl: require('@/icons/vipIcon.png')
           },
           {
-            text: '金币余额',
+            text: this.$t('header.userOLT')[1],
             moreClass: 'balance',
-            balance: 0,
             routerUrl: ''
           },
           {
-            text: '剩余容量',
+            text: this.$t('header.userOLT')[2],
             moreClass: 'capacity',
-            balance: 0,
             routerUrl: ''
           },
           {
-            text: '基本信息',
+            text: this.$t('header.userOLT')[3],
             moreClass: 'info'
           },
           {
-            text: '退出',
+            text: this.$t('header.userOLT')[4],
             moreClass: 'quit'
           }
         ],
         problemOperateList: [
           {
-            text: '渲染指引'
+            text: this.$t('header.problemOLT')[0]
           },
           {
-            text: '帮助中心'
+            text: this.$t('header.problemOLT')[1]
           }
         ],
         guideShow: false,
         guideShowStep: 1,
-        uptop: '充值',
+        uptop: this.$t('header.uptopBtn'),
         // 公告
         bulletin: {
-          bulletinTit: '公告：',
+          bulletinTit: this.$t('header.bulletinT'),
           bulletinVal: `1.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊。 2.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧…`,
         },
       }
@@ -352,9 +344,9 @@
       },
       // 退出
       quitFun() {
-        this.$confirm('确认退出登录?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm(this.$t('message.configExit'), this.$t('message.prompt'), {
+          confirmButtonText: this.$t('message.config'),
+          cancelButtonText: this.$t('message.cancel'),
           type: 'warning'
         })
           .then(() => {
@@ -362,13 +354,13 @@
             this.$router.push('/login')
             this.$message({
               type: 'success',
-              message: '退出成功!'
+              message: this.$t('message.sucExit')
             })
           })
           .catch(() => {
             this.$message({
               type: 'info',
-              message: '已取消退出'
+              message: this.$t('message.cancelExit')
             })
           })
 
@@ -498,6 +490,11 @@
         align-items: center;
         width: 500px;
         flex-shrink: 1;
+        box-sizing: border-box;
+
+        &.inhome {
+          padding-right: 30px;
+        }
 
         .r {
           display: flex;
@@ -605,12 +602,12 @@
           .userInfo {
             width: 44px;
             height: 44px;
-            box-sizing: border-box;
 
             .userImg {
-              margin: 26px auto;
+              width: 28px;
               display: block !important;
               cursor: pointer;
+              border-radius: 5px;
             }
 
             &.active {
@@ -661,19 +658,6 @@
           .news {
             margin-right: 14px;
             cursor: pointer;
-          }
-
-          .recharge {
-            margin-right: 81px;
-
-            .t {
-              font-size: 14px;
-              font-weight: 500;
-              color: rgba(255, 255, 255, 0.59);
-              display: inline-block;
-              margin-right: 10px;
-              user-select: none;
-            }
           }
 
           .messageE {

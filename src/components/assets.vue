@@ -109,17 +109,17 @@
             {
               initialIcon: require('@/icons/u-black.png'),
               selectedIcon: require('@/icons/u-white.png'),
-              text: '上传'
+              text: this.$t('assets.myUploadBtnGroup')[0]  // 上传
             },
             {
               initialIcon: require('@/icons/addIcon-black.png'),
               selectedIcon: require('@/icons/addIcon-white.png'),
-              text: '新建文件夹'
+              text: this.$t('assets.myUploadBtnGroup')[1]  // 新建文件夹
             },
             {
               initialIcon: require('@/icons/u-black.png'),
               selectedIcon: require('@/icons/u-white.png'),
-              text: '下载',
+              text: this.$t('assets.myUploadBtnGroup')[2], // 下载
               css: 'rotate(180deg)'
             }
           ],
@@ -127,29 +127,26 @@
             {
               initialIcon: require('@/icons/u-blue.png'),
               selectedIcon: require('@/icons/u-white.png'),
-              text: '下载',
+              text: this.$t('assets.outPutBtnGroup')[0], // 下载
               css: 'rotate(180deg)'
             },
             {
               initialIcon: require('@/icons/deleteIcon-blue.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png'),
-              text: '删除'
+              text: this.$t('assets.outPutBtnGroup')[1], // 删除
             }
           ],
-          moreBtnText: '更多',
+          moreBtnText: this.$t('assets.moreBtnText'),
           moreBtnIcon: require('@/icons/more-btn.png'),
-          moreBtnList: ['移动到', '复制到', '重命名', '解压', '删除'],
+          moreBtnList: this.$t('assets.moreBtnList'),    // ['移动到', '复制到', '重命名', '解压', '删除']
           showMoreBtnList: false,
-          howToCreateBtn: ['手动创建资产目录', '自动创建资产目录'],
+          howToCreateBtn: this.$t('assets.howToCreateBtn'),  // ['手动创建资产目录', '自动创建资产目录']
           howToCreateIindex: 0
         },
-        info: [
-          '温馨提示：上传的资产有效期为20天，20天后系统会自动清除，请在有效期截止前进行渲染或下载，如有特殊需求，可联系在线客服。',
-          '温馨提示：渲染输出文件夹的有效期为20天，20天后系统会自动清除，请在有效期截止前及时下载，如有特殊需求，可联系在线客服。'
-        ],
+        info: this.$t('assets.info'),
         table: {
           navListActiveIndex: 0,
-          navList: ['我的上传', '渲染输出']
+          navList: this.$t('assets.navList'),            // ['我的上传', '渲染输出']
         },
         searchInputVal: ''
       }
@@ -194,10 +191,10 @@
       // 操作
       operating(active) {
         switch (active) {
-          case '下载':
+          case this.$t('assets.outPutBtnGroup')[0]:  // 下载
             this.$refs.outPutTable.downloadFun()
             break
-          case '删除':
+          case this.$t('assets.outPutBtnGroup')[1]:  // 删除
             this.$refs.outPutTable.deleteFun()
             break
         }

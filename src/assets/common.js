@@ -193,17 +193,19 @@ const setInfo = function (data) {
     level: data.vipLevel,
     balance: data.goldBalance
   }))
-  store.commit('changeName', data.nickname)                                            // 昵称
-  store.commit('changeAccount', data.account)                                          // 帐号
-  store.commit('changePhone', data.phone)                                              // 手机号
-  store.commit('changeLevel', data.vipLevel)                                           // 会员等级
-  store.commit('changeBirthday', data.birthday)                                        // 生日
-  store.commit('changeEmail', data.email)                                              // email
-  store.commit('changeSex', data.sex)                                                  // 性别
-  store.commit('changeUserBalance', data.goldBalance.toFixed(3))            // 现余额
-  store.commit('changePayAmount', data.cumulativeRecharge.toFixed(3))       // 累计支付金额
-  store.commit('changeGoldCoins', data.totalArrival.toFixed(3))             // 累计到账金币
-  store.commit('changeConsumption', data.cumulativeConsume.toFixed(2))      // 累计消费金币
+  store.commit('changeAvatar', data.headImg)                                                     // 头像
+  store.commit('changeName', data.nickname)                                                      // 昵称
+  store.commit('changeAccount', data.account)                                                    // 帐号
+  store.commit('changePhone', data.phone)                                                        // 手机号
+  store.commit('changeLevel', data.vipLevel)                                                     // 会员等级
+  store.commit('changeBirthday', data.birthday)                                                  // 生日
+  store.commit('changeEmail', data.email)                                                        // email
+  store.commit('changeSex', data.sex)                                                            // 性别
+  store.commit('changeUserBalance', data.goldBalance.toFixed(3))                      // 金币余额
+  store.commit('changeHaveCapacity', (data.haveCapacity / 1073741824).toFixed(3))     // 剩余容量
+  store.commit('changePayAmount', data.cumulativeRecharge.toFixed(3))                 // 累计支付金额
+  store.commit('changeGoldCoins', data.totalArrival.toFixed(3))                       // 累计到账金币
+  store.commit('changeConsumption', data.cumulativeConsume.toFixed(2))                // 累计消费金币
 }
 
 // 判断是否为IE等版本

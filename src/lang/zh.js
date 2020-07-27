@@ -1,5 +1,15 @@
 export default {
   title: '这是一个demo',
+  transportBtn: '传输列表',
+  // 导航
+  navbar: ['首页', '任务', '资产', '账单', '统计', '设置'],
+  // 首部
+  header: {
+    userOLT: ['未知用户', '金币余额', '剩余容量', '基本信息', '退出'],
+    problemOLT: ['渲染指引', '帮助中心'],
+    uptopBtn: '充值',
+    bulletinT: '公告：',
+  },
   // 登录页
   login_page: {
     nav_phoneText: '短信验证登录',
@@ -94,6 +104,27 @@ export default {
       text2: 'Copyright © 2018-2020 国家电影云制作服务平台'
     }
   },
+  // 首页 home
+  home: {
+    taskStatus: {
+      label: '任务状态',
+      list: ['待设置参数', '渲染中', '待全部渲染', '渲染暂停', '渲染完成'],
+    },
+    statistics: {
+      label: '数据统计',
+      list: {
+        text: ['累计消费', '累计渲染用时'],
+        unit: ['金币', '小时']
+      }
+    },
+    pastWeek: {
+      label: '近七天任务',
+      miniLabel: '/单位：个'
+    },
+    recentProjects: {
+      label: '近期项目'
+    },
+  },
   // 统计页
   statistics_mainM: {
     // 任务数统计
@@ -101,6 +132,64 @@ export default {
       name: '任务数统计',
       navLi_one: '新增任务数统计',
       navLi_two: '累计任务数统计'
+    },
+    numberOfFrames: {
+      name: '帧数统计',
+      navLi_one: '新增帧数统计',
+      navLi_two: '累计帧数统计'
+    },
+    consumption: {
+      name: '消费统计',
+      navLi_one: '新增消费统计',
+      navLi_two: '累计消费统计'
+    },
+    taskStatus: {
+      name: '任务状态统计',
     }
+  },
+  // 任务
+  task: {
+    tableNavList: ['上传分析', '渲染下载'],
+    uploadBtnGroup: ['新建任务', '删除', '重新分析', '刷新'],
+    renderBtnGroup: ['新建任务', '开始', '暂停', '删除', '下载完成帧', '全部渲染', '重新渲染', '归档', '刷新'],
+    archiveRecords: '归档记录',
+    status: {
+      canceled: '已取消',
+      giveUp: '已放弃',
+      upload_ing: '上传中...',
+      upload_timeOut: '上传暂停',
+      upload_err: '上传失败',
+      analysis_ing: '分析中',
+      render_ing: '渲染中',
+      render_timeOut: '渲染暂停',
+      render_all: '待全部渲染',
+      render_done: '渲染完成',
+      toBeSet: '待设置参数'
+    }
+  },
+  // 资产
+  assets: {
+    myUploadBtnGroup: ['上传', '新建文件夹', '下载'],
+    outPutBtnGroup: ['下载', '删除'],
+    moreBtnText: '更多',
+    moreBtnList: ['移动到', '复制到', '重命名', '解压', '删除'],
+    howToCreateBtn: ['手动创建资产目录', '自动创建资产目录'],
+    info: [
+      '温馨提示：上传的资产有效期为20天，20天后系统会自动清除，请在有效期截止前进行渲染或下载，如有特殊需求，可联系在线客服。',
+      '温馨提示：渲染输出文件夹的有效期为20天，20天后系统会自动清除，请在有效期截止前及时下载，如有特殊需求，可联系在线客服。'
+    ],
+    navList: ['我的上传', '渲染输出']
+  },
+  // 消息提示
+  message: {
+    configExit: '确认退出登录?',
+    sucExit: '退出成功!',
+    cancelExit: '已取消退出',
+    prompt: '提示',
+    config: '确认',
+    cancel: '取消',
+    editSuc: '修改成功',
+    noTimes: '本月更新次数已用完',
+
   }
 }

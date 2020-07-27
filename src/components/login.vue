@@ -345,9 +345,9 @@
             <!--</div>-->
             <div class="c">
               <label>{{ $t('login_page.register.type') }}：</label>
-              <el-radio-group v-model="registered.form.type" class="radio">
-                <el-radio :label="$t('login_page.register.typeRadio')[0]"></el-radio>
-                <el-radio :label="$t('login_page.register.typeRadio')[1]"></el-radio>
+              <el-radio-group v-model="registered.form.zone" class="radio">
+                <el-radio :label=1>{{ $t('login_page.register.typeRadio')[0] }}</el-radio>
+                <el-radio :label=2>{{ $t('login_page.register.typeRadio')[1] }}</el-radio>
               </el-radio-group>
 
             </div>
@@ -494,7 +494,7 @@
             password: '',
             phone: '',
             code: '',
-            type: '影视版'
+            zone: 1
           },
           status: {                 // 输入文本是否通过正则 && 是否获得焦点
             account: null,

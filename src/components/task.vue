@@ -156,11 +156,11 @@
         table: {
           navList: [
             {
-              text: '上传分析',
+              text: this.$t('task.tableNavList')[0],
               num: 0
             },
             {
-              text: '渲染下载',
+              text: this.$t('task.tableNavList')[1],
               num: 0
             }
           ],
@@ -169,73 +169,73 @@
         btnGroup: {
           uploadBtnGroup: [
             {
-              text: '新建任务',
+              text: this.$t('task.uploadBtnGroup')[0],
               class: 'addMoreBtn',
               initialIcon: require('@/icons/addIcon-black.png'),
               selectedIcon: require('@/icons/addIcon-white.png')
             },
             {
-              text: '删除',
+              text: this.$t('task.uploadBtnGroup')[1],
               class: 'deleteBtn',
               initialIcon: require('@/icons/deleteIcon-black.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
             {
-              text: '重新分析',
+              text: this.$t('task.uploadBtnGroup')[2],
               class: 'againBtn'
             },
             {
-              text: '刷新',
+              text: this.$t('task.uploadBtnGroup')[3],
               class: 'refresh'
             }
           ],
           renderBtnGroup: [
             {
-              text: '新建任务',
+              text: this.$t('task.renderBtnGroup')[0],
               class: 'addMoreBtn',
               initialIcon: require('@/icons/addIcon-black.png'),
               selectedIcon: require('@/icons/addIcon-white.png')
             },
             {
-              text: '开始',
+              text: this.$t('task.renderBtnGroup')[1],
               class: 'startBtn',
               initialIcon: require('@/icons/playIcon-black.png'),
               selectedIcon: require('@/icons/playIcon-white.png')
             },
             {
-              text: '暂停',
+              text: this.$t('task.renderBtnGroup')[2],
               class: 'pauseBtn',
               initialIcon: require('@/icons/pauseIcon-black.png'),
               selectedIcon: require('@/icons/pauseIcon-white.png')
             },
             {
-              text: '删除',
+              text: this.$t('task.renderBtnGroup')[3],
               class: 'deleteBtn',
               initialIcon: require('@/icons/deleteIcon-black.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png')
             },
             {
-              text: '下载完成帧',
+              text: this.$t('task.renderBtnGroup')[4],
               class: 'downloadBtn',
             },
             {
-              text: '全部渲染',
+              text: this.$t('task.renderBtnGroup')[5],
               class: 'renderAllBtn',
             },
             {
-              text: '重新渲染',
+              text: this.$t('task.renderBtnGroup')[6],
               class: 'renderAgainBtn',
             },
             {
-              text: '归档',
+              text: this.$t('task.renderBtnGroup')[7],
               class: 'archiveBtn',
             },
             {
-              text: '刷新',
+              text: this.$t('task.renderBtnGroup')[8],
               class: 'refresh'
             }
           ],
-          archiveRecords: '归档记录',
+          archiveRecords: this.$t('task.archiveRecords'),
           archiveRecordsNum: 0,
           searchInputUpload: '',                   // 上传分析 关键字检索
           searchInputDownload: '',                 // 渲染下载 关键字检索
@@ -268,24 +268,24 @@
         let t = this.btnGroup
         t.uploadTableBtnDelete = true       // 上传分析 - 删除
         t.uploadTableBtnAgain = true        // 上传分析 - 重新分析
-        if (val.includes('上传中...')) {
+        if (val.includes(this.$t('task.status.upload_ing'))) {
           t.uploadTableBtnDelete = false;
           t.uploadTableBtnAgain = false
         }
-        if (val.includes('分析中')) {
+        if (val.includes(this.$t('task.status.analysis_ing'))) {
           t.uploadTableBtnDelete = false;
           t.uploadTableBtnAgain = false
         }
-        if (val.includes('上传暂停')) t.uploadTableBtnAgain = false
-        if (val.includes('上传失败')) t.uploadTableBtnAgain = false
-        if (val.includes('已取消')) t.uploadTableBtnAgain = false
-        if (val.includes('已放弃')) t.uploadTableBtnAgain = false
+        if (val.includes(this.$t('task.status.upload_timeOut'))) t.uploadTableBtnAgain = false
+        if (val.includes(this.$t('task.status.upload_err'))) t.uploadTableBtnAgain = false
+        if (val.includes(this.$t('task.status.canceled'))) t.uploadTableBtnAgain = false
+        if (val.includes(this.$t('task.status.giveUp'))) t.uploadTableBtnAgain = false
         // if(val.includes('分析警告')) ''
         // if(val.includes('待设置参数')) ''
         // if(val.includes('分析失败')) ''
         if (!val.length) {
-          t.uploadTableBtnDelete = false       // 上传分析 - 删除
-          t.uploadTableBtnAgain = false        // 上传分析 - 重新分析
+          t.uploadTableBtnDelete = false     // 上传分析 - 删除
+          t.uploadTableBtnAgain = false      // 上传分析 - 重新分析
         }
       },
       // 渲染下载 多选结果
@@ -298,23 +298,23 @@
         t.downloadTableBtnRenderAll = true   // 渲染下载 - 全部渲染
         t.downloadTableBtnRenderAgain = true // 渲染下载 - 重新渲染
         t.downloadTableBtnArchive = true     // 渲染下载 - 归档
-        if (val.includes('渲染中')) {
+        if (val.includes(this.$t('task.status.render_ing'))) {
           t.downloadTableBtnDelete = false
           t.downloadTableBtnStart = false
           // t.downloadTableBtnRenderAll = false
           t.downloadTableBtnArchive = false
         }
-        if (val.includes('渲染暂停')) {
+        if (val.includes(this.$t('task.status.render_timeOut'))) {
           t.downloadTableBtnPause = false
           t.downloadTableBtnRenderAll = false
           t.downloadTableBtnArchive = false
         }
-        if (val.includes('待全部渲染')) {
+        if (val.includes(this.$t('task.status.render_all'))) {
           t.downloadTableBtnStart = false
           t.downloadTableBtnPause = false
           t.downloadTableBtnArchive = false
         }
-        if (val.includes('渲染完成')) {
+        if (val.includes(this.$t('task.status.render_done'))) {
           t.downloadTableBtnStart = false
           t.downloadTableBtnPause = false
           t.downloadTableBtnRenderAll = false
@@ -351,18 +351,18 @@
       // 上传分析 - 操作台
       uploadOperating(ing) {
         switch (ing) {
-          case '新建任务':
+          case this.$t('task.uploadBtnGroup')[0]: // 新建任务
             this.createTask()
             break
-          case '删除':
+          case this.$t('task.uploadBtnGroup')[1]: // 删除
             if (!this.btnGroup.uploadTableBtnDelete) return false
             this.$refs.uploadMode.deleteItem()
             break
-          case '重新分析':
+          case this.$t('task.uploadBtnGroup')[2]: // 重新分析
             if (!this.btnGroup.uploadTableBtnAgain) return false
             this.$refs.uploadMode.analyseAgainFun()
             break
-          case '刷新':
+          case this.$t('task.uploadBtnGroup')[3]: // 刷新
             this.$refs.uploadMode.getList()
             break
         }
@@ -370,37 +370,37 @@
       // 渲染下载 - 操作台
       renderOperating(ing) {
         switch (ing) {
-          case '新建任务':
+          case this.$t('task.renderBtnGroup')[0]: // 新建任务
             this.createTask()
             break
-          case '开始':
+          case this.$t('task.renderBtnGroup')[1]: // 开始
             if (!this.btnGroup.downloadTableBtnStart) return false
             this.$refs.renderMode.startFun()
             break
-          case '暂停':
+          case this.$t('task.renderBtnGroup')[2]: // 暂停
             if (!this.btnGroup.downloadTableBtnPause) return false
             this.$refs.renderMode.pauseFun()
             break
-          case '删除':
+          case this.$t('task.renderBtnGroup')[3]: // 删除
             if (!this.btnGroup.downloadTableBtnDelete) return false
             this.$refs.renderMode.deleteFun()
             break
-          case '下载完成帧':
+          case this.$t('task.renderBtnGroup')[4]: // 下载完成帧
             this.$refs.renderMode.downloadFils()
             break
-          case '全部渲染':
+          case this.$t('task.renderBtnGroup')[5]: // 全部渲染
             if (!this.btnGroup.downloadTableBtnRenderAll) return false
             this.$refs.renderMode.renderAllFun()
             break
-          case '重新渲染':
+          case this.$t('task.renderBtnGroup')[6]: // 重新渲染
             if (!this.btnGroup.downloadTableBtnRenderAgain) return false
             this.$refs.renderMode.renderAgainFun()
             break
-          case '归档':
+          case this.$t('task.renderBtnGroup')[7]: // 归档
             if (!this.btnGroup.downloadTableBtnArchive) return false
             this.$refs.renderMode.archiveFun()
             break
-          case '刷新':
+          case this.$t('task.renderBtnGroup')[8]: // 刷新
             this.$refs.renderMode.getList()
             break
         }
@@ -426,9 +426,6 @@
           }
 
         })
-        // this.createTaskDialog = true
-        // this.$refs.uploadMode.getList()
-        // this.$refs.renderMode.getList()
       },
       // 上传分析 - 关键字检索
       searchUploadInput() {
@@ -452,27 +449,27 @@
       let name = this.$route.params.name ? this.$route.params.name : null
       if (!name) return false
       switch (name) {
-        case '待设置参数':
+        case this.$t('task.status.toBeSet'):          // 待设置参数
           sessionStorage.setItem('taskListActive', '0')
           this.table.navListActiveIndex = 0
           this.$refs.uploadMode.getList(true)
           break
-        case '渲染中':
+        case this.$t('task.status.render_ing'):       // 渲染中
           sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(2)
           break
-        case '待全部渲染':
+        case this.$t('task.status.render_all'):       // 待全部渲染
           sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(5)
           break
-        case '渲染暂停':
+        case this.$t('task.status.render_timeOut'):   // 渲染暂停
           sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(4)
           break
-        case '渲染完成':
+        case this.$t('task.status.render_done'):      // 渲染完成
           sessionStorage.setItem('taskListActive', '1')
           this.table.navListActiveIndex = 1
           this.$refs.renderMode.getList(3)

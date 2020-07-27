@@ -43,6 +43,7 @@
     createCalendar,
     getDate
   } from '@/assets/common.js'
+  import {mapState} from "vuex";
 
   export default {
     name: 'modelCalendar',
@@ -53,11 +54,13 @@
         checkTimesTamp: new Date(),
         selectDate: 'start',
         dateVal: null,
-        // 起始时间时间戳
-        startTimestamp: new Date(),
       }
     },
-    props: {},
+    props: {
+      birthdayVal: {
+        type: Number,
+      }
+    },
     directives: {
       operating: {
         bind(el, bindings, vnode) {
@@ -85,7 +88,7 @@
       }
     },
     computed: {
-
+      ...mapState(['user']),
       // 当前年份
       yearNow() {
         let {year} = createCalendar(this.checkTimesTamp)
@@ -116,7 +119,7 @@
       selectSpanDate(date) {
         let {year, month, day} = createCalendar(date)
         this.dateVal = this.formatFun(year, month, day)
-
+        this.$emit('changeSelectDate', date.getTime())
       },
       // 日期格式
       formatFun(year, month, day) {
@@ -168,14 +171,9 @@
             break
         }
       },
-      // 日期确定选择
-      correctDateVal() {
-        this.u = this.startDate + ' ~ ' + this.endDate
-        this.$emit('changeSelectDate', [this.startDate, this.endDate])
-      }
     },
     mounted() {
-      let {year, month, day} = createCalendar(this.checkTimesTamp)
+      let {year, month, day} = createCalendar(new Date(this.user.birthday))
       this.dateVal = this.formatFun(year, month, day)
     }
   }

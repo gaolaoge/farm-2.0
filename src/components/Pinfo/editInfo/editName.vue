@@ -30,12 +30,12 @@
       return {
         title: '更改昵称',
         placeHolder: '输入新的昵称',
-        name: ''
+        name: null
       }
     },
     methods: {
-      // 关闭
-      async cancelFun() {
+      // 确定
+      async enterFun() {
         let data = await editBasicInfo({
             "nickname": this.name,
             "headImg": null,
@@ -44,15 +44,16 @@
         })
         if(data.data.code == 200) {
           this.$store.commit('changeName', this.name)
-          messageFun('success', '修改成功')
+          messageFun('success', this.$t('message.editSuc'))
         }else if(data.data.code == 999){
-          messageFun('warning', '本月更新次数已用完')
+          messageFun('warning', this.$t('message.noTimes'))
         }
         this.$emit('cancel')
       },
-      // 确定
-      enterFun() {
-        this.cancelFun()
+      // 取消 && 关闭
+      cancelFun() {
+        this.name = null
+        this.$emit('cancel')
       }
     }
   }

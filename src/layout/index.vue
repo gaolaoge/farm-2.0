@@ -11,7 +11,7 @@
     <div class="gz" v-show="showGZ">
       <img src="@/icons/gz-black.png" alt="" class="d">
       <img src="@/icons/gz-blue.png" alt="" class="h">
-      <span>传输列表</span>
+      <span>{{ $t('transportBtn') }}</span>
     </div>
   </div>
 </template>

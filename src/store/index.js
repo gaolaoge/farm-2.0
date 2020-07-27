@@ -10,17 +10,17 @@ export default new Vuex.Store({
       name: null,           // 昵称
       account: null,        // 账号
       phone: null,
-      imgUrl: require('@/assets/userImg.png'),
-      imgUrlMini: require('@/assets/userImgMini.png'),
+      avatar: require('@/assets/userImg.png'),  // 头像
       token: '',
-      balance: '0.000',     // 余额
+      balance: '0.000',     // 金币余额
+      haveCapacity: '0.000',// 剩余容量
       payAmount: '0.000',   // 累计支付金币
       goldCoins: '0.000',   // 累计到账金币
       consumption: '0.00',  // 累计消费金币
       level: null,
       birthday: null,
       email: null,
-      sex: 'nan',
+      sex: null,
     },
     login: false,
     zoneId: ''
@@ -58,7 +58,11 @@ export default new Vuex.Store({
       s.user.phone = val
     },
     changeLevel(s, val) {
-      s.user.level = val
+      if(val == 0) s.user.level = '普通会员'
+      else if(val == 1) s.user.level = '璀璨白银'
+      else if(val == 2) s.user.level = '荣耀黄金'
+      else if(val == 3) s.user.level = '尊贵铂金'
+      else if(val == 4) s.user.level = '永恒钻石'
     },
     changeBirthday(s, val) {
       s.user.birthday = val
@@ -69,6 +73,12 @@ export default new Vuex.Store({
     changeSex(s, val) {
       s.user.sex = val
     },
+    changeAvatar(s, val){
+      s.user.avatar = val
+    },
+    changeHaveCapacity(s, val){
+      s.user.haveCapacity = val
+    }
   },
   actions: {}
 })

@@ -10,13 +10,13 @@
         <!--手机号-->
         <div class="farm-item">
           <div class="phone">
-            <span>{{ phonePlaceholder }}</span>
+            <span>{{ String(user.phone).substr(0, 3) + '****' + String(user.phone).substr(7,4) }}</span>
           </div>
         </div>
         <!--验证码-->
         <div class="farm-item">
           <input type="text" class="farm-input code" v-model="codeVal" :placeholder="codePlaceholder">
-          <div class="getCode">
+          <div class="getCode" @click="getPhoneCode">
             <span>{{ codeLabel }}</span>
           </div>
         </div>
@@ -27,7 +27,7 @@
         <!--验证码-->
         <div class="farm-item">
           <input type="text" class="farm-input code" v-model="emailCodeVal" :placeholder="emailCodePlaceholder">
-          <div class="getCode">
+          <div class="getCode" @click="getEmailCode">
             <span>{{ codeLabel }}</span>
           </div>
         </div>
@@ -52,6 +52,18 @@
 </template>
 
 <script>
+  import {
+    mapState
+  } from 'vuex'
+  import {
+    getPhoneCodeFromEmail,
+    getEmailCodeFromEmail,
+    editEmail
+  } from '@/api/editInfo-api'
+  import {
+    messageFun
+  } from "@/assets/common"
+
   export default {
     name: 'editEmail',
     data() {
@@ -61,7 +73,6 @@
         emailPlaceholder: '新邮箱',
         emailCodeVal: '',
         emailCodePlaceholder: '验证码',
-        phonePlaceholder: '185****7163',
         codeVal: '',
         codePlaceholder: '验证码',
         codeLabel: '获取验证码',
@@ -78,9 +89,54 @@
         this.editing = true
         this.$emit('cancel')
       },
-      saveFun() {
-        this.editing = false
+      // 确定修改
+      async saveFun() {
+        if(!this.codeVal || !this.emailVal || !this.emailCodeVal) return false
+        let reg = /^\d{6}$/,
+            reg2 = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+        if(!reg2.test(this.emailVal)) return false
+        if(!reg.test(this.codeVal) || !reg.test(this.emailCodeVal)){
+          messageFun('error', '验证码输入错误')
+          return false
+        }
+        let data = await editEmail({
+          "phoneCode": this.codeVal,
+          "email": this.emailVal,
+          "emailCode": this.emailCodeVal
+        })
+        if(data.data.code == 200){
+          messageFun('success', '修改成功')
+          this.codeVal = null
+          this.emailVal = null
+          this.emailCodeVal = null
+          this.editing = false
+        }else if(data.data.msg == '邮箱验证码无效'){
+          messageFun('error', '邮箱验证码无效')
+        }else if(data.data.msg == '手机号验证码无效'){
+          messageFun('error', '手机号验证码无效')
+        }
+
+      },
+      // 获取手机号验证码
+      async getPhoneCode(){
+        let data = await getPhoneCodeFromEmail()
+        if(data.data.code == 200) messageFun('success', '验证码已发送')
+      },
+      // 获取新邮箱验证码
+      async getEmailCode(){
+        if(!this.emailVal) return false
+        let reg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+        if(!reg.test(this.emailVal)){
+          messageFun('error', '邮箱格式错误')
+          return false
+        }else {
+          let data = await getEmailCodeFromEmail(this.emailVal)
+          if(data.data.code == 200) messageFun('success', '验证码已发送')
+        }
       }
+    },
+    computed: {
+      ...mapState(['user'])
     }
   }
 </script>
@@ -115,7 +171,7 @@
       .tit {
         font-size: 20px;
         font-weight: 500;
-        color: rgba(255, 255, 255, 1);
+        color: rgba(22, 29, 37, 1);
         line-height: 28px;
         letter-spacing: 2px;
         margin-bottom: 10px;
@@ -123,7 +179,7 @@
 
       .dire {
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(22, 29, 37, 0.6);
         line-height: 17px;
       }
 

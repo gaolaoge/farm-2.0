@@ -10,7 +10,7 @@
         <!--手机号-->
         <div class="farm-item">
           <div class="phone">
-            <span>{{ String(user.phone).substr(0, 3) + '****' + String(user.phone).substr(7,11) }}</span>
+            <span>{{ String(user.phone).substr(0, 3) + '****' + String(user.phone).substr(7,4) }}</span>
           </div>
         </div>
         <!--验证码-->
