@@ -51,3 +51,45 @@ export function editEmail(data) {
     data
   })
 }
+
+// 修改手机号 - 通过验证手机号 - 获取旧手机号验证码
+export function editPhoneGetOC() {
+  return api({
+    url: `/customer/sendPhoneCode4ChangePhone`,
+    method: 'GET'
+  })
+}
+
+// 修改手机号 - 通用 - 获取新手机号验证码
+export function editPhoneGetNC(data) {
+  return api({
+    url: `/customer/sendPhoneCode4CheckOwn/${data}`,
+    method: 'GET'
+  })
+}
+
+// 修改手机号 - 通过验证手机号 - 发送验证
+export function editPhoneP(data) {
+  return api({
+    url: `/customer/changePhoneByPhoneCode`,
+    method: 'PUT',
+    data
+  })
+}
+
+// 修改手机号 - 通过验证邮箱 - 获取邮箱验证码
+export function editPhoneGetEC() {
+  return api({
+    url: `/customer/sendEmailCode4ChangePhone`,
+    method: 'GET'
+  })
+}
+
+// 修改手机号 - 通过验证邮箱 - 发送验证
+export function editPhonePP(data) {
+  return api({
+    url: `/customer/changePhoneByEmailCode`,
+    method: 'PUT',
+    data
+  })
+}

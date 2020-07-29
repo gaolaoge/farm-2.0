@@ -25,34 +25,53 @@
       <div class="choosePhone" v-show="step == 'choosePhone'">
         <!--验证旧手机-->
         <div class="farm-item">
-          <div class="phone"><span>{{ phoneNumber }}</span></div>
+          <div class="phone"><span>{{ String(user.phone).substr(0,3) + '****' + String(user.phone).substr(7,4) }}</span>
+          </div>
         </div>
         <div class="farm-item">
+          <!--输入旧手机号验证码-->
           <input type="text"
+                 v-model="phoneFrom.oldPhoneCode"
                  class="farm-input code"
-                 :class="[{'oldPhoneCodeError': phoneVeri.oldPhoneCodeError}]"
+                 @focus="phoneVeri.oldPhoneCodeError = null"
+                 @blur="verifOldCodeForPhone"
+                 :class="[{'oldPhoneCodeError': phoneVeri.oldPhoneCodeError == false}]"
                  :placeholder="phoneVeri.codePlaceHolder">
-          <div class="getCode"><span>{{ phoneVeri.btn }}</span></div>
+          <span class="errorInfo">{{ phoneVeri.oldPhoneCodeErrorInfo }}</span>
+          <!--旧手机号获取验证码-->
+          <div class="getCode" @click="oldPhoneGetCode"><span>{{ phoneVeri.btn }}</span></div>
         </div>
         <!--验证新手机-->
         <div class="farm-item">
+          <!--新手机号-->
           <input type="text"
                  class="farm-input"
-
+                 @focus="phoneVeri.newPhoneError = null"
+                 @blur="verifNewPhoneForPhone"
+                 :class="[{'newPhoneError': phoneVeri.newPhoneError == false}]"
+                 v-model="phoneFrom.newPhone"
                  :placeholder="phoneVeri.newPhoneNumberLabel">
+          <span class="errorInfo">{{ phoneVeri.newPhoneErrorInfo }}</span>
         </div>
+        <!--新手机号验证码-->
         <div class="farm-item">
+          <!--输入新手机号验证码-->
           <input type="text"
+                 v-model="phoneFrom.newPhoneCode"
                  class="farm-input code"
-                 :class="[{'newPhoneCodeError': phoneVeri.newPhoneCodeError}]"
+                 @focus="phoneVeri.newPhoneCodeError = null"
+                 @blur="verifNewCodeForPhone"
+                 :class="[{'newPhoneCodeError': phoneVeri.newPhoneCodeError == false}]"
                  :placeholder="phoneVeri.codePlaceHolder">
-          <div class="getCode"><span>{{ phoneVeri.btn }}</span></div>
+          <span class="errorInfo">{{ phoneVeri.newPhoneCodeErrorInfo }}</span>
+          <!--获取新手机号验证码-->
+          <div class="getCode" @click="rt('phone')"><span>{{ phoneVeri.btn }}</span></div>
         </div>
         <div class="x">
           <div class="farm-btn cancel" @click="step = 'chooseVerificationMethod'">
             <span>{{ btnCancel }}</span>
           </div>
-          <div class="farm-btn save" @click="saveFun">
+          <div class="farm-btn save" @click="editPhoneForPhone">
             <span>{{ btnSave }}</span>
           </div>
         </div>
@@ -61,34 +80,46 @@
       <div class="chooseEmail" v-show="step == 'chooseEmail'">
         <!--验证邮箱-->
         <div class="farm-item">
-          <div class="phone"><span>{{ emailAccount }}</span></div>
+          <div class="phone"><span>{{ user.email }}</span></div>
         </div>
         <div class="farm-item">
           <input type="text"
+                 v-model="emailFrom.emailCode"
                  class="farm-input code"
-                 :class="[{'oldPhoneCodeError': emailVeri.oldEmailCodeError}]"
+                 :class="[{'oldPhoneCodeError': emailVeri.emailCodeError == false}]"
+                 @focus="emailVeri.emailCodeError = null"
+                 @blur="verifEmailCodeForEmail"
                  :placeholder="emailVeri.codePlaceHolder">
-          <div class="getCode"><span>{{ emailVeri.btn }}</span></div>
+          <span class="errorInfo">{{ emailVeri.emailCodeErrorInfo }}</span>
+          <div class="getCode" @click="emailGetCode"><span>{{ emailVeri.btn }}</span></div>
         </div>
         <!--验证新手机-->
         <div class="farm-item">
           <input type="text"
+                 v-model="emailFrom.newPhone"
                  class="farm-input"
-
+                 :class="[{'oldPhoneCodeError': emailVeri.newPhoneError == false}]"
+                 @focus="emailVeri.newPhoneError = null"
+                 @blur="verifNewPhoneForEmail"
                  :placeholder="emailVeri.newPhoneNumberLabel">
+          <span class="errorInfo">{{ emailVeri.newPhoneErrorInfo }}</span>
         </div>
         <div class="farm-item">
           <input type="text"
+                 v-model="emailFrom.newCode"
                  class="farm-input code"
-                 :class="[{'newPhoneCodeError': emailVeri.newPhoneCodeError}]"
+                 :class="[{'newPhoneCodeError': emailVeri.newPhoneCodeError == false}]"
+                 @focus="emailVeri.newPhoneError = null"
+                 @blur="verifPhoneCodeForEmail"
                  :placeholder="emailVeri.codePlaceHolder">
-          <div class="getCode"><span>{{ emailVeri.btn }}</span></div>
+          <span class="errorInfo">{{ emailVeri.newPhoneCodeErrorInfo }}</span>
+          <div class="getCode" @click="rt('email')"><span>{{ emailVeri.btn }}</span></div>
         </div>
         <div class="x">
           <div class="farm-btn cancel" @click="step = 'chooseVerificationMethod'">
             <span>{{ btnCancel }}</span>
           </div>
-          <div class="farm-btn save" @click="saveFun">
+          <div class="farm-btn save" @click="ecx">
             <span>{{ btnSave }}</span>
           </div>
         </div>
@@ -129,7 +160,7 @@
       <!--修改成功-->
       <div class="success" v-show="step == 'success'">
         <img src="@/icons/smail.png" alt="">
-        <h5 class="tit">{{ success.successTit }}</h5>
+        <h5 class="tit">{{ success.tit }}</h5>
         <span class="dire">{{ success.dire }}</span>
         <div class="btnn" @click="cancelFun"><span>{{ success.btnn }}</span></div>
       </div>
@@ -138,6 +169,18 @@
 </template>
 
 <script>
+  import {
+    editPhoneGetOC,
+    editPhoneGetNC,
+    editPhoneP,
+    editPhoneGetEC,
+    editPhonePP
+  } from '@/api/editInfo-api'
+  import {messageFun} from "../../../assets/common"
+  import {
+    mapState
+  } from 'vuex'
+
   export default {
     name: 'editPhone',
     data() {
@@ -167,23 +210,29 @@
             f: 'choosePassword'
           }
         ],
-        phoneNumber: '185****7163',
-        emailAccount: '1834121808@qq.com',
         btnCancel: '返回',
         btnSave: '确定',
         phoneVeri: {
           btn: '获取验证码',
           codePlaceHolder: '验证码',
           newPhoneNumberLabel: '新手机号',
-          oldPhoneCodeError: true,
-          newPhoneCodeError: true
+          oldPhoneCodeError: null,
+          newPhoneCodeError: null,
+          newPhoneError: null,
+          oldPhoneCodeErrorInfo: null,
+          newPhoneCodeErrorInfo: null,
+          newPhoneErrorInfo: null,
         },
         emailVeri: {
           btn: '获取验证码',
           codePlaceHolder: '验证码',
           newPhoneNumberLabel: '新手机号',
-          oldEmailCodeError: true,
-          newPhoneCodeError: true
+          emailCodeError: null,
+          newPhoneCodeError: null,
+          newPhoneError: null,
+          emailCodeErrorInfo: null,
+          newPhoneCodeErrorInfo: null,
+          newPhoneErrorInfo: null,
         },
         passwordVeri: {
           btn: '获取验证码',
@@ -192,6 +241,21 @@
           newPhoneNumberLabel: '新手机号',
           passWordCodeError: true,
           newPhoneCodeError: true
+        },
+        phoneFrom: {
+          oldPhoneCode: null,
+          newPhoneCode: null,
+          newPhone: null
+        },
+        emailFrom: {
+          emailCode: null,
+          newCode: null,
+          newPhone: null
+        },
+        psFrom: {
+          password: null,
+          newCode: null,
+          newPhone: null
         },
         success: {
           tit: '更换手机号成功',
@@ -212,7 +276,186 @@
       },
       saveFun() {
         this.step = 'success'
-      }
+      },
+      // 根据手机号修改 - 旧手机号获取验证码
+      async oldPhoneGetCode() {
+        let data = await editPhoneGetOC()
+        if (data.data.code == 200) messageFun('success', '验证码已发送')
+      },
+      // 通用 - 新手机号获取验证码
+      rt(type) {
+        setTimeout(() => {
+          this.newPhoneGetCode(type)
+        }, 0)
+      },
+      async newPhoneGetCode(type) {
+        let p
+        if (type == 'phone') {
+          if (!this.phoneVeri.newPhoneError) return false
+          p = this.phoneFrom.newPhone
+        } else if (type == 'email') {
+          if (!this.emailVeri.newPhoneError) return false
+          p = this.emailFrom.newPhone
+        }
+        let data = await editPhoneGetNC(p)
+        if (data.data.code == 200) messageFun('success', '验证码已发送')
+      },
+      // 根据手机号修改 - 确认修改
+      async editPhoneForPhone() {
+        let {oldPhoneCodeError: oc, newPhoneCodeError: nc, newPhoneError: np} = this.phoneVeri
+        if (!oc || !nc || !np) return false
+        let {newPhone, oldPhoneCode, newPhoneCode} = this.phoneFrom
+        let data = await editPhoneP({newPhone, oldPhoneCode, newPhoneCode})
+        let d_ = data.data,
+          v = this.phoneVeri
+        if (d_.code == 10001) {
+          // 输入的新手机号已被注册使用
+          v.newPhoneErrorInfo = '手机号码已被注册'
+          v.newPhoneError = false
+        } else if (d_.code == 4034) {
+          if (d_.data.errorCode == 1) {
+            // 旧手机号验证码错误
+            v.oldPhoneCodeErrorInfo = '验证码错误'
+            v.oldPhoneCodeError = false
+          } else if (d_.data.errorCode == 2) {
+            // 新手机号验证码错误
+            v.newPhoneCodeErrorInfo = '验证码错误'
+            v.newPhoneCodeError = false
+          }
+        } else if (d_.code == 200) {
+          messageFun('success', '修改成功')
+          Object.assign(this.phoneVeri, {
+            oldPhoneCodeError: null,
+            newPhoneCodeError: null,
+            newPhoneError: null,
+            oldPhoneCodeErrorInfo: null,
+            newPhoneCodeErrorInfo: null,
+            newPhoneErrorInfo: null,
+          })
+          this.step = 'success'
+        }
+      },
+      // 根据手机号修改 - 验证旧手机号验证码格式
+      verifOldCodeForPhone() {
+        let v = this.phoneVeri
+        if (!this.phoneFrom.oldPhoneCode) {
+          v.oldPhoneCodeError = null
+          return false
+        }
+        if (!/^\d{6}$/.test(this.phoneFrom.oldPhoneCode)) {
+          v.oldPhoneCodeErrorInfo = '验证码格式错误'
+          v.oldPhoneCodeError = false
+        } else v.oldPhoneCodeError = true
+      },
+      // 根据手机号修改 - 验证新手机号验证码格式
+      verifNewCodeForPhone() {
+        let v = this.phoneVeri
+        if (!this.phoneFrom.newPhoneCode) {
+          v.newPhoneCodeError = null
+          return false
+        }
+        if (!/^\d{6}$/.test(this.phoneFrom.newPhoneCode)) {
+          v.newPhoneCodeErrorInfo = '验证码格式错误'
+          v.newPhoneCodeError = false
+        } else v.newPhoneCodeError = true
+      },
+      // 根据手机号修改 - 验证新手机号格式
+      verifNewPhoneForPhone() {
+        let v = this.phoneVeri
+        if (!this.phoneFrom.newPhone) {
+          v.newPhoneError = null
+          return false
+        }
+        if (!/^1(3|4|5|6|7|8|9)\d{9}$/.test(this.phoneFrom.newPhone)) {
+          v.newPhoneErrorInfo = '手机号码格式错误'
+          v.newPhoneError = false
+        } else v.newPhoneError = true
+      },
+      // 根据邮箱修改 - 验证邮箱验证码格式
+      verifEmailCodeForEmail() {
+        let v = this.emailVeri
+        if (!this.emailFrom.emailCode) {
+          v.emailCodeError = null
+          return false
+        }
+        if (!/^\d{6}$/.test(this.emailFrom.emailCode)) {
+          v.emailCodeErrorInfo = '验证码格式错误'
+          v.emailCodeError = false
+        } else v.emailCodeError = true
+      },
+      // 根据邮箱修改 - 验证新手机号验证码格式
+      verifPhoneCodeForEmail() {
+        let v = this.emailVeri
+        if (!this.emailFrom.newCode) {
+          v.newPhoneCodeError = null
+          return false
+        }
+        if (!/^\d{6}$/.test(this.emailFrom.newCode)) {
+          v.newPhoneCodeErrorInfo = '验证码格式错误'
+          v.newPhoneCodeError = false
+        } else v.newPhoneCodeError = true
+      },
+      // 根据邮箱修改 - 验证新手机号格式
+      verifNewPhoneForEmail() {
+        let v = this.emailVeri
+        if (!this.emailFrom.newPhone) {
+          v.newPhoneError = null
+          return false
+        }
+        if (!/^1(3|4|5|6|7|8|9)\d{9}$/.test(this.emailFrom.newPhone)) {
+          v.newPhoneErrorInfo = '手机号码格式错误'
+          v.newPhoneError = false
+        } else v.newPhoneError = true
+      },
+      // 根据邮箱修改 - 邮箱获取验证码
+      async emailGetCode() {
+        let data = await editPhoneGetEC()
+        if (data.data.code == 200) messageFun('success', '验证码已发送')
+      },
+      // 根据邮箱修改 - 确认修改
+      ecx() {
+        setTimeout(() => {
+          this.editPhoneForEmail()
+        }, 10)
+      },
+      async editPhoneForEmail() {
+        let {emailCodeError: ec, newPhoneCodeError: nc, newPhoneError: np} = this.emailVeri
+        console.log(ec, nc, np)
+        if (!ec || !nc || !np) return false
+        let {newPhone, emailCode, newCode: newPhoneCode} = this.emailFrom
+        let data = await editPhonePP({newPhone, emailCode, newPhoneCode})
+        let d_ = data.data,
+          v = this.emailVeri
+        if (d_.code == 10001) {
+          // 输入的新手机号已被注册使用
+          v.newPhoneErrorInfo = '手机号码已被注册'
+          v.newPhoneError = false
+        } else if (d_.code == 4034) {
+          if (d_.data.errorCode == 3) {
+            // 邮箱验证码错误
+            v.emailCodeErrorInfo = '验证码错误'
+            v.emailCodeError = false
+          } else if (d_.data.errorCode == 2) {
+            // 新手机号验证码错误
+            v.newPhoneCodeErrorInfo = '验证码错误'
+            v.newPhoneCodeError = false
+          }
+        } else if (d_.code == 200) {
+          messageFun('success', '修改成功')
+          Object.assign(this.emailVeri, {
+            emailCodeError: null,
+            newPhoneCodeError: null,
+            newPhoneError: null,
+            emailCodeErrorInfo: null,
+            newPhoneCodeErrorInfo: null,
+            newPhoneErrorInfo: null,
+          })
+          this.step = 'success'
+        }
+      },
+    },
+    computed: {
+      ...mapState(['user'])
     }
   }
 </script>
@@ -294,6 +537,7 @@
     }
 
     .farm-item {
+      position: relative;
       width: 300px;
       height: 36px;
       margin-bottom: 20px;
@@ -343,27 +587,17 @@
 
         &.oldPhoneCodeError,
         &.newPhoneCodeError,
-        &.passWordCodeError {
+        &.passWordCodeError,
+        &.newPhoneError {
           border: 1px solid rgba(255, 62, 77, 1);
 
-          & + .getCode,
-          & + .g {
-            position: relative;
-
-            &::after {
-              position: absolute;
-              bottom: -20px;
-              left: -189px;
-              content: '验证码不正确';
-              font-size: 12px;
-              color: rgba(255, 62, 77, 0.88);
-              line-height: 17px;
-            }
-          }
-
-          & + .g {
-            bottom: 21px;
-            left: 210px;
+          & + .errorInfo {
+            position: absolute;
+            top: 38px;
+            left: 20px;
+            font-size: 12px;
+            color: rgba(255, 62, 77, 0.88);
+            line-height: 17px;
           }
         }
       }
@@ -386,7 +620,7 @@
       .tit {
         font-size: 20px;
         font-weight: 500;
-        color: rgba(255, 255, 255, 1);
+        color: rgba(22, 29, 37, 0.8);
         line-height: 28px;
         letter-spacing: 2px;
         margin-bottom: 10px;
@@ -394,7 +628,7 @@
 
       .dire {
         font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
+        color: rgba(22, 29, 37, 0.6);
         line-height: 17px;
       }
 
