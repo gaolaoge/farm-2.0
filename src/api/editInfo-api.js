@@ -93,3 +93,12 @@ export function editPhonePP(data) {
     data
   })
 }
+
+// 修改手机号 - 通过验证密码 - 发送验证
+export function editPhonePS(data) {
+  return api({
+    url: `/customer/changePhoneByPassword`,
+    method: 'PUT',
+    data
+  })
+}
