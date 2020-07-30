@@ -60,7 +60,7 @@
     <el-dialog :visible.sync="createTaskDialog"
                :show-close=false
                top="8vh"
-               width="1100px">
+               width="862px">
       <newTask @closeDialogFun="closeDialogFun"
                :filelist="fileList"/>
     </el-dialog>
@@ -322,4 +322,16 @@
       }
     }
   }
+
+
+  /deep/.el-dialog {
+    border-radius: 8px;
+    overflow: hidden;
+
+    .el-dialog__body {
+      padding: 0px;
+      background-color: rgba(255, 255, 255, 1);
+    }
+  }
+
 </style>

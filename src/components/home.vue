@@ -93,14 +93,6 @@
         </div>
       </div>
     </div>
-
-    <el-dialog :visible.sync="showNewTask"
-               :show-close=false
-               :close-on-click-modal=false
-               top="8vh"
-               width="1100px">
-      <newTask @closeDialogFun="closeDialogFun" :filelist="fileList"/>
-    </el-dialog>
   </div>
 </template>
 
@@ -764,7 +756,6 @@
       }
     }
   }
-
 
   @media screen and (orientation: portrait) {
     .home-wrapper .thiRow {

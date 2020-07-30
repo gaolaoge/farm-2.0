@@ -10,88 +10,114 @@
            class="closeBtn">
     </header>
     <section class="stepGroup">
-      <!--导航-->
-      <div class="stepBtn">
-        <div class="step-btn"
-             :class="[{'active': stepBtnActive == 1}]"
-             @click="stepBtnActive = 1">
-          {{ stepBtnOne }}
-        </div>
-        <div class="step-btn"
-             :class="[{'active': stepBtnActive == 2}]"
-             @click="stepBtnActive = 2">
-          {{ stepBtnTwo }}
-        </div>
+      <!--面包屑-->
+      <div class="navL">
+        <ul>
+          <li class="li" :class="[{'active': index + 1 == stepBtnActive}]" v-for="(item,index) in navL" :key="index">
+            <svg width="277" height="37" class="f svg" v-show="index == 0">
+              <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 Z" fill="rgba(27, 83, 244, 1)"/>
+            </svg>
+            <svg width="277" height="37" class="st svg" v-show="index != 0">
+              <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 L 18.5 18.5 Z" fill="rgba(27, 83, 244, 1)"/>
+            </svg>
+            <span class="i">{{ index + 1 }}</span>
+            <span class="s">{{ item }}</span>
+          </li>
+        </ul>
       </div>
       <!--主体-->
       <div class="stepBody">
         <!--选择场景文件-->
-        <div class="stepBody-item"
+        <div class="stepBody-item selectFile"
              v-show="stepBtnActive == 1">
-          <!--操作按钮-->
-          <div class="operateBtnGroup">
-            <div class="farm-primary-form-btn"
-                 @click="operateBtnFun(item['text'])"
-                 v-for="(item,index) in stepOneBase.operateBtnGroup"
-                 :key="index">
-              <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
-              <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
-              <span>
-                {{ item['text'] }}
-              </span>
-            </div>
+          <div class="sele">
+            <ul>
+              <li class="li" :class="[{'active': stepOneBase.index == index}]"
+                  v-for="(item,index) in stepOneBase.btnList" :key="index" @click="changeFileSelection(index)">
+                <img class="img" :src="item.imgUrl" alt="">
+                <span class="span">{{ item.span }}</span>
+              </li>
+            </ul>
           </div>
-          <!--table-->
-          <div class="table">
-            <el-table
-              :data="filelist"
-              class="o"
-              @selection-change="handleSelectionChange"
-              style="width: 100%">
+          <div class="sec">
+            <!--我的网盘-->
+            <div class="netdist" v-show="stepOneBase.index == 0">
+              <div class="farm-form">
+                <!--工程路径-->
+                <div class="farm-form-item">
+                  <div class="farm-form-item-label">{{ stepOneBase.netdisc.pathLabel }}：</div>
+                  <div class="farm-form-item-input p" :placeholder="stepOneBase.netdisc.pathPlaceholder">
+                    <span class="sp">{{ stepOneBase.netdisc.pathV }}</span>
+                    <img src="@/icons/more-btn.png" alt="" class="im">
+                    <div class="netCatalogue"></div>
+                  </div>
+                </div>
+                <!--场景文件-->
+                <div class="farm-form-item">
+                  <div class="farm-form-item-label">{{ stepOneBase.netdisc.fileLabel }}：</div>
+                  <div class="farm-form-item-input b"
+                       :class="[{'null': stepOneBase.netdisc.selectionDefault.length == 0}]">
+                    <div class="null">
+                      <img src="@/icons/warningIcon_.png" alt="">
+                      <span class="span">{{ stepOneBase.netdisc.warnSpan }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--我的电脑-->
+            <div class="table" v-show="stepOneBase.index == 1">
+              <el-table
+                :data="filelist"
+                class="o"
+                @selection-change="handleSelectionChange"
+                style="width: 100%">
 
-              <el-table-column
-                type="selection"
-                align="center"
-                width="55"/>
-              <!--场景文件-->
-              <el-table-column
-                prop="sceneFile.name"
-                label="场景名"
-                show-overflow-tooltip
-                width="220"/>
-              <!--工程文件夹-->
-              <el-table-column
-                label="工程文件名">
-                <template slot-scope="scope">
+                <el-table-column
+                  type="selection"
+                  align="center"
+                  width="55"/>
+                <!--场景文件-->
+                <el-table-column
+                  prop="sceneFile.name"
+                  label="场景名"
+                  show-overflow-tooltip
+                  width="220"/>
+                <!--工程文件夹-->
+                <el-table-column
+                  label="工程文件名">
+                  <template slot-scope="scope">
                     <span class="addressNameText">
                       {{ scope.row.projectFileName }}
                     </span>
-                  <img src="@/icons/j.png"
-                       alt=""
-                       class="se"
-                       @click="selectFiles($event,scope.row)">
-                </template>
-              </el-table-column>
-              <!--工程路径-->
-              <el-table-column
-                prop="address"
-                :render-header="renderHeader"
-                label="工程路径">
-                <template slot-scope="scope">
+                    <img src="@/icons/j.png"
+                         alt=""
+                         class="se"
+                         @click="selectFiles($event,scope.row)">
+                  </template>
+                </el-table-column>
+                <!--工程路径-->
+                <el-table-column
+                  prop="address"
+                  :render-header="renderHeader"
+                  label="工程路径">
+                  <template slot-scope="scope">
                   <span class="address-span" :class="[{'inputing': scope.row.inputStatus}]">
                     {{ scope.row.address }}
                   </span>
-                  <input type="text"
-                         class="address-input"
-                         :class="[{'inputing': scope.row.inputStatus}]"
-                         @focus="scope.row.inputStatus = true"
-                         @blur="scope.row.inputStatus = false"
-                         v-model="scope.row.address">
-                </template>
-              </el-table-column>
+                    <input type="text"
+                           class="address-input"
+                           :class="[{'inputing': scope.row.inputStatus}]"
+                           @focus="scope.row.inputStatus = true"
+                           @blur="scope.row.inputStatus = false"
+                           v-model="scope.row.address">
+                  </template>
+                </el-table-column>
 
-            </el-table>
+              </el-table>
+            </div>
           </div>
+
         </div>
         <!--设置渲染模板-->
         <div class="stepBody-item"
@@ -145,6 +171,8 @@
             </div>
           </div>
         </div>
+        <!--设置渲染参数-->
+        <div class="stepBody-item"></div>
       </div>
     </section>
     <!--下一步-->
@@ -309,6 +337,10 @@
     oneMorePath
   } from '@/api/api'
   import {
+    identify,
+    catalogue
+  } from '@/api/newTask-api'
+  import {
     mapState
   } from 'vuex'
   import {
@@ -321,7 +353,13 @@
     name: 'new-task',
     data() {
       return {
+        type: null,         // 文件渲染模式
         title: '新建任务',
+        navL: [
+          '选择渲染文件',
+          '设置渲染模板',
+          '设置渲染参数'
+        ],
         stepBtnOne: '选择场景文件',
         stepBtnTwo: '设置渲染模板',
         stepBtnActive: 1,
@@ -330,20 +368,26 @@
           previous: '上一步',
           confirm: '确认'
         },
-        stepOneBase: {
-          operateBtnGroup: [
+        stepOneBase: {   // 选择渲染文件
+          selectionTableData: [],     // 选择场景文件 table 多选值
+          index: 0,
+          btnList: [
             {
-              text: '添加',
-              initialIcon: require('@/icons/addIcon-Blue.png'),
-              selectedIcon: require('@/icons/addIcon-Whit.png')
+              span: '我的资产',
+              imgUrl: require('@/icons/fileIcon.png')
             },
             {
-              text: '删除',
-              initialIcon: require('@/icons/deleteIcon-blue.png'),
-              selectedIcon: require('@/icons/deleteIcon-white.png')
-            },
+              span: '我的电脑',
+              imgUrl: require('@/icons/computerIcon.png')
+            }
           ],
-          selectionTableData: [],     //选择场景文件 table 多选值
+          netdisc: {     // 网盘
+            pathLabel: '工程路径',
+            pathV: '选择工程路径',
+            fileLabel: '场景文件',
+            warnSpan: '请先选择工程路径',
+            selectionDefault: [],   // 选中场景文件
+          }
         },
         stepTwoBase: {
           addMoreText: '添加模板',
@@ -482,6 +526,10 @@
       }
     },
     methods: {
+      // 选择渲染文件 - 切换选中文件方式
+      changeFileSelection(index) {
+        this.stepOneBase.index = index
+      },
       renderHeader(h, {column}) {
         return h('span', {}, [
           h('span', {}, column.label),
@@ -811,17 +859,6 @@
       handleSelectionChange(val) {
         this.stepOneBase.selectionTableData = val
       },
-      // 选择场景文件 - 操作按钮
-      operateBtnFun(action) {
-        switch (action) {
-          case '添加':
-            this.operateBtnAddMore()
-            break
-          case '删除':
-            this.operateBtnDelete()
-            break
-        }
-      },
       // 选择场景文件 - 【添加】
       operateBtnAddMore() {
         if (this.filelist.length == 20) {
@@ -930,9 +967,21 @@
           this.$emit('getListAgain')
         })
       },
+      // 文件渲染模式
+      async getIdentify() {
+        let data = await identify()
+        if (data.data.data == 1) this.taskType = 'profession'   // 专业版
+        else if (data.data.data == 0) this.taskType = 'easy'    // 一键版
+      },
+      // 获取网盘目录
+      async getCatalogue() {
+
+      }
     },
     mounted() {
-      this.getList()
+      this.getIdentify()   // 识别文件渲染模式
+      this.getCatalogue()  // 查询网盘目录
+      this.getList()       // 获取渲染模板列表
     },
     directives: {
       operating: {
@@ -961,142 +1010,274 @@
     position: relative;
 
     .header {
-      text-align: center;
-      padding-bottom: 21px;
+      background-color: rgba(241, 244, 249, 1);
+      box-shadow: 0px 1px 6px 0px rgba(27, 83, 244, 0.3);
+      height: 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0px 30px;
 
       .title {
         font-size: 18px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 1);
+        color: rgba(22, 29, 37, 1);
         line-height: 25px;
-        letter-spacing: 4px;
       }
 
       .closeBtn {
-        float: right;
-        width: 18px;
-        height: 18px;
+        width: 12px;
         cursor: pointer;
-        opacity: 0.6;
+        opacity: 0.8;
       }
     }
 
     .stepGroup {
-      height: calc(80vh - 92px);
-      display: flex;
+      height: calc(100% - 35px - 20px - 72px);
+      padding: 20px 30px 0px;
 
-      .stepBtn {
-        width: 58px;
+      .navL {
+        ul {
+          display: flex;
+          flex-direction: row;
+        }
 
-        .step-btn {
+        .li {
           position: relative;
-          font-size: 14px;
-          font-weight: 400;
-          color: rgba(22, 29, 37, 0.8);
-          letter-spacing: 2px;
-          height: 136px;
-          width: 58px;
-          line-height: 58px;
-          text-align: center;
-          writing-mode: vertical-lr;
-          border-radius: 6px 0px 0px 6px;
-          cursor: pointer;
+          width: 277px;
+          height: 37px;
+          display: flex;
+          align-items: center;
+          padding-left: 45px;
+          box-sizing: border-box;
+          margin-right: -12px;
+          opacity: 0.3;
+
+          .svg {
+            position: absolute;
+            left: 0px;
+          }
+
+          .i {
+            position: relative;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 1);
+            box-shadow: 0px 0px 0px 3px rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(27, 83, 244, 1);
+            text-align: center;
+            margin-right: 8px;
+          }
+
+          .s {
+            position: relative;
+            font-size: 14px;
+            font-family: SourceHanSansCN-Medium, SourceHanSansCN;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 1);
+          }
+
+          &:nth-of-type(1) {
+            padding-left: 20px;
+          }
 
           &.active {
-            background-color: RGBA(255,255,255, 1);
-            color: rgba(22, 29, 37, 1);
-
-            &::after {
-              content: '';
-              position: absolute;
-              right: 4px;
-              top: 50%;
-              transform: translateY(-50%);
-              width: 2px;
-              height: 25px;
-              box-shadow: 0px 0px 2px 1px rgba(10, 98, 241, 1);
-              background-color: rgba(10, 98, 241, 1);
-            }
+            opacity: 1;
           }
         }
       }
 
       .stepBody {
+        margin-top: 20px;
         position: relative;
-        width: 1px;
-        flex-grow: 1;
         background-color: rgba(255, 255, 255, 1);
         border-radius: 0px 6px 6px 6px;
+        height: 488px;
         overflow: hidden;
 
         .stepBody-item {
           position: relative;
           height: 100%;
-          color: #fff;
-          font-size: 14px;
+          display: flex;
+          flex-direction: row;
+
           /*选择场景文件*/
 
-          .operateBtnGroup {
-            text-align: right;
-            padding: 19px 21px;
-          }
+          .sele {
+            flex-shrink: 0;
+            width: 143px;
+            border-radius: 4px;
+            border: 1px solid rgba(22, 29, 37, 0.15);
+            padding-top: 26px;
+            box-sizing: border-box;
 
-          .table {
-            padding: 0px 20px;
+            .li {
+              height: 28px;
+              background-color: rgba(246, 246, 246, 1);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-bottom: 16px;
+              opacity: 0.6;
+              cursor: pointer;
 
-            .addressNameBase {
-              position: relative;
+              .img {
+                margin-right: 10px;
+              }
 
-              .addressNameText {
+              .span {
                 font-size: 14px;
-                font-weight: 400;
-                color: rgba(0, 97, 255, 1);
-                line-height: 26px;
+                font-family: PingFangSC-Regular, PingFang SC;
+                color: rgba(22, 29, 37, 1);
               }
 
-              .addressNameInput {
-                position: absolute;
-                left: 0px;
-                height: 26px;
-                opacity: 0;
-              }
-            }
-
-            .address-span {
-              font-size: 14px;
-              font-weight: 400;
-              color: rgba(22, 29, 37, 0.8);
-
-              &.inputing {
-                display: none;
-              }
-            }
-
-            .address-input {
-              position: absolute;
-              left: 10px;
-              top: 13px;
-              font-size: 14px;
-              font-weight: 400;
-              color: rgba(22, 29, 37, 0.8);
-              background-color: transparent;
-              border: 0px;
-              outline: none;
-              opacity: 0;
-              font-family: 'SourceHanSansCN', 'Arial Bold';
-
-              &.inputing {
+              &.active {
                 opacity: 1;
               }
             }
+          }
 
-            .se {
-              position: absolute;
-              right: 24px;
-              top: 18px;
-              width: 13px;
-              opacity: 0.6;
-              cursor: pointer;
+          .sec {
+            flex-grow: 1;
+            width: 1px;
+            border-radius: 4px;
+            border: 1px solid rgba(22, 29, 37, 0.15);
+            margin-left: 10px;
+
+            /*我的网盘*/
+
+            .netdist {
+              padding: 20px;
+              box-sizing: border-box;
+
+              .farm-form-item {
+                display: flex;
+
+                .farm-form-item-label {
+                  width: 85px;
+                }
+
+                .farm-form-item-input {
+                  flex-grow: 1;
+                  border: 1px solid rgba(22, 29, 37, 0.2);
+
+                  &.b {
+                    height: 400px;
+
+                    .null {
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+
+                      .span {
+                        font-size: 14px;
+                        font-family: PingFangSC-Regular, PingFang SC;
+                        color: rgba(22, 29, 37, 0.29);
+                      }
+                    }
+
+                    &.null {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                    }
+                  }
+
+                  &.p {
+                    position: relative;
+                    padding: 0px 20px;
+                    box-sizing: border-box;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .sp {
+                      font-size: 14px;
+                      font-family: PingFangSC-Regular, PingFang SC;
+                      color: rgba(22, 29, 37, 0.4);
+                    }
+
+                    .im {
+                      cursor: pointer;
+                    }
+
+                    .netCatalogue {
+                      position: absolute;
+                      top: 40px;
+                      left: 0px;
+                      width: 100%;
+                      height: 408px;
+                      border-radius: 6px;
+                      border: 1px solid rgba(22, 29, 37, 0.2);
+                      background-color: rgba(255, 255, 255, 1);
+                    }
+                  }
+                }
+              }
+            }
+
+            /*我的电脑*/
+
+            .table {
+              padding: 0px 20px;
+
+              .addressNameBase {
+                position: relative;
+
+                .addressNameText {
+                  font-size: 14px;
+                  font-weight: 400;
+                  color: rgba(0, 97, 255, 1);
+                  line-height: 26px;
+                }
+
+                .addressNameInput {
+                  position: absolute;
+                  left: 0px;
+                  height: 26px;
+                  opacity: 0;
+                }
+              }
+
+              .address-span {
+                font-size: 14px;
+                font-weight: 400;
+                color: rgba(22, 29, 37, 0.8);
+
+                &.inputing {
+                  display: none;
+                }
+              }
+
+              .address-input {
+                position: absolute;
+                left: 10px;
+                top: 13px;
+                font-size: 14px;
+                font-weight: 400;
+                color: rgba(22, 29, 37, 0.8);
+                background-color: transparent;
+                border: 0px;
+                outline: none;
+                opacity: 0;
+                font-family: 'SourceHanSansCN', 'Arial Bold';
+
+                &.inputing {
+                  opacity: 1;
+                }
+              }
+
+              .se {
+                position: absolute;
+                right: 24px;
+                top: 18px;
+                width: 13px;
+                opacity: 0.6;
+                cursor: pointer;
+              }
             }
           }
 
@@ -1228,6 +1409,10 @@
                 }
               }
             }
+          }
+
+          &.selectFile {
+            display: flex;
           }
         }
       }
