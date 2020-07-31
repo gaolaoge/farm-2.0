@@ -61,8 +61,7 @@
                :show-close=false
                top="8vh"
                width="862px">
-      <newTask @closeDialogFun="closeDialogFun"
-               :filelist="fileList"/>
+      <newTask @closeDialogFun="closeDialogFun" />
     </el-dialog>
   </div>
 </template>
@@ -118,7 +117,6 @@
         ],
         navActive: 0,
         createTaskDialog: false,
-        fileList: [],
         d: null
       }
     },
@@ -132,23 +130,7 @@
       },
       // 新建任务
       createTask() {
-        let inputDom = document.createElement('INPUT')
-        inputDom.type = 'file'
-        inputDom.accept = '.ma,.mb'
-        inputDom.click()
-        inputDom.addEventListener('change', () => {
-          if (inputDom.files.length == 1) {
-            this.fileList = [{
-              sceneFile: inputDom.files[0],
-              projectFileList: null,
-              projectFileName: '',
-              inputStatus: false,
-              path: '',
-              id: Math.floor(Math.random() * 100000000000000)
-            }]
-            this.createTaskDialog = true
-          }
-        })
+        this.createTaskDialog = true
       },
       // 关闭新建任务弹窗
       closeDialogFun() {

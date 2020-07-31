@@ -15,3 +15,11 @@ export function catalogue(){
     method: 'GET'
   })
 }
+
+// 准备工作 - 获取可用的场景文件格式
+export function getFileType(){
+  return api({
+    url: `/file/render/code/getRenderCode`,
+    method: 'GET'
+  })
+}

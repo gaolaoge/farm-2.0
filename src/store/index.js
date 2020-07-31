@@ -23,10 +23,14 @@ export default new Vuex.Store({
       sex: null,
     },
     login: false,
-    zoneId: ''
+    zoneId: '',
+    socket_: null
   },
   getter: {},
   mutations: {
+    changeSocket_(s, val) {
+      s.socket_ = val
+    },
     changeLogin(s, val) {
       s.login = val
     },
@@ -58,11 +62,11 @@ export default new Vuex.Store({
       s.user.phone = val
     },
     changeLevel(s, val) {
-      if(val == 0) s.user.level = '普通会员'
-      else if(val == 1) s.user.level = '璀璨白银'
-      else if(val == 2) s.user.level = '荣耀黄金'
-      else if(val == 3) s.user.level = '尊贵铂金'
-      else if(val == 4) s.user.level = '永恒钻石'
+      if (val == 0) s.user.level = '普通会员'
+      else if (val == 1) s.user.level = '璀璨白银'
+      else if (val == 2) s.user.level = '荣耀黄金'
+      else if (val == 3) s.user.level = '尊贵铂金'
+      else if (val == 4) s.user.level = '永恒钻石'
     },
     changeBirthday(s, val) {
       s.user.birthday = val
@@ -73,10 +77,10 @@ export default new Vuex.Store({
     changeSex(s, val) {
       s.user.sex = val
     },
-    changeAvatar(s, val){
+    changeAvatar(s, val) {
       s.user.avatar = val
     },
-    changeHaveCapacity(s, val){
+    changeHaveCapacity(s, val) {
       s.user.haveCapacity = val
     }
   },

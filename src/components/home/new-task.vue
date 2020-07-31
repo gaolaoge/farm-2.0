@@ -30,6 +30,7 @@
         <!--选择场景文件-->
         <div class="stepBody-item selectFile"
              v-show="stepBtnActive == 1">
+          <!--左侧导航-->
           <div class="sele">
             <ul>
               <li class="li" :class="[{'active': stepOneBase.index == index}]"
@@ -46,10 +47,12 @@
                 <!--工程路径-->
                 <div class="farm-form-item">
                   <div class="farm-form-item-label">{{ stepOneBase.netdisc.pathLabel }}：</div>
-                  <div class="farm-form-item-input p" :placeholder="stepOneBase.netdisc.pathPlaceholder">
+                  <div class="farm-form-item-input p" @click="expandDiskDirectory">
                     <span class="sp">{{ stepOneBase.netdisc.pathV }}</span>
-                    <img src="@/icons/more-btn.png" alt="" class="im">
-                    <div class="netCatalogue"></div>
+                    <img src="@/icons/more-btn.png" alt="" class="im" :class="[{'active': stepOneBase.showMe}]">
+                  </div>
+                  <div class="netCatalogue" :class="[{'active': stepOneBase.showMe}]">
+
                   </div>
                 </div>
                 <!--场景文件-->
@@ -66,55 +69,56 @@
               </div>
             </div>
             <!--我的电脑-->
-            <div class="table" v-show="stepOneBase.index == 1">
-              <el-table
-                :data="filelist"
-                class="o"
-                @selection-change="handleSelectionChange"
-                style="width: 100%">
+            <div class="local" v-show="stepOneBase.index == 1">
+              <div class="operate">
+                <div class="farm-primary-form-btn"
+                     @click="operateBtnFun(item['text'])"
+                     v-for="(item,index) in stepOneBase.local.operateBtnGroup"
+                     :key="index">
+                  <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
+                  <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
+                  <span>
+                {{ item['text'] }}
+              </span>
+                </div>
+              </div>
+              <div class="table">
+                <el-table
+                  :data="filelist"
+                  class="o"
+                  @selection-change="handleSelectionChange"
+                  style="width: 100%">
 
-                <el-table-column
-                  type="selection"
-                  align="center"
-                  width="55"/>
-                <!--场景文件-->
-                <el-table-column
-                  prop="sceneFile.name"
-                  label="场景名"
-                  show-overflow-tooltip
-                  width="220"/>
-                <!--工程文件夹-->
-                <el-table-column
-                  label="工程文件名">
-                  <template slot-scope="scope">
-                    <span class="addressNameText">
-                      {{ scope.row.projectFileName }}
-                    </span>
-                    <img src="@/icons/j.png"
-                         alt=""
-                         class="se"
-                         @click="selectFiles($event,scope.row)">
-                  </template>
-                </el-table-column>
-                <!--工程路径-->
-                <el-table-column
-                  prop="address"
-                  :render-header="renderHeader"
-                  label="工程路径">
-                  <template slot-scope="scope">
+                  <el-table-column
+                    type="selection"
+                    align="center"
+                    width="55"/>
+                  <!--场景文件-->
+                  <el-table-column
+                    prop="sceneFile"
+                    label="场景名"
+                    show-overflow-tooltip
+                    width="220"/>
+                  <!--工程路径-->
+                  <el-table-column
+                    prop="address"
+                    :render-header="renderHeader"
+                    label="工程路径">
+                    <template slot-scope="scope">
                   <span class="address-span" :class="[{'inputing': scope.row.inputStatus}]">
                     {{ scope.row.address }}
                   </span>
-                    <input type="text"
-                           class="address-input"
-                           :class="[{'inputing': scope.row.inputStatus}]"
-                           @focus="scope.row.inputStatus = true"
-                           @blur="scope.row.inputStatus = false"
-                           v-model="scope.row.address">
-                  </template>
-                </el-table-column>
+                      <input type="text"
+                             class="address-input"
+                             :class="[{'inputing': scope.row.inputStatus}]"
+                             @focus="scope.row.inputStatus = true"
+                             @blur="scope.row.inputStatus = false"
+                             v-model="scope.row.address">
+                    </template>
+                  </el-table-column>
 
-              </el-table>
+                </el-table>
+              </div>
             </div>
           </div>
 
@@ -338,7 +342,8 @@
   } from '@/api/api'
   import {
     identify,
-    catalogue
+    catalogue,
+    getFileType
   } from '@/api/newTask-api'
   import {
     mapState
@@ -353,7 +358,7 @@
     name: 'new-task',
     data() {
       return {
-        type: null,         // 文件渲染模式
+        type: null,                // 文件渲染模式
         title: '新建任务',
         navL: [
           '选择渲染文件',
@@ -369,6 +374,7 @@
           confirm: '确认'
         },
         stepOneBase: {   // 选择渲染文件
+          showMe: false,
           selectionTableData: [],     // 选择场景文件 table 多选值
           index: 0,
           btnList: [
@@ -387,6 +393,20 @@
             fileLabel: '场景文件',
             warnSpan: '请先选择工程路径',
             selectionDefault: [],   // 选中场景文件
+          },
+          local: {
+            operateBtnGroup: [
+              {
+                text: '添加',
+                initialIcon: require('@/icons/addIcon-Blue.png'),
+                selectedIcon: require('@/icons/addIcon-Whit.png')
+              },
+              {
+                text: '删除',
+                initialIcon: require('@/icons/deleteIcon-blue.png'),
+                selectedIcon: require('@/icons/deleteIcon-white.png')
+              },
+            ],
           }
         },
         stepTwoBase: {
@@ -431,7 +451,7 @@
           ],
           renderListActive: 0     //选中索引
         },
-        innerVisible: false,   //添加模板
+        innerVisible: false,      //添加模板
         // 添加模板窗口
         dialogAdd: {
           title: '添加模板',
@@ -492,43 +512,89 @@
           editOrAdd: '',
           index: null      //编辑已存在模板时模板的索引
         },
-        infoMessageShow: false
+        infoMessageShow: false,
+        // 场景文件 + 工程文件 + 工程路径
+        filelist: [
+          // {
+          //   sceneFile: '',      // 场景名
+          //   address: ''         // 工程路径
+          // }
+        ],
+        socket_: null,             // websocket 对象
+        numberOfReconnections: 0,  // 连接失败 - 重连次数
+        socketStatus: false,       // websocket 是否在连接状态
+        renderFileType: ['ma','mb']// 可用的场景文件格式
       }
     },
-    props: {
-      // 场景文件 + 工程文件 + 工程路径
-      filelist: {
-        type: Array,
-        required: true
-        // [
-        //   {
-        //      sceneFile: file,
-        //      projectFileList: files,
-        //      projectFileName: '',
-        //      path: '',
-        //      inputStatus: false,
-        //      id: 10000
-        //   }
-        //]
-      }
-    },
+    props: {},
     components: {operationGuide},
     computed: {
       ...mapState(['zoneId']),
       // 验证表格是否填写完整
       disableSelf() {
         let a = this.dialogAdd
-        if (a.form.valName && a.nList.length && a.form.formatName) {
-          return true
-        } else {
-          return false
-        }
+        if (a.form.valName && a.nList.length && a.form.formatName) return true
+        else return false
       }
     },
     methods: {
-      // 选择渲染文件 - 切换选中文件方式
+      // 连接插件
+      openWebsocket() {
+        this.socketStatus = null
+        this.socket_ = new WebSocket('ws://192.168.1.85:15000')    //第二个参数可选 指定可接受的子协议
+        this.socket_.addEventListener('open', () => {
+          console.log('--插件连接成功--')
+          this.numberOfReconnections = 0
+          this.socketStatus = true
+          // this.socket_.send('connect_success gaoge')
+        })
+        this.socket_.addEventListener('error', e => {
+          if (this.numberOfReconnections >= 5) {
+            console.log('--websocket--与插件连接失败--')
+            this.socketStatus = false
+            return false
+          }
+          console.log('--插件重连中--')
+          this.numberOfReconnections++
+          this.openWebsocket()
+        })
+        this.socket_.addEventListener('message',e => {
+          this.getMessage(e)
+        })
+        this.socket_.addEventListener('close', e => {
+
+        })
+      },
+      // 接收插件信息
+      getMessage(e) {
+        let t = e.result
+        if(!t || t[0] !== 0) {
+          // 报错
+          return false
+        }
+        t[1].forEach(item => {
+          let n = item.lastIndexOf('/')
+          this.filelist.push({
+            sceneFile: item.slice(0, n), // 场景名
+            address: item.slice(n)       // 工程路径
+          })
+        })
+      },
+      // 断开插件
+      shutWebsocket(){
+        this.socket_.close()
+      },
+      // 获取可用场景文件格式
+      async getRenderFileType(){
+        let data = await getFileType()
+        this.renderFiletype = data.data.data.split(',').map(item => item.match(/\w/g))
+      },
+      // 选择渲染文件 - 切换选择文件方式
       changeFileSelection(index) {
         this.stepOneBase.index = index
+        // 判断是否已连接插件
+        if (index == 1 && !this.socket_) this.openWebsocket()
+
       },
       renderHeader(h, {column}) {
         return h('span', {}, [
@@ -544,6 +610,7 @@
           })
         ])
       },
+      // 设置渲染模板 - 添加模板 - 检验模板名格式
       nameVerif() {
         if (this.dialogAdd.form.valName.length > 50) {
           messageFun('error', '最多输入50个字符');
@@ -552,7 +619,7 @@
         }
         this.dialogAdd.form.formatName = true
       },
-      // 关闭
+      // 主体 - 关闭
       closeDialogFun() {
         this.$emit('closeDialogFun', '')
       },
@@ -827,64 +894,46 @@
             break
         }
       },
-      // 选择场景文件 - 添加工程文件夹
-      selectFiles(e, row) {
-        let formDom = document.createElement('FORM')
-        formDom.classList.add('formDom')
-        formDom.style.display = 'none'
-
-        let inputFileDom = document.createElement('INPUT'),
-          Fun = function () {
-            // row.projectFileList = inputFileDom.files
-            if (![...inputFileDom.files].every(item => !/:/.test(item['webkitRelativePath']))) {
-              messageFun('error', '请不要选择根目录');
-              return false
-            }
-            row.projectFileName = inputFileDom.files[0]['webkitRelativePath'].split('/')[0]
-          }.bind(this)
-        inputFileDom.type = 'file'
-        inputFileDom.name = 'folder'
-        inputFileDom.setAttribute('webkitdirectory', true)
-
-        formDom.appendChild(inputFileDom)
-        document.querySelector('body').appendChild(formDom)
-
-        if (IEVersion() == -1) inputFileDom.addEventListener('change', Fun)
-        else if (IEVersion() == 'edge') inputFileDom.onchange = Fun
-        else inputFileDom.onpropertychange = Fun
-
-        inputFileDom.click()
-      },
       // 选择场景文件 - table 多选值
       handleSelectionChange(val) {
         this.stepOneBase.selectionTableData = val
       },
-      // 选择场景文件 - 【添加】
+      // 选择场景文件 - 操作按钮
+      operateBtnFun(action) {
+        switch (action) {
+          case '添加':
+            this.operateBtnAddMore()
+            break
+          case '删除':
+            this.operateBtnDelete()
+            break
+        }
+      },
+      // 选择场景文件 - 我的资产 - 展开网盘目录
+      expandDiskDirectory(){
+        this.stepOneBase.showMe = !this.stepOneBase.showMe
+      },
+      // 选择场景文件 - 我的电脑 -【添加】新场景文件
       operateBtnAddMore() {
         if (this.filelist.length == 20) {
           messageFun('info', '操作失败，不能选择超过20个场景文件！');
           return false
         }
-        let inputDom = document.createElement('INPUT'),
-          Fun = function () {
-            this.filelist.push({
-              sceneFile: inputDom.files[0],
-              projectFileList: [],
-              projectFileName: '',
-              path: '',
-              inputStatus: false,
-              id: Math.floor(Math.random() * 100000000000000)
-            })
-          }.bind(this)
-        inputDom.type = 'file'
-        inputDom.accept = '.ma,.mb'
-        if (IEVersion() == -1) inputDom.addEventListener('change', Fun)
-        else if (IEVersion() == 'edge') inputDom.onchange = Fun
-        else inputDom.onpropertychange = Fun
-
-        inputDom.click()
+        if (this.socketStatus === null) {
+          messageFun('error', '插件连接中，请稍后重试')
+          return false
+        } else if (this.socketStatus === false) {
+          messageFun('error', '插件连接失败，无法选择文件')
+          return false
+        }
+        // 通知插件选择本地文件
+        this.socket_.send(JSON.stringify({
+          transferType: 3,              // 传输类型
+          operaType: 0,                 // 弹窗类型
+          suffix: this.renderFileType   // 文件后缀
+        }))
       },
-      // 选择场景文件 - 【删除】
+      // 选择场景文件 - 我的电脑 -【删除】新场景文件
       operateBtnDelete() {
         if (!this.stepOneBase.selectionTableData.length) {
           messageFun('error', '没有选中项')
@@ -979,9 +1028,10 @@
       }
     },
     mounted() {
-      this.getIdentify()   // 识别文件渲染模式
-      this.getCatalogue()  // 查询网盘目录
-      this.getList()       // 获取渲染模板列表
+      this.getIdentify()         // 识别文件渲染模式
+      this.getCatalogue()        // 查询网盘目录
+      // this.getRenderFileType()   // 获取可用的场景文件格式
+      this.getList()             // 获取渲染模板列表
     },
     directives: {
       operating: {
@@ -1095,7 +1145,7 @@
         position: relative;
         background-color: rgba(255, 255, 255, 1);
         border-radius: 0px 6px 6px 6px;
-        height: 488px;
+        height: 440px;
         overflow: hidden;
 
         .stepBody-item {
@@ -1155,6 +1205,7 @@
 
               .farm-form-item {
                 display: flex;
+                position: relative;
 
                 .farm-form-item-label {
                   width: 85px;
@@ -1165,7 +1216,7 @@
                   border: 1px solid rgba(22, 29, 37, 0.2);
 
                   &.b {
-                    height: 400px;
+                    height: 340px;
 
                     .null {
                       display: flex;
@@ -1201,82 +1252,110 @@
                     }
 
                     .im {
+                      transform: rotate(0deg);
+                      transition: all 0.2s;
                       cursor: pointer;
+                      &.active {
+                        transform: rotate(180deg);
+                      }
                     }
 
-                    .netCatalogue {
-                      position: absolute;
-                      top: 40px;
-                      left: 0px;
-                      width: 100%;
-                      height: 408px;
-                      border-radius: 6px;
-                      border: 1px solid rgba(22, 29, 37, 0.2);
-                      background-color: rgba(255, 255, 255, 1);
-                    }
                   }
                 }
+                .netCatalogue {
+                  position: absolute;
+                  z-index: 1;
+                  top: 44px;
+                  right: 1px;
+                  width: 510px;
+                  height: 0px;
+                  border-radius: 6px;
+                  box-shadow: 0px 0px 0px 1px rgba(22, 29, 37, 0);
+                  background-color: rgba(255, 255, 255, 1);
+                  transition: all 0.2s;
+                  &.active {
+                    height: 320px;
+                    box-shadow: 0px 0px 0px 1px rgba(22, 29, 37, 0.2);
+                  }
+                }
+
               }
             }
 
             /*我的电脑*/
 
-            .table {
-              padding: 0px 20px;
+            .local {
+              height: 100%;
+              .operate {
+                margin: 10px;
+                text-align: right;
+              }
 
-              .addressNameBase {
-                position: relative;
+              .table {
+                padding: 0px 20px;
+                height: calc(100% - 46px);
 
-                .addressNameText {
+                /deep/.el-table {
+                  height: 100%;
+                  .el-table__body-wrapper {
+                    height: calc(100% - 47px);
+                  }
+                }
+
+                .addressNameBase {
+                  position: relative;
+
+                  .addressNameText {
+                    font-size: 14px;
+                    font-weight: 400;
+                    color: rgba(0, 97, 255, 1);
+                    line-height: 26px;
+                  }
+
+                  .addressNameInput {
+                    position: absolute;
+                    left: 0px;
+                    height: 26px;
+                    opacity: 0;
+                  }
+                }
+
+                .address-span {
                   font-size: 14px;
                   font-weight: 400;
-                  color: rgba(0, 97, 255, 1);
-                  line-height: 26px;
+                  color: rgba(22, 29, 37, 0.8);
+
+                  &.inputing {
+                    display: none;
+                  }
                 }
 
-                .addressNameInput {
+                .address-input {
                   position: absolute;
-                  left: 0px;
-                  height: 26px;
+                  left: 10px;
+                  top: 13px;
+                  font-size: 14px;
+                  font-weight: 400;
+                  color: rgba(22, 29, 37, 0.8);
+                  background-color: transparent;
+                  border: 0px;
+                  outline: none;
                   opacity: 0;
+                  font-family: 'SourceHanSansCN', 'Arial Bold';
+
+                  &.inputing {
+                    opacity: 1;
+                  }
                 }
-              }
 
-              .address-span {
-                font-size: 14px;
-                font-weight: 400;
-                color: rgba(22, 29, 37, 0.8);
-
-                &.inputing {
-                  display: none;
+                .se {
+                  position: absolute;
+                  right: 24px;
+                  top: 18px;
+                  width: 13px;
+                  opacity: 0.6;
+                  cursor: pointer;
                 }
-              }
-
-              .address-input {
-                position: absolute;
-                left: 10px;
-                top: 13px;
-                font-size: 14px;
-                font-weight: 400;
-                color: rgba(22, 29, 37, 0.8);
-                background-color: transparent;
-                border: 0px;
-                outline: none;
-                opacity: 0;
-                font-family: 'SourceHanSansCN', 'Arial Bold';
-
-                &.inputing {
-                  opacity: 1;
-                }
-              }
-
-              .se {
-                position: absolute;
-                right: 24px;
-                top: 18px;
-                width: 13px;
-                opacity: 0.6;
-                cursor: pointer;
               }
             }
           }
