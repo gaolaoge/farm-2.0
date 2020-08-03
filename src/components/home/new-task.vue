@@ -52,7 +52,14 @@
                     <img src="@/icons/more-btn.png" alt="" class="im" :class="[{'active': stepOneBase.showMe}]">
                   </div>
                   <div class="netCatalogue" :class="[{'active': stepOneBase.showMe}]">
-
+                    <el-tree
+                      :data="stepOneBase.netdisc.catalogData"
+                      show-checkbox
+                      node-key="id"
+                      :default-expanded-keys="[2, 3]"
+                      :default-checked-keys="[5]"
+                      :props="stepOneBase.netdisc.defaultProps">
+                    </el-tree>
                   </div>
                 </div>
                 <!--场景文件-->
@@ -60,6 +67,13 @@
                   <div class="farm-form-item-label">{{ stepOneBase.netdisc.fileLabel }}：</div>
                   <div class="farm-form-item-input b"
                        :class="[{'null': stepOneBase.netdisc.selectionDefault.length == 0}]">
+                    <div class="pathList">
+                      <span class="filePathLi" v-for="(item,index) in stepOneBase.netdisc.sceneFilePath" :key="index">
+                        <span class="s">{{ item }}</span>
+                        <img src="@/icons/enter.png" alt="" class="im">
+                      </span>
+                    </div>
+                    <!--请先选择工程路径-->
                     <div class="null">
                       <img src="@/icons/warningIcon_.png" alt="">
                       <span class="span">{{ stepOneBase.netdisc.warnSpan }}</span>
@@ -343,7 +357,9 @@
   import {
     identify,
     catalogue,
-    getFileType
+    getFileType,
+    savePath,
+    newTaskProfession
   } from '@/api/newTask-api'
   import {
     mapState
@@ -359,7 +375,7 @@
     data() {
       return {
         type: null,                // 文件渲染模式
-        title: '新建任务',
+        title: '',
         navL: [
           '选择渲染文件',
           '设置渲染模板',
@@ -375,7 +391,7 @@
         },
         stepOneBase: {   // 选择渲染文件
           showMe: false,
-          selectionTableData: [],     // 选择场景文件 table 多选值
+          selectionTableData: [],   // 选择场景文件 table 多选值
           index: 0,
           btnList: [
             {
@@ -387,12 +403,19 @@
               imgUrl: require('@/icons/computerIcon.png')
             }
           ],
-          netdisc: {     // 网盘
+          netdisc: {     // 我的资产
             pathLabel: '工程路径',
             pathV: '选择工程路径',
             fileLabel: '场景文件',
             warnSpan: '请先选择工程路径',
             selectionDefault: [],   // 选中场景文件
+            catalogData: [],        // 工程路径 - 树状图
+            defaultProps: {
+              children: 'children',
+              label: 'label'
+            },
+            sceneFilePath: ['我的资产', 'D', 'Maya文件'],      // 场景文件 - 面包屑
+
           },
           local: {
             operateBtnGroup: [
@@ -407,7 +430,7 @@
                 selectedIcon: require('@/icons/deleteIcon-white.png')
               },
             ],
-          }
+          },
         },
         stepTwoBase: {
           addMoreText: '添加模板',
@@ -523,7 +546,7 @@
         socket_: null,             // websocket 对象
         numberOfReconnections: 0,  // 连接失败 - 重连次数
         socketStatus: false,       // websocket 是否在连接状态
-        renderFileType: ['ma','mb']// 可用的场景文件格式
+        renderFileType: ['ma', 'mb']// 可用的场景文件格式
       }
     },
     props: {},
@@ -558,7 +581,7 @@
           this.numberOfReconnections++
           this.openWebsocket()
         })
-        this.socket_.addEventListener('message',e => {
+        this.socket_.addEventListener('message', e => {
           this.getMessage(e)
         })
         this.socket_.addEventListener('close', e => {
@@ -568,7 +591,7 @@
       // 接收插件信息
       getMessage(e) {
         let t = e.result
-        if(!t || t[0] !== 0) {
+        if (!t || t[0] !== 0) {
           // 报错
           return false
         }
@@ -581,11 +604,11 @@
         })
       },
       // 断开插件
-      shutWebsocket(){
+      shutWebsocket() {
         this.socket_.close()
       },
       // 获取可用场景文件格式
-      async getRenderFileType(){
+      async getRenderFileType() {
         let data = await getFileType()
         this.renderFiletype = data.data.data.split(',').map(item => item.match(/\w/g))
       },
@@ -604,7 +627,7 @@
               class: 'ix',
               src: require('@/icons/problemIcon.png'),
               style: 'vertical-align: text-bottom;margin-left: 8px;cursor: pointer;',
-              title: '新建任务操作指南'
+              title: '南'
             },
             on: {click: () => this.infoMessageShow = true}
           })
@@ -623,7 +646,7 @@
       closeDialogFun() {
         this.$emit('closeDialogFun', '')
       },
-      // 新建任务 - 设置渲染模板 - 选择插件版本
+      // 设置渲染模板 - 选择插件版本
       changeOIndex(index) {
         //插件版本左侧窗口切换选中状态
         this.dialogAdd.oList.forEach((curr, ind) => {
@@ -670,7 +693,7 @@
           }
         })
       },
-      // 新建任务 - 设置渲染模板 - 删除已选择插件结果
+      // 设置渲染模板 - 删除已选择插件结果
       deleteSeletedOption(item, index) {
         this.dialogAdd.oList.findIndex(curr => {
           if (item.pluginUuid == curr.pluginUuid)
@@ -679,7 +702,7 @@
         })
         this.dialogAdd.nList.splice(index, 1)
       },
-      // 新建任务 - 设置渲染模板 - 获取渲染模板列表
+      // 设置渲染模板 - 获取渲染模板列表
       async getList() {
         let data = await createTaskSet()
         this.stepTwoBase.renderList = data.data.data
@@ -720,7 +743,7 @@
         //   }
         // ]
       },
-      // 新建任务 - 设置渲染模板 - 打开【新建模板】
+      // 设置渲染模板 - 打开【新建模板】
       async addTemplate(s, index) {
         // 获取软件列表
         let data = await createTaskSetSoftware()
@@ -774,7 +797,7 @@
           this.changeSoftware([t['renderTemplate']['softName'], b.value])   //获取对应插件下拉框List
         }
       },
-      // 新建任务 - 设置渲染模板 - 删除模板
+      // 设置渲染模板 - 删除模板
       deleteTemplate(index) {
         this.$confirm('删除后将无法找回，确认删除当前模板吗？', '提示', {
           confirmButtonText: '确定',
@@ -792,7 +815,7 @@
             messageFun('info', '已取消删除')
           })
       },
-      // 新建任务 - 设置渲染模板 - 软件下拉框选中
+      // 设置渲染模板 - 软件下拉框选中
       async changeSoftware(val) {
         let data = await createTaskSetPlugin(val[1])
         this.dialogAdd.pluginList = data.data.data.map(curr => {
@@ -804,7 +827,7 @@
         })
         this.dialogAdd.oList = []
       },
-      // 新建任务 - 设置渲染模板 - 插件下拉框选中
+      // 设置渲染模板 - 插件下拉框选中
       changePlugin(val) {
         //匹配项
         let t = this.dialogAdd.pluginList.find(curr => {
@@ -849,7 +872,7 @@
         this.dialogAdd.oList = []
         this.dialogAdd.nList = []
       },
-      // 新建任务 - 设置渲染模板 - 添加or修改
+      // 设置渲染模板 - 添加or修改
       async taskDefine() {
         let val
         // 若表格未填写完整 返回
@@ -898,7 +921,7 @@
       handleSelectionChange(val) {
         this.stepOneBase.selectionTableData = val
       },
-      // 选择场景文件 - 操作按钮
+      // 1.选择渲染文件 - 我的电脑 - 操作按钮
       operateBtnFun(action) {
         switch (action) {
           case '添加':
@@ -909,11 +932,11 @@
             break
         }
       },
-      // 选择场景文件 - 我的资产 - 展开网盘目录
-      expandDiskDirectory(){
+      // 1.选择渲染文件 - 我的资产 - 展开网盘目录
+      expandDiskDirectory() {
         this.stepOneBase.showMe = !this.stepOneBase.showMe
       },
-      // 选择场景文件 - 我的电脑 -【添加】新场景文件
+      // 1.选择渲染文件 - 我的电脑 -【添加】新场景文件
       operateBtnAddMore() {
         if (this.filelist.length == 20) {
           messageFun('info', '操作失败，不能选择超过20个场景文件！');
@@ -933,7 +956,7 @@
           suffix: this.renderFileType   // 文件后缀
         }))
       },
-      // 选择场景文件 - 我的电脑 -【删除】新场景文件
+      // 1.选择渲染文件 - 我的电脑 -【删除】新场景文件
       operateBtnDelete() {
         if (!this.stepOneBase.selectionTableData.length) {
           messageFun('error', '没有选中项')
@@ -960,71 +983,84 @@
             messageFun('info', '已取消删除')
           });
       },
-      // 新建任务 - 提交新【任务】
+      // 4.提交
       async confirmFun() {
-        console.log(this.filelist)
-        if (!this.filelist.every(curr => curr.projectFileName)) {
-          messageFun('error', '请选择工程文件');
-          this.stepBtnActive = 1;
-          return false
-        }
-        if (!this.filelist.every(curr => curr.address)) {
-          messageFun('error', '请填写工程路径');
-          this.stepBtnActive = 1;
-          return false
-        }
-        let data = await pushTask({
-          zoneUuid: this.zoneId,              // 分区uuid
-          templateUuid: this.stepTwoBase.renderList[this.stepTwoBase.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
-          taskCount: this.filelist.length,    // 要创建任务的数量
-          pattern: 2,                         // 渲染模式
-          patternNorm: 2,                     // 提交模式
-          source: 2                           // 任务来源
-        })
-        await oneMorePath(data.data.data)
-        if (data.data.code == 1001) {
-          messageFun('info', '您已欠费');
-          return false
-        }
-        this.upLoadFun(data.data.data)
-      },
-      // 上传【场景文件】【工程文件】
-      upLoadFun(idList) {
-        idList.forEach(async (curr, index) => {
-          let CJData = new FormData()
-          CJData.append('file', this.filelist[index]['sceneFile'])          //场景文件
-          CJData.append('taskUuid', curr)      //任务ID
-          CJData.append('localPaths', this.filelist[index]['address'])     //用户手写路径 以盘符开头 结尾没有/ 例如 E:\Folder
-
-          let GCData = new FormData(document.getElementsByClassName('formDom')[index]) //工程文件
-          GCData.append('localPaths', this.filelist[index]['address'])     //用户手写路径 以盘符开头 结尾没有/ 例如 E:\Folder
-          // GCData.append('relativePath','')
-          GCData.append('taskUuid', curr)      //任务ID
-
-          // 上传场景文件
-          let data = await upTopCJ(CJData)
-          if (data.data.code == 1001) {
-            messageFun('error', '余额不足');
-            return false
+        let data = await newTaskProfession({
+          zoneUuid: this.zoneId,                             // 分区uuid
+          templateUuid: 'cacb01da-bf06-45ae-9c47-7b151f03f7fc',    //选中模板uuid
+          taskCount: 1,          // 要创建任务的数量
+          pattern: this.taskType == 'easy' ? 1 : 2,          // 渲染模式
+          patternNorm: 1,                     // 提交模式
+          source: 1,                                         // 任务来源
+          filePathList: [
+            {
+              filePath: {
+                fileType: '1',
+                inFileName: 'sdfsdf',
+                fileName: 'sdf',
+                inResourceName: 'sdf',
+                inFilePath: 'fgb',
+                inResourcePath: 'sdf',
+                pathScene: 'sdf',
+                pathResource: 'sdf'
+              }
+            },
+          ],
+          commitTaskDTO: this.taskType != 'easy' ? null : {
+            layer: '',                        // 是否开启分层渲染。1开启，0关闭
+            renderPattern: '',                // 配置组编号
+            taskType: '',                     // 任务类型
+            otherSettings: {
+              projectName: '',
+              projectUuid: '',
+              frameTimeoutWarn: '',
+              frameTimeoutStop: ''
+            },
+            testRender: {                     // 测试帧信息对象
+              testRendering: '',              // 是否开启测试渲染
+              frameFirst: '',                 // 首帧
+              frameMiddle: '',                // 末帧
+              frameFinally: ''                // 中间帧
+            },
           }
-          this.$router.push('/task')
-          this.closeDialogFun()
-          // 上传工程文件
-          let data2 = await upTopGC(GCData)
-          if (data2.data.code != 200) throw '网络传输失败'
-          messageFun('success', '创建成功')
-          this.$emit('getListAgain')
         })
+        // this.savePathFun()       // 保存历史工程路径
       },
-      // 文件渲染模式
+      // 0.文件渲染模式
       async getIdentify() {
         let data = await identify()
         if (data.data.data == 1) this.taskType = 'profession'   // 专业版
         else if (data.data.data == 0) this.taskType = 'easy'    // 一键版
       },
-      // 获取网盘目录
+      // 0.选择渲染文件 - 获取网盘目录
       async getCatalogue() {
+        let data = await catalogue()
+        if (data.data.code != 200) {
+          messageFun('error', '网盘目录获取失败')
+          return false
+        }
+        this.createCatalog(data.data.data)
+      },
+      // 1.选择渲染文件 - 我的资产 - 创建网盘目录
+      createCatalog(data) {
+        data.forEach(item => {
+          function g(item_) {
+            let children = []
+            for (let t in item_) {
+              if (item_[t] == '-') children.push({'label': t})
+              else children.push({'label': t, children: g(item_[t])})
+            }
+            return children
+          }
 
+          this.stepOneBase.netdisc.catalogData = this.stepOneBase.netdisc.catalogData.concat(g(JSON.parse(item)))
+        })
+      },
+      // 3.设置渲染参数 - 上传工程路径记录
+      savePathFun() {
+        savePath({
+          'sceneFilePath': '/demo'
+        })
       }
     },
     mounted() {
@@ -1216,7 +1252,43 @@
                   border: 1px solid rgba(22, 29, 37, 0.2);
 
                   &.b {
+                    position: relative;
                     height: 340px;
+                    padding: 0px 20px;
+
+                    /*选择渲染文件 - 我的资产 - 场景文件 - nav*/
+
+                    .pathList {
+                      position: absolute;
+                      top: 0px;
+                      height: 34px;
+                      width: calc(100% - 40px);
+                      border-bottom: 1px solid rgba(22, 29, 37, 0.29);
+                      display: flex;
+                      align-items: center;
+
+                      .filePathLi {
+                        display: flex;
+                        align-items: center;
+
+                        &:nth-last-of-type(1) {
+                          .im {
+                            display: none;
+                          }
+                        }
+
+                        .s {
+                          color: rgba(22, 29, 37, 0.6);
+                          font-size: 14px;
+                          cursor: pointer;
+                          font-family: PingFangSC-Regular, PingFang SC;
+
+                          &:hover {
+                            color: rgba(22, 29, 37, 0.8);
+                          }
+                        }
+                      }
+                    }
 
                     .null {
                       display: flex;
@@ -1255,6 +1327,7 @@
                       transform: rotate(0deg);
                       transition: all 0.2s;
                       cursor: pointer;
+
                       &.active {
                         transform: rotate(180deg);
                       }
@@ -1262,6 +1335,7 @@
 
                   }
                 }
+
                 .netCatalogue {
                   position: absolute;
                   z-index: 1;
@@ -1273,6 +1347,8 @@
                   box-shadow: 0px 0px 0px 1px rgba(22, 29, 37, 0);
                   background-color: rgba(255, 255, 255, 1);
                   transition: all 0.2s;
+                  overflow: hidden;
+
                   &.active {
                     height: 320px;
                     box-shadow: 0px 0px 0px 1px rgba(22, 29, 37, 0.2);
@@ -1286,6 +1362,7 @@
 
             .local {
               height: 100%;
+
               .operate {
                 margin: 10px;
                 text-align: right;
@@ -1295,8 +1372,9 @@
                 padding: 0px 20px;
                 height: calc(100% - 46px);
 
-                /deep/.el-table {
+                /deep/ .el-table {
                   height: 100%;
+
                   .el-table__body-wrapper {
                     height: calc(100% - 47px);
                   }

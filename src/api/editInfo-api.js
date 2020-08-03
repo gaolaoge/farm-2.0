@@ -1,8 +1,10 @@
-import api from './index.js'
+import {
+  businessServer
+} from './index.js'
 
 // 修改基本信息 【昵称】【头像】【性别】【生日】
 export function editBasicInfo(data) {
-  return api({
+  return businessServer({
     url: '/customer/updateCustomerInfo',
     method: 'PUT',
     data
@@ -11,7 +13,7 @@ export function editBasicInfo(data) {
 
 // 修改密码 - 验证码
 export function getCodeFromPS(data) {
-  return api({
+  return businessServer({
     url: '/customer/sendPhoneCode4ChangePassword',
     method: 'GET',
     data
@@ -20,7 +22,7 @@ export function getCodeFromPS(data) {
 
 // 修改密码
 export function editPassWord(data) {
-  return api({
+  return businessServer({
     url: '/customer/updatePassword',
     method: 'PUT',
     data
@@ -29,7 +31,7 @@ export function editPassWord(data) {
 
 // 修改邮箱 - 获取手机验证码
 export function getPhoneCodeFromEmail() {
-  return api({
+  return businessServer({
     url: '/customer/sendPhoneCode4ChangeEmail',
     method: 'GET',
   })
@@ -37,7 +39,7 @@ export function getPhoneCodeFromEmail() {
 
 // 修改邮箱 - 获取新邮箱验证码
 export function getEmailCodeFromEmail(data) {
-  return api({
+  return businessServer({
     url: `/customer/sendEmailCode4CheckOwn/${data}`,
     method: 'GET'
   })
@@ -45,7 +47,7 @@ export function getEmailCodeFromEmail(data) {
 
 // 修改邮箱 - 修改
 export function editEmail(data) {
-  return api({
+  return businessServer({
     url: `/customer/changeEmailByPhoneCode`,
     method: 'PUT',
     data
@@ -54,7 +56,7 @@ export function editEmail(data) {
 
 // 修改手机号 - 通过验证手机号 - 获取旧手机号验证码
 export function editPhoneGetOC() {
-  return api({
+  return businessServer({
     url: `/customer/sendPhoneCode4ChangePhone`,
     method: 'GET'
   })
@@ -62,7 +64,7 @@ export function editPhoneGetOC() {
 
 // 修改手机号 - 通用 - 获取新手机号验证码
 export function editPhoneGetNC(data) {
-  return api({
+  return businessServer({
     url: `/customer/sendPhoneCode4CheckOwn/${data}`,
     method: 'GET'
   })
@@ -70,7 +72,7 @@ export function editPhoneGetNC(data) {
 
 // 修改手机号 - 通过验证手机号 - 发送验证
 export function editPhoneP(data) {
-  return api({
+  return businessServer({
     url: `/customer/changePhoneByPhoneCode`,
     method: 'PUT',
     data
@@ -79,7 +81,7 @@ export function editPhoneP(data) {
 
 // 修改手机号 - 通过验证邮箱 - 获取邮箱验证码
 export function editPhoneGetEC() {
-  return api({
+  return businessServer({
     url: `/customer/sendEmailCode4ChangePhone`,
     method: 'GET'
   })
@@ -87,7 +89,7 @@ export function editPhoneGetEC() {
 
 // 修改手机号 - 通过验证邮箱 - 发送验证
 export function editPhonePP(data) {
-  return api({
+  return businessServer({
     url: `/customer/changePhoneByEmailCode`,
     method: 'PUT',
     data
@@ -96,7 +98,7 @@ export function editPhonePP(data) {
 
 // 修改手机号 - 通过验证密码 - 发送验证
 export function editPhonePS(data) {
-  return api({
+  return businessServer({
     url: `/customer/changePhoneByPassword`,
     method: 'PUT',
     data

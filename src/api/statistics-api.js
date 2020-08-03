@@ -1,8 +1,10 @@
-import api from './index.js'
+import {
+  businessServer
+} from './index.js'
 
 // 获取Echarts查询条件
 export function getQueryConditions(){
-  return api({
+  return businessServer({
     url: '/professional/countProjects',
     method: 'GET'
   })

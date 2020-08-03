@@ -2,13 +2,14 @@ import axios from 'axios'
 import vue from '@/main.js'
 import {Message} from "element-ui";
 
-const http = new axios.create({
+// 业务服务
+const businessServer = new axios.create({
   baseURL: 'http://192.168.1.179/',
   // timeout: 5000,
   // headers: {}
 })
 
-http.interceptors.request.use(config => {
+businessServer.interceptors.request.use(config => {
   let token = null
   if(document.cookie) token = document.cookie.split(';').find(curr => /token/.test(curr)).split('=')[1]
   if(sessionStorage.getItem('token')) token = sessionStorage.getItem('token')
@@ -17,7 +18,7 @@ http.interceptors.request.use(config => {
 })
 
 // respone拦截器 拦截到所有的response，然后先做一些判断
-http.interceptors.response.use(
+businessServer.interceptors.response.use(
   response => {
     const res = response.data
     // if (res.code != 200) {
@@ -41,4 +42,7 @@ http.interceptors.response.use(
     }
 })
 
-export default http
+export {
+  businessServer,
+  fileServer
+}
