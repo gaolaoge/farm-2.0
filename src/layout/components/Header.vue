@@ -245,7 +245,7 @@
           //   val: '影视版CPU 1区'
           // }
         ],
-        workBenchVal: '',
+        workBenchVal: null,
         // showNews: false                      // 展示消息
         showUserList: false,                    // 个人信息下拉
         showProblemList: false,                 // 问题下拉
@@ -294,7 +294,7 @@
       }
     },
     computed: {
-      ...mapState(['user', 'login']),
+      ...mapState(['user', 'login', 'zoneId']),
     },
     mounted() {
       this.getList()
@@ -319,6 +319,7 @@
       },
       workBenchVal: {
         handler: function (val) {
+          if(val == this.zoneId) return false
           this.$store.commit('changeZoneId', val)
           sessionStorage.setItem('zoneUuid', val)
         },
@@ -329,6 +330,20 @@
         handler: function (val) {
           if (val.name == 'home') this.inHome = true
           else this.inHome = false
+        },
+        immediate: true
+      },
+      zoneId: {
+        handler: function (val) {
+          if (!val || val == this.workBenchVal) return false
+          this.workBenchVal = val
+        },
+        immediate: true
+      },
+      'user.account': {
+        handler: function(val){
+          if(!val) return false
+          this.$websocket_back.dispatch('WEBSOCKET_INIT', `ws://192.168.1.86:5002/websocket/web/${val}`)
         },
         immediate: true
       }
@@ -377,8 +392,8 @@
                   val: curr.zoneUuid
                 })
               })
-              this.workBenchVal = this.workBenchList[0]['val']
-              sessionStorage.setItem('zoneUuid', this.workBenchList[0]['val'])
+              // this.workBenchVal = this.zoneId
+              // sessionStorage.setItem('zoneUuid', this.zoneId)
             }
           })
           .catch(error => console.log(`工作台下拉框获取报错，${error}`))

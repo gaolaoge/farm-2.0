@@ -2078,10 +2078,6 @@
             cursor: pointer;
           }
 
-          .farm-drawer-item-val {
-
-          }
-
           .slider {
             display: inline-block;
             width: 240px;

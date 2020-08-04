@@ -23,13 +23,18 @@ export default new Vuex.Store({
       sex: null,
     },
     login: false,
-    zoneId: '',
-    socket_: null
+    zoneId: null,    // 所在区ID
+    zone: null,      // 分区 1影视区 2效果图区
+    socket_Plugin: null,    // 与插件关联的websocket
+    socket_backS: null,     // 与后台关联的websocket
   },
   getter: {},
   mutations: {
-    changeSocket_(s, val) {
-      s.socket_ = val
+    changeSocket_Plugin(s, val) {
+      s.socket_Plugin = val
+    },
+    changeZone(s, val) {
+      s.zone = val
     },
     changeLogin(s, val) {
       s.login = val

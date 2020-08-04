@@ -162,16 +162,30 @@
                   {{ item.renderTemplate.templateName }}
                 </span>
                 <span class="opacityBtnGroup">
-                  <!--编辑-->
-                  <img src="@/icons/set-renderTemplate-item-edit.png"
-                       alt=""
-                       @click.stop="addTemplate('editOne',index)"
-                       class="item-icon">
-                  <!--删除-->
-                  <img src="@/icons/set-renderTemplate-item-delete.png"
-                       alt=""
-                       @click="deleteTemplate(index)"
-                       class="item-icon">
+                  <span v-show="stepTwoBase.renderListActive == index">
+                    <!--编辑-->
+                    <img src="@/icons/set-renderTemplate-item-edit.png"
+                         alt=""
+                         @click.stop="addTemplate('editOne',index)"
+                         class="item-icon">
+                    <!--删除-->
+                    <img src="@/icons/set-renderTemplate-item-delete.png"
+                         alt=""
+                         @click="deleteTemplate(index)"
+                         class="item-icon">
+                  </span>
+                  <span v-show="stepTwoBase.renderListActive != index">
+                    <!--编辑-->
+                    <img src="@/icons/set-renderTemplate-item-edit-b.png"
+                         alt=""
+                         @click.stop="addTemplate('editOne',index)"
+                         class="item-icon">
+                    <!--删除-->
+                    <img src="@/icons/set-renderTemplate-item-delete-b.png"
+                         alt=""
+                         @click="deleteTemplate(index)"
+                         class="item-icon">
+                  </span>
                 </span>
               </div>
               <div class="bodyB">
@@ -190,28 +204,224 @@
           </div>
         </div>
         <!--设置渲染参数-->
-        <div class="stepBody-item"></div>
+        <div class="stepBody-item">
+          <div class="farm-drawer-body">
+            <!--优先渲染-->
+            <div class="farm-drawer-body-item">
+              <!--标题-->
+              <div class="farm-drawer-body-item-header">
+                <span class="farm-drawer-body-item-header-main">
+                  {{ stepThreeBase.priority.title }}
+                </span>
+              </div>
+              <!--开关-->
+              <div class="farm-drawer-body-item-d addPadding">
+                <div class="item-label">
+                  {{ stepThreeBase.priority.label }}：
+                </div>
+                <!--首帧-->
+                <div class="item-switch">
+                  <el-switch
+                    v-model="stepThreeBase.priority.topVal"
+                    @change="val => {if(val == 1) stepThreeBase.priority.selfVal = 0}"
+                    inactive-color="RGBA(200, 202, 203, 1)"
+                    active-color="rgba(10, 98, 241, 1)"
+                    active-value='1'
+                    inactive-value='0'/>
+                  <span class="item-switch-label" :class="[{'active': stepThreeBase.priority.topVal}]">
+                {{ stepThreeBase.priority.topLabel }}
+              </span>
+                </div>
+                <!--中间帧-->
+                <div class="item-switch">
+                  <el-switch
+                    v-model="stepThreeBase.priority.middleVal"
+                    @change="val => {if(val == 1) stepThreeBase.priority.selfVal = 0}"
+                    inactive-color="RGBA(200, 202, 203, 1)"
+                    active-color="rgba(10, 98, 241, 1)"
+                    active-value='1'
+                    inactive-value='0'/>
+                  <span class="item-switch-label" :class="[{'active': stepThreeBase.priority.middleVal}]">
+                {{ stepThreeBase.priority.middleLabel }}
+              </span>
+                </div>
+                <!--末帧-->
+                <div class="item-switch">
+                  <el-switch
+                    v-model="stepThreeBase.priority.bottomVal"
+                    @change="val => {if(val == 1) stepThreeBase.priority.selfVal = 0}"
+                    inactive-color="RGBA(200, 202, 203, 1)"
+                    active-color="rgba(10, 98, 241, 1)"
+                    active-value='1'
+                    inactive-value='0'/>
+                  <span class="item-switch-label" :class="[{'active': stepThreeBase.priority.bottomVal}]">
+                {{ stepThreeBase.priority.bottomLabel }}
+              </span>
+                </div>
+                <!--自定义-->
+                <div class="item-switch" v-show="stepThreeBase.num.singleChoiceVal != '1'">
+                  <el-switch
+                    style="vertical-align: inherit"
+                    v-model="stepThreeBase.priority.selfVal"
+                    @change="val => {if(val == 0) stepThreeBase.priority.customize = ''}"
+                    inactive-color="RGBA(200, 202, 203, 1)"
+                    active-color="rgba(10, 98, 241, 1)"
+                    active-value='1'
+                    inactive-value='0'/>
+                  <span class="item-switch-label"
+                        :class="[{'active': stepThreeBase.priority.selfVal}]"
+                        style="vertical-align: inherit">
+                {{ stepThreeBase.priority.selfLabel }}
+              </span>
+                  <el-input class='customizeInput'
+                            :class="[{customizeInputError: stepThreeBase.priority.customizeInputError}]"
+                            v-show="stepThreeBase.priority.selfVal == 1"
+                            v-model="stepThreeBase.priority.customize"
+                            @blur="verifFormat"
+                            @focus="stepThreeBase.priority.customizeInputError = false"
+                            :placeholder="stepThreeBase.priority.inputPlaceholder"/>
+                </div>
+              </div>
+              <!--提示-->
+              <span class="info">
+            <img src="@/icons/warningIcon.png" alt="">
+            {{ stepThreeBase.priority.info }}
+          </span>
+            </div>
+            <!--渲染模式-->
+            <div class="farm-drawer-body-item ">
+              <!--标题-->
+              <div class="farm-drawer-body-item-header">
+                <span class="farm-drawer-body-item-header-main">{{ stepThreeBase.mode.title }}</span>
+                <span class="farm-drawer-body-item-header-assist">
+                  {{ stepThreeBase.mode.miniTitO }}
+                  <span class="rule">{{ stepThreeBase.mode.rule }}</span>
+                  {{ stepThreeBase.mode.miniTitT }}
+                </span>
+              </div>
+              <div class="farm-drawer-body-item-d">
+                <el-radio-group v-model="stepThreeBase.mode.mode">
+                  <el-radio :label="item.val"
+                            v-for="(item,index) in stepThreeBase.mode.modeList"
+                            :key="index">
+                    <span>{{ item.label }}</span>
+                    <span class="supplement">{{ item.supplement }}</span>
+                  </el-radio>
+                </el-radio-group>
+              </div>
+
+            </div>
+            <!--其他设置-->
+            <div class="farm-drawer-body-item set">
+              <!--标题-->
+              <div class="farm-drawer-body-item-header">
+            <span class="farm-drawer-body-item-header-main">
+              {{ stepThreeBase.other.title }}
+            </span>
+              </div>
+              <div class="farm-drawer-body">
+                <!--所属项目-->
+                <div class="farm-drawer-item">
+              <span class="farm-drawer-item-label star">
+                {{ stepThreeBase.other.viewLabel }}
+              </span>
+                  <el-select v-model="stepThreeBase.other.view"
+                             placeholder="选择已有项目名称"
+                             class="workBench-optionBase haveBorder">
+                    <el-option
+                      v-for="(item,index) in stepThreeBase.other.viewList"
+                      :key="index"
+                      :label="item.label"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+                  <!--新建项目-->
+                  <span class="createBtn" @click="createItem">
+                <img src="@/icons/createIcon.png"
+                     alt=""
+                     class="createIcon">
+                {{ stepThreeBase.other.btn }}
+              </span>
+                </div>
+                <!--超时提醒-->
+                <div class="farm-drawer-item">
+              <span class="farm-drawer-item-label">
+                {{ stepThreeBase.other.remindLabel }}
+              </span>
+                  <el-slider v-model="stepThreeBase.other.remindVal"
+                             class="slider"
+                             :min="1"
+                             :max="72"/>
+                  <input type="text"
+                         class="sliderVal"
+                         @blur="changeSliderVal"
+                         v-model="stepThreeBase.other.remindVal">
+                  <el-tooltip class="item"
+                              popper-class="t mini"
+                              effect="dark"
+                              content="单帧渲染时长超过设定，系统发送提醒消息给联系人，具体通知方式可在“消息设置”中完成"
+                              placement="right">
+                    <img src="@/icons/question-mark-icon.png" alt="" class="mark">
+                  </el-tooltip>
+                </div>
+                <!--超时提醒-->
+                <div class="farm-drawer-item">
+              <span class="farm-drawer-item-label">
+                {{ stepThreeBase.other.stopLabel }}
+              </span>
+                  <el-slider v-model="stepThreeBase.other.stopVal"
+                             class="slider"
+                             :min="1"
+                             :max="72"/>
+                  <input type="text"
+                         class="sliderVal"
+                         @blur="changeStopVal"
+                         v-model="stepThreeBase.other.stopVal">
+                  <el-tooltip class="item"
+                              popper-class="t mini"
+                              effect="dark"
+                              content="单帧渲染时长超过设定，系统停止当前帧的渲染并发送消息给联系人"
+                              placement="right">
+                    <img src="@/icons/question-mark-icon.png" alt="" class="mark">
+                  </el-tooltip>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
-    <!--下一步-->
+
     <div class="btnGroup">
-      <div class="btnGroup-btn confirm" v-show="stepBtnActive == 1" @click="stepBtnActive = 2">
-        <span class="nextStep">
-          {{ btn.next }}
-        </span>
+      <div v-show="stepBtnActive == 1">
+        <!--下一步-->
+        <div class="btnGroup-btn confirm" @click="stepBtnActive = 2">
+          <span class="nextStep">{{ btn.next }}</span>
+        </div>
       </div>
-      <!--确定-->
-      <div class="btnGroup-btn confirm" v-show="stepBtnActive == 2" @click.once="confirmFun">
-        <span>
-          {{ btn.confirm }}
-        </span>
+
+      <div v-show="stepBtnActive == 2">
+        <!--上一步-->
+        <div class="btnGroup-btn previous" @click="stepBtnActive = 1">
+          <span>{{ btn.previous }}</span>
+        </div>
+        <!--下一步-->
+        <div class="btnGroup-btn confirm" @click="stepBtnActive = 3">
+          <span>{{ btn.next }}</span>
+        </div>
       </div>
-      <!--上一步-->
-      <div class="btnGroup-btn previous" v-show="stepBtnActive == 2" @click="stepBtnActive = 1">
-        <span>
-          {{ btn.previous }}
-        </span>
+
+      <div v-show="stepBtnActive == 3">
+        <!--上一步-->
+        <div class="btnGroup-btn previous" @click="stepBtnActive = 2">
+          <span>{{ btn.previous }}</span>
+        </div>
+        <!--确定-->
+        <div class="btnGroup-btn confirm" @click.once="confirmFun">
+          <span>{{ btn.confirm }}</span>
+        </div>
       </div>
+
     </div>
     <!--添加模板-->
     <el-dialog
@@ -349,6 +559,7 @@
     createTaskSetDeletePlugin,
     createTaskSetNewPlugin,
     createTaskSetEditPlugin,
+    addNewItem,
     pushTask,
     upTopCJ,
     upTopGC,
@@ -375,7 +586,7 @@
     data() {
       return {
         type: null,                // 文件渲染模式
-        title: '',
+        title: '新建任务',
         navL: [
           '选择渲染文件',
           '设置渲染模板',
@@ -474,6 +685,113 @@
           ],
           renderListActive: 0     //选中索引
         },
+        stepThreeBase: {
+          t: '设置参数',
+          // 渲染层数
+          num: {
+            title: '渲染层数',
+            miniTitO: '（已选择',
+            miniTitT: '个层）',
+            val: '2',
+            singleChoice: '启动分层渲染',
+            // 分层渲染
+            singleChoiceVal: '0',
+            tableData: [
+              {
+                // id: '1',
+                // name: '默认层',
+                // range: '1-24',
+                // num: '1',
+                // w: '231',
+                // h: '231',
+                // format: 'cin',
+                // camera: '相机二',
+                // rangeEdit: false,         //帧范围
+                // numEdit: false,           //间隔帧数
+                // wEdit: false,             //图像宽度
+                // hEdit: false,             //图像高度
+                // formatList: [
+                //   {
+                //     label: 'AVI(avi)',
+                //     val: 'avi'
+                //   }
+                // ],
+                // cameraList: [
+                //   {
+                //     label: '相机一',
+                //     val: '相机一'
+                //   }
+                // ]
+              },
+            ],
+            tableDataAll: [],
+            selected: [],
+            randerError: false,
+            numError: false
+          },
+          // 优先渲染
+          priority: {
+            title: '优先渲染',
+            label: '优先渲染测试帧',
+            topLabel: '首帧',
+            topVal: '1',
+            middleLabel: '中间帧',
+            middleVal: '1',
+            bottomLabel: '末帧',
+            bottomVal: '1',
+            selfLabel: '自定义',
+            selfVal: '0',
+            info: '测试帧渲染完成后，任务处于“待全部渲染”状态，请点击【全部渲染】',
+            customize: '',
+            inputPlaceholder: '例如1,2,5',
+            customizeInputError: false
+          },
+          // 渲染模式
+          mode: {
+            title: '渲染模式',
+            miniTitO: '（',
+            miniTitT: '）',
+            rule: '计费规则说明',
+            mode: '2002',
+            modeList: [
+              {
+                val: '2002',
+                label: '16核32G',
+                supplement: '【标准模式1】'
+              },
+              {
+                val: '32核64G【标准模式2】',
+                label: '32核64G',
+                supplement: '【标准模式2】'
+              }
+              // {
+              //   val: '32核128G【标准模式3】',
+              //   label: '32核128G【标准模式3】'
+              // }
+            ]
+          },
+          // 其它设置
+          other: {
+            title: '其他设置',
+            btn: '新建项目',
+            viewLabel: '所属项目',
+            viewList: [
+              // {
+              //   value: '选项1',
+              //   label: '黄金糕'
+              // }
+            ],
+            view: '',
+            remindLabel: '单帧超时提醒 (h)',
+            remindVal: 12,
+            stopLabel: '单帧超时停止 (h)',
+            stopVal: 24
+          },
+          btn: {
+            returnBtn: '返回',
+            startBtn: '开始渲染'
+          }
+        },
         innerVisible: false,      //添加模板
         // 添加模板窗口
         dialogAdd: {
@@ -543,9 +861,9 @@
           //   address: ''         // 工程路径
           // }
         ],
-        socket_: null,             // websocket 对象
-        numberOfReconnections: 0,  // 连接失败 - 重连次数
-        socketStatus: false,       // websocket 是否在连接状态
+        socket_: null,              // websocket 对象
+        numberOfReconnections: 0,   // 连接失败 - 重连次数
+        socketStatus: false,        // websocket 是否在连接状态
         renderFileType: ['ma', 'mb']// 可用的场景文件格式
       }
     },
@@ -569,7 +887,7 @@
           console.log('--插件连接成功--')
           this.numberOfReconnections = 0
           this.socketStatus = true
-          // this.socket_.send('connect_success gaoge')
+          this.$store.commit('changeSocket_Plugin', this.socket_)
         })
         this.socket_.addEventListener('error', e => {
           if (this.numberOfReconnections >= 5) {
@@ -606,6 +924,7 @@
       // 断开插件
       shutWebsocket() {
         this.socket_.close()
+        this.$store.commit('changeSocket_Plugin', null)
       },
       // 获取可用场景文件格式
       async getRenderFileType() {
@@ -1026,7 +1345,7 @@
         })
         // this.savePathFun()       // 保存历史工程路径
       },
-      // 0.文件渲染模式
+      // 0.获取文件渲染模式
       async getIdentify() {
         let data = await identify()
         if (data.data.data == 1) this.taskType = 'profession'   // 专业版
@@ -1041,7 +1360,7 @@
         }
         this.createCatalog(data.data.data)
       },
-      // 1.选择渲染文件 - 我的资产 - 创建网盘目录
+      // 0.选择渲染文件 - 我的资产 - 创建网盘目录
       createCatalog(data) {
         data.forEach(item => {
           function g(item_) {
@@ -1061,7 +1380,101 @@
         savePath({
           'sceneFilePath': '/demo'
         })
-      }
+      },
+      // 3.设置渲染参数 验证 自定义帧格式
+      verifFormat() {
+        let val = this.stepThreeBase.priority.customize
+        if (!val) {
+          this.stepThreeBase.priority.customizeInputError = false;
+          return false
+        }
+
+        let valList = val.replace(/，/g, ',').split(',').filter(curr => curr != '')          // 输入帧
+
+        if (valList.length > 3) {
+          this.errFun('最多优先测试3帧');
+          return false
+        }
+        if (!valList.every(curr => /^[0-9]+$/.test(Number(curr)))) {
+          this.errFun('输入格式不正确，请重新输入');
+          return false
+        }
+
+        let range = this.stepThreeBase.num.tableData[0].range,         // 帧范围
+          rangeH = Number(range.split('-')[0]),                // 首帧
+          rangeF = Number(range.split('-')[1]),                // 尾帧
+          interval = Number(this.stepThreeBase.num.tableData[0].num),// 帧间隔
+          result = renderingRange(rangeH, rangeF, interval),     // 遍历帧范围
+          r = valList.every(curr => result.includes(Number(curr)))        // 【帧范围】是否完全包含【输入帧】
+
+        if (!r) {
+          this.errFun('优先帧超出帧范围，请重新输入');
+          return false
+        }
+        if (r) this.stepThreeBase.priority.customizeInputError = false
+      },
+      // 3.设置渲染参数 设置参数 - 其他设置 - 新建项目
+      createItem() {
+        let newItemName = ''
+        this.$prompt('', '新建项目', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPlaceholder: '请输入项目名称'
+        })
+          .then(
+            value => {
+              newItemName = value.value
+              return addNewItem({
+                projectName: value.value,
+                isDefault: 1
+              })
+            },
+            () => {
+              this.$message({
+                type: 'info',
+                message: '取消输入'
+              })
+              return Promise.reject()
+            }
+          )
+          .then(
+            data => {
+              if (data.data.code == '201') {
+                this.$message({
+                  message: '创建项目成功',
+                  type: 'success'
+                })
+                this.getItemList(newItemName)
+              }
+              if (data.data.code == '101') {
+                this.$message({
+                  message: '创建失败，项目名已存在',
+                  type: 'error'
+                })
+              }
+            }
+          )
+          .catch(() => {
+          })
+      },
+      // 3.设置渲染参数 超时提醒改变
+      changeSliderVal(e) {
+        let n = Number(e.target.value)
+        if (n >= 1 && 72 >= n) {
+          this.stepThreeBase.other.remindVal = n
+        } else {
+          this.stepThreeBase.other.remindVal = 12
+        }
+      },
+      // 3.设置渲染参数 超时停止改变
+      changeStopVal(e) {
+        let n = Number(e.target.value)
+        if (n >= 1 && 72 >= n) {
+          this.stepThreeBase.other.stopVal = n
+        } else {
+          this.stepThreeBase.other.stopVal = 24
+        }
+      },
     },
     mounted() {
       this.getIdentify()         // 识别文件渲染模式
@@ -1105,7 +1518,7 @@
       padding: 0px 30px;
 
       .title {
-        font-size: 18px;
+        font-size: 14px;
         font-weight: 600;
         color: rgba(22, 29, 37, 1);
         line-height: 25px;
@@ -1181,7 +1594,7 @@
         position: relative;
         background-color: rgba(255, 255, 255, 1);
         border-radius: 0px 6px 6px 6px;
-        height: 440px;
+        height: calc(100% - 57px);
         overflow: hidden;
 
         .stepBody-item {
@@ -1253,7 +1666,7 @@
 
                   &.b {
                     position: relative;
-                    height: 340px;
+                    height: 422px;
                     padding: 0px 20px;
 
                     /*选择渲染文件 - 我的资产 - 场景文件 - nav*/
@@ -1446,20 +1859,22 @@
             box-sizing: border-box;
             display: flex;
             align-content: flex-start;
+            justify-content: space-between;
             flex-wrap: wrap;
+            overflow-y: scroll;
 
             .set-renderTemplate-item {
-              width: 200px;
+              width: 230px;
               height: 150px;
               border-radius: 8px;
               overflow: hidden;
-              margin: 30px 0px 0px 30px;
+              margin: 0px 0px 30px 0px;
               cursor: pointer;
 
               &.addMore {
-                width: 196px;
+                width: 228px;
                 height: 146px;
-                border: 2px dashed rgba(255, 255, 255, 0.29);
+                border: 2px dashed rgba(22, 29, 37, 0.29);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -1473,16 +1888,16 @@
                 .addMoreText {
                   font-size: 12px;
                   font-weight: 400;
-                  color: rgba(255, 255, 255, 0.3);
+                  color: rgba(22, 29, 37, 0.3);
                 }
               }
 
               &.ed {
-                background-color: rgba(28, 36, 47, 1);
+                background-color: rgba(240, 240, 240, 1);
 
                 .headerB {
                   height: 36px;
-                  background: rgba(32, 41, 53, 1);
+                  background-color: rgba(240, 240, 240, 1);
                   box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.2);
                   padding: 0px 20px;
                   display: flex;
@@ -1491,9 +1906,8 @@
 
                   .headerText {
                     font-size: 13px;
-                    font-weight: 400;
                     line-height: 36px;
-                    color: rgba(255, 255, 255, 0.8);
+                    color: rgba(22, 29, 37, 0.8);
                     display: inline-block;
                     width: 94px;
                     overflow: hidden;
@@ -1522,7 +1936,7 @@
                   .software {
                     display: block;
                     font-size: 14px;
-                    color: rgba(255, 255, 255, 0.6);
+                    color: rgba(22, 29, 37, 0.6);
                     line-height: 20px;
                     margin-bottom: 3px;
                   }
@@ -1546,23 +1960,32 @@
                 }
 
                 &:hover {
-                  box-shadow: 0px 1px 15px 0px rgba(0, 97, 255, 0.3);
+                  box-shadow: 0px 0px 2px 2px rgba(27, 83, 244, 0.5);
                 }
 
                 &.active {
                   .headerB {
                     background-color: rgba(5, 81, 206, 1);
-                    box-shadow: 0px 1px 12px 8px rgba(0, 0, 0, 0.4);
+                    box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.21);
+
+                    .headerText {
+                      color: rgba(255, 255, 255, 0.8);
+                    }
                   }
 
                   .bodyB {
                     background-color: rgba(10, 98, 241, 0.59);
 
+                    .hardware,
+                    .plugin,
+                    .software {
+                      color: rgba(255, 255, 255, 1);
+                    }
+
                     .item-selected {
                       display: inline-block;
                     }
                   }
-
                 }
               }
             }
@@ -1588,25 +2011,27 @@
         font-size: 14px;
         font-weight: 500;
         color: rgba(255, 255, 255, 0.79);
-
         text-align: center;
         cursor: pointer;
-
-        span {
-          display: inline-block;
-          line-height: 1em;
-        }
 
         &.confirm {
           background-color: rgba(10, 98, 241, 1);
           width: 76px;
           line-height: 32px;
+
+          span {
+            color: rgba(255, 255, 255, 0.8);
+          }
         }
 
         &.previous {
-          border: 1px solid rgba(255, 255, 255, 0.6);
+          border: 1px solid rgba(22, 29, 37, 0.2);
           width: 74px;
           line-height: 30px;
+
+          span {
+            color: rgba(22, 29, 37, 0.79);
+          }
         }
       }
     }
@@ -1614,28 +2039,36 @@
 
   .wrapper {
     .header {
-      text-align: center;
-      padding-bottom: 21px;
+      height: 36px;
+      background-color: rgba(241, 244, 249, 1);
+      box-shadow: 0px 1px 6px 0px rgba(27, 83, 244, 0.3);
+      border-radius: 8px 8px 0px 0px;
+      padding: 8px 20px 8px 30px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
       .title {
-        font-size: 18px;
+        font-size: 14px;
         font-weight: 600;
-        color: rgba(255, 255, 255, 1);
-        line-height: 25px;
+        color: rgba(22, 29, 37, 1);
         letter-spacing: 4px;
       }
 
       .closeBtn {
-        float: right;
-        width: 18px;
-        height: 18px;
+        width: 12px;
         cursor: pointer;
         opacity: 0.6;
       }
     }
 
     #templateName {
-      color: rgba(256, 256, 256, 0.8);
+      color: rgba(22, 29, 37, 0.8);
+    }
+
+    .farm-form {
+      padding: 30px;
     }
 
     .transferBase {
@@ -1650,14 +2083,13 @@
       .n {
         width: 220px;
         height: 250px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 4px;
+        border: 1px solid rgba(22, 29, 37, 0.2);
 
         .label {
           font-size: 14px;
-          font-weight: 400;
           line-height: 1em;
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(22, 29, 37, 0.6);
           padding: 20px;
         }
 
@@ -1676,7 +2108,7 @@
               font-size: 14px;
               line-height: 20px;
               font-weight: 400;
-              color: rgba(255, 255, 255, 0.39);
+              color: rgba(22, 29, 37, 0.39);
               width: 134px;
               display: inline-block;
             }
@@ -1685,7 +2117,7 @@
             .deleteNIcon {
               float: right;
               margin-top: 5px;
-              border: 1px solid rgba(255, 255, 255, 0.59);
+              border: 1px solid rgba(22, 29, 37, 0.59);
               border-radius: 50%;
               width: 12px;
               height: 12px;
@@ -1712,10 +2144,10 @@
 
             &.active,
             &:hover {
-              background-color: rgba(255, 255, 255, 0.04);
+              background-color: rgba(22, 29, 37, 0.04);
 
               .name {
-                color: rgba(255, 255, 255, 0.59);
+                color: rgba(22, 29, 37, 0.59);
               }
             }
           }
@@ -1781,14 +2213,14 @@
         }
 
         &.cancel {
-          border: 1px solid rgba(255, 255, 255, 0.4);
+          border: 1px solid rgba(22, 29, 37, 0.4);
           padding: 5px 23px;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(22, 29, 37, 0.4);
           transition: all 0.2s;
 
           &:hover {
-            color: rgba(255, 255, 255, 0.6);
-            border-color: rgba(255, 255, 255, 0.6);
+            color: rgba(22, 29, 37, 0.6);
+            border-color: rgba(22, 29, 37, 0.6);
           }
         }
 
@@ -1806,7 +2238,147 @@
     }
   }
 
+  .farm-form-item-input {
+    border-radius: 4px !important;
+    border: 1px solid rgba(22, 29, 37, 0.2) !important;
+  }
+
+  /deep/ .el-dialog__body {
+    padding: 0px;
+  }
+
+  /deep/ .el-select .el-input__inner,
+  /deep/ .el-cascader .el-input__inner {
+    border: 1px solid rgba(22, 29, 37, 0.2);
+  }
+
   .inputError {
     color: #f40 !important;
+  }
+
+  .farm-drawer-body-item-d {
+    padding-top: 15px;
+
+    .el-radio {
+      &:nth-of-type(1) .supplement {
+        color: rgba(70, 203, 93, 1);
+      }
+
+      &:nth-of-type(2) .supplement {
+        color: rgba(70, 203, 93, 0.5);
+      }
+
+      &:nth-of-type(3) .supplement {
+        color: rgba(255, 62, 77, 0.5);
+      }
+    }
+
+    .item-label {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(22, 29, 37, 0.6);
+      margin-right: 10px;
+    }
+
+    .item-switch {
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 30px;
+
+      .item-switch-label {
+        margin-left: 5px;
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 400;
+        color: rgba(22, 29, 37, 1);
+        vertical-align: middle;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+
+        &.active {
+          opacity: 1;
+        }
+      }
+    }
+
+    &.addPadding {
+      padding-bottom: 15px;
+    }
+  }
+
+  .farm-drawer-body-item {
+    border: 1px solid rgba(22, 29, 37, 0.15);
+  }
+
+  .info {
+    margin-left: 122px;
+    font-size: 12px;
+    color: rgba(255, 191, 0, 1);
+    display: flex;
+    align-items: center;
+
+    img {
+      width: 13px;
+      margin-right: 2px;
+    }
+  }
+
+  .set {
+    .haveBorder {
+      border: 1px solid rgba(22, 29, 37, 0.3);
+      border-radius: 6px;
+
+      /deep/ .el-input__inner {
+        width: 317px;
+      }
+    }
+  }
+
+  .slider {
+    display: inline-block;
+    width: 240px;
+    vertical-align: middle;
+  }
+
+  .farm-drawer-body {
+    padding: 1px;
+  }
+
+  .farm-drawer-item-label {
+    width: 110px !important;
+    margin-right: 28px;
+  }
+
+  .mark {
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  .createBtn {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(10, 98, 241, 1);
+    cursor: pointer;
+
+    .createIcon {
+      width: 18px;
+      vertical-align: middle;
+      margin-left: 20px;
+    }
+  }
+
+  .rule {
+    color: rgba(27, 83, 244, 1);
+    opacity: 0.8;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 </style>

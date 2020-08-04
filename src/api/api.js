@@ -111,6 +111,15 @@ export function homeT(data){
   })
 }
 
+// 首页 传达切换分区事件
+export function putNewZoneID(data){
+  return businessServer({
+    url: `/customer/updateZoneUuid`,
+    method: 'PUT',
+    data
+  })
+}
+
 // 首页 echarts
 export function echartsData(data){
   return businessServer({

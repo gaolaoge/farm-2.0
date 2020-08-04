@@ -1120,7 +1120,7 @@
         } else {
           this.$refs.passwordRegister.type = 'password'
         }
-      }
+      },
     },
     created() {
       sessionStorage.setItem('info', JSON.stringify({

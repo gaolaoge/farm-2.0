@@ -8,6 +8,7 @@ import App from './App'
 import router from './router'
 import 'babel-polyfill'
 import i18n from './lang'
+import websocket_back from './assets/websocketStore_back'
 
 // process.env.Mock && require('./mock')
 
@@ -19,6 +20,7 @@ Vue.use(ElementUI)
 Vue.use(elTableInfiniteScroll)
 
 Vue.prototype.$echarts = echarts
+Vue.prototype.$websocket_back = websocket_back
 
 const vue = new Vue({
   el: '#app',

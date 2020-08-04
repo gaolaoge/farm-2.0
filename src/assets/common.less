@@ -966,201 +966,200 @@ td {
     }
   }
 
-  .farm-drawer-body {
-    flex-grow: 1;
-    padding: 0px 20px;
-
-    .farm-drawer-body-item {
-      box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.3);
-      border-radius: 4px;
-      margin-bottom: 20px;
-      padding: 20px 30px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-
-      &.one {
-        height: 165px;
-      }
-
-      &.two {
-        height: calc(100vh - 360px);
-      }
-
-      &.three {
-        max-height: 240px;
-        overflow: hidden;
-      }
-
-      //键值对
-      .farm-drawer-item {
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 20px;
-        padding-bottom: 15px;
-
-        .farm-drawer-item-label {
-          position: relative;
-          display: inline-block;
-          color: rgba(22, 29, 37, 0.8);
-          width: 70px;
-          margin-right: 5px;
-
-          &.star {
-            &::before {
-              position: absolute;
-              left: -10px;
-              content: '*';
-              color: rgba(249, 0, 35, 1);
-            }
-          }
-        }
-
-        .farm-drawer-item-val {
-          color: rgba(22, 29, 37, 0.6);
-        }
-      }
-
-      //警示爆红区
-      .errorList,
-      .warningList {
-        min-height: 83px;
-        box-sizing: border-box;
-        border-radius: 4px;
-        margin-bottom: 10px;
-        padding: 15px 40px;
-        overflow-y: scroll;
-        flex-grow: 1;
-
-        .farm-drawer-list-item {
-          margin-bottom: 15px;
-          display: flex;
-
-          .icon {
-            vertical-align: top;
-
-            img {
-              width: 20px;
-            }
-          }
-
-          .text {
-            margin-left: 15px;
-
-            .t {
-              display: block;
-              font-size: 14px;
-              font-weight: 500;
-              line-height: 20px;
-              margin-bottom: 9px;
-            }
-
-            .c {
-              font-size: 14px;
-              font-weight: 400;
-              line-height: 22px;
-            }
-          }
-
-          &:nth-last-of-type(1) {
-            margin-bottom: 0px;
-          }
-        }
-
-        &::-webkit-scrollbar {
-          /*滚动条整体样式*/
-          width: 8px; /*高宽分别对应横竖滚动条的尺寸*/
-          height: 8px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          /*滚动条里面小方块*/
-          border-radius: 10px;
-          -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
-          background: #9e9797;
-        }
-
-        &::-webkit-scrollbar-track {
-          /*滚动条里面轨道*/
-          -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
-          border-radius: 10px;
-          background: rgba(226, 221, 221, 0.2);
-        }
-      }
-
-      .errorList {
-        background-color: rgba(255, 106, 115, 0.08);
-        border: 1px solid rgba(255, 106, 115, 0.16);
-
-        .text {
-          .t {
-            color: RGBA(255, 106, 115, 1);
-          }
-
-          .c {
-            color: RGBA(255, 106, 115, 0.8);
-          }
-        }
-      }
-
-      .warningList {
-        background-color: rgba(229, 199, 138, 0.08);
-        border: 1px solid rgba(229, 199, 138, 0.16);
-
-        .text {
-          .t {
-            color: RGBA(229, 199, 138, 1);
-          }
-
-          .c {
-            color: RGBA(229, 199, 138, 0.8);
-          }
-        }
-      }
-
-      //操作按钮
-      .farm-drawer-btn {
-        height: 32px;
-        background: rgba(10, 98, 241, 1);
-        border-radius: 4px;
-        font-size: 14px;
-        font-weight: 500;
-        text-align: center;
-        color: rgba(255, 255, 255, 1);
-        line-height: 32px;
-        cursor: pointer;
-        margin-top: 4px;
-      }
-
-      //标头
-      .farm-drawer-body-item-header {
-        .farm-drawer-body-item-header-main {
-          font-size: 14px;
-          font-weight: 600;
-          color: rgba(22, 29, 37, 1);
-        }
-
-        .farm-drawer-body-item-header-assist {
-          font-size: 14px;
-          font-weight: 400;
-          color: rgba(22, 29, 37, 0.8);
-        }
-      }
-    }
-
-    &.e {
-      //min-height: 783px;
-      //overflow-y: scroll;
-    }
-  }
-
   &.active {
     right: 0px;
   }
 
   &.r {
     width: 1161px;
+  }
+}
+.farm-drawer-body {
+  flex-grow: 1;
+  padding: 0px 20px;
+
+  .farm-drawer-body-item {
+    box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.3);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    padding: 20px 30px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    &.one {
+      height: 165px;
+    }
+
+    &.two {
+      height: calc(100vh - 360px);
+    }
+
+    &.three {
+      max-height: 240px;
+      overflow: hidden;
+    }
+
+    //键值对
+    .farm-drawer-item {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      padding-bottom: 15px;
+
+      .farm-drawer-item-label {
+        position: relative;
+        display: inline-block;
+        color: rgba(22, 29, 37, 0.8);
+        width: 70px;
+        margin-right: 5px;
+
+        &.star {
+          &::before {
+            position: absolute;
+            left: -10px;
+            content: '*';
+            color: rgba(249, 0, 35, 1);
+          }
+        }
+      }
+
+      .farm-drawer-item-val {
+        color: rgba(22, 29, 37, 0.6);
+      }
+    }
+
+    //警示爆红区
+    .errorList,
+    .warningList {
+      min-height: 83px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      padding: 15px 40px;
+      overflow-y: scroll;
+      flex-grow: 1;
+
+      .farm-drawer-list-item {
+        margin-bottom: 15px;
+        display: flex;
+
+        .icon {
+          vertical-align: top;
+
+          img {
+            width: 20px;
+          }
+        }
+
+        .text {
+          margin-left: 15px;
+
+          .t {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            margin-bottom: 9px;
+          }
+
+          .c {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 22px;
+          }
+        }
+
+        &:nth-last-of-type(1) {
+          margin-bottom: 0px;
+        }
+      }
+
+      &::-webkit-scrollbar {
+        /*滚动条整体样式*/
+        width: 8px; /*高宽分别对应横竖滚动条的尺寸*/
+        height: 8px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 5px rgba(102, 89, 89, 0.2);
+        background: #9e9797;
+      }
+
+      &::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        -webkit-box-shadow: inset 0 0 5px rgba(138, 129, 129, 0.2);
+        border-radius: 10px;
+        background: rgba(226, 221, 221, 0.2);
+      }
+    }
+
+    .errorList {
+      background-color: rgba(255, 106, 115, 0.08);
+      border: 1px solid rgba(255, 106, 115, 0.16);
+
+      .text {
+        .t {
+          color: RGBA(255, 106, 115, 1);
+        }
+
+        .c {
+          color: RGBA(255, 106, 115, 0.8);
+        }
+      }
+    }
+
+    .warningList {
+      background-color: rgba(229, 199, 138, 0.08);
+      border: 1px solid rgba(229, 199, 138, 0.16);
+
+      .text {
+        .t {
+          color: RGBA(229, 199, 138, 1);
+        }
+
+        .c {
+          color: RGBA(229, 199, 138, 0.8);
+        }
+      }
+    }
+
+    //操作按钮
+    .farm-drawer-btn {
+      height: 32px;
+      background: rgba(10, 98, 241, 1);
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      color: rgba(255, 255, 255, 1);
+      line-height: 32px;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    //标头
+    .farm-drawer-body-item-header {
+      .farm-drawer-body-item-header-main {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(22, 29, 37, 1);
+      }
+
+      .farm-drawer-body-item-header-assist {
+        font-size: 14px;
+        font-weight: 400;
+        color: rgba(22, 29, 37, 0.8);
+      }
+    }
+  }
+
+  &.e {
+    //min-height: 783px;
+    //overflow-y: scroll;
   }
 }
 

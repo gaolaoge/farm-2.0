@@ -1,7 +1,7 @@
 <template>
   <div class="home-wrapper" ref="homeWrapper">
     <div class="hi">
-      <span>{{hi.hi}} {{hi.name}}</span>
+      <span>{{hi}} {{user.name}}</span>
     </div>
     <div class="firRow">
       <!--任务状态-->
@@ -102,7 +102,8 @@
   import newTask from '@/components/home/new-task'
   import {
     homeT,
-    echartsData
+    echartsData,
+    putNewZoneID
   } from '@/api/api.js'
   import {
     messageFun,
@@ -159,10 +160,7 @@
         chartsDate: [],
         // 工程文件
         fileList: [],
-        hi: {
-          hi: 'Hello,',
-          name: 'Celia Greer'
-        },
+        hi: 'Hello,',
         recentList: [
           {
             projectImgUrl: '',
@@ -192,6 +190,7 @@
           if (!val) return false
           this.getHomeTData(val)
           this.getEchartsData(val)
+          putNewZoneID({"zoneUuid": val})   // 传达切换分区事件
         },
         immediate: true
       },
@@ -212,9 +211,6 @@
     components: {
       HomeCharts,
       newTask
-    },
-    mounted() {
-
     },
     methods: {
       // 关闭
