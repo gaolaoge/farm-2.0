@@ -21,17 +21,72 @@ export default new Vuex.Store({
       birthday: null,
       email: null,
       sex: null,
+      id: null
     },
     login: false,
     zoneId: null,    // 所在区ID
     zone: null,      // 分区 1影视区 2效果图区
-    socket_Plugin: null,    // 与插件关联的websocket
+    socket_plugin: null,    // 与插件关联的websocket
+    socket_plugin_msg: null,// 与插件关联的websocket接收的参数
     socket_backS: null,     // 与后台关联的websocket
+    socket_backS_msg: null, // 与后台关联的websocket接收的参数
   },
   getter: {},
   mutations: {
+    // 创建与后台的websocket
+    WEBSOCKET_BACKS_INIT(state, url) {
+      let num = 0
+      state.socket_backS = new WebSocket(url)
+      state.socket_backS.addEventListener('open', () => console.log('--与后台连接成功--'))
+      state.socket_backS.addEventListener('error', () => {
+        if(num >= 5){
+          console.log('--与后台连接失败--')
+          state.socket_backS = 'err'
+        }else {
+          num ++
+          console.log('--与后台连接失败，尝试重新连接--')
+          this.WEBSOCKET_BACKS_INIT(state, url)
+        }
+      })
+      state.socket_backS.addEventListener('message', data => state.socket_backS_msg = data)
+    },
+    // 对与后台的websocket发送消息
+    WEBSOCKET_BACKS_SEND(state, data) {
+      if(!state.socket_backS) return false
+      state.socket_backS.send(data)
+    },
+    // 创建与插件的websocket
+    WEBSOCKET_PLUGIN_INIT(state, url){
+      let num = 0
+      state.socket_plugin = new WebSocket(url)
+      state.socket_plugin.addEventListener('open', () => console.log('--与插件连接成功--'))
+      state.socket_plugin.addEventListener('error', () => {
+        if(num >= 5){
+          console.log('--与插件连接失败--')
+          state.socket_plugin = 'err'
+        }else {
+          num ++
+          console.log('--与插件连接失败，尝试重新连接--')
+          this.WEBSOCKET_PLUGIN_INIT(state, url)
+        }
+      })
+      state.socket_plugin.addEventListener('message', data => state.socket_plugin_msg = data)
+    },
+    // 对与插件的websocket发送消息
+    WEBSOCKET_PLUGIN_SEND(state, data){
+      if(!state.socket_plugin) return false
+      state.socket_plugin.send(data)
+    },
+    // 与插件的websocket断开连接
+    WEBSOCKET_PLUGIN_CLOSE(state){
+      if(!state.socket_plugin) return false
+      state.socket_plugin.close()
+    },
     changeSocket_Plugin(s, val) {
       s.socket_Plugin = val
+    },
+    changeID(s, val) {
+      s.user.id = val
     },
     changeZone(s, val) {
       s.zone = val

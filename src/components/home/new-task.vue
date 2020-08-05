@@ -27,7 +27,7 @@
       </div>
       <!--主体-->
       <div class="stepBody">
-        <!--选择场景文件-->
+        <!--选择渲染文件-->
         <div class="stepBody-item selectFile"
              v-show="stepBtnActive == 1">
           <!--左侧导航-->
@@ -98,7 +98,7 @@
               </div>
               <div class="table">
                 <el-table
-                  :data="filelist"
+                  :data="stepOneBase.local.filelist"
                   class="o"
                   @selection-change="handleSelectionChange"
                   style="width: 100%">
@@ -119,15 +119,14 @@
                     :render-header="renderHeader"
                     label="工程路径">
                     <template slot-scope="scope">
-                  <span class="address-span" :class="[{'inputing': scope.row.inputStatus}]">
-                    {{ scope.row.address }}
-                  </span>
-                      <input type="text"
-                             class="address-input"
-                             :class="[{'inputing': scope.row.inputStatus}]"
-                             @focus="scope.row.inputStatus = true"
-                             @blur="scope.row.inputStatus = false"
-                             v-model="scope.row.address">
+                      <div class="f">
+                        <span>{{ scope.row.address }}</span>
+                        <img src="@/icons/more-btn.png" alt=""
+                             @click="$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
+                          transferType: 4,              // 传输类型
+                          sceneFile: scope.$index
+                        }))">
+                      </div>
                     </template>
                   </el-table-column>
 
@@ -258,29 +257,6 @@
                 {{ stepThreeBase.priority.bottomLabel }}
               </span>
                 </div>
-                <!--自定义-->
-                <div class="item-switch" v-show="stepThreeBase.num.singleChoiceVal != '1'">
-                  <el-switch
-                    style="vertical-align: inherit"
-                    v-model="stepThreeBase.priority.selfVal"
-                    @change="val => {if(val == 0) stepThreeBase.priority.customize = ''}"
-                    inactive-color="RGBA(200, 202, 203, 1)"
-                    active-color="rgba(10, 98, 241, 1)"
-                    active-value='1'
-                    inactive-value='0'/>
-                  <span class="item-switch-label"
-                        :class="[{'active': stepThreeBase.priority.selfVal}]"
-                        style="vertical-align: inherit">
-                {{ stepThreeBase.priority.selfLabel }}
-              </span>
-                  <el-input class='customizeInput'
-                            :class="[{customizeInputError: stepThreeBase.priority.customizeInputError}]"
-                            v-show="stepThreeBase.priority.selfVal == 1"
-                            v-model="stepThreeBase.priority.customize"
-                            @blur="verifFormat"
-                            @focus="stepThreeBase.priority.customizeInputError = false"
-                            :placeholder="stepThreeBase.priority.inputPlaceholder"/>
-                </div>
               </div>
               <!--提示-->
               <span class="info">
@@ -315,16 +291,14 @@
             <div class="farm-drawer-body-item set">
               <!--标题-->
               <div class="farm-drawer-body-item-header">
-            <span class="farm-drawer-body-item-header-main">
-              {{ stepThreeBase.other.title }}
-            </span>
+                <span class="farm-drawer-body-item-header-main">{{ stepThreeBase.other.title }}</span>
               </div>
               <div class="farm-drawer-body">
                 <!--所属项目-->
                 <div class="farm-drawer-item">
-              <span class="farm-drawer-item-label star">
-                {{ stepThreeBase.other.viewLabel }}
-              </span>
+                  <span class="farm-drawer-item-label star">
+                    {{ stepThreeBase.other.viewLabel }}
+                  </span>
                   <el-select v-model="stepThreeBase.other.view"
                              placeholder="选择已有项目名称"
                              class="workBench-optionBase haveBorder">
@@ -337,17 +311,34 @@
                   </el-select>
                   <!--新建项目-->
                   <span class="createBtn" @click="createItem">
-                <img src="@/icons/createIcon.png"
-                     alt=""
-                     class="createIcon">
-                {{ stepThreeBase.other.btn }}
-              </span>
+                    <img src="@/icons/createIcon.png" class="createIcon">
+                    {{ stepThreeBase.other.btn }}
+                  </span>
+                </div>
+                <!--分层渲染-->
+                <div class="farm-drawer-item">
+                  <span class="farm-drawer-item-label">
+                    {{ stepThreeBase.other.stratifyLabel }}
+                  </span>
+                  <el-switch
+                    v-model="stepThreeBase.other.stratifyVal"
+                    inactive-color="RGBA(200, 202, 203, 1)"
+                    active-color="rgba(10, 98, 241, 1)"
+                    active-value="1"
+                    inactive-value="0"/>
                 </div>
                 <!--超时提醒-->
                 <div class="farm-drawer-item">
-              <span class="farm-drawer-item-label">
-                {{ stepThreeBase.other.remindLabel }}
-              </span>
+                  <span class="farm-drawer-item-label">
+                    {{ stepThreeBase.other.remindLabel }}
+                    <el-tooltip class="item"
+                                popper-class="t mini"
+                                effect="dark"
+                                content="单帧渲染时长超过设定，系统发送提醒消息给联系人，具体通知方式可在“消息设置”中完成"
+                                placement="right">
+                      <img src="@/icons/question-mark-icon.png" alt="" class="mark">
+                    </el-tooltip>
+                  </span>
                   <el-slider v-model="stepThreeBase.other.remindVal"
                              class="slider"
                              :min="1"
@@ -356,19 +347,20 @@
                          class="sliderVal"
                          @blur="changeSliderVal"
                          v-model="stepThreeBase.other.remindVal">
-                  <el-tooltip class="item"
-                              popper-class="t mini"
-                              effect="dark"
-                              content="单帧渲染时长超过设定，系统发送提醒消息给联系人，具体通知方式可在“消息设置”中完成"
-                              placement="right">
-                    <img src="@/icons/question-mark-icon.png" alt="" class="mark">
-                  </el-tooltip>
+                  <span class="unit">{{ stepThreeBase.other.unit }}</span>
                 </div>
                 <!--超时提醒-->
                 <div class="farm-drawer-item">
-              <span class="farm-drawer-item-label">
-                {{ stepThreeBase.other.stopLabel }}
-              </span>
+                  <span class="farm-drawer-item-label">
+                    {{ stepThreeBase.other.stopLabel }}
+                    <el-tooltip class="item"
+                                popper-class="t mini"
+                                effect="dark"
+                                content="单帧渲染时长超过设定，系统停止当前帧的渲染并发送消息给联系人"
+                                placement="right">
+                    <img src="@/icons/question-mark-icon.png" alt="" class="mark">
+                  </el-tooltip>
+                  </span>
                   <el-slider v-model="stepThreeBase.other.stopVal"
                              class="slider"
                              :min="1"
@@ -377,13 +369,7 @@
                          class="sliderVal"
                          @blur="changeStopVal"
                          v-model="stepThreeBase.other.stopVal">
-                  <el-tooltip class="item"
-                              popper-class="t mini"
-                              effect="dark"
-                              content="单帧渲染时长超过设定，系统停止当前帧的渲染并发送消息给联系人"
-                              placement="right">
-                    <img src="@/icons/question-mark-icon.png" alt="" class="mark">
-                  </el-tooltip>
+                  <span class="unit">{{ stepThreeBase.other.unit }}</span>
                 </div>
               </div>
             </div>
@@ -560,6 +546,7 @@
     createTaskSetNewPlugin,
     createTaskSetEditPlugin,
     addNewItem,
+    getConsumptionSelectList,
     pushTask,
     upTopCJ,
     upTopGC,
@@ -567,7 +554,6 @@
   } from '@/api/api'
   import {
     identify,
-    catalogue,
     getFileType,
     savePath,
     newTaskProfession
@@ -628,7 +614,7 @@
             sceneFilePath: ['我的资产', 'D', 'Maya文件'],      // 场景文件 - 面包屑
 
           },
-          local: {
+          local: {   // 我的电脑
             operateBtnGroup: [
               {
                 text: '添加',
@@ -641,13 +627,19 @@
                 selectedIcon: require('@/icons/deleteIcon-white.png')
               },
             ],
+            filelist: [     // 已选场景文件
+              // {
+              //   sceneFile: '',      // 场景名
+              //   address: '',        // 工程路径
+              //   absolutePath: '',   // 绝对路径
+              // }，
+            ],
           },
         },
         stepTwoBase: {
           addMoreText: '添加模板',
-          //设置渲染模板 - 已存在列表
           renderList: [
-            // [
+            // 设置渲染模板 - 已存在模板列表
             //   {
             //     renderTemplate: {                       //模板
             //       id: 16
@@ -681,7 +673,6 @@
             //       }
             //     ]
             //   }
-            // ]
           ],
           renderListActive: 0     //选中索引
         },
@@ -694,8 +685,6 @@
             miniTitT: '个层）',
             val: '2',
             singleChoice: '启动分层渲染',
-            // 分层渲染
-            singleChoiceVal: '0',
             tableData: [
               {
                 // id: '1',
@@ -739,12 +728,7 @@
             middleVal: '1',
             bottomLabel: '末帧',
             bottomVal: '1',
-            selfLabel: '自定义',
-            selfVal: '0',
             info: '测试帧渲染完成后，任务处于“待全部渲染”状态，请点击【全部渲染】',
-            customize: '',
-            inputPlaceholder: '例如1,2,5',
-            customizeInputError: false
           },
           // 渲染模式
           mode: {
@@ -782,10 +766,13 @@
               // }
             ],
             view: '',
-            remindLabel: '单帧超时提醒 (h)',
+            unit: '(h)',
+            remindLabel: '单帧超时提醒',
             remindVal: 12,
-            stopLabel: '单帧超时停止 (h)',
-            stopVal: 24
+            stopLabel: '单帧超时停止',
+            stopVal: 24,
+            stratifyLabel: '分层渲染',
+            stratifyVal: "1"
           },
           btn: {
             returnBtn: '返回',
@@ -854,23 +841,13 @@
           index: null      //编辑已存在模板时模板的索引
         },
         infoMessageShow: false,
-        // 场景文件 + 工程文件 + 工程路径
-        filelist: [
-          // {
-          //   sceneFile: '',      // 场景名
-          //   address: ''         // 工程路径
-          // }
-        ],
-        socket_: null,              // websocket 对象
-        numberOfReconnections: 0,   // 连接失败 - 重连次数
-        socketStatus: false,        // websocket 是否在连接状态
-        renderFileType: ['ma', 'mb']// 可用的场景文件格式
+        renderFileType: ['txt']     // 可用的场景文件格式
       }
     },
     props: {},
     components: {operationGuide},
     computed: {
-      ...mapState(['zoneId']),
+      ...mapState(['zone', 'zoneId', 'user', 'socket_backS', 'socket_backS_msg', 'socket_plugin', 'socket_plugin_msg']),
       // 验证表格是否填写完整
       disableSelf() {
         let a = this.dialogAdd
@@ -878,55 +855,53 @@
         else return false
       }
     },
-    methods: {
-      // 连接插件
-      openWebsocket() {
-        this.socketStatus = null
-        this.socket_ = new WebSocket('ws://192.168.1.85:15000')    //第二个参数可选 指定可接受的子协议
-        this.socket_.addEventListener('open', () => {
-          console.log('--插件连接成功--')
-          this.numberOfReconnections = 0
-          this.socketStatus = true
-          this.$store.commit('changeSocket_Plugin', this.socket_)
-        })
-        this.socket_.addEventListener('error', e => {
-          if (this.numberOfReconnections >= 5) {
-            console.log('--websocket--与插件连接失败--')
-            this.socketStatus = false
-            return false
-          }
-          console.log('--插件重连中--')
-          this.numberOfReconnections++
-          this.openWebsocket()
-        })
-        this.socket_.addEventListener('message', e => {
-          this.getMessage(e)
-        })
-        this.socket_.addEventListener('close', e => {
+    watch: {
+      'socket_backS_msg': {
+        handler: function (e) {
+          let data = JSON.parse(e.data)
+          if (data.code != 208) return false
+          if (data.msg == '842') {
+            // 场景文件列表
 
+          } else if (data.msg == '841') {
+            // scenePath 场景文件导航Path / resourcePath 工程路径Path
+          }
+        },
+        immediate: true
+      },
+      'socket_plugin_msg': {
+        handler: function (e) {
+          let data = JSON.parse(e.data)
+          if (data.code == 102) data.fileList.forEach(curr => this.pluginFilterFile(curr))  // 场景文件
+          else if (data.code == 103) this.pluginEditProjectPath(data)  // 工程路径
+        },
+        immediate: true
+      }
+    },
+    methods: {
+      // 1.选择渲染文件 - 我的电脑 插件 修改场景文件对应的【工程路径】
+      pluginEditProjectPath(data) {
+        this.stepOneBase.local.filelist[data.sceneFile].address = data.path
+      },
+      // 1.选择渲染文件 - 我的电脑 插件 操作接收的【场景文件列表】
+      pluginFilterFile(file) {
+        let index = file.lastIndexOf('/') + 1
+        this.stepOneBase.local.filelist.push({
+          address: file.substr(0, index),      // 场景名
+          sceneFile: file.substr(index),                 // 工程路径
+          absolutePath: file,                          // 绝对路径
         })
       },
-      // 接收插件信息
-      getMessage(e) {
-        let t = e.result
-        if (!t || t[0] !== 0) {
-          // 报错
-          return false
-        }
-        t[1].forEach(item => {
-          let n = item.lastIndexOf('/')
-          this.filelist.push({
-            sceneFile: item.slice(0, n), // 场景名
-            address: item.slice(n)       // 工程路径
-          })
-        })
+      // 1.选择渲染文件 - 我的电脑 插件 连接插件
+      openWebsocket() {
+        if (this.socket_plugin) return false   // 已连接
+        this.$store.commit('WEBSOCKET_PLUGIN_INIT', 'ws://192.168.1.85:15000')
       },
-      // 断开插件
+      // 1.选择渲染文件 - 我的电脑 插件 断开插件
       shutWebsocket() {
-        this.socket_.close()
-        this.$store.commit('changeSocket_Plugin', null)
+        this.$store.commit('WEBSOCKET_PLUGIN_CLOSE')
       },
-      // 获取可用场景文件格式
+      // 0.获取可用场景文件格式
       async getRenderFileType() {
         let data = await getFileType()
         this.renderFiletype = data.data.data.split(',').map(item => item.match(/\w/g))
@@ -1257,21 +1232,20 @@
       },
       // 1.选择渲染文件 - 我的电脑 -【添加】新场景文件
       operateBtnAddMore() {
-        if (this.filelist.length == 20) {
+        if (this.stepOneBase.local.filelist.length == 20) {
           messageFun('info', '操作失败，不能选择超过20个场景文件！');
           return false
         }
-        if (this.socketStatus === null) {
-          messageFun('error', '插件连接中，请稍后重试')
-          return false
-        } else if (this.socketStatus === false) {
+        if (!this.socket_backS) {
           messageFun('error', '插件连接失败，无法选择文件')
+          return false
+        } else if (this.socket_backS === 'err') {
+          messageFun('error', '插件连接中，请稍后重试')
           return false
         }
         // 通知插件选择本地文件
-        this.socket_.send(JSON.stringify({
+        this.$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
           transferType: 3,              // 传输类型
-          operaType: 0,                 // 弹窗类型
           suffix: this.renderFileType   // 文件后缀
         }))
       },
@@ -1304,14 +1278,17 @@
       },
       // 4.提交
       async confirmFun() {
+        let fir = this.stepOneBase,
+          sec = this.stepTwoBase,
+          thi = this.stepThreeBase
         let data = await newTaskProfession({
           zoneUuid: this.zoneId,                             // 分区uuid
-          templateUuid: 'cacb01da-bf06-45ae-9c47-7b151f03f7fc',    //选中模板uuid
-          taskCount: 1,          // 要创建任务的数量
+          templateUuid: sec.renderList[sec.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
+          taskCount: fir.index == 0 ? null : fir.local.filelist.length,                            // 要创建任务的数量
           pattern: this.taskType == 'easy' ? 1 : 2,          // 渲染模式
-          patternNorm: 1,                     // 提交模式
+          patternNorm: fir.index == 0 ? 2 : 1,  // 提交模式
           source: 1,                                         // 任务来源
-          filePathList: [
+          filePathList: fir.index == 0 ? null : [
             {
               filePath: {
                 fileType: '1',
@@ -1326,39 +1303,42 @@
             },
           ],
           commitTaskDTO: this.taskType != 'easy' ? null : {
-            layer: '',                        // 是否开启分层渲染。1开启，0关闭
-            renderPattern: '',                // 配置组编号
-            taskType: '',                     // 任务类型
-            otherSettings: {
-              projectName: '',
-              projectUuid: '',
-              frameTimeoutWarn: '',
-              frameTimeoutStop: ''
+            layer: Number(thi.other.stratifyVal),        // 是否开启分层渲染。1开启，0关闭
+            renderPattern: thi.mode.mode,                // 渲染模式编号
+            taskType: this.zone,                         // 任务类型 看分区
+            otherSettings: {      // 其它设置
+              projectName: thi.other.viewList.forEach(curr => {if(curr.value == thi.other.view) return curr.label}),
+              projectUuid: thi.other.view,
+              frameTimeoutWarn: thi.other.remindVal,
+              frameTimeoutStop: thi.other.stopVal
             },
-            testRender: {                     // 测试帧信息对象
-              testRendering: '',              // 是否开启测试渲染
-              frameFirst: '',                 // 首帧
-              frameMiddle: '',                // 末帧
-              frameFinally: ''                // 中间帧
+            testRender: {                     // 优先渲染
+              testRendering: thi.priority.topVal == '1' || thi.priority.middleVal == '1' || thi.priority.bottomVal == '1' ? 1 : 0,              // 是否开启测试渲染
+              frameFirst: Number(thi.priority.topVal),                // 首帧
+              frameMiddle: Number(thi.priority.middleVal),            // 末帧
+              frameFinally: Number(thi.priority.bottomVal)            // 中间帧
             },
           }
         })
-        // this.savePathFun()       // 保存历史工程路径
+        if(data.data.code == 200) {
+          this.$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
+            'transferType': 5,
+            'userID': this.user.id,
+            'taskList': fir.local.filelist.map((curr,index) => {
+              return {
+                'sceneFile': curr.absolutePath,            // 场景文件
+                'path': curr.address,                      // 工程路径
+                'taskID': data.data.data[index]
+              }
+            })
+          }))
+        }
       },
       // 0.获取文件渲染模式
       async getIdentify() {
         let data = await identify()
         if (data.data.data == 1) this.taskType = 'profession'   // 专业版
         else if (data.data.data == 0) this.taskType = 'easy'    // 一键版
-      },
-      // 0.选择渲染文件 - 获取网盘目录
-      async getCatalogue() {
-        let data = await catalogue()
-        if (data.data.code != 200) {
-          messageFun('error', '网盘目录获取失败')
-          return false
-        }
-        this.createCatalog(data.data.data)
       },
       // 0.选择渲染文件 - 我的资产 - 创建网盘目录
       createCatalog(data) {
@@ -1380,38 +1360,6 @@
         savePath({
           'sceneFilePath': '/demo'
         })
-      },
-      // 3.设置渲染参数 验证 自定义帧格式
-      verifFormat() {
-        let val = this.stepThreeBase.priority.customize
-        if (!val) {
-          this.stepThreeBase.priority.customizeInputError = false;
-          return false
-        }
-
-        let valList = val.replace(/，/g, ',').split(',').filter(curr => curr != '')          // 输入帧
-
-        if (valList.length > 3) {
-          this.errFun('最多优先测试3帧');
-          return false
-        }
-        if (!valList.every(curr => /^[0-9]+$/.test(Number(curr)))) {
-          this.errFun('输入格式不正确，请重新输入');
-          return false
-        }
-
-        let range = this.stepThreeBase.num.tableData[0].range,         // 帧范围
-          rangeH = Number(range.split('-')[0]),                // 首帧
-          rangeF = Number(range.split('-')[1]),                // 尾帧
-          interval = Number(this.stepThreeBase.num.tableData[0].num),// 帧间隔
-          result = renderingRange(rangeH, rangeF, interval),     // 遍历帧范围
-          r = valList.every(curr => result.includes(Number(curr)))        // 【帧范围】是否完全包含【输入帧】
-
-        if (!r) {
-          this.errFun('优先帧超出帧范围，请重新输入');
-          return false
-        }
-        if (r) this.stepThreeBase.priority.customizeInputError = false
       },
       // 3.设置渲染参数 设置参数 - 其他设置 - 新建项目
       createItem() {
@@ -1457,7 +1405,26 @@
           .catch(() => {
           })
       },
-      // 3.设置渲染参数 超时提醒改变
+      // 3.设置渲染参数 - 其它设置 - 项目列表
+      async getItemList(name) {
+        let data = await getConsumptionSelectList()
+        this.stepThreeBase.other.viewList = data.data.data.map(curr => {
+          return {
+            value: curr.taskProjectUuid + '-/-' + curr.projectName,
+            label: curr.projectName,
+            id: curr.taskProjectUuid
+          }
+        })
+        if (!name) {
+          this.stepThreeBase.other.view = this.stepThreeBase.other.viewList[0]['value']
+        } else {
+          let obj = this.stepThreeBase.other.viewList.find(curr => {
+            return curr.label == name
+          })
+          this.setting.other.view = obj['value']
+        }
+      },
+      // 3.设置渲染参数 - 其它设置 - 超时提醒改变
       changeSliderVal(e) {
         let n = Number(e.target.value)
         if (n >= 1 && 72 >= n) {
@@ -1466,7 +1433,7 @@
           this.stepThreeBase.other.remindVal = 12
         }
       },
-      // 3.设置渲染参数 超时停止改变
+      // 3.设置渲染参数 - 其它设置 - 超时停止改变
       changeStopVal(e) {
         let n = Number(e.target.value)
         if (n >= 1 && 72 >= n) {
@@ -1478,9 +1445,10 @@
     },
     mounted() {
       this.getIdentify()         // 识别文件渲染模式
-      this.getCatalogue()        // 查询网盘目录
       // this.getRenderFileType()   // 获取可用的场景文件格式
       this.getList()             // 获取渲染模板列表
+      this.getItemList()
+      if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', JSON.stringify({'code': 841}))
     },
     directives: {
       operating: {
@@ -1811,32 +1779,15 @@
                   }
                 }
 
-                .address-span {
-                  font-size: 14px;
-                  font-weight: 400;
-                  color: rgba(22, 29, 37, 0.8);
+                .f {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
 
-                  &.inputing {
-                    display: none;
+                  span {
+                    font-size: 14px;
                   }
-                }
 
-                .address-input {
-                  position: absolute;
-                  left: 10px;
-                  top: 13px;
-                  font-size: 14px;
-                  font-weight: 400;
-                  color: rgba(22, 29, 37, 0.8);
-                  background-color: transparent;
-                  border: 0px;
-                  outline: none;
-                  opacity: 0;
-                  font-family: 'SourceHanSansCN', 'Arial Bold';
-
-                  &.inputing {
-                    opacity: 1;
-                  }
                 }
 
                 .se {
@@ -2345,9 +2296,20 @@
     padding: 1px;
   }
 
+  .farm-drawer-item {
+    display: flex;
+    align-items: center;
+  }
+
   .farm-drawer-item-label {
     width: 110px !important;
     margin-right: 28px;
+    color: rgba(22, 29, 37, 0.6) !important;
+  }
+
+  .unit {
+    color: rgba(22, 29, 37, 0.6);
+    margin-left: 6px;
   }
 
   .mark {

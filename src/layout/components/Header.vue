@@ -294,7 +294,7 @@
       }
     },
     computed: {
-      ...mapState(['user', 'login', 'zoneId']),
+      ...mapState(['user', 'login', 'zoneId', 'socket_backS']),
     },
     mounted() {
       this.getList()
@@ -342,8 +342,8 @@
       },
       'user.account': {
         handler: function(val){
-          if(!val) return false
-          this.$websocket_back.dispatch('WEBSOCKET_INIT', `ws://192.168.1.86:5002/websocket/web/${val}`)
+          if(!val || this.socket_backS) return false
+          this.$store.commit('WEBSOCKET_BACKS_INIT', `ws://192.168.1.86:5002/websocket/web/${val}`)
         },
         immediate: true
       }

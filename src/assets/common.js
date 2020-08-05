@@ -193,6 +193,7 @@ const setInfo = function (data) {
     level: data.vipLevel,
     balance: data.goldBalance
   }))
+  store.commit('changeID', data.customerUuid)                                                    // ID
   store.commit('changeAvatar', data.headImg)                                                     // 头像
   store.commit('changeName', data.nickname)                                                      // 昵称
   store.commit('changeAccount', data.account)                                                    // 帐号
