@@ -9,3 +9,12 @@ export function getQueryConditions(){
     method: 'GET'
   })
 }
+
+// 获取Echarts查询条件
+export function getTaskData(data){
+  return businessServer({
+    url: '/professional/taskCount',
+    method: 'POST',
+    data
+  })
+}

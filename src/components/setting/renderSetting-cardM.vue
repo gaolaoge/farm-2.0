@@ -2,53 +2,41 @@
   <div class="renderSetting">
     <!--分析后参数修改-->
     <div class="farm-item">
-      <span class="label"><span>{{ isEditLabel }}:</span></span>
+      <span class="label">{{ isEditLabel }}:</span>
       <div class="vv">
         <el-switch
-          v-model="value2"
+          v-model="switchV"
+          active-value="1"
+          inactive-value="0"
           inactive-color="rgba(22, 29, 37, 0.3)"
-          active-color="rgba(10, 98, 241, 1)"/>
+          active-color="rgba(10, 98, 241, 1)"
+          @change="editData"/>
       </div>
       <span class="desc">（{{ isEditDesc }}）</span>
     </div>
     <!--单帧超时提醒-->
     <div class="farm-item">
-      <span class="label"><span>{{ reminderLabel }}:</span></span>
+      <span class="label">{{ reminderLabel }}:</span>
       <div class="v">
-        <input type="text"
-               :class="[{'show': reminderShow}]"
-               v-model="reminderVal"
-               @focus="reminderShow = true"
-               @blur="reminderShow = false">
-        <span class="val" :class="[{'noShow': reminderShow}]">{{ reminderVal }}</span>
+        <input type="text" v-model="reminderVal" @change="veriRemind">
         <span class="unit">{{ unit[0] }}</span>
       </div>
       <span class="desc">（{{ reminderDesc }}）</span>
     </div>
     <!--单帧超时停止-->
     <div class="farm-item">
-      <span class="label"><span>{{ stopLabel }}:</span></span>
+      <span class="label">{{ stopLabel }}:</span>
       <div class="v">
-        <input type="text"
-               :class="[{'show': stopShow}]"
-               v-model="stopVal"
-               @focus="stopShow = true"
-               @blur="stopShow = false">
-        <span class="val" :class="[{'noShow': stopShow}]">{{ stopVal }}</span>
+        <input type="text" v-model="stopVal" @change="veriStop">
         <span class="unit">{{ unit[0] }}</span>
       </div>
       <span class="desc">（{{ stopDesc }}）</span>
     </div>
     <!--单个任务预警-->
     <div class="farm-item">
-      <span class="label"><span>{{ warningLabel }}:</span></span>
+      <span class="label">{{ warningLabel }}:</span>
       <div class="v">
-        <input type="text"
-               :class="[{'show': warningShow}]"
-               v-model="warningVal"
-               @focus="warningShow = true"
-               @blur="warningShow = false">
-        <span class="val" :class="[{'noShow': warningShow}]">{{ warningVal }}</span>
+        <input type="text" v-model="warningVal" @change="veriWarning">
         <span class="unit">{{ unit[1] }}</span>
       </div>
       <span class="desc">（{{ warningDesc }}）</span>
@@ -57,6 +45,12 @@
 </template>
 
 <script>
+  import {
+    getSetData,
+    setSetData
+  } from '@/api/setting-api'
+  import {messageFun} from "../../assets/common";
+
   export default {
     name: 'renderSetting',
     data() {
@@ -66,21 +60,73 @@
         isEditVal: '',
         reminderLabel: '单帧超时提醒',
         reminderDesc: '单帧渲染时长超过设定，系统发送提醒消息给联系人，具体通知方式可在“消息设置”中完成；',
-        reminderVal: '12',
+        reminderVal: null,
         reminderShow: false,
         stopLabel: '单帧超时停止',
         stopDesc: '单帧渲染时长超过设定，系统停止当前帧的渲染并发送消息给联系人；',
-        stopVal: '24',
+        stopVal: null,
         stopShow: false,
         warningLabel: '单个任务预警',
         warningDesc: '单个任务渲染费用累计超过设定金币值时，系统发送提醒消息给联系人，具体方式可在“消息设置”中完成；',
-        warningVal: '99999',
+        warningVal: null,
         warningShow: false,
         unit: ['小时', '金币'],
-        value2: ''
+        switchV: '0',
+        renderSettingUuid: null,
       }
     },
-
+    methods: {
+      // 获取数据
+      async getData(){
+        let data = await getSetData()
+        this.switchV = String(data.data.data.endSetting)        // 分析后参数修改
+        this.reminderVal = data.data.data.frameTimeoutWarn      // 单帧超时提醒
+        this.stopVal = data.data.data.frameTimeoutStop          // 单帧超时停止
+        this.warningVal = data.data.data.taskEarlyWarning       // 单个任务渲染费用累计超过设定金币值
+        this.renderSettingUuid = data.data.data.renderSettingUuid
+      },
+      // 修改数据
+      async editData(){
+        let data = await setSetData({
+          'renderSettingUuid': this.renderSettingUuid,
+          'endSetting': Number(this.switchV),
+          'frameTimeoutWarn': this.reminderVal,
+          'frameTimeoutStop': this.stopVal,
+          'taskEarlyWarning': this.warningVal
+        })
+        if(data.data.code == 201) messageFun('success', '设置成功')
+      },
+      // 修改单帧超时提醒
+      veriRemind(){
+        let n = Number(this.reminderVal)
+        if(!n) this.reminderVal = 12
+        else if(n > 72) this.reminderVal = 72
+        else if(n < 1) this.reminderVal = 1
+        else this.reminderVal = n
+        this.editData()
+      },
+      // 修改单帧超时提醒
+      veriStop(){
+        let n = Number(this.stopVal)
+        if(!n) this.stopVal = 24
+        else if(n > 72) this.stopVal = 72
+        else if(n < 1) this.stopVal = 1
+        else this.stopVal = n
+        this.editData()
+      },
+      // 修改单帧超时提醒
+      veriWarning(){
+        let n = Number(this.warningVal)
+        if(!n) this.warningVal = 99999
+        else if(n > 99999) this.warningVal = 99999
+        else if(n < 1) this.warningVal = 1
+        else this.warningVal = n
+        this.editData()
+      },
+    },
+    mounted(){
+      this.getData()
+    }
   }
 </script>
 
@@ -98,11 +144,8 @@
       .label {
         width: 112px;
         margin-right: 10px;
-
-        span {
-          font-size: 14px;
-          color: rgba(22, 29, 37, 0.79);
-        }
+        font-size: 14px;
+        color: rgba(22, 29, 37, 0.79);
       }
 
       .vv {
@@ -125,36 +168,21 @@
         margin-right: 10px;
         border: 1px solid rgba(22, 29, 37, 0.3);
 
-        .unit,
-        .val {
+        .unit {
           font-size: 14px;
           color: rgba(22, 29, 37, 1);
           line-height: 34px;
         }
 
-        .val {
-          opacity: 1;
-
-          &.noShow {
-            opacity: 0;
-          }
-        }
-
         input {
-          position: absolute;
           outline: none;
           background-color: transparent;
           border: 0px;
           width: 100px;
           font-size: 14px;
-          color: rgba(255, 255, 255, 1);
+          color: rgba(22, 29, 37, 0.8);
           line-height: 34px;
-          opacity: 0;
           font-family: 'SourceHanSansCN', 'Arial Bold';
-
-          &.show {
-            opacity: 1;
-          }
         }
       }
 

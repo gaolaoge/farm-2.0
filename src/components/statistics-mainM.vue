@@ -1,7 +1,12 @@
 <template>
   <div class="statisticsM-wrapper" :class="[{'fullItem': fullItem}]">
     <!--任务数据统计-->
-    <taskData ref="taskData" @monitorVal="monitorVal" @fullScreen="fullScreen" @miniScreen="miniScreen"
+    <taskData ref="taskData"
+              @monitorVal="monitorVal"
+              @fullScreen="fullScreen"
+              @miniScreen="miniScreen"
+              :taskList="projectList"
+              :chartsData="taskTemplate"
               v-show="screen.showTaskData"/>
     <!--帧数统计-->
     <numberOfFrames ref="numOfFrames" v-show="screen.showNumOfFrames"/>
@@ -35,6 +40,8 @@
           showConsumption: true,
           showTaskStatus: true
         },
+        projectList: null,     // 项目列表
+        taskTemplate: null,    // 任务数统计数据
       }
     },
     methods: {
@@ -61,14 +68,22 @@
       miniScreen(){
         this.fullItem = false
         for (let i in this.screen) if (!this.screen[i]) this.screen[i] = true
+      },
+      // 获取全局数据
+      async getData(){
+        // 获取图表条件历史记录
+        let data = await getQueryConditions()
+        this.projectList = data.data.data.project.map(curr => {
+            return {
+              'value': curr.taskProjectUuid,
+              'label': curr.projectName,
+            }
+        })
+        this.taskTemplate = data.data.data.chart.taskTemplate
       }
     },
     mounted() {
-      // 获取图表条件历史记录
-      getQueryConditions()
-        .then(data => {
-          console.log(data)
-        })
+      this.getData()
     },
     components: {
       taskData,

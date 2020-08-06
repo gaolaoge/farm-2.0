@@ -66,15 +66,27 @@
                 <div class="farm-form-item">
                   <div class="farm-form-item-label">{{ stepOneBase.netdisc.fileLabel }}：</div>
                   <div class="farm-form-item-input b"
-                       :class="[{'null': stepOneBase.netdisc.selectionDefault.length == 0}]">
+                       :class="[{'null': !stepOneBase.netdisc.treeData.length}]">
+                    <!--面包屑-->
                     <div class="pathList">
                       <span class="filePathLi" v-for="(item,index) in stepOneBase.netdisc.sceneFilePath" :key="index">
                         <span class="s">{{ item }}</span>
                         <img src="@/icons/enter.png" alt="" class="im">
                       </span>
                     </div>
+                    <!--场景文件tree-->
+                    <div class="tree" v-show="stepOneBase.netdisc.treeData.length">
+                      <el-tree
+                        :data="stepOneBase.netdisc.treeData"
+                        show-checkbox
+                        node-key="id"
+                        :default-expanded-keys="[2, 3]"
+                        :default-checked-keys="[5]"
+                        :props="stepOneBase.netdisc.defaultProps">
+                      </el-tree>
+                    </div>
                     <!--请先选择工程路径-->
-                    <div class="null">
+                    <div class="null" v-show="!stepOneBase.netdisc.treeData.length">
                       <img src="@/icons/warningIcon_.png" alt="">
                       <span class="span">{{ stepOneBase.netdisc.warnSpan }}</span>
                     </div>
@@ -91,11 +103,10 @@
                      :key="index">
                   <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
                   <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
-                  <span>
-                {{ item['text'] }}
-              </span>
+                  <span>{{ item['text'] }}</span>
                 </div>
               </div>
+              <!--场景文件table-->
               <div class="table">
                 <el-table
                   :data="stepOneBase.local.filelist"
@@ -134,7 +145,6 @@
               </div>
             </div>
           </div>
-
         </div>
         <!--设置渲染模板-->
         <div class="stepBody-item"
@@ -377,15 +387,18 @@
         </div>
       </div>
     </section>
-
+    <!--前进或后退按钮-->
     <div class="btnGroup">
+      <!--选择渲染文件-->
       <div v-show="stepBtnActive == 1">
         <!--下一步-->
-        <div class="btnGroup-btn confirm" @click="stepBtnActive = 2">
+        <div class="btnGroup-btn confirm"
+             :class="[{'cannotTrigger': stepOneBase.local.filelist.length == 0}]"
+             @click="goToMode('next')">
           <span class="nextStep">{{ btn.next }}</span>
         </div>
       </div>
-
+      <!--设置渲染模板-->
       <div v-show="stepBtnActive == 2">
         <!--上一步-->
         <div class="btnGroup-btn previous" @click="stepBtnActive = 1">
@@ -396,10 +409,10 @@
           <span>{{ btn.next }}</span>
         </div>
       </div>
-
+      <!--设置渲染参数-->
       <div v-show="stepBtnActive == 3">
         <!--上一步-->
-        <div class="btnGroup-btn previous" @click="stepBtnActive = 2">
+        <div class="btnGroup-btn previous" @click="goToMode('previous')">
           <span>{{ btn.previous }}</span>
         </div>
         <!--确定-->
@@ -588,7 +601,6 @@
         },
         stepOneBase: {   // 选择渲染文件
           showMe: false,
-          selectionTableData: [],   // 选择场景文件 table 多选值
           index: 0,
           btnList: [
             {
@@ -611,8 +623,50 @@
               children: 'children',
               label: 'label'
             },
-            sceneFilePath: ['我的资产', 'D', 'Maya文件'],      // 场景文件 - 面包屑
-
+            sceneFilePath: [],      // 场景文件 - 面包屑
+            filelist: [
+              // 场景文件
+              // {
+              //   sceneFile: '',      // 场景名
+              //   address: '',        // 工程路径
+              //   absolutePath: '',   // 绝对路径
+              //   id: ''
+              // }，
+            ],
+            treeData: [
+              {
+                id: 1,
+                label: '一级 1',
+                children: [{
+                  id: 4,
+                  label: '二级 1-1',
+                  children: [
+                    {
+                      id: 9,
+                      label: '三级 1-1-1'
+                    },
+                    {
+                      id: 10,
+                      label: '三级 1-1-2'
+                    }
+                  ]
+                }]
+              },
+              {
+                id: 2,
+                label: '一级 2',
+                children: [
+                  {
+                    id: 5,
+                    label: '二级 2-1'
+                  },
+                  {
+                    id: 6,
+                    label: '二级 2-2'
+                  }
+                ]
+              },
+            ],
           },
           local: {   // 我的电脑
             operateBtnGroup: [
@@ -627,13 +681,16 @@
                 selectedIcon: require('@/icons/deleteIcon-white.png')
               },
             ],
-            filelist: [     // 已选场景文件
+            filelist: [
+              // 场景文件
               // {
               //   sceneFile: '',      // 场景名
               //   address: '',        // 工程路径
               //   absolutePath: '',   // 绝对路径
+              //   id: ''
               // }，
             ],
+            selectionR: [],       // 选择渲染文件 table多选值
           },
         },
         stepTwoBase: {
@@ -841,7 +898,7 @@
           index: null      //编辑已存在模板时模板的索引
         },
         infoMessageShow: false,
-        renderFileType: ['txt']     // 可用的场景文件格式
+        renderFileTypeList: ['txt']     // 可用的场景文件格式
       }
     },
     props: {},
@@ -865,6 +922,8 @@
 
           } else if (data.msg == '841') {
             // scenePath 场景文件导航Path / resourcePath 工程路径Path
+            this.stepOneBase.netdisc.sceneFilePath = data.data.scenePath.split('/')
+            this.stepOneBase.netdisc.pathV = data.data.resourcePath
           }
         },
         immediate: true
@@ -888,8 +947,9 @@
         let index = file.lastIndexOf('/') + 1
         this.stepOneBase.local.filelist.push({
           address: file.substr(0, index),      // 场景名
-          sceneFile: file.substr(index),                 // 工程路径
-          absolutePath: file,                          // 绝对路径
+          sceneFile: file.substr(index),            // 工程路径
+          absolutePath: file,                       // 绝对路径
+          id: Math.floor(Math.random() * Math.pow(10, 16))
         })
       },
       // 1.选择渲染文件 - 我的电脑 插件 连接插件
@@ -904,15 +964,16 @@
       // 0.获取可用场景文件格式
       async getRenderFileType() {
         let data = await getFileType()
-        this.renderFiletype = data.data.data.split(',').map(item => item.match(/\w/g))
+        this.renderFileTypeList = data.data.data.split(',').map(item => item.match(/\w/g))
       },
-      // 选择渲染文件 - 切换选择文件方式
+      // 1.选择渲染文件 - 切换选择场景文件方式
       changeFileSelection(index) {
         this.stepOneBase.index = index
         // 判断是否已连接插件
-        if (index == 1 && !this.socket_) this.openWebsocket()
+        if (index == 1 && !this.socket_plugin) this.openWebsocket()
 
       },
+      // 1.选择渲染文件 - 我的电脑 = 工程路径 问号提示
       renderHeader(h, {column}) {
         return h('span', {}, [
           h('span', {}, column.label),
@@ -921,26 +982,25 @@
               class: 'ix',
               src: require('@/icons/problemIcon.png'),
               style: 'vertical-align: text-bottom;margin-left: 8px;cursor: pointer;',
-              title: '南'
             },
             on: {click: () => this.infoMessageShow = true}
           })
         ])
       },
-      // 设置渲染模板 - 添加模板 - 检验模板名格式
+      // 2.设置渲染模板 - 添加模板 - 检验模板名格式
       nameVerif() {
         if (this.dialogAdd.form.valName.length > 50) {
-          messageFun('error', '最多输入50个字符');
-          this.dialogAdd.form.formatName = false;
+          messageFun('error', '最多输入50个字符')
+          this.dialogAdd.form.formatName = false
           return false
         }
         this.dialogAdd.form.formatName = true
       },
-      // 主体 - 关闭
+      // 关闭
       closeDialogFun() {
         this.$emit('closeDialogFun', '')
       },
-      // 设置渲染模板 - 选择插件版本
+      // 2.设置渲染模板 - 选择插件版本
       changeOIndex(index) {
         //插件版本左侧窗口切换选中状态
         this.dialogAdd.oList.forEach((curr, ind) => {
@@ -987,7 +1047,7 @@
           }
         })
       },
-      // 设置渲染模板 - 删除已选择插件结果
+      // 2.设置渲染模板 - 删除已选择插件结果
       deleteSeletedOption(item, index) {
         this.dialogAdd.oList.findIndex(curr => {
           if (item.pluginUuid == curr.pluginUuid)
@@ -996,7 +1056,7 @@
         })
         this.dialogAdd.nList.splice(index, 1)
       },
-      // 设置渲染模板 - 获取渲染模板列表
+      // 2.设置渲染模板 - 获取渲染模板列表
       async getList() {
         let data = await createTaskSet()
         this.stepTwoBase.renderList = data.data.data
@@ -1037,7 +1097,7 @@
         //   }
         // ]
       },
-      // 设置渲染模板 - 打开【新建模板】
+      // 2.设置渲染模板 - 打开【新建模板】
       async addTemplate(s, index) {
         // 获取软件列表
         let data = await createTaskSetSoftware()
@@ -1091,7 +1151,7 @@
           this.changeSoftware([t['renderTemplate']['softName'], b.value])   //获取对应插件下拉框List
         }
       },
-      // 设置渲染模板 - 删除模板
+      // 2.设置渲染模板 - 删除模板
       deleteTemplate(index) {
         this.$confirm('删除后将无法找回，确认删除当前模板吗？', '提示', {
           confirmButtonText: '确定',
@@ -1109,7 +1169,7 @@
             messageFun('info', '已取消删除')
           })
       },
-      // 设置渲染模板 - 软件下拉框选中
+      // 2.设置渲染模板 - 软件下拉框选中
       async changeSoftware(val) {
         let data = await createTaskSetPlugin(val[1])
         this.dialogAdd.pluginList = data.data.data.map(curr => {
@@ -1121,7 +1181,7 @@
         })
         this.dialogAdd.oList = []
       },
-      // 设置渲染模板 - 插件下拉框选中
+      // 2.设置渲染模板 - 插件下拉框选中
       changePlugin(val) {
         //匹配项
         let t = this.dialogAdd.pluginList.find(curr => {
@@ -1155,7 +1215,7 @@
         // dataStatus: 1
         // })
       },
-      // 关闭 新建/编辑模板窗口
+      // 2.设置渲染模板 - 关闭【新建/编辑渲染模板窗口】
       closeAddTemplateDialog() {
         // 窗口数据初始化
         this.dialogAdd.form.valName = ''
@@ -1166,7 +1226,7 @@
         this.dialogAdd.oList = []
         this.dialogAdd.nList = []
       },
-      // 设置渲染模板 - 添加or修改
+      // 2.设置渲染模板 - 添加or修改
       async taskDefine() {
         let val
         // 若表格未填写完整 返回
@@ -1211,9 +1271,9 @@
             break
         }
       },
-      // 选择场景文件 - table 多选值
+      // 1.选择渲染文件 - 我的电脑 - table多选
       handleSelectionChange(val) {
-        this.stepOneBase.selectionTableData = val
+        this.stepOneBase.local.selectionR = val
       },
       // 1.选择渲染文件 - 我的电脑 - 操作按钮
       operateBtnFun(action) {
@@ -1245,36 +1305,27 @@
         }
         // 通知插件选择本地文件
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
-          transferType: 3,              // 传输类型
-          suffix: this.renderFileType   // 文件后缀
+          transferType: 3,                  // 传输类型
+          suffix: this.renderFileTypeList   // 文件后缀
         }))
       },
       // 1.选择渲染文件 - 我的电脑 -【删除】新场景文件
       operateBtnDelete() {
-        if (!this.stepOneBase.selectionTableData.length) {
-          messageFun('error', '没有选中项')
-          return false
-        }
-        this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+        let r = this.stepOneBase.local.selectionR
+        if (!r.length) messageFun('error', '没有选中项')
+        else this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         })
           .then(() => {
-            let deleteIdList = this.stepOneBase.selectionTableData.map(curr => {
-              return curr.id
-            })
-            deleteIdList.forEach(curr => {
-              let index = this.filelist.findIndex((c, index) => {
-                return c.id == curr
-              })
-              this.filelist.splice(index, 1)
+            r.forEach(curr => {
+              let index = this.stepOneBase.local.filelist.findIndex((c, index) => c.id == curr.id)
+              this.stepOneBase.local.filelist.splice(index, 1)
             })
             messageFun('success', '删除成功')
           })
-          .catch(() => {
-            messageFun('info', '已取消删除')
-          });
+          .catch(() => messageFun('info', '已取消删除'))
       },
       // 4.提交
       async confirmFun() {
@@ -1307,7 +1358,9 @@
             renderPattern: thi.mode.mode,                // 渲染模式编号
             taskType: this.zone,                         // 任务类型 看分区
             otherSettings: {      // 其它设置
-              projectName: thi.other.viewList.forEach(curr => {if(curr.value == thi.other.view) return curr.label}),
+              projectName: thi.other.viewList.forEach(curr => {
+                if (curr.value == thi.other.view) return curr.label
+              }),
               projectUuid: thi.other.view,
               frameTimeoutWarn: thi.other.remindVal,
               frameTimeoutStop: thi.other.stopVal
@@ -1320,11 +1373,11 @@
             },
           }
         })
-        if(data.data.code == 200) {
+        if (data.data.code == 200) {
           this.$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
             'transferType': 5,
             'userID': this.user.id,
-            'taskList': fir.local.filelist.map((curr,index) => {
+            'taskList': fir.local.filelist.map((curr, index) => {
               return {
                 'sceneFile': curr.absolutePath,            // 场景文件
                 'path': curr.address,                      // 工程路径
@@ -1442,12 +1495,27 @@
           this.stepThreeBase.other.stopVal = 24
         }
       },
+      // 1.设置渲染文件 - 下一步
+      goToMode(dire) {
+        if (dire == 'previous') this.stepBtnActive = 2
+        else {
+          if (this.stepOneBase.index == 0) {
+            // 我的资产
+
+          } else if (this.stepOneBase.index == 1 && this.stepOneBase.local.filelist.length == 0) {
+            // 我的电脑
+            messageFun('error', '尚未选择场景文件')
+            return false
+          }
+          this.stepBtnActive = 2
+        }
+      }
     },
     mounted() {
       this.getIdentify()         // 识别文件渲染模式
-      // this.getRenderFileType()   // 获取可用的场景文件格式
+      this.getRenderFileType()   // 获取可用的场景文件格式
       this.getList()             // 获取渲染模板列表
-      this.getItemList()
+      this.getItemList()         // 获取项目列表
       if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', JSON.stringify({'code': 841}))
     },
     directives: {
@@ -1671,6 +1739,10 @@
                       }
                     }
 
+                    .tree {
+                      margin-top: 36px;
+                    }
+
                     .null {
                       display: flex;
                       flex-direction: column;
@@ -1719,7 +1791,7 @@
 
                 .netCatalogue {
                   position: absolute;
-                  z-index: 1;
+                  z-index: 2;
                   top: 44px;
                   right: 1px;
                   width: 510px;
@@ -1956,7 +2028,7 @@
       flex-direction: row-reverse;
 
       .btnGroup-btn {
-        margin-right: 21px;
+        margin-right: 30px;
         display: inline-block;
         border-radius: 8px;
         font-size: 14px;
@@ -1967,6 +2039,7 @@
 
         &.confirm {
           background-color: rgba(10, 98, 241, 1);
+          border: 1px solid rgba(10, 98, 241, 1);
           width: 76px;
           line-height: 32px;
 
@@ -1982,6 +2055,18 @@
 
           span {
             color: rgba(22, 29, 37, 0.79);
+          }
+        }
+
+        &.cannotTrigger {
+          cursor: no-drop;
+          border: 1px solid rgba(22, 29, 37, 0.19);
+          background-color: rgba(255, 255, 255, 1);
+          width: 74px;
+          line-height: 30px;
+
+          span {
+            color: rgba(22, 29, 37, 0.19);
           }
         }
       }
@@ -2343,4 +2428,5 @@
       opacity: 1;
     }
   }
+
 </style>

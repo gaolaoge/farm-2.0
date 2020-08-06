@@ -24,8 +24,8 @@ export default new Vuex.Store({
       id: null
     },
     login: false,
-    zoneId: null,    // 所在区ID
-    zone: null,      // 分区 1影视区 2效果图区
+    zoneId: null,           // 所在区ID
+    zone: null,             // 分区 1影视区 2效果图区
     socket_plugin: null,    // 与插件关联的websocket
     socket_plugin_msg: null,// 与插件关联的websocket接收的参数
     socket_backS: null,     // 与后台关联的websocket
