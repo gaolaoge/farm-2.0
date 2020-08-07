@@ -5,11 +5,11 @@
         <!--名称-->
         <span class="name fc">{{ $t('statistics_mainM.taskData.name') }}</span>
         <!--新增任务数统计-->
-        <span class="navLi fc" :class="[{'active': navIndex == 0}]">
+        <span class="navLi fc" :class="[{'active': navIndex == 0}]" @click="navIndex = 0">
           {{ $t('statistics_mainM.taskData.navLi_one') }}
         </span>
         <!--累计任务数统计-->
-        <span class="navLi fc" :class="[{'active': navIndex == 1}]">
+        <span class="navLi fc" :class="[{'active': navIndex == 1}]" @click="navIndex = 1">
           {{ $t('statistics_mainM.taskData.navLi_two') }}
         </span>
       </div>
@@ -43,7 +43,7 @@
     </div>
     <section>
       <div class="selectData">
-        <el-select v-model="taskV" placeholder="请选择">
+        <el-select v-model="taskV" multiple collapse-tags placeholder="请选择">
           <el-option
             v-for="item in taskList"
             :key="item.value"
@@ -51,6 +51,12 @@
             :value="item.value">
           </el-option>
         </el-select>
+      </div>
+      <div class="itemList">
+        <div class="item" v-for="(item,index) in taskL" :key="index">
+          <span>{{ item.label }}</span>
+          <img src="@/icons/b.png" alt="" @click="taskV.splice(index, 1)">
+        </div>
       </div>
       <div class="ec" ref="ec"/>
     </section>
@@ -102,11 +108,36 @@
           }
         ],
         dateInterval: 'nearlySevenDays',
-        taskV: '',
+        taskV: [],
+        taskL: [],
         startDate: '',
         endDate: '',
         fullBtn: true,
-        chartsSeries: []
+        chartsSeries: [],
+        lock: false,
+        cProjectUuid: [],
+        nProjectUuid: [],
+        color: [
+          'rgba(27, 83, 244, 1)',
+          'rgba(255, 191, 0, 1)',
+          'rgba(255, 62, 77, 1)',
+          'rgba(70, 203, 93, 1)',
+          'rgba(236, 60, 255, 1)'
+        ],
+        linearGradientT: [
+          'rgba(27, 83, 244, 0.2)',
+          'rgba(255, 191, 0, 0.2)',
+          'rgba(255, 62, 77, 0.2)',
+          'rgba(70, 203, 93, 0.2)',
+          'rgba(236, 60, 255, 0.2)'
+        ],
+        linearGradientB: [
+          'rgba(27, 83, 244, 0)',
+          'rgba(255, 191, 0, 0)',
+          'rgba(255, 62, 77, 0)',
+          'rgba(70, 203, 93, 0)',
+          'rgba(236, 60, 255, 0)'
+        ],
       }
     },
     props: {
@@ -119,20 +150,35 @@
     watch: {
       startDate() {
         this.$emit('monitorVal', [this.startDate, this.endDate, 'taskData'])
+        this.aisle()
       },
       endDate() {
         this.$emit('monitorVal', [this.startDate, this.endDate, 'taskData'])
+        this.aisle()
+      },
+      taskV(v) {
+        this.aisle()
+        let t = []
+        v.forEach(curr => t.push(this.taskList.find(item => item.value == curr)))
+        this.taskL = t
+      },
+      navIndex(){
+        this.navIndex == 0 ? this.taskV = this.cProjectUuid : this.taskV = this.nProjectUuid
+        this.aisle()
       },
       'chartsData': {
         handler: function (val) {
           if (!val) return false
-          else this.getChartsData()
+          else {
+            this.cProjectUuid = val.count.projectUuid
+            this.nProjectUuid = val.newly.projectUuid
+            this.navIndex == 0 ? this.taskV = this.cProjectUuid : this.taskV = this.nProjectUuid
+          }
         },
         immediate: true
       }
     },
     mounted() {
-      this.init()
       window.addEventListener('resize', this.ec.resize)
       this.$refs.selectDateM.setDateInterval(this.dateInterval)
     },
@@ -211,20 +257,30 @@
         setTimeout(this.ec.resize, 120)
         this.fullBtn = true
       },
+      // 获取charts数据通道
+      aisle() {
+        if (this.lock) return false
+        this.lock = true
+        this.getChartsData()
+        setTimeout(() => this.lock = false, 200)
+      },
       // 获取charts数据
       async getChartsData() {
+        let num
+        if (this.dateInterval == 'nearlySevenDays') num = '1'
+        else if (this.dateInterval == 'nearlyThirtyDays') num = '2'
+        else if (this.dateInterval == 'customize') num = '3'
         let data = await getTaskData({
           "type": String(this.navIndex + 1),
-          "projectUuid": this.chartsData[this.navIndex == 0 ? 'count' : 'newly']['projectUuid'],
+          "projectUuid": this.taskV,
           "dateBegin": new Date(this.startDate).getTime(),
           "dateEnd": new Date(this.endDate).getTime(),
-          "defaultDateStatus": '1',
+          "defaultDateStatus": num,
           "zoneuuid": this.zoneId
         })
-        if (data.data.code != 200) {
-          messageFun('error', '获取数据失败')
-        } else {
-          this.chartsSeries = Object.keys(data.data.data).map((item,index) => {
+        if (data.data.code != 200) messageFun('error', '获取数据失败')
+        else {
+          this.chartsSeries = Object.keys(data.data.data).map((item, index) => {
             return {
               name: this.taskList.find(curr => curr.value == item).label,
               type: 'line',
@@ -233,35 +289,34 @@
               symbolSize: 5,
               sampling: 'average',
               itemStyle: {
-                color: 'rgba(255, 191, 0, 1)'
+                color: this.color[index]
               },
-              // areaStyle: {
-              //   color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              //     {
-              //       offset: 0,
-              //       color: 'rgba(255, 191, 0, 0.2)'
-              //     },
-              //     {
-              //       offset: 1,
-              //       color: 'rgba(255, 191, 0, 0)'
-              //     }
-              //   ])
-              // },
+              areaStyle: {
+                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  {
+                    offset: 0,
+                    color: this.linearGradientT[index]
+                  },
+                  {
+                    offset: 1,
+                    color: this.linearGradientB[index]
+                  }
+                ])
+              },
               data: this.transformType(data.data.data[item])
             }
           })
-          console.log(this.chartsSeries)
           this.init()
         }
       },
       // 格式转换
-      transformType(data){
+      transformType(data) {
         let l = []
         Object.keys(data).forEach(item => {
           l.push([item, data[item]])
         })
         return l
-      }
+      },
     },
     components: {
       calendar
@@ -271,6 +326,23 @@
 
 <style lang="less" scoped>
   .taskDataEchart-wrapper {
+    /deep/.el-tag.el-tag--info.el-tag--small.el-tag--light {
+      display: flex;
+      align-items: center;
+      .el-select__tags-text {
+        display: inline-block;
+        width: 54px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .el-tag__close.el-icon-close {
+        margin: 0px;
+        position: inherit;
+      }
 
+      &:nth-last-of-type(1) {
+        width: 38px;
+      }
+    }
   }
 </style>

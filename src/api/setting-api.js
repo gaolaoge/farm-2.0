@@ -44,3 +44,20 @@ export function setSetData(data){
     data
   })
 }
+
+// 消息设置 - 获取既定参数
+export function getMessageData(){
+  return businessServer({
+    url: `/professional/notice/setting/getSystemNoticeSetting`,
+    method: 'GET'
+  })
+}
+
+// 消息设置 - 获取既定参数
+export function setMessageData(data){
+  return businessServer({
+    url: `/professional/notice/setting/updateNoticeSetting`,
+    method: 'POST',
+    data
+  })
+}

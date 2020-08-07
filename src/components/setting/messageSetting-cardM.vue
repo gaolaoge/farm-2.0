@@ -5,25 +5,26 @@
       style="width: 100%">
 
       <el-table-column
-        prop="name"
+        prop="noticeSettingName"
         label="通知名称"
         show-overflow-tooltip
-        width="220" />
+        width="220"/>
 
       <el-table-column
-        prop="desc"
+        prop="noticeSettingDetail"
         label="通知描述"
         show-overflow-tooltip
-        width="600" />
+        width="600"/>
 
       <el-table-column
         label="通知方式">
         <template slot-scope="scope">
-          <el-checkbox-group v-model="scope.row.checkList">
-            <el-checkbox label="站内信" />
-            <el-checkbox label="邮件" />
-            <el-checkbox label="短信" />
-          </el-checkbox-group>
+          <el-checkbox v-model="scope.row.isMessage" true-label="1" false-label="0" label="站内信"
+                       @change="changeCheckBox(scope.row.noticeSettingUuid, scope.row.customerNoticeSettingUuid, 1, scope.row.isMessage)"/>
+          <el-checkbox v-model="scope.row.isEmail" true-label="1" false-label="0" label="邮件"
+                       @change="changeCheckBox(scope.row.noticeSettingUuid, scope.row.customerNoticeSettingUuid, 2, scope.row.isEmail)"/>
+          <el-checkbox v-model="scope.row.isNote" true-label="1" false-label="0" label="短信"
+                       @change="changeCheckBox(scope.row.noticeSettingUuid, scope.row.customerNoticeSettingUuid, 3, scope.row.isNote)"/>
         </template>
       </el-table-column>
 
@@ -32,45 +33,56 @@
 </template>
 
 <script>
+  import {
+    getMessageData,
+    setMessageData
+  } from '@/api/setting-api'
+  import {messageFun} from "../../assets/common";
+
   export default {
     name: 'messageSetting',
-    data(){
+    data() {
       return {
         tableData: [
-          {
-            name: '添加任务通知',
-            desc: '任务[任务ID_场景名]已添加到渲染任务列表。',
-            checkList: ['邮件']
-          },
-          {
-            name: '渲染染完成通知',
-            desc: '任务[任务ID_场景名]渲染完成，渲染结果将保留20天，请您及时登录系统下载。',
-            checkList: ['邮件']
-          },
-          {
-            name: '单帧超时提醒通知',
-            desc: '任务[任务ID_场景名]第[X]帧已渲染超[X]小时，请您及时登录系统查看。',
-            checkList: ['邮件']
-          },
-          {
-            name: '单帧超时停止通知',
-            desc: '任务[任务ID_场景名]第[X]帧在因渲染超时已自动暂停渲染，请您及时登录系统查看。',
-            checkList: ['邮件']
-          },
-          {
-            name: '单帧渲染失败通知',
-            desc: '任务[任务ID_场景名]第[X]帧渲染失败，请您及时登录系统查看。',
-            checkList: ['邮件']
-          },
-          {
-            name: '单个任务渲染预警',
-            desc: '任务[任务ID_场景名]累计渲染费用已达到[X]金币，请您及时登录系统查看。',
-            checkList: ['邮件']
-          },
+          // {
+          //   noticeSettingName: '添加任务通知',
+          //   noticeSettingDetail: '任务[任务ID_场景名]已添加到渲染任务列表。',
+          //   customerNoticeSettingUuid: null,
+          //   noticeSettingUuid
+          //   isEmail: null,   // 邮箱
+          //   isMessage: null, // 站内信
+          //   isNote: null,    // 短信
+          // },
         ],
       }
     },
-
+    methods: {
+      // 获取设置记录
+      async getData() {
+        let data = await getMessageData()
+        if (data.data.code != 200) return false
+        this.tableData = data.data.data.map(item => {
+          return Object.assign(item,{
+            isEmail: item.isEmail == 1 ? '1' : '0',   // 邮箱
+            isMessage: item.isMessage == 1 ? '1' : '0', // 站内信
+            isNote: item.isNote == 1 ? '1' : '0',    // 短信
+          })
+        })
+      },
+      // 修改设置
+      async changeCheckBox(noticeSettingUuid, customerNoticeSettingUuid, noticeWay, noticeStatus){
+        let data = await setMessageData({
+          noticeSettingUuid,
+          customerNoticeSettingUuid,
+          noticeWay,
+          noticeStatus
+        })
+        if(data.data.code == 201) messageFun('success', '修改成功')
+      }
+    },
+    mounted() {
+      this.getData()
+    }
   }
 </script>
 
@@ -80,5 +92,8 @@
     padding: 10px;
     box-sizing: border-box;
   }
-  /deep/.el-table .el-table__row:hover::after { display: none }
+
+  /deep/ .el-table .el-table__row:hover::after {
+    display: none
+  }
 </style>

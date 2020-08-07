@@ -219,9 +219,7 @@
             <div class="farm-drawer-body-item">
               <!--标题-->
               <div class="farm-drawer-body-item-header">
-                <span class="farm-drawer-body-item-header-main">
-                  {{ stepThreeBase.priority.title }}
-                </span>
+                <span class="farm-drawer-body-item-header-main">{{ stepThreeBase.priority.title }}</span>
               </div>
               <!--开关-->
               <div class="farm-drawer-body-item-d addPadding">
@@ -270,9 +268,9 @@
               </div>
               <!--提示-->
               <span class="info">
-            <img src="@/icons/warningIcon.png" alt="">
-            {{ stepThreeBase.priority.info }}
-          </span>
+                <img src="@/icons/warningIcon.png" alt="">
+                {{ stepThreeBase.priority.info }}
+              </span>
             </div>
             <!--渲染模式-->
             <div class="farm-drawer-body-item ">
@@ -295,7 +293,6 @@
                   </el-radio>
                 </el-radio-group>
               </div>
-
             </div>
             <!--其他设置-->
             <div class="farm-drawer-body-item set">
@@ -306,9 +303,7 @@
               <div class="farm-drawer-body">
                 <!--所属项目-->
                 <div class="farm-drawer-item">
-                  <span class="farm-drawer-item-label star">
-                    {{ stepThreeBase.other.viewLabel }}
-                  </span>
+                  <span class="farm-drawer-item-label star">{{ stepThreeBase.other.viewLabel }}</span>
                   <el-select v-model="stepThreeBase.other.view"
                              placeholder="选择已有项目名称"
                              class="workBench-optionBase haveBorder">
@@ -327,9 +322,7 @@
                 </div>
                 <!--分层渲染-->
                 <div class="farm-drawer-item">
-                  <span class="farm-drawer-item-label">
-                    {{ stepThreeBase.other.stratifyLabel }}
-                  </span>
+                  <span class="farm-drawer-item-label">{{ stepThreeBase.other.stratifyLabel }}</span>
                   <el-switch
                     v-model="stepThreeBase.other.stratifyVal"
                     inactive-color="RGBA(200, 202, 203, 1)"
@@ -584,24 +577,21 @@
     name: 'new-task',
     data() {
       return {
-        type: null,                // 文件渲染模式
         title: '新建任务',
         navL: [
           '选择渲染文件',
           '设置渲染模板',
           '设置渲染参数'
         ],
-        stepBtnOne: '选择场景文件',
-        stepBtnTwo: '设置渲染模板',
-        stepBtnActive: 1,
+        stepBtnActive: 1,           // 当前所在步骤 1.选择渲染文件 2.设置渲染模板 3.设置渲染参数
         btn: {
           next: '下一步',
           previous: '上一步',
           confirm: '确认'
-        },
-        stepOneBase: {   // 选择渲染文件
-          showMe: false,
-          index: 0,
+        },    // 按钮集合
+        stepOneBase: {      // 选择渲染文件
+          showMe: false,    // 我的资产 - 工程路径 - 展开网盘目录
+          index: 0,         // 0.我的资产 1.我的电脑
           btnList: [
             {
               span: '我的资产',
@@ -624,15 +614,6 @@
               label: 'label'
             },
             sceneFilePath: [],      // 场景文件 - 面包屑
-            filelist: [
-              // 场景文件
-              // {
-              //   sceneFile: '',      // 场景名
-              //   address: '',        // 工程路径
-              //   absolutePath: '',   // 绝对路径
-              //   id: ''
-              // }，
-            ],
             treeData: [
               {
                 id: 1,
@@ -682,15 +663,14 @@
               },
             ],
             filelist: [
-              // 场景文件
               // {
               //   sceneFile: '',      // 场景名
               //   address: '',        // 工程路径
               //   absolutePath: '',   // 绝对路径
               //   id: ''
               // }，
-            ],
-            selectionR: [],       // 选择渲染文件 table多选值
+            ],      // 渲染文件
+            selectionR: [],       // 多选渲染文件值
           },
         },
         stepTwoBase: {
@@ -735,46 +715,6 @@
         },
         stepThreeBase: {
           t: '设置参数',
-          // 渲染层数
-          num: {
-            title: '渲染层数',
-            miniTitO: '（已选择',
-            miniTitT: '个层）',
-            val: '2',
-            singleChoice: '启动分层渲染',
-            tableData: [
-              {
-                // id: '1',
-                // name: '默认层',
-                // range: '1-24',
-                // num: '1',
-                // w: '231',
-                // h: '231',
-                // format: 'cin',
-                // camera: '相机二',
-                // rangeEdit: false,         //帧范围
-                // numEdit: false,           //间隔帧数
-                // wEdit: false,             //图像宽度
-                // hEdit: false,             //图像高度
-                // formatList: [
-                //   {
-                //     label: 'AVI(avi)',
-                //     val: 'avi'
-                //   }
-                // ],
-                // cameraList: [
-                //   {
-                //     label: '相机一',
-                //     val: '相机一'
-                //   }
-                // ]
-              },
-            ],
-            tableDataAll: [],
-            selected: [],
-            randerError: false,
-            numError: false
-          },
           // 优先渲染
           priority: {
             title: '优先渲染',
@@ -822,7 +762,7 @@
               //   label: '黄金糕'
               // }
             ],
-            view: '',
+            view: null,
             unit: '(h)',
             remindLabel: '单帧超时提醒',
             remindVal: 12,
@@ -897,8 +837,8 @@
           editOrAdd: '',
           index: null      //编辑已存在模板时模板的索引
         },
-        infoMessageShow: false,
-        renderFileTypeList: ['txt']     // 可用的场景文件格式
+        infoMessageShow: false,    // 选择渲染文件 - 我的电脑 - 工程路径 - 问号
+        renderFileTypeList: []     // 可用的场景文件格式
       }
     },
     props: {},
@@ -933,6 +873,7 @@
           let data = JSON.parse(e.data)
           if (data.code == 102) data.fileList.forEach(curr => this.pluginFilterFile(curr))  // 场景文件
           else if (data.code == 103) this.pluginEditProjectPath(data)  // 工程路径
+          else if (data.code == 104 && data.result == 0) this.createSuc()
         },
         immediate: true
       }
@@ -957,14 +898,18 @@
         if (this.socket_plugin) return false   // 已连接
         this.$store.commit('WEBSOCKET_PLUGIN_INIT', 'ws://192.168.1.85:15000')
       },
-      // 1.选择渲染文件 - 我的电脑 插件 断开插件
+      // 4.选择渲染文件 - 我的电脑 插件 断开插件
       shutWebsocket() {
         this.$store.commit('WEBSOCKET_PLUGIN_CLOSE')
       },
       // 0.获取可用场景文件格式
       async getRenderFileType() {
-        let data = await getFileType()
-        this.renderFileTypeList = data.data.data.split(',').map(item => item.match(/\w/g))
+        let data = await getFileType(),
+          t = []
+        data.data.data.split(',').forEach(item => {
+          t = t.concat(item.match(/\w+/g))
+        })
+        this.renderFileTypeList = t
       },
       // 1.选择渲染文件 - 切换选择场景文件方式
       changeFileSelection(index) {
@@ -996,9 +941,10 @@
         }
         this.dialogAdd.form.formatName = true
       },
-      // 关闭
+      // 4.关闭窗口
       closeDialogFun() {
         this.$emit('closeDialogFun', '')
+        this.dataReset()
       },
       // 2.设置渲染模板 - 选择插件版本
       changeOIndex(index) {
@@ -1128,21 +1074,15 @@
         // 打开弹窗
         this.innerVisible = true
         this.dialogAdd.editOrAdd = s
-        if (s == 'addOne') {
-          // 新建模板
-        }
-        if (s == 'editOne') {
+        if (s == 'addOne') null // 新建模板
+        else if (s == 'editOne') {
           // 编辑模板
           this.dialogAdd.index = index
           let t = this.stepTwoBase.renderList[index],   // 选中渲染模板data
             v = this.dialogAdd,
-            f = v.softwareList.find(curr => {         // 软件选中记录
-              return curr.label == t.renderTemplate.softName
-            })
-          let b = f['children'].find(curr => {                // 插件
-            return curr.label == t.renderTemplate.softName + '-' + t.renderTemplate.softVer
-          })
-          // debugger
+            f = v.softwareList.find(curr => curr.label == t.renderTemplate.softName)  // 软件选中记录
+          let b = f['children'].find(curr => curr.label == t.renderTemplate.softName + '-' + t.renderTemplate.softVer)   // 插件
+
           v.nList = t.xxlPlugins                             // 导入已选中插件记录
           this.$data.dialogAdd.nList = t.xxlPlugins
           v.form.valName = t['renderTemplate']['templateName']              //编辑窗口内模板名
@@ -1165,9 +1105,7 @@
                 messageFun('success', '删除成功')
               })
           })
-          .catch(() => {
-            messageFun('info', '已取消删除')
-          })
+          .catch(() => messageFun('info', '已取消删除'))
       },
       // 2.设置渲染模板 - 软件下拉框选中
       async changeSoftware(val) {
@@ -1184,13 +1122,9 @@
       // 2.设置渲染模板 - 插件下拉框选中
       changePlugin(val) {
         //匹配项
-        let t = this.dialogAdd.pluginList.find(curr => {
-          return curr.val == val
-        })
+        let t = this.dialogAdd.pluginList.find(curr => curr.val == val)
         this.dialogAdd.oList = t.list.map(curr => {
-          let r = this.dialogAdd.nList.findIndex(c => {
-            return c.pluginName == curr.pluginName && c.version == curr.version
-          })
+          let r = this.dialogAdd.nList.findIndex(c => c.pluginName == curr.pluginName && c.version == curr.version)
           return {
             ...curr,
             status: r == -1 ? false : true
@@ -1257,9 +1191,7 @@
               templateName: this.dialogAdd.form.valName,                           // 模板名称
               softUuid: this.dialogAdd.form.valSoftware[1],                        // 软件uuid
               isDefault: obj['renderTemplate']['isDefault'],                       // 是否默认
-              pluginUuids: this.dialogAdd.nList.map(curr => {                      // 插件
-                return curr.pluginUuid
-              })
+              pluginUuids: this.dialogAdd.nList.map(curr => curr.pluginUuid)       // 插件
             }
             let data2 = await createTaskSetEditPlugin(val)
             if (data2.data.code == 200) {
@@ -1293,13 +1225,14 @@
       // 1.选择渲染文件 - 我的电脑 -【添加】新场景文件
       operateBtnAddMore() {
         if (this.stepOneBase.local.filelist.length == 20) {
-          messageFun('info', '操作失败，不能选择超过20个场景文件！');
+          messageFun('info', '操作失败，不能选择超过20个场景文件！')
           return false
         }
         if (!this.socket_backS) {
           messageFun('error', '插件连接失败，无法选择文件')
           return false
-        } else if (this.socket_backS === 'err') {
+        }
+        if (this.socket_backS === 'err') {
           messageFun('error', '插件连接中，请稍后重试')
           return false
         }
@@ -1337,7 +1270,7 @@
           templateUuid: sec.renderList[sec.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
           taskCount: fir.index == 0 ? null : fir.local.filelist.length,                            // 要创建任务的数量
           pattern: this.taskType == 'easy' ? 1 : 2,          // 渲染模式
-          patternNorm: fir.index == 0 ? 2 : 1,  // 提交模式
+          patternNorm: fir.index == 0 ? 2 : 1,               // 提交模式
           source: 1,                                         // 任务来源
           filePathList: fir.index == 0 ? null : [
             {
@@ -1387,6 +1320,15 @@
           }))
         }
       },
+      // 4.创建成功
+      createSuc(){
+        if(this.stepOneBase.index == 0) this.savePathFun()   // 保存工程路径记录
+        else this.shutWebsocket()                            // 关闭与插件的websocket连接
+        messageFun('success', '创建成功')
+        this.closeDialogFun()
+        this.$router.push('/task')
+
+      },
       // 0.获取文件渲染模式
       async getIdentify() {
         let data = await identify()
@@ -1404,14 +1346,37 @@
             }
             return children
           }
-
           this.stepOneBase.netdisc.catalogData = this.stepOneBase.netdisc.catalogData.concat(g(JSON.parse(item)))
         })
       },
-      // 3.设置渲染参数 - 上传工程路径记录
+      // 4.设置渲染参数 - 上传工程路径记录
       savePathFun() {
-        savePath({
-          'sceneFilePath': '/demo'
+        savePath({ 'sceneFilePath': '/demo' })
+      },
+      // 4.复位
+      dataReset(){
+        this.stepBtnActive = 1    // 步骤退回到第一步
+        this.stepOneBase.index = 0
+        Object.assign(this.stepOneBase.netdisc,{
+          selectionDefault: [],   // 选中场景文件
+          catalogData: [],        // 工程路径 - 树状图
+          treeData: [],           // 渲染文件 - 树状图
+          sceneFilePath: [],      // 场景文件 - 面包屑
+        })
+        Object.assign(this.stepOneBase.local,{
+          filelist: [],           // 渲染文件
+          selectionR: [],         // 多选渲染文件值
+        })
+        Object.assign(this.stepThreeBase.priority,{
+          topVal: '1',            // 首帧
+          middleVal: '1',         // 中间帧
+          bottomVal: '1',         // 末帧
+        })
+        Object.assign(this.stepThreeBase.other,{
+          view: null,             // 选中项目
+          remindVal: 12,          // 单帧超时提醒
+          stopVal: 24,            // 单帧超时停止
+          stratifyVal: '1',       // 分层渲染
         })
       },
       // 3.设置渲染参数 设置参数 - 其他设置 - 新建项目
@@ -1431,32 +1396,20 @@
               })
             },
             () => {
-              this.$message({
-                type: 'info',
-                message: '取消输入'
-              })
+              messageFun('info', '取消输入')
               return Promise.reject()
             }
           )
           .then(
             data => {
               if (data.data.code == '201') {
-                this.$message({
-                  message: '创建项目成功',
-                  type: 'success'
-                })
+                messageFun('success', '创建项目成功')
                 this.getItemList(newItemName)
               }
-              if (data.data.code == '101') {
-                this.$message({
-                  message: '创建失败，项目名已存在',
-                  type: 'error'
-                })
-              }
+              if (data.data.code == '101') messageFun('error', '创建失败，项目名已存在')
             }
           )
-          .catch(() => {
-          })
+          .catch(() => null)
       },
       // 3.设置渲染参数 - 其它设置 - 项目列表
       async getItemList(name) {
@@ -1468,32 +1421,23 @@
             id: curr.taskProjectUuid
           }
         })
-        if (!name) {
-          this.stepThreeBase.other.view = this.stepThreeBase.other.viewList[0]['value']
-        } else {
-          let obj = this.stepThreeBase.other.viewList.find(curr => {
-            return curr.label == name
-          })
+        if (!name) this.stepThreeBase.other.view = this.stepThreeBase.other.viewList[0]['value']
+        else {
+          let obj = this.stepThreeBase.other.viewList.find(curr => curr.label == name)
           this.setting.other.view = obj['value']
         }
       },
       // 3.设置渲染参数 - 其它设置 - 超时提醒改变
       changeSliderVal(e) {
         let n = Number(e.target.value)
-        if (n >= 1 && 72 >= n) {
-          this.stepThreeBase.other.remindVal = n
-        } else {
-          this.stepThreeBase.other.remindVal = 12
-        }
+        if (n >= 1 && 72 >= n) this.stepThreeBase.other.remindVal = n
+        else this.stepThreeBase.other.remindVal = 12
       },
       // 3.设置渲染参数 - 其它设置 - 超时停止改变
       changeStopVal(e) {
         let n = Number(e.target.value)
-        if (n >= 1 && 72 >= n) {
-          this.stepThreeBase.other.stopVal = n
-        } else {
-          this.stepThreeBase.other.stopVal = 24
-        }
+        if (n >= 1 && 72 >= n) this.stepThreeBase.other.stopVal = n
+        else this.stepThreeBase.other.stopVal = 24
       },
       // 1.设置渲染文件 - 下一步
       goToMode(dire) {

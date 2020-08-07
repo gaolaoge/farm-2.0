@@ -65,19 +65,19 @@
         }
       },
       // 取消全屏
-      miniScreen(){
+      miniScreen() {
         this.fullItem = false
         for (let i in this.screen) if (!this.screen[i]) this.screen[i] = true
       },
       // 获取全局数据
-      async getData(){
+      async getData() {
         // 获取图表条件历史记录
         let data = await getQueryConditions()
         this.projectList = data.data.data.project.map(curr => {
-            return {
-              'value': curr.taskProjectUuid,
-              'label': curr.projectName,
-            }
+          return {
+            'value': curr.taskProjectUuid,
+            'label': curr.projectName,
+          }
         })
         this.taskTemplate = data.data.data.chart.taskTemplate
       }
@@ -219,7 +219,7 @@
 
             .el-input__inner {
               height: 25px;
-              width: 120px;
+              width: 170px;
               background: rgba(248, 248, 248, 1);
               border-radius: 2px;
               border: 1px solid rgba(22, 29, 37, 0.1);
@@ -236,12 +236,80 @@
           }
         }
 
+        .itemList {
+          position: absolute;
+          z-index: 9;
+          top: 10px;
+          left: 200px;
+          display: flex;
+          width: calc(100% - 220px);
+
+          .item {
+            position: relative;
+            width: 119px;
+            height: 25px;
+            background: rgba(248, 248, 248, 1);
+            border-radius: 2px;
+            border: 1px solid rgba(22, 29, 37, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0px 10px 0px 14px;
+            box-sizing: border-box;
+            margin-right: 1%;
+
+            span {
+              font-size: 12px;
+              font-family: PingFangSC-Regular, PingFang SC;
+              color: rgba(22, 29, 37, 1);
+              width: 70%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            img {
+              cursor: pointer;
+            }
+
+            &::before {
+              position: absolute;
+              left: 0px;
+              content: '';
+              width: 4px;
+              height: 25px;
+              border-radius: 2px;
+            }
+
+            &:nth-of-type(1)::before {
+              background-color: rgba(27, 83, 244, 1);
+            }
+
+            &:nth-of-type(2)::before {
+              background-color: rgba(255, 191, 0, 1);
+            }
+
+            &:nth-of-type(3)::before {
+              background-color: rgba(255, 62, 77, 1);
+            }
+
+            &:nth-of-type(4)::before {
+              background-color: rgba(70, 203, 93, 1);
+            }
+
+            &:nth-of-type(5)::before {
+              background-color: rgba(236, 60, 255, 1);
+            }
+
+          }
+        }
+
         .ec {
           height: 100%;
         }
       }
     }
   }
+
 </style>
 
 <style lang="less" scoped>
