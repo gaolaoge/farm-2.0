@@ -268,7 +268,7 @@
         //   analyseStatus: this.table.analyseStatus,             //分析状态数组
         //   projectUuid: this.projectUuidList                    //项目UUID数组
         // }
-        let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&uploadStatus=&analyseStatus=&projectUuid=${this.projectUuidList.length == 0 ? '' : JSON.stringify(this.projectUuidList)}&setParameters=${uploadStatus ? 1 : ''}`
+        let t = `zoneUuid=${this.zoneId}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&uploadStatus=&analyseStatus=&projectUuid=${this.projectUuidList.length == 0 ? '' : JSON.stringify(this.projectUuidList)}&setParameters=${uploadStatus ? 1 : ''}`
         let data = await getTaskTableList(t),
             usersList = new Set(),
             statusList = new Set()

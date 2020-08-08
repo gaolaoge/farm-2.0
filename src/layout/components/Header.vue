@@ -337,6 +337,7 @@
         handler: function (val) {
           if (!val || val == this.workBenchVal) return false
           this.workBenchVal = val
+          this.changeIsGpu()
         },
         immediate: true
       },
@@ -389,14 +390,16 @@
               d.data.forEach(curr => {
                 this.workBenchList.push({
                   name: curr.zoneName,
-                  val: curr.zoneUuid
+                  val: curr.zoneUuid,
+                  isGpu: curr.isGpu
                 })
               })
-              // this.workBenchVal = this.zoneId
-              // sessionStorage.setItem('zoneUuid', this.zoneId)
             }
           })
           .catch(error => console.log(`工作台下拉框获取报错，${error}`))
+      },
+      changeIsGpu(){
+        this.$store.commit('changeIsGpu', this.workBenchList.find(curr => curr.val == this.workBenchVal).isGpu)
       },
       async getUserInfo() {
         let data = await getInfo(),

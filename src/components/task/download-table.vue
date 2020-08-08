@@ -517,7 +517,7 @@
         //   uploadStatus '',         // 渲染状态
         //   renderStatus: ''         // 工程ID
         // }
-        let t = `zoneUuid=${sessionStorage.getItem('zoneUuid')}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=${condition == 'null' ? '' : condition}&projectUuid=`
+        let t = `zoneUuid=${this.zoneId}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=${condition == 'null' ? '' : condition}&projectUuid=`
         let data = await getRenderTableList(t),
             usersList = new Set()
         this.table.renderTableTotal = data.data.total
@@ -888,7 +888,6 @@
     },
     mounted() {
       if(!this.$route.params.name) setTimeout(() => this.getList(), 100)
-      // document.getElementsByClassName('el-table__expand-icon')
     },
     computed: {
       ...mapState(['zoneId']),

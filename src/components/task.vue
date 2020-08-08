@@ -127,15 +127,6 @@
       <!--窗口主体-->
       <archive-records @refreshTaskBase="x" ref="archiveTable"/>
     </el-dialog>
-    <!--弹窗 新建任务-->
-    <el-dialog :visible.sync="createTaskDialog"
-               :show-close=false
-               top="8vh"
-               width="1100px">
-      <newTask @closeDialogFun="closeDialogFun"
-               @getListAgain="$refs.uploadMode.getList()"
-               :filelist="fileList"/>
-    </el-dialog>
   </div>
 </template>
 
@@ -169,12 +160,6 @@
         btnGroup: {
           uploadBtnGroup: [
             {
-              text: this.$t('task.uploadBtnGroup')[0],
-              class: 'addMoreBtn',
-              initialIcon: require('@/icons/addIcon-black.png'),
-              selectedIcon: require('@/icons/addIcon-white.png')
-            },
-            {
               text: this.$t('task.uploadBtnGroup')[1],
               class: 'deleteBtn',
               initialIcon: require('@/icons/deleteIcon-black.png'),
@@ -190,12 +175,6 @@
             }
           ],
           renderBtnGroup: [
-            {
-              text: this.$t('task.renderBtnGroup')[0],
-              class: 'addMoreBtn',
-              initialIcon: require('@/icons/addIcon-black.png'),
-              selectedIcon: require('@/icons/addIcon-white.png')
-            },
             {
               text: this.$t('task.renderBtnGroup')[1],
               class: 'startBtn',
@@ -252,7 +231,6 @@
         dialogTable: {
           status: false,
         },
-        createTaskDialog: false,
         fileList: []
       }
     },
@@ -344,16 +322,9 @@
       renderTbaleTotalItem(val) {
         this.table.navList[1]['num'] = val
       },
-      // 关闭新建任务弹窗
-      closeDialogFun() {
-        this.createTaskDialog = false
-      },
       // 上传分析 - 操作台
       uploadOperating(ing) {
         switch (ing) {
-          case this.$t('task.uploadBtnGroup')[0]: // 新建任务
-            this.createTask()
-            break
           case this.$t('task.uploadBtnGroup')[1]: // 删除
             if (!this.btnGroup.uploadTableBtnDelete) return false
             this.$refs.uploadMode.deleteItem()
@@ -370,9 +341,6 @@
       // 渲染下载 - 操作台
       renderOperating(ing) {
         switch (ing) {
-          case this.$t('task.renderBtnGroup')[0]: // 新建任务
-            this.createTask()
-            break
           case this.$t('task.renderBtnGroup')[1]: // 开始
             if (!this.btnGroup.downloadTableBtnStart) return false
             this.$refs.renderMode.startFun()
@@ -404,28 +372,6 @@
             this.$refs.renderMode.getList()
             break
         }
-      },
-      // 新建任务
-      createTask() {
-        let inputDom = document.createElement('INPUT')
-        inputDom.type = 'file'
-        inputDom.accept = '.ma,.mb'
-        inputDom.click()
-        inputDom.addEventListener('change', () => {
-
-          if (inputDom.files.length == 1) {
-            this.fileList = [{
-              sceneFile: inputDom.files[0],
-              projectFileList: null,
-              projectFileName: '',
-              inputStatus: false,
-              path: '',
-              id: Math.floor(Math.random() * 100000000000000)
-            }]
-            this.createTaskDialog = true
-          }
-
-        })
       },
       // 上传分析 - 关键字检索
       searchUploadInput() {

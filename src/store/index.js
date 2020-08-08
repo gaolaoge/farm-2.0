@@ -26,6 +26,7 @@ export default new Vuex.Store({
     login: false,
     zoneId: null,           // 所在区ID
     zone: null,             // 分区 1影视区 2效果图区
+    isGup: null,
     socket_plugin: null,    // 与插件关联的websocket
     socket_plugin_msg: null,// 与插件关联的websocket接收的参数
     socket_backS: null,     // 与后台关联的websocket
@@ -81,6 +82,9 @@ export default new Vuex.Store({
     WEBSOCKET_PLUGIN_CLOSE(state){
       if(!state.socket_plugin) return false
       state.socket_plugin.close()
+    },
+    changeIsGpu(s, val) {
+      s.isGup = val
     },
     changeSocket_Plugin(s, val) {
       s.socket_Plugin = val

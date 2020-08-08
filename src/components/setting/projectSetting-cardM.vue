@@ -73,8 +73,8 @@
         <el-table-column
           label="操作">
           <template slot-scope="scope">
-            <span class="operateBtn">{{ tableOperateBtn[0] }}</span>
-            <span class="operateBtn">{{ tableOperateBtn[1] }}</span>
+            <span class="operateBtn" @click="editItem(scope.$index)">{{ tableOperateBtn[0] }}</span>
+            <span class="operateBtn" @click="setItem(scope.$index)">{{ tableOperateBtn[1] }}</span>
           </template>
         </el-table-column>
 
@@ -101,13 +101,54 @@
                  class="name"
                  v-model="createProject.name"
                  :placeholder="createProject.placeholder">
-          <el-checkbox v-model="createProject.checked" label="设为当前项目"/>
+          <el-checkbox v-model="createProject.checked" true-label='1' false-label='0' label="设为当前项目"/>
           <div class="btn-group">
             <div class="farm-btn cancel" @click="createCancelBtnFun">
-              <span>{{ createProject.btnCancel }}</span>
+              <span>{{ btnCancel }}</span>
             </div>
             <div class="farm-btn save" @click="createSaveBtnFun">
-              <span>{{ createProject.btnSave }}</span>
+              <span>{{ btnSave }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--编辑项目dialog-->
+    <div class="editProject" v-show="editBaseShow">
+      <div class="editBase">
+        <div class="tit">
+          <span>{{ editProject.tit }}</span>
+          <img src="@/icons/shutDialogIcon.png" alt="" @click="editCancelBtnFun">
+        </div>
+        <div class="con">
+          <!--缩略图-->
+          <img class="img" :src="editProject.thumbnail" alt="">
+          <!--项目名称-->
+          <div class="item">
+            <span class="label">{{ editProject.nameL }}：</span>
+            <input type="text"
+                   class="name v"
+                   v-model="editProject.nameV">
+          </div>
+          <!--项目状态-->
+          <div class="item">
+            <span class="label">{{ editProject.statusL }}：</span>
+            <el-select v-model="editProject.statusV" class="v" placeholder="请选择">
+              <el-option
+                v-for="item in editProject.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </div>
+          <div class="btn-group">
+            <div class="farm-btn cancel" @click="editCancelBtnFun">
+              <span>{{ btnCancel }}</span>
+            </div>
+            <div class="farm-btn save" @click="editSaveBtnFun">
+              <span>{{ btnSave }}</span>
             </div>
           </div>
         </div>
@@ -131,15 +172,7 @@
     name: 'projectSetting',
     data() {
       return {
-        tableData: [
-          // {
-          //   'createTime'      创建时间
-          //   'projectName'     项目名称
-          //   'customerName'    创建人
-          //   'isDefault':      当前项目 0否 1是
-          //   'projectStatus'   项目状态 0不启用 1启用
-          // },
-        ],
+        tableData: [],
         tableOperateBtn: ['编辑', '设为当前项目'],
         btnGroup: [
           {
@@ -160,19 +193,38 @@
         placeholder: '输入项目名称',
         createProject: {
           tit: '新建项目',
-          name: '',
-          checked: false,
+          name: null,
+          checked: 0,
           placeholder: '请输入项目名称',
-          btnCancel: '取消',
-          btnSave: '确定'
+        },
+        editProject: {
+          tit: '编辑项目',
+          nameL: '项目名称',
+          nameV: null,
+          statusL: '项目状态',
+          statusV: null,
+          thumbnail: null,
+          options: [
+            {
+              value: '1',
+              label: '启动'
+            },
+            {
+              value: '0',
+              label: '禁用'
+            }
+          ],
         },
         createBaseShow: false,
+        editBaseShow: false,
         selectionList: [],
         page: {
           index: 0,
           size: 10,
           total: 0
-        }
+        },
+        btnCancel: '取消',
+        btnSave: '确定'
       }
     },
     watch: {
@@ -216,28 +268,60 @@
           //   updateTime: 1591689369051
           // }
           return {
-            'id': curr.taskProjectUuid,
+            'taskProjectUuid': curr.taskProjectUuid,
             'createTime': createDateFun(new Date(curr.createTime)),
             'projectName': curr.projectName,
             'customerName': curr.customerName,
             'isDefault': curr.isDefault == 0 ? '否' : '是',
-            'projectStatus': curr.projectStatus == 0 ? '禁用' : '启用'
+            'projectStatus': curr.projectStatus == 0 ? '禁用' : '启用',
+            'thumbnail': curr.thumbnail,     // 缩略图
           }
         })
       },
-      // 新建任务-关闭
+      // 新建项目 - 关闭
       createCancelBtnFun() {
         this.createProject.name = ''
         this.createBaseShow = false
       },
-      // 新建任务-保存
+      // 新建项目 - 保存
       async createSaveBtnFun() {
         let c = this.createProject
-        if(!c.name) return false
+        if (!c.name) return false
         let data = await createTask({
           'projectName': c.name,
           'isDefault': c.checked
         })
+        if (data.data.code == 201) {
+          messageFun('success', '创建成功')
+          this.createBaseShow = false
+          Object.assign(this.createProject, {
+            name: null,
+            checked: 0
+          })
+          this.getList('', 1, this.page.size)
+        }
+      },
+      // 编辑项目 - 关闭
+      editCancelBtnFun() {
+        this.editBaseShow = false
+      },
+      // 编辑项目 - 保存
+      async editSaveBtnFun() {
+        let c = this.createProject
+        if (!c.name) return false
+        let data = await createTask({
+          'projectName': c.name,
+          'isDefault': c.checked
+        })
+        if (data.data.code == 201) {
+          messageFun('success', '创建成功')
+          this.createBaseShow = false
+          Object.assign(this.createProject, {
+            name: null,
+            checked: 0
+          })
+          this.getList('', 1, this.page.size)
+        }
       },
       // 操作按钮
       uploadOperating(name) {
@@ -254,14 +338,30 @@
       createProjectFun() {
         this.createBaseShow = true
       },
+      // 项目 - 编辑
+      editItem(index) {
+        this.editBaseShow = true
+        let data = this.tableData[index]
+        Object.assign(this.editProject, {
+          nameV: data.projectName,
+          statusV: data.projectStatus,
+          thumbnail: data.thumbnail
+        })
+      },
+      // 项目 - 设为当前项目
+      setItem(index){
+
+      },
       // 删除
       async deleteFun() {
         let data = await deleteTask({'projectList': this.selectionList.map(curr => curr.id)})
-        if(data.data.code == 201){
+        if (data.data.code == 201) {
           messageFun('success', '操作成功')
-          this.getList(this.searchInputVal, this.page.index + 1, this.page.size)
-        }else if(data.data.code == 1000){
+          this.getList(this.searchInputVal, this.page.index, this.page.size)
+        } else if (data.data.code == 1000) {
           messageFun('error', '操作失败')
+        } else if (data.data.code == 10001) {
+          messageFun('error', '参数无效')
         }
       },
       // 跳页
@@ -298,7 +398,8 @@
     cursor: pointer;
   }
 
-  .createProject {
+  .createProject,
+  .editProject {
     position: fixed;
     display: flex;
     justify-content: center;
@@ -310,9 +411,8 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
 
-    .createBase {
-      width: 588px;
-      height: 273px;
+    .createBase,
+    .editBase {
       background-color: rgba(255, 255, 255, 1);
       box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
       border-radius: 8px;
@@ -344,7 +444,6 @@
         padding: 0px 80px;
 
         .name {
-          width: 428px;
           height: 36px;
           border-radius: 8px;
           border: 1px solid rgba(22, 29, 37, 0.4);
@@ -359,8 +458,61 @@
         .btn-group {
           margin-top: 50px;
           text-align: right;
+          width: 100%;
         }
       }
+    }
+
+    .createBase {
+      width: 588px;
+      height: 273px;
+
+      .con {
+        .name {
+          width: 428px;
+        }
+      }
+    }
+
+    .editBase {
+      width: 398px;
+      height: 455px;
+
+      .con {
+        padding: 0px 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .img {
+          width: 150px;
+          height: 150px;
+          border-radius: 4px;
+          margin: 30px 0px;
+        }
+
+        .item {
+          display: flex;
+          width: 100%;
+          align-items: center;
+          margin-bottom: 15px;
+
+          .label {
+            font-size: 14px;
+            font-family: PingFangSC-Regular, PingFang SC;
+            color: rgba(22, 29, 37, 0.6);
+          }
+
+          .v {
+            flex-grow: 1;
+            margin: 0px;
+            border: 1px solid rgba(22, 29, 37, 0.2);
+            border-radius: 6px;
+          }
+        }
+      }
+
+
     }
   }
 

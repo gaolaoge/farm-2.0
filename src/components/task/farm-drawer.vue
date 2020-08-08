@@ -949,6 +949,7 @@
     itemDownloadStatus
   } from '@/assets/common.js'
   import elTableInfiniteScroll from 'el-table-infinite-scroll'
+  import { mapState } from 'vuex'
 
   export default {
     name: 'farm-drawer',
@@ -1561,26 +1562,22 @@
           p = this.result.operateBtnList[1],   // 暂停
           d = this.result.operateBtnList[2],   // 下载完成帧
           a = this.result.operateBtnList[3]    // 重新渲染
+
         if (t.length > 0 && t.every(item => ['暂停', '暂停（超时）', '暂停（欠费）'].includes(item))) {
           s['classState'] = false
-        } else {
-          s['classState'] = true
-        }
+        } else s['classState'] = true
+
         if (t.length > 0 && t.every(item => ['渲染成功', '渲染失败'].includes(item))) {
           a['classState'] = false
-        } else {
-          a['classState'] = true
-        }
+        } else a['classState'] = true
+
         if (t.length > 0 && t.every(item => ['渲染中', '等待中'].includes(item))) {
           p['classState'] = false
-        } else {
-          p['classState'] = true
-        }
+        } else p['classState'] = true
+
         if (t.length > 0) {
           d['classState'] = false
-        } else {
-          d['classState'] = true
-        }
+        } else d['classState'] = true
 
       },
       // 详情table多选事件
@@ -1665,20 +1662,21 @@
       },
       // 设置参数 - 开始渲染
       async startRenderFun() {
-        if (this.setting.priority.customizeInputError) {
+        let tt = this.setting
+        if (tt.priority.customizeInputError) {
           messageFun('error', '自定义帧错误');
           return false
         }
-        if (this.setting.num.randerError) {
+        if (tt.num.randerError) {
           messageFun('error', '帧范围设定存在错误');
           return false
         }
-        if (this.setting.num.numError) {
+        if (tt.num.numError) {
           messageFun('error', '帧间隔设定存在错误');
           return false
         }
 
-        let layerSetSettingList = this.setting.num.selected.map(curr => {
+        let layerSettingsList = tt.num.selected.map(curr => {
           // id: '1',
           // name: '默认层',
           // range: '1-24',
@@ -1689,34 +1687,45 @@
           // camera: '相机二',
           return {
             layerName: curr.name,                                 // 层名
-            layerUuid: curr.id,                                   // 层ID
+            // layerUuid: curr.id,                                // 层ID
             frameStart: Number(curr.range.split('-')[0]),         // 帧范围起始帧
             frameEnd: Number(curr.range.split('-')[1]),           // 帧范围结束帧
             frameIterval: Number(curr.num),                       // 间隔帧数
             camera: curr.camera,                                  // 相机
             width: curr.w,                                        // 图像宽度
             height: curr.h,                                       // 图像高度
-            format: curr.format.split('-')[0],                    // 输出格式Val
-            formatName: curr.format.split('-')[1],                // 输出格式Label
-            codeUuid: curr.format.split('-')[2]                   // 输出格式Uuid
+            formatName: curr.format.split('-')[1],                // 输出格式Val
+            // codeUuid: curr.format.split('-')[2],               // 输出格式Uuid
+            imageName: '',
+            ratio: 0
           }
         })
 
         let data = await startRender({
           taskUuid: this.taskData.taskUuid,                       // 项目Uuid
-          layer: Number(this.setting.num.singleChoiceVal),        // 启动分层渲染
-          testRendering: this.setting.priority.topVal == '1' || this.setting.priority.middleVal == '1' || this.setting.priority.bottomVal == '1' ? '1' : '0',  // 开启优先渲染
-          frameFirst: this.setting.priority.topVal,               // 首帧
-          frameMiddle: this.setting.priority.middleVal,           // 中间帧
-          frameFinally: this.setting.priority.bottomVal,          // 尾帧
-          frameCustom: this.setting.priority.selfVal,             // 自定义
-          frameCustomNo: this.setting.priority.customize.match(/\d/g),         // 自定义帧
-          allocation: this.setting.mode.mode,                     // 渲染模式
-          projectUuid: this.setting.other.view.split('-/-')[0],     // 所属项目ID
-          projectName: this.setting.other.view.split('-/-')[1],     // 所属项目label
-          frameTimeoutWarn: this.setting.other.remindVal,         // 超时提醒
-          frameTimeoutStop: this.setting.other.stopVal,           // 超时停止
-          layerSetSettingList
+          layer: Number(tt.num.singleChoiceVal),                  // 启动分层渲染
+          frameCustomNo: tt.priority.customize.match(/\d/g) || [],// 自定义帧
+          layerSettingsList,
+          // ----------------------
+          isGpu: this.isGup,                                       // 是否为gpu，分区信息对象可找到
+          taskType: this.zone,                                     // 任务类型 1，影视版；2，效果图.
+          taskSource: 1,                                           // 任务来源 ，网页端 1
+          frameCustom: Number(tt.priority.selfVal),                // 是否开启自定义帧1是，0否
+          colorChannel: this.zone == 1 ? 0 : null,                 // 颜色通道。影视版固定值0
+          aoChannel: this.zone == 1 ? 0 : null,                    // AO通道。影视版固定值0
+          renderPattern: tt.mode.mode,                             // 选中的配置编号 渲染模式
+          testRender: {                                            // 测试帧对象
+            testRendering: tt.priority.topVal == '1' || tt.priority.middleVal == '1' || tt.priority.bottomVal == '1' ? '1' : '0',        // 是否开启测试帧（优先渲染）1是0否
+            frameFirst: tt.priority.topVal,                        // 首帧 1是 0否
+            frameMiddle: tt.priority.middleVal,                    // 中间帧
+            frameFinally: tt.priority.bottomVal                    // 末帧
+          },
+          otherSettings: {                                         // 其他设置
+            projectName: tt.other.view.split('-/-')[1],            // 项目名称
+            projectUuid: tt.other.view.split('-/-')[0],            // 项目uuid
+            frameTimeoutWarn: tt.other.remindVal,                  // 超时警告
+            frameTimeoutStop: tt.other.stopVal                     // 超时停止
+          }
         })
         if (data.data.code == 200) {
           this.closeDrawer()
@@ -1966,6 +1975,9 @@
         messageFun('error', text)
         this.setting.priority.customizeInputError = true
       }
+    },
+    computed: {
+      ...mapState(['zone', 'isGup'])
     }
   }
 </script>
