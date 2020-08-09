@@ -668,13 +668,14 @@
                    @click="operateFun(item.text)"
                    v-for="(item,index) in result.operateBtnList"
                    :key="index">
-                <img :src="item.imgUrl" alt="" v-if="item.imgUrl">
+                <img :src="item.imgUrlR" alt="" v-if="item.imgUrl" v-show="item.classState">
+                <img :src="item.imgUrlH" alt="" v-if="item.imgUrl" v-show="!item.classState">
                 <span class="text">
                 {{ item.text }}
               </span>
               </div>
               <div class="searchBase">
-                <img src="@/icons/searchIcon.png" alt="" class="i" @click="getRenderItemMoreTableF">
+                <img src="@/icons/global-search-icon.png" alt="" class="i" @click="getRenderItemMoreTableF">
                 <input type="text"
                        v-model="result.searchInpVal"
                        class="search"
@@ -694,7 +695,7 @@
               </span>
               </div>
               <div class="searchBase">
-                <img src="@/icons/searchIcon.png"
+                <img src="@/icons/global-search-icon.png"
                      alt=""
                      class="i"
                      @click="">
@@ -949,7 +950,7 @@
     itemDownloadStatus
   } from '@/assets/common.js'
   import elTableInfiniteScroll from 'el-table-infinite-scroll'
-  import { mapState } from 'vuex'
+  import {mapState} from 'vuex'
 
   export default {
     name: 'farm-drawer',
@@ -1062,11 +1063,13 @@
             modeList: [
               {
                 val: '2002',
-                label: '16核32G【标准模式1】'
+                label: '16核32G【标准模式1】',
+                id: '224',
               },
               {
                 val: '32核64G【标准模式2】',
-                label: '32核64G【标准模式2】'
+                label: '32核64G【标准模式2】',
+                id: ''
               }
               // {
               //   val: '32核128G【标准模式3】',
@@ -1136,12 +1139,14 @@
           // 主 table 操作
           operateBtnList: [
             {
-              imgUrl: require('@/icons/playIcon-blue.png'),
+              imgUrlR: require('@/icons/playIcon-blue.png'),
+              imgUrlH: require('@/icons/playIcon-blue.png'),
               text: '开始',
               classState: true
             },
             {
-              imgUrl: require('@/icons/pauseIcon-blue.png'),
+              imgUrlR: require('@/icons/pauseIcon-blue.png'),
+              imgUrlH: require('@/icons/pauseIcon-blue.png'),
               text: '暂停',
               classState: true
             },
@@ -1713,7 +1718,7 @@
           frameCustom: Number(tt.priority.selfVal),                // 是否开启自定义帧1是，0否
           colorChannel: this.zone == 1 ? 0 : null,                 // 颜色通道。影视版固定值0
           aoChannel: this.zone == 1 ? 0 : null,                    // AO通道。影视版固定值0
-          renderPattern: tt.mode.mode,                             // 选中的配置编号 渲染模式
+          renderPattern: tt.mode.modeList.find(curr => curr.val == tt.mode.mode).id,   // 选中的配置编号 渲染模式
           testRender: {                                            // 测试帧对象
             testRendering: tt.priority.topVal == '1' || tt.priority.middleVal == '1' || tt.priority.bottomVal == '1' ? '1' : '0',        // 是否开启测试帧（优先渲染）1是0否
             frameFirst: tt.priority.topVal,                        // 首帧 1是 0否
@@ -1788,7 +1793,7 @@
           messageFun('error', '报错，操作失败')
         }
       },
-      // 渲染结果 - 主 - 操作 - 下载完成帧
+      // 渲染结果 - 主 - 操作 - 5 526 u6 uy6 下载完成帧
       async operateDownloadFrame() {
         if (this.result.operateBtnList[2]['classState']) return false
         let data = await seeBalance()
@@ -2001,7 +2006,6 @@
 
     .switchLayeredText {
       font-size: 14px;
-      font-weight: 400;
       color: rgba(255, 255, 255, 0.6);
       vertical-align: middle;
       display: inline-block;
@@ -2064,7 +2068,6 @@
     .info {
       margin-left: 122px;
       font-size: 12px;
-      font-weight: 400;
       color: rgba(255, 191, 0, 1);
 
       img {
@@ -2100,7 +2103,6 @@
             display: inline-block;
             margin-left: 4px;
             font-size: 14px;
-            font-weight: 400;
             color: rgba(10, 98, 241, 1);
             cursor: pointer;
 
@@ -2207,11 +2209,12 @@
         padding: 10px;
         box-sizing: border-box;
         border-radius: 4px;
-        background-color: rgba(255, 255, 255, 0.05);
         margin-bottom: 23px;
+        box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.15);
 
         .img {
           width: 240px;
+          box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.1);
         }
 
         .status {
@@ -2220,7 +2223,6 @@
           display: inline-block;
           margin-top: 15px;
           font-size: 14px;
-          font-weight: 400;
 
           &::before {
             content: '';
@@ -2279,7 +2281,7 @@
         padding: 20px;
         box-sizing: border-box;
         border-radius: 4px;
-        background-color: rgba(255, 255, 255, 0.05);
+        box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.15);
 
         .item {
           margin-bottom: 15px;
@@ -2289,8 +2291,7 @@
             width: 70px;
             height: 20px;
             font-size: 14px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(22, 29, 37, 0.8);
             margin-right: 19px;
           }
 
@@ -2300,7 +2301,7 @@
             width: 130px;
             font-size: 14px;
             font-weight: 400;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(22, 29, 37, 0.6);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -2319,40 +2320,35 @@
         border-radius: 4px;
         height: calc(100vh - 234px);
         background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.15);
 
         .operateBtnBase {
           .operateBtn {
             display: inline-flex;
             align-items: center;
-            background-color: rgba(33, 41, 51, 1);
+            background-color: rgba(248, 248, 248, 1);
+            border: 1px solid rgba(22, 29, 37, 0.1);
             border-radius: 5px;
-            padding: 3px 15px;
-            box-sizing: border-box;
             cursor: pointer;
             margin-right: 10px;
+            padding: 1px 10px;
 
             .text {
               font-size: 13px;
-              font-weight: 400;
-              color: rgba(0, 97, 255, 1);
-              line-height: 18px;
+              color: rgba(22, 29, 37, 0.79);
             }
 
             img {
               width: 8px;
               margin-right: 4px;
-              /*vertical-align: sub;*/
             }
 
             &.cannotTrigger {
               cursor: no-drop;
 
-              img {
-                opacity: 0;
-              }
-
               span {
-                color: rgba(255, 255, 255, 0.1);
+                color: rgba(22, 29, 37, 0.39);
               }
             }
           }
@@ -2367,7 +2363,7 @@
               border-radius: 4px;
               border: 1px solid rgba(0, 97, 255, 0.5);
               background-color: transparent;
-              color: rgba(255, 255, 255, 0.6);
+              color: rgba(22, 29, 37, 0.6);
               outline: none;
               padding-left: 24px;
               box-sizing: border-box;
@@ -2463,13 +2459,14 @@
         background-color: rgba(255, 255, 255, 0.05);
         display: flex;
         justify-content: space-around;
+        border-radius: 4px;
+        box-shadow: 0px 0px 1px 1px rgba(22, 29, 37, 0.15);
 
         .happen-item {
           .label,
           .val {
             font-size: 14px;
-            font-weight: 400;
-            color: rgba(0, 228, 255, 0.8);
+            color: rgba(27, 83, 244, 1);
           }
         }
       }
