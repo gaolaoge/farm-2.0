@@ -668,8 +668,8 @@
                    @click="operateFun(item.text)"
                    v-for="(item,index) in result.operateBtnList"
                    :key="index">
-                <img :src="item.imgUrlR" alt="" v-if="item.imgUrl" v-show="item.classState">
-                <img :src="item.imgUrlH" alt="" v-if="item.imgUrl" v-show="!item.classState">
+                <img :src="item.imgUrlR" alt="" v-if="item.imgUrlR" class="r">
+                <img :src="item.imgUrlH" alt="" v-if="item.imgUrlH" class="h">
                 <span class="text">
                 {{ item.text }}
               </span>
@@ -1139,14 +1139,14 @@
           // 主 table 操作
           operateBtnList: [
             {
-              imgUrlR: require('@/icons/playIcon-blue.png'),
-              imgUrlH: require('@/icons/playIcon-blue.png'),
+              imgUrlR: require('@/icons/playIcon-black.png'),
+              imgUrlH: require('@/icons/playIcon-white.png'),
               text: '开始',
               classState: true
             },
             {
-              imgUrlR: require('@/icons/pauseIcon-blue.png'),
-              imgUrlH: require('@/icons/pauseIcon-blue.png'),
+              imgUrlR: require('@/icons/pauseIcon-black.png'),
+              imgUrlH: require('@/icons/pauseIcon-white.png'),
               text: '暂停',
               classState: true
             },
@@ -1848,7 +1848,7 @@
       // 渲染结果 - 详情 - 操作 - 下载日志
       async moreOperateDownload() {
         let data = await downloadLog(`layerTaskUuid=${this.result.detailsTableData[0]['layerTaskUuid']}&frameTaskUuid=${this.result.detailsTableData[0]['frameTaskUuid']}`)
-        exportDownloadFun(data, data.headers.file, 'text')
+        // exportDownloadFun(data, data.headers.file, 'text')  事件交接给C
       },
       // 分析结果 - 进入设置参数
       async setParameter() {
@@ -2342,6 +2342,10 @@
             img {
               width: 8px;
               margin-right: 4px;
+
+              &.h {
+                display: none;
+              }
             }
 
             &.cannotTrigger {
@@ -2349,6 +2353,29 @@
 
               span {
                 color: rgba(22, 29, 37, 0.39);
+              }
+
+              img {
+                opacity: 0.39;
+              }
+            }
+
+            &:not(.cannotTrigger):hover {
+              background-color: rgba(27, 83, 244, 1);
+              border: 1px solid rgba(27, 83, 244, 1);
+
+              .text {
+                color: rgba(255, 255, 255, 1);
+              }
+
+              img {
+                &.h {
+                  display: inline-block;
+                }
+
+                &.r {
+                  display: none;
+                }
               }
             }
           }
@@ -2416,17 +2443,16 @@
             flex-shrink: 1;
             flex-grow: 1;
             border-radius: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(22, 29, 37, 0.1);
             margin-top: 30px;
             padding: 20px 15px;
             box-sizing: border-box;
-            /*max-height: calc(100vh - 500px);*/
             overflow-y: auto;
 
             /deep/ .p {
               font-size: 13px;
               font-weight: 400;
-              color: rgba(255, 255, 255, 0.59);
+              color: rgba(22, 29, 37, 0.59);
               line-height: 18px;
             }
 

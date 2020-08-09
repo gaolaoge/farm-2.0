@@ -123,7 +123,10 @@
         </div>
         <div class="con">
           <!--缩略图-->
-          <img class="img" :src="editProject.thumbnail" alt="">
+          <div class="imgB">
+            <div class="avatarEdit" @click="avatarEditFun"><span>{{ editAvatar }}</span></div>
+            <img class="img" :src="editProject.thumbnail" alt="">
+          </div>
           <!--项目名称-->
           <div class="item">
             <span class="label">{{ editProject.nameL }}：</span>
@@ -154,6 +157,13 @@
         </div>
       </div>
     </div>
+
+    <!--修改头像-->
+    <avatar-cutter v-show="showCutter"
+                   @cancel="showCutter = false"
+                   return-type="url"
+                   @enter="saveAvatar"
+                   ref="avatarEdit"/>
   </div>
 </template>
 
@@ -167,6 +177,7 @@
     messageFun,
     createDateFun
   } from "@/assets/common"
+  import AvatarCutter from '@/components/farm-model/farm-avatarCutter'
 
   export default {
     name: 'projectSetting',
@@ -224,7 +235,9 @@
           total: 0
         },
         btnCancel: '取消',
-        btnSave: '确定'
+        btnSave: '确定',
+        editAvatar: '修改图片',
+        showCutter: false,
       }
     },
     watch: {
@@ -236,9 +249,26 @@
       }
     },
     methods: {
+      // 编辑头像
+      avatarEditFun(){
+        let input = document.createElement('INPUT')
+        input.type = 'file'
+        input.accept = '.jpg,.jpeg,.png'
+        input.addEventListener('change', event => {
+          this.showCutter = true
+          this.$refs.avatarEdit.fileChange(event)
+        })
+        input.click()
+      },
       handleSelectionChange(val) {
         this.selectionList = val
       },
+      // 保存裁剪好的头像
+      saveAvatar(src){
+        this.editProject.thumbnail = src
+        this.showCutter = false
+      },
+
       // 关键字搜索
       getData() {
         this.getList(this.searchInputVal, 1, this.page.size)
@@ -349,7 +379,7 @@
         })
       },
       // 项目 - 设为当前项目
-      setItem(index){
+      setItem(index) {
 
       },
       // 删除
@@ -371,7 +401,10 @@
     },
     mounted() {
       this.getList('', 1, this.page.size)
-    }
+    },
+    components: {
+      AvatarCutter,
+    },
   }
 </script>
 
@@ -484,11 +517,40 @@
         flex-direction: column;
         align-items: center;
 
-        .img {
+        .imgB {
+          position: relative;
           width: 150px;
           height: 150px;
           border-radius: 4px;
           margin: 30px 0px;
+          overflow: hidden;
+
+          .img {
+            width: 100%;
+          }
+
+          .avatarEdit {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0);
+            text-align: center;
+
+            span {
+              font-size: 14px;
+              line-height: 150px;
+              color: rgba(255, 255, 255, 0);
+            }
+          }
+
+          &:hover .avatarEdit {
+            background-color: rgba(0, 0, 0, 0.7);
+
+            span {
+              color: rgba(255, 255, 255, 1);
+            }
+          }
         }
 
         .item {

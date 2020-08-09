@@ -12,7 +12,7 @@
     <section class="stepGroup">
       <!--面包屑-->
       <div class="navL">
-        <ul>
+        <ul :class="[{'professionC': taskType == 'profession'}]">
           <li class="li" :class="[{'active': index + 1 == stepBtnActive}]" v-for="(item,index) in navL" :key="index">
             <svg width="277" height="37" class="f svg" v-show="index == 0">
               <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 Z" fill="rgba(27, 83, 244, 1)"/>
@@ -398,8 +398,12 @@
           <span>{{ btn.previous }}</span>
         </div>
         <!--下一步-->
-        <div class="btnGroup-btn confirm" @click="stepBtnActive = 3">
+        <div class="btnGroup-btn confirm" @click="stepBtnActive = 3" v-show="taskType != 'profession'">
           <span>{{ btn.next }}</span>
+        </div>
+        <!--确定-->
+        <div class="btnGroup-btn confirm" @click.once="confirmFun" v-show="taskType == 'profession'">
+          <span>{{ btn.confirm }}</span>
         </div>
       </div>
       <!--设置渲染参数-->
@@ -776,7 +780,7 @@
             startBtn: '开始渲染'
           }
         },
-        innerVisible: false,      //添加模板
+        innerVisible: false,        //添加模板
         // 添加模板窗口
         dialogAdd: {
           title: '添加模板',
@@ -837,8 +841,9 @@
           editOrAdd: '',
           index: null      //编辑已存在模板时模板的索引
         },
-        infoMessageShow: false,    // 选择渲染文件 - 我的电脑 - 工程路径 - 问号
-        renderFileTypeList: []     // 可用的场景文件格式
+        infoMessageShow: false,     // 选择渲染文件 - 我的电脑 - 工程路径 - 问号
+        renderFileTypeList: [],     // 可用的场景文件格式
+        taskType: null,             // 渲染模式 profession 专业版  easy 一键版
       }
     },
     props: {},
@@ -1272,21 +1277,21 @@
           pattern: this.taskType == 'easy' ? 1 : 2,          // 渲染模式
           patternNorm: fir.index == 0 ? 2 : 1,               // 提交模式
           source: 1,                                         // 任务来源
-          filePathList: fir.index == 0 ? null : [
-            {
-              filePath: {
-                fileType: '1',
-                inFileName: 'sdfsdf',
-                fileName: 'sdf',
-                inResourceName: 'sdf',
-                inFilePath: 'fgb',
-                inResourcePath: 'sdf',
-                pathScene: 'sdf',
-                pathResource: 'sdf'
-              }
-            },
+          filePathList: fir.index == 1 ? null : [            // 选中的文件
+            // {
+            //   filePath: {
+            //     fileType: '1',                // 存储类型： "1" 本地挂载 ；"2" 分布式文件系统
+            //     inFileName: 'sdfsdf',         // 场景源文件上传后保存路径-分布系统名
+            //     fileName: 'sdf',              // 场景源文件上传后保存路径-文件名称+后缀
+            //     inResourceName: 'sdf',        // 工程资源(服务器存放地址)-分布系统名
+            //     inFilePath: 'fgb',            // 场景文件服务器地址
+            //     inResourcePath: 'sdf',        // 工程路径服务器地址
+            //     pathScene: 'sdf',             // 场景文件用户本地地址
+            //     pathResource: 'sdf'           // 工程路径用户本地地址
+            //   }
+            // },
           ],
-          commitTaskDTO: this.taskType != 'easy' ? null : {
+          commitTaskDTO: this.taskType == 'profession' ? null : {
             layer: Number(thi.other.stratifyVal),        // 是否开启分层渲染。1开启，0关闭
             renderPattern: thi.mode.mode,                // 渲染模式编号
             taskType: this.zone,                         // 任务类型 看分区
@@ -1321,8 +1326,8 @@
         }
       },
       // 4.创建成功
-      createSuc(){
-        if(this.stepOneBase.index == 0) this.savePathFun()   // 保存工程路径记录
+      createSuc() {
+        if (this.stepOneBase.index == 0) this.savePathFun()   // 保存工程路径记录
         else this.shutWebsocket()                            // 关闭与插件的websocket连接
         messageFun('success', '创建成功')
         this.closeDialogFun()
@@ -1346,33 +1351,34 @@
             }
             return children
           }
+
           this.stepOneBase.netdisc.catalogData = this.stepOneBase.netdisc.catalogData.concat(g(JSON.parse(item)))
         })
       },
       // 4.设置渲染参数 - 上传工程路径记录
       savePathFun() {
-        savePath({ 'sceneFilePath': '/demo' })
+        savePath({'sceneFilePath': '/demo'})
       },
       // 4.复位
-      dataReset(){
+      dataReset() {
         this.stepBtnActive = 1    // 步骤退回到第一步
         this.stepOneBase.index = 0
-        Object.assign(this.stepOneBase.netdisc,{
+        Object.assign(this.stepOneBase.netdisc, {
           selectionDefault: [],   // 选中场景文件
           catalogData: [],        // 工程路径 - 树状图
           treeData: [],           // 渲染文件 - 树状图
           sceneFilePath: [],      // 场景文件 - 面包屑
         })
-        Object.assign(this.stepOneBase.local,{
+        Object.assign(this.stepOneBase.local, {
           filelist: [],           // 渲染文件
           selectionR: [],         // 多选渲染文件值
         })
-        Object.assign(this.stepThreeBase.priority,{
+        Object.assign(this.stepThreeBase.priority, {
           topVal: '1',            // 首帧
           middleVal: '1',         // 中间帧
           bottomVal: '1',         // 末帧
         })
-        Object.assign(this.stepThreeBase.other,{
+        Object.assign(this.stepThreeBase.other, {
           view: null,             // 选中项目
           remindVal: 12,          // 单帧超时提醒
           stopVal: 24,            // 单帧超时停止
@@ -1519,6 +1525,12 @@
         ul {
           display: flex;
           flex-direction: row;
+
+          &.professionC {
+            li:nth-of-type(3) {
+              display: none;
+            }
+          }
         }
 
         .li {
