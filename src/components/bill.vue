@@ -125,7 +125,7 @@
 
 <script>
   import rechargeCentre from '@/components/bill/recharge-centre.vue'
-  import consumption from '@/components/bill/consumption.vue'
+  import consumption from '@/components/bill/consumption-tableM.vue'
   import invoicing from '@/components/bill/invoicing.vue'
   import {
     mapState

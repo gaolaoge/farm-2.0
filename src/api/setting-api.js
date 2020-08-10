@@ -28,6 +28,24 @@ export function deleteTask(data){
   })
 }
 
+// 项目设置 - 编辑任务
+export function editTask(data){
+  return businessServer({
+    url: `/professional/project/updateCustomerProject`,
+    method: 'POST',
+    data
+  })
+}
+
+// 项目设置 - 编辑任务
+export function setDefault(data){
+  return businessServer({
+    url: `/professional/project/updateDefaultProject`,
+    method: 'POST',
+    data
+  })
+}
+
 // 渲染设置 - 获取设定参数
 export function getSetData(){
   return businessServer({

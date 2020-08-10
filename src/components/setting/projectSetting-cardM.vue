@@ -74,7 +74,7 @@
           label="操作">
           <template slot-scope="scope">
             <span class="operateBtn" @click="editItem(scope.$index)">{{ tableOperateBtn[0] }}</span>
-            <span class="operateBtn" @click="setItem(scope.$index)">{{ tableOperateBtn[1] }}</span>
+            <span class="operateBtn" @click="setItem(scope.row.taskProjectUuid)">{{ tableOperateBtn[1] }}</span>
           </template>
         </el-table-column>
 
@@ -171,7 +171,9 @@
   import {
     getObjectList,
     createTask,
-    deleteTask
+    deleteTask,
+    editTask,
+    setDefault
   } from '@/api/setting-api.js'
   import {
     messageFun,
@@ -215,13 +217,14 @@
           statusL: '项目状态',
           statusV: null,
           thumbnail: null,
+          taskProjectUuid: null,
           options: [
             {
-              value: '1',
+              value: 1,
               label: '启动'
             },
             {
-              value: '0',
+              value: 0,
               label: '禁用'
             }
           ],
@@ -337,19 +340,16 @@
       },
       // 编辑项目 - 保存
       async editSaveBtnFun() {
-        let c = this.createProject
-        if (!c.name) return false
-        let data = await createTask({
-          'projectName': c.name,
-          'isDefault': c.checked
+        let c = this.editProject
+        let data = await editTask({
+          'projectName': c.nameV,
+          'projectStatus': c.statusV,
+          'taskProjectUuid': c.taskProjectUuid,
+          'thumbnail': c.thumbnail
         })
         if (data.data.code == 201) {
-          messageFun('success', '创建成功')
-          this.createBaseShow = false
-          Object.assign(this.createProject, {
-            name: null,
-            checked: 0
-          })
+          messageFun('success', '编辑成功')
+          this.editBaseShow = false
           this.getList('', 1, this.page.size)
         }
       },
@@ -374,13 +374,20 @@
         let data = this.tableData[index]
         Object.assign(this.editProject, {
           nameV: data.projectName,
-          statusV: data.projectStatus,
-          thumbnail: data.thumbnail
+          statusV: data.projectStatus == '禁用' ? 0 : 1,
+          thumbnail: data.thumbnail,
+          taskProjectUuid: data.taskProjectUuid
         })
       },
       // 项目 - 设为当前项目
-      setItem(index) {
-
+      async setItem(id) {
+        let data = await setDefault({
+          'taskProjectUuid': id
+        })
+        if(data.data.code == 201){
+          messageFun('success', '设置成功')
+          this.getList('', 1, this.page.size)
+        }
       },
       // 删除
       async deleteFun() {
@@ -483,7 +490,7 @@
           background-color: transparent;
           outline: none;
           margin: 20px 0px;
-          padding-left: 20px;
+          padding-left: 16px;
           box-sizing: border-box;
           color: rgba(22, 29, 37, 1);
         }
