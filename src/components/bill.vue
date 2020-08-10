@@ -124,9 +124,9 @@
 </template>
 
 <script>
-  import rechargeCentre from '@/components/bill/recharge-centre.vue'
+  import rechargeCentre from '@/components/bill/rechargeCentre-tableM.vue'
   import consumption from '@/components/bill/consumption-tableM.vue'
-  import invoicing from '@/components/bill/invoicing.vue'
+  import invoicing from '@/components/bill/invoice-tableM.vue'
   import {
     mapState
   } from 'vuex'
