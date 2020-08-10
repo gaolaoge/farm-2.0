@@ -132,7 +132,7 @@
         layout="prev, pager, next, jumper"
         @current-change="jump"
         :current-page.sync="table.currentPage"
-        :total="table.outPutTableTotal"/>
+        :total="table.total"/>
     </div>
   </div>
 </template>
@@ -151,7 +151,8 @@
     downloadReceipt
   } from '@/api/api'
   import {
-    getInvoiceList
+    getInvoiceList,
+    getHeadersList
   } from '@/api/bill-api'
 
   export default {
@@ -169,24 +170,6 @@
 //               email: '',            // 邮箱
 //               date: '',             // 开票时间
 //             },
-            {
-              invoice: '青岛很厉害科技有限公司',
-              invoiceNum: '27937293688628648',
-              invoiceAmount: '100.00',
-              invoiceType: '增值税普票',
-              invoiceState: '审核中',
-              email: '1738683@163.com',
-              date: '2020-03-02 00:23:46'
-            },
-            {
-              invoice: '青岛特别能控股有限集团',
-              invoiceNum: '27937293688628648',
-              invoiceAmount: '287.34',
-              invoiceType: '增值税普票',
-              invoiceState: '已发送',
-              email: '376yegww@qq.com',
-              date: '2020-03-02 00:23:46'
-            }
           ],
           statusList: [
             {text: '上传中', value: '上传中...'},
@@ -199,7 +182,7 @@
             {text: '分析失败', value: '分析失败'},
             {text: '已放弃', value: '已放弃'},
           ],
-          tableTotal: 0,
+          total: 0,
           currentPage: 1,
           pageSize: 10,
           selectionList: [],            //渲染输出选中项
@@ -207,12 +190,7 @@
         filter: {
           tradingtatusLabel: '发票抬头',
           tradingtatusVal: '',
-          tradingtatusList: [
-            {
-              label: '示例',
-              value: null
-            }
-          ],
+          tradingtatusList: [],         // 发票抬头列表
           paymentMethodLabel: '发票状态',
           paymentMethodVal: '',
           paymentMethodList: [
@@ -285,37 +263,33 @@
       },
       // 获取table数据
       async getList(t) {
-          data = await getInvoiceList(t)
-        this.table.outPutTableTotal = data.data.total
-        this.table.rechargeData = data.data.data.map(curr => {
-          curr.operate = '-'
-          switch (curr.paymentStatus) {
+        let data = await getInvoiceList(t)
+        this.table.total = data.data.total
+        this.table.invoicingData = data.data.data.map(curr => {
+          let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime)),
+              status
+          switch(curr.invoiceStatus){
+            case 0:
+              status = '审核中'
+              break
             case 1:
-              curr.paymentStatus = '成功'
-              if (curr.actualPayment) curr.operate = '下载收据'
+              status = '审核通过'
               break
             case 2:
-              curr.paymentStatus = '失败'
+              status = '审核不过'
               break
             case 3:
-              curr.paymentStatus = '待付款'
-              if (curr.actualPayment) curr.operate = '待付款'
+              status = '已发送'
               break
           }
-          if (!curr.actualPayment) curr.actualPayment = '-'
-          let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime))
           return {
-            id: curr.outTradeNo,                // 交易ID
-            state: curr.paymentStatus,            // 交易状态
-            realPay: curr.actualPayment,          // 实际支付金额（元）
-            realArrive: curr.arrivalAmount,       // 充值到账（金币）
-            directions: curr.rechargeExplain,     // 充值说明
-            paymentMethod: curr.paymentTitle == '1' ? '支付宝' : '-',                      // 充值方式
-            singleNumber: curr.productOrderUuid ? curr.productOrderUuid : '-',  // 支付单号
-            date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,                // 交易时间
-            dateDefault: curr.updateTime,
-            invoice: curr.invoice,                // 开票标识
-            operate: curr.operate                 // 操作
+              invoice: curr.invoiceTitle,          // 发票抬头
+              invoiceNum: curr.taxpayerId,         // 纳税人标识号
+              invoiceAmount: curr.invoiceAmount,   // 发票金额（元）
+              invoiceType: curr.invoiceType == 0 ? '增值税普票' : '-',           // 发票类型
+              invoiceState: status,     // 发票状态
+              email: curr.email,                   // 邮箱
+              date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,   // 开票时间
           }
         })
       },
@@ -366,6 +340,16 @@
           let data = await downloadReceipt(t)
           exportDownloadFun(data, '收据', 'pdf')
         }
+      },
+      // 获取发票抬头list
+      async getHeadersListF(){
+        let data = await getHeadersList()
+        if(data.data.code == 200) this.filter.tradingtatusList = data.data.data.map(curr => {
+          return {
+            value: curr,
+            label: curr
+          }
+        })
       }
     },
     mounted() {
@@ -374,6 +358,7 @@
           data = `pageSize=${t.pageSize}&pageIndex=${t.currentPage}&invoiceTitle=${f.tradingtatusVal}&beginTime=${f.inquireValS}&endTime=${f.inquireValV.getTime()}&invoiceStatus=${f.paymentMethodVal}&sortColumn=0&sortBy=0`
       this.getList(data)
       createTableIconList()
+      this.getHeadersListF()
     }
   }
 </script>

@@ -9,3 +9,11 @@ export function getInvoiceList(data) {
     method: 'GET'
   })
 }
+
+// 开票记录 - 获取列表
+export function getHeadersList() {
+  return businessServer({
+    url: `/billing/invoice/getInvoiceTitleList`,
+    method: 'GET'
+  })
+}

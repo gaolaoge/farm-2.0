@@ -82,7 +82,7 @@
               {{ remind.cumulativeBillingAmount }}：
             </span>
             <span class="val">
-              null
+              {{ user.totalInvoiceAmount }}
             </span>
           </span>
           <span class="it">
@@ -90,7 +90,7 @@
               {{ remind.invoicableAmount }}：
             </span>
             <span class="val">
-              null
+              {{ user.totalInvoiceAble }}
             </span>
           </span>
         </span>

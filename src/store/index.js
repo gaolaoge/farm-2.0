@@ -17,6 +17,8 @@ export default new Vuex.Store({
       payAmount: '0.000',   // 累计支付金币
       goldCoins: '0.000',   // 累计到账金币
       consumption: '0.00',  // 累计消费金币
+      totalInvoiceAmount: 0,// 已开票金额
+      totalInvoiceAble: 0,  // 可开票金额
       level: null,
       birthday: null,
       email: null,
@@ -84,6 +86,12 @@ export default new Vuex.Store({
       if(!state.socket_plugin) return false
       state.socket_plugin.close()
       state.socket_plugin = null
+    },
+    changeTotalInvoiceAble(s, val){
+      s.user.totalInvoiceAble = val
+    },
+    changeTotalInvoiceAmount(s, val){
+      s.user.totalInvoiceAmount = val
     },
     changeTaskType(s, val){
       s.taskType = val

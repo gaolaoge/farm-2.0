@@ -204,6 +204,8 @@ const setInfo = function (data) {
   store.commit('changeSex', data.sex)                                                            // 性别
   store.commit('changeZone', data.zone)                                                          // 分区 1影视区 2效果图区
   store.commit('changeZoneId', data.zoneUuid)                                                    // 所在区ID
+  store.commit('changeTotalInvoiceAmount', data.totalInvoiceAmount)                              // 已开票金额
+  store.commit('changeTotalInvoiceAble', data.totalInvoiceAble)                                  // 可开票金额
   store.commit('changeUserBalance', data.goldBalance.toFixed(3))                      // 金币余额
   store.commit('changeHaveCapacity', (data.haveCapacity / 1073741824).toFixed(3))     // 剩余容量
   store.commit('changePayAmount', data.cumulativeRecharge.toFixed(3))                 // 累计支付金额
