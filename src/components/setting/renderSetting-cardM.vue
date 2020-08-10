@@ -49,6 +49,9 @@
     getSetData,
     setSetData
   } from '@/api/setting-api'
+  import {
+    mapState
+  } from 'vuex'
   import {messageFun} from "../../assets/common";
 
   export default {
@@ -94,7 +97,10 @@
           'frameTimeoutStop': this.stopVal,
           'taskEarlyWarning': this.warningVal
         })
-        if(data.data.code == 201) messageFun('success', '设置成功')
+        if(data.data.code == 201) {
+          messageFun('success', '设置成功')
+          this.$store.commit('changeTaskType', this.switchV == '1' ? 'profession' : 'easy')
+        }
       },
       // 修改单帧超时提醒
       veriRemind(){
@@ -126,6 +132,10 @@
     },
     mounted(){
       this.getData()
+      this.taskType == 'profession' ? this.switchV = '1' : this.switchV = '0'
+    },
+    computed: {
+      ...mapState(['taskType'])
     }
   }
 </script>

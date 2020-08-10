@@ -150,6 +150,9 @@
     exportUpTopTable,
     downloadReceipt
   } from '@/api/api'
+  import {
+    getInvoiceList
+  } from '@/api/bill-api'
 
   export default {
     name: 'invoicing',
@@ -196,26 +199,26 @@
             {text: '分析失败', value: '分析失败'},
             {text: '已放弃', value: '已放弃'},
           ],
-          outPutTableTotal: 0,
+          tableTotal: 0,
           currentPage: 1,
           pageSize: 10,
           selectionList: [],            //渲染输出选中项
         },
         filter: {
           tradingtatusLabel: '发票抬头',
-          tradingtatusVal: '-1',
+          tradingtatusVal: '',
           tradingtatusList: [
             {
               label: '示例',
-              value: '-1'
+              value: null
             }
           ],
           paymentMethodLabel: '发票状态',
-          paymentMethodVal: '-1',
+          paymentMethodVal: '',
           paymentMethodList: [
             {
               label: '全部',
-              value: '-1'
+              value: ''
             },
             {
               label: '审核中',
@@ -281,9 +284,8 @@
         })
       },
       // 获取table数据
-      async getList() {
-        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&productOrderUuid=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
-          data = await getUpTopTable(t)
+      async getList(t) {
+          data = await getInvoiceList(t)
         this.table.outPutTableTotal = data.data.total
         this.table.rechargeData = data.data.data.map(curr => {
           curr.operate = '-'
@@ -367,7 +369,10 @@
       }
     },
     mounted() {
-      this.getList()
+      let t = this.table,
+          f = this.filter,
+          data = `pageSize=${t.pageSize}&pageIndex=${t.currentPage}&invoiceTitle=${f.tradingtatusVal}&beginTime=${f.inquireValS}&endTime=${f.inquireValV.getTime()}&invoiceStatus=${f.paymentMethodVal}&sortColumn=0&sortBy=0`
+      this.getList(data)
       createTableIconList()
     }
   }

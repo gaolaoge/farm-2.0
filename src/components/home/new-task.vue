@@ -563,7 +563,6 @@
     oneMorePath
   } from '@/api/api'
   import {
-    identify,
     getFileType,
     savePath,
     newTaskProfession
@@ -843,13 +842,12 @@
         },
         infoMessageShow: false,     // 选择渲染文件 - 我的电脑 - 工程路径 - 问号
         renderFileTypeList: [],     // 可用的场景文件格式
-        taskType: null,             // 渲染模式 profession 专业版  easy 一键版
       }
     },
     props: {},
     components: {operationGuide},
     computed: {
-      ...mapState(['zone', 'zoneId', 'user', 'socket_backS', 'socket_backS_msg', 'socket_plugin', 'socket_plugin_msg']),
+      ...mapState(['zone', 'zoneId', 'user', 'socket_backS', 'socket_backS_msg', 'socket_plugin', 'socket_plugin_msg', 'taskType']),
       // 验证表格是否填写完整
       disableSelf() {
         let a = this.dialogAdd
@@ -901,7 +899,7 @@
       // 1.选择渲染文件 - 我的电脑 插件 连接插件
       openWebsocket() {
         if (this.socket_plugin) return false   // 已连接
-        this.$store.commit('WEBSOCKET_PLUGIN_INIT', 'ws://192.168.1.85:15000')
+        this.$store.commit('WEBSOCKET_PLUGIN_INIT', 'ws://localhost:15000')
       },
       // 4.选择渲染文件 - 我的电脑 插件 断开插件
       shutWebsocket() {
@@ -1334,12 +1332,6 @@
         this.$router.push('/task')
 
       },
-      // 0.获取文件渲染模式
-      async getIdentify() {
-        let data = await identify()
-        if (data.data.data == 1) this.taskType = 'profession'   // 专业版
-        else if (data.data.data == 0) this.taskType = 'easy'    // 一键版
-      },
       // 0.选择渲染文件 - 我的资产 - 创建网盘目录
       createCatalog(data) {
         data.forEach(item => {
@@ -1462,7 +1454,6 @@
       }
     },
     mounted() {
-      this.getIdentify()         // 识别文件渲染模式
       this.getRenderFileType()   // 获取可用的场景文件格式
       this.getList()             // 获取渲染模板列表
       this.getItemList()         // 获取项目列表

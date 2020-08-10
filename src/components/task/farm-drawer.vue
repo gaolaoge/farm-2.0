@@ -939,7 +939,8 @@
     itemStart,
     getFrameHistoryTable,
     downloadLog,
-    analyseAgain
+    analyseAgain,
+    getThumbnail,
   } from '@/api/api'
   import {
     createDateFun,
@@ -1339,10 +1340,11 @@
       // 渲染下载 - 详情 - 缩略图
       async showMiniImg(row, column, event) {
         this.result.statusData = row['status']
-        let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&type=1`,
+        let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}`,
+        //   data = await getThumbnail(t)
+        // this.result.miniImgHref = window.URL.createObjectURL(data.data)
           data = await downloadFrame(t)
         this.result.miniImgHref = window.URL.createObjectURL(data.data)
-
       },
       // 渲染下载 - 详情 - 主table 获取列表
       async getRenderItemMoreTableF() {

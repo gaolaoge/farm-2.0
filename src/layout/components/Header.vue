@@ -231,6 +231,9 @@
     homeSelect,
     getInfo
   } from '@/api/api.js'
+  import {
+    identify
+  } from '@/api/newTask-api'
   import {setInfo} from '@/assets/common'
   import messageTable from '@/components/headerM/message-table'
 
@@ -299,6 +302,7 @@
     mounted() {
       this.getList()
       this.getUserInfo()
+      this.getIdentify()
     },
     watch: {
       login: {
@@ -412,7 +416,13 @@
       // 渲染指引
       guide() {
         this.guideShow = true
-      }
+      },
+      // 0.获取文件渲染模式
+      async getIdentify() {
+        let data = await identify()
+        if (data.data.data == 1) this.$store.commit('changeTaskType', 'profession')   // 专业版
+        else if (data.data.data == 0) this.$store.commit('changeTaskType', 'easy')    // 一键版
+      },
     },
     directives: {
       operating: {
