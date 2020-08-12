@@ -512,8 +512,8 @@
         reg: {
           phoneReg: /^1(3|4|5|6|7|8|9)\d{9}$/,
           codeReg: /^\d{6}$/,
-          passwordReg1: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)/,
-          passwordReg2: /^\w{8,18}$/
+          passwordReg1: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?!^.*[\u4E00-\u9FA5].*$)/,
+          passwordReg2: /^[\w\W]{8,18}$/
         },
         pdf: null,
         screenWidth: '',
@@ -695,7 +695,7 @@
       passwVerif() {
         // 操作为打开密码预览，则不做校验动作
         if (this.registered.clickEye) {
-          this.registered.clickEye = false;
+          this.registered.clickEye = false
           return false
         }
         let t = this.registered.form.password,

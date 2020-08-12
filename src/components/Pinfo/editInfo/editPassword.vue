@@ -183,7 +183,7 @@
           this.status.ps = false
           return false
         }
-        if(!/^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)/.test(this.passWordVal)){
+        if(!/^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?!^.*[\u4E00-\u9FA5].*$)/.test(this.passWordVal)){
           this.psTypeErr = '请至少包含大小写字母、数字、特殊字符中任意2种字符'
           this.status.ps = false
           return false

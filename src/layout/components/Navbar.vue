@@ -299,9 +299,6 @@
       justify-content: center;
       align-items: center;
 
-      .addTaskIcon {
-        width: 34px;
-      }
     }
   }
 

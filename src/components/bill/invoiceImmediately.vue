@@ -18,6 +18,7 @@
             <el-table
               :data="recordingTableData"
               height="260"
+              @selection-change="recordingSelectionChange"
               style="width: 100%">
 
               <el-table-column
@@ -26,29 +27,33 @@
                 width="55"/>
 
               <el-table-column
-                prop="id"
+                prop="outTradeNo"
                 label="交易ID"/>
 
               <el-table-column
-                prop="amount"
+                prop="actualPayment"
+                width="180"
                 label="实际支付金额（元）"/>
 
               <el-table-column
-                prop="type"
-                label="支付方式"/>
+                label="支付方式">
+                <template slot-scope="scope">
+                  <span>{{ scope.paymentTitle == 1 ? '支付宝' : '微信' }}</span>
+                </template>
+              </el-table-column>
 
               <el-table-column
-                prop="singleNumber"
+                prop="productOrderUuid"
                 label="支付单号"/>
 
               <el-table-column
-                prop="date"
+                prop="updateTime"
                 label="支付时间"/>
 
             </el-table>
           </div>
         </div>
-        <!--开票余额-->
+        <!--开票金额-->
         <div class="item">
           <span class="label">{{ blanceLabel }}：</span>
           <span class="val">￥{{ blanceVal }}</span>
@@ -57,8 +62,10 @@
         <div class="item">
           <span class="label">{{ typeLabel }}：</span>
           <el-radio-group v-model="typeVal" class="radio">
-            <el-radio :label="typeValList[0]"/>
-            <el-radio :label="typeValList[1]"/>
+            <el-radio :label="item.value"
+                      v-for="(item,index) in typeValList"
+                      :key="index">{{ item.label }}
+            </el-radio>
           </el-radio-group>
         </div>
         <!--发票抬头-->
@@ -71,18 +78,23 @@
               style="width: 100%">
 
               <el-table-column
-                type="selection"
+                width="55"
                 align="right"
-                width="55"/>
+                show-overflow-tooltip
+                label="">
+                <template slot-scope="scope">
+                  <el-checkbox/>
+                </template>
+              </el-table-column>
 
               <el-table-column
-                prop="invoice"
+                prop="invoiceTitle"
                 width="400"
                 show-overflow-tooltip
                 label="发票抬头"/>
 
               <el-table-column
-                prop="num"
+                prop="taxpayerId"
                 label="纳税人识别号"/>
 
               <el-table-column
@@ -90,17 +102,21 @@
                 label="邮箱"/>
 
               <el-table-column
-                prop="default"
+                prop="isDefault"
                 width="140"
-                label="是否默认"/>
+                label="是否默认">
+                <template slot-scope="scope">
+                  <span>{{ scope.row.isDefault == 0 ? '非默认' : '默认' }}</span>
+                </template>
+              </el-table-column>
 
               <el-table-column
                 width="360"
                 label="操作">
                 <template slot-scope="scope">
-                  <span class="table-btn">{{ operatingBtn[0] }}</span>
-                  <span class="table-btn">{{ operatingBtn[1] }}</span>
-                  <span class="table-btn">{{ operatingBtn[2] }}</span>
+                  <span class="table-btn" @click="setDefault(scope.$index)">{{ operatingBtn[0] }}</span>
+                  <span class="table-btn" @click="editItem(scope.$index)">{{ operatingBtn[1] }}</span>
+                  <span class="table-btn" @click="deleteItem(scope.$index)">{{ operatingBtn[2] }}</span>
                 </template>
               </el-table-column>
 
@@ -126,13 +142,18 @@
       <img src="@/icons/shutDialogIcon.png" alt="" class="shutDialogIcon mini">
       <div class="farm-form">
         <div class="farm-form-item" v-for="(item,index) in dialogData.list">
-          <label :for="item.id" class="farm-form-label">{{ item.Label }}：</label>
+          <label :for="item.id" class="farm-form-label">
+            <span v-if="item.required" class="star">*</span>
+            {{ item.Label }}：
+          </label>
           <input type="text" :id="item.id" class="farm-form-input" v-model="item.Val"
                  :placeholder="item.Placeholder">
         </div>
         <div class="sw">
           <el-switch
-            v-model="dialogData.switchVal"
+            v-model="dialogData.isDefault"
+            active-value="1"
+            inactive-value="0"
             active-color="RGBA(18, 91, 243, 1)"
             inactive-color="RGBA(200, 202, 203, 1)"/>
           <span class="s" :class="[{'active': dialogData.switchVal}]">{{ dialogData.switchSpan }}</span>
@@ -140,13 +161,28 @@
       </div>
       <div class="btnList">
         <div class="farm-form-btn cancel" @click="dialogData.visible = false"><span>取消</span></div>
-        <div class="farm-form-btn" type="primary" @click="dialogData.visible = false"><span>确定</span></div>
+        <div class="farm-form-btn" type="primary" @click="addHeader" v-show="!editHeader"><span>确定</span></div>
+        <div class="farm-form-btn" type="primary" @click="editHeaderF" v-show="editHeader"><span>确定</span></div>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
+
+  import {
+    getRechargeListF,
+    getInvoiceHeaderListF,
+    addInvoiceHeader,
+    setItemDefault,
+    deleteItemIn,
+    editItemIn
+  } from '@/api/bill-api'
+  import {
+    createDateFun
+  } from '@/assets/common'
+  import {messageFun} from "../../assets/common";
+
   export default {
     name: '',
     data() {
@@ -158,29 +194,48 @@
           ]
         },
         recordingLabel: '选择充值记录',
-        blanceLabel: '开票余额',
-        blanceVal: '210.13',
+        blanceLabel: '开票金额',
+        blanceVal: '0.00',
         typeLabel: '开票类型',
-        typeVal: '',
-        typeValList: ['增值税普票', '增值税专票'],
+        typeVal: '1',
+        typeValList: [
+          {
+            label: '增值税普票',
+            value: '1'
+          }, {
+            label: '增值税专票',
+            value: '2'
+          }
+        ],
         invoiceLabel: '开票抬头',
         btn: '立即开票',
         recordingTableData: [
-          {
-            id: '1002748211241',
-            amount: '100.00',
-            type: '支付宝',
-            singleNumber: '12988562306532',
-            date: '2020-03-02 00:23:46'
-          }
+          // {
+          //   rechargeUuid: '',
+          //   paymentStatus: '',
+          //   actualPayment: '',          // 实际支付金额
+          //   arrivalAmount: '',
+          //   rechargeExplain: '',
+          //   paymentTitle: '',           // 支付方式1:支付宝 2:微信
+          //   outTradeNo: '',             // 交易id
+          //   productOrderUuid: '',       // 支付单号
+          //   updateTime: '',             // 支付时间
+          //   invoice: ''
+          // }
         ],
         invoiceTableData: [
-          {
-            invoice: '青岛市哩啦哩科技有限公司青岛市哩啦哩科技有限公司青岛市哩啦哩科技有限公司',
-            num: '38726868486246873232',
-            email: 'shdsasd@163.com',
-            default: '是'
-          },
+          // {
+          //    invoiceSettingUuid: '',    // 发票抬头uuid
+          //    invoiceTitle: '',          // 发票抬头
+          //    taxpayerId: '',            // 纳税人识别号
+          //    email: '',                 // 邮箱
+          //    isDefault: '',             // 是否默认0:非默认 1:默认
+          //    customerUuid: '',          //
+          //    companyAddress: '',        // 公司地址
+          //    companyTelephone: '',      // 公司电话
+          //    companyBank: '',           // 开户行
+          //    bankAccount: ''            // 开户行账号
+          // },
         ],
         operatingBtn: ['设为默认', '编辑', '删除'],
         addMoreBtn: '添加发票抬头',
@@ -191,19 +246,22 @@
               Label: '发票抬头',
               Val: '',
               Placeholder: '请输入发票抬头',
-              id: 'header'
+              id: 'header',
+              required: true
             },
             {
               Label: '纳税人识别号',
               Val: '',
               Placeholder: '请输入纳税人识别号',
-              id: 'number'
+              id: 'number',
+              required: true
             },
             {
               Label: '邮箱',
               Val: '',
               Placeholder: '请输入邮箱',
-              id: 'email'
+              id: 'email',
+              required: true
             },
             {
               Label: '注册地址',
@@ -231,8 +289,10 @@
             }
           ],
           switchSpan: '设为默认',
-          switchVal: false
-        }
+          isDefault: '0',
+          Uuid: null
+        },
+        editHeader: false,         // 添加默认抬头 确认btn 切换
       }
     },
     methods: {
@@ -244,6 +304,110 @@
       closeDialog() {
 
       },
+      // 获取可开票的充值记录
+      async getRechargeList() {
+        let data = await getRechargeListF()
+        if (data.data.code == 200) {
+          this.recordingTableData = data.data.data.map(item => {
+            return Object.assign(item, {
+              'updateTime': createDateFun(new Date(item.updateTime))
+            })
+          })
+        }
+      },
+      // 获取户开票抬头信息
+      async getInvoiceHeaderList() {
+        let data = await getInvoiceHeaderListF()
+        if (data.data.code == 200) {
+          this.invoiceTableData = data.data.data
+        }
+      },
+      // 充值记录tab 多选
+      recordingSelectionChange(list) {
+        this.blanceVal = list.reduce((total, item) => {
+          return total + item.actualPayment
+        }, 0).toFixed(2)
+      },
+      // 开票抬头tab 多选
+      invoiceSelectionChange(list) {
+
+      },
+      // 添加发票抬头
+      async addHeader() {
+
+        let data = await addInvoiceHeader({
+          invoiceTitle: list[0]['Val'],                 // 发票抬头
+          taxpayerId: list[1]['Val'],                   // 纳税人识别号
+          email: list[2]['Val'],                        // 邮箱
+          companyAddress: list[3]['Val'],               // 公司地址
+          companyTelephone: list[4]['Val'],             // 公司电话
+          companyBank: list[5]['Val'],                  // 公司开户行地址
+          bankAccount: list[6]['Val'],                  // 公司开户行账号
+          isDefault: this.dialogData.isDefault          // 0:非默认 1:默认
+        })
+        if (data.data.code == 200) {
+          messageFun('success', '操作成功')
+          this.getInvoiceHeaderList()
+          this.dialogData.visible = false
+        }
+      },
+      // 发票抬头 - 编辑 - 打开
+      editItem(index) {
+        this.editHeader = true
+        this.dialogData.visible = true
+        let list = this.dialogData.list,
+          item = this.invoiceTableData[index]
+        list[0]['Val'] = item['invoiceTitle']
+        list[1]['Val'] = item['taxpayerId']
+        list[2]['Val'] = item['email']
+        list[3]['Val'] = item['companyAddress']
+        list[4]['Val'] = item['companyTelephone']
+        list[5]['Val'] = item['companyBank']
+        list[6]['Val'] = item['bankAccount']
+        this.Uuid = item['invoiceSettingUuid']
+        this.dialogData.isDefault = item['isDefault']
+      },
+      // 发票抬头 - 编辑 - 发送
+      async editHeaderF(){
+        let list = this.dialogData.list
+        let data = await editItemIn({
+          invoiceSettingUuid: this.Uuid,
+          invoiceTitle: list[0]['Val'],                 // 发票抬头
+          taxpayerId: list[1]['Val'],                   // 纳税人识别号
+          email: list[2]['Val'],                        // 邮箱
+          companyAddress: list[3]['Val'],               // 公司地址
+          companyTelephone: list[4]['Val'],             // 公司电话
+          companyBank: list[5]['Val'],                  // 公司开户行地址
+          bankAccount: list[6]['Val'],                  // 公司开户行账号
+          isDefault: this.dialogData.isDefault          // 0:非默认 1:默认
+        })
+        if(data.data.code == 200){
+          this.editHeader = false
+          messageFun('success', '操作成功')
+          this.dialogData.visible = false
+          this.getInvoiceHeaderList()
+        }
+      },
+      // 发票抬头 - 设为默认
+      async setDefault(index) {
+        let data = await setItemDefault(this.invoiceTableData[index]['invoiceSettingUuid'])
+        if (data.data.code == 200) {
+          messageFun('success', '操作成功')
+          this.getInvoiceHeaderList()
+        }
+      },
+      // 发票抬头 - 删除
+      async deleteItem(index) {
+        let data = await deleteItemIn(this.invoiceTableData[index]['invoiceSettingUuid'])
+        if (data.data.code == 200) {
+          messageFun('success', '操作成功')
+          this.getInvoiceHeaderList()
+        }
+      },
+    },
+    mounted() {
+      this.getRechargeList()
+      this.getInvoiceHeaderList()
     }
   }
 </script>
@@ -349,13 +513,17 @@
 
       .farm-form-label {
         display: inline-block;
-        width: 100px;
+        width: 114px;
         height: 20px;
         font-size: 14px;
         font-family: PingFangSC-Regular, PingFang SC;
         color: rgba(22, 29, 37, 0.8);
         line-height: 36px;
         text-align: right;
+
+        .star {
+          color: tomato;
+        }
       }
 
       .farm-form-input {
@@ -435,6 +603,7 @@
     .el-dialog__body {
       padding: 30px;
       background-color: rgba(255, 255, 255, 1);
+      border-radius: 0px 0px 8px 8px;
 
       .shutDialogIcon {
         top: -24px;
@@ -445,7 +614,7 @@
       display: flex;
       align-items: center;
       margin-top: 12px;
-      margin-left: 100px;
+      margin-left: 114px;
 
       .s {
         display: inline-block;

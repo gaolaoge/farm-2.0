@@ -257,19 +257,29 @@
         switch (dateInterval) {
           case 'nearlySevenDays':
             this.selectSpanDate(new Date(todayNum - 6 * num))
+            this.startTimestamp = createCalendar(new Date(todayNum - 6 * num))
             break
           case 'nearlyThirtyDays':
             this.selectSpanDate(new Date(todayNum - 29 * num))
+            this.startTimestamp = createCalendar(new Date(todayNum - 29 * num))
             break
           case 'customize':  // 无需操作
+            this.startTimestamp = createCalendar(new Date(0))
             break
         }
         // 设置结束结束日期 当日
         this.selectDate = 'end'
         this.selectSpanDate(this.todayTimesTamp)  // new Date()
+        this.endTimestamp = createCalendar(new Date())
 
         this.selectDate = 'start'
         this.correctDateVal()     // 选定
+      },
+      // 设为空 值为0-today
+      setNull(){
+        this.u = '-'
+        this.startTimestamp = createCalendar(new Date(0))
+        this.endTimestamp = createCalendar(new Date())
       }
     },
     mounted() {

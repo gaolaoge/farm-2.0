@@ -741,12 +741,14 @@
               {
                 val: '2002',
                 label: '16核32G',
-                supplement: '【标准模式1】'
+                supplement: '【标准模式1】',
+                id: '224'
               },
               {
                 val: '32核64G【标准模式2】',
                 label: '32核64G',
-                supplement: '【标准模式2】'
+                supplement: '【标准模式2】',
+                id: null
               }
               // {
               //   val: '32核128G【标准模式3】',
@@ -1291,13 +1293,11 @@
           ],
           commitTaskDTO: this.taskType == 'profession' ? null : {
             layer: Number(thi.other.stratifyVal),        // 是否开启分层渲染。1开启，0关闭
-            renderPattern: thi.mode.mode,                // 渲染模式编号
+            renderPattern: thi.mode.modeList.find(curr => curr.val == thi.mode.mode).id,          // 渲染模式编号
             taskType: this.zone,                         // 任务类型 看分区
-            otherSettings: {      // 其它设置
-              projectName: thi.other.viewList.forEach(curr => {
-                if (curr.value == thi.other.view) return curr.label
-              }),
-              projectUuid: thi.other.view,
+            otherSettings: {                             // 其它设置
+              projectName: thi.other.viewList.find(curr => curr.value == thi.other.view).label,
+              projectUuid: thi.other.viewList.find(curr => curr.value == thi.other.view).id,
               frameTimeoutWarn: thi.other.remindVal,
               frameTimeoutStop: thi.other.stopVal
             },

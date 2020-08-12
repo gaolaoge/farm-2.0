@@ -6,9 +6,7 @@
       <div class="filter">
         <!--发票抬头-->
         <div class="filter-item">
-          <span class="filter-item-label">
-            {{ filter.tradingtatusLabel }}：
-          </span>
+          <span class="filter-item-label">{{ filter.tradingtatusLabel }}：</span>
           <el-select v-model="filter.tradingtatusVal"
                      placeholder="-"
                      class="filter-item-i filter-item-select">
@@ -16,15 +14,12 @@
               v-for="item in filter.tradingtatusList"
               :key="item.value"
               :label="item.label"
-              :value="item.value">
-            </el-option>
+              :value="item.value" />
           </el-select>
         </div>
         <!--发票状态-->
         <div class="filter-item">
-          <span class="filter-item-label">
-            {{ filter.paymentMethodLabel }}：
-          </span>
+          <span class="filter-item-label">{{ filter.paymentMethodLabel }}：</span>
           <el-select v-model="filter.paymentMethodVal"
                      placeholder="-"
                      class="filter-item-i filter-item-select">
@@ -32,8 +27,7 @@
               v-for="item in filter.paymentMethodList"
               :key="item.value"
               :label="item.label"
-              :value="item.value">
-            </el-option>
+              :value="item.value" />
           </el-select>
         </div>
         <!--查询时间-->
@@ -41,7 +35,7 @@
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
           </span>
-          <model-calendar style="display: inline-block;" @changeSelectDate="changeFilterDate"/>
+          <model-calendar style="display: inline-block;" ref="calendar" @changeSelectDate="changeFilterDate"/>
         </div>
         <!--查询-->
         <div class="filter-btn primary" @click="getList">
@@ -104,8 +98,6 @@
         <el-table-column
           prop="invoiceState"
           label="发票状态"
-          :filter-method="filterStatus"
-          :filters="table.statusList"
           show-overflow-tooltip
           width="150"/>
         <!--邮箱-->
@@ -146,13 +138,9 @@
     createTableIconList
   } from '@/assets/common.js'
   import {
-    getUpTopTable,
-    exportUpTopTable,
-    downloadReceipt
-  } from '@/api/api'
-  import {
     getInvoiceList,
-    getHeadersList
+    getHeadersList,
+    exportInvoiceTable
   } from '@/api/bill-api'
 
   export default {
@@ -170,17 +158,6 @@
 //               email: '',            // 邮箱
 //               date: '',             // 开票时间
 //             },
-          ],
-          statusList: [
-            {text: '上传中', value: '上传中...'},
-            {text: '上传暂停', value: '上传暂停'},
-            {text: '上传失败', value: '上传失败'},
-            {text: '已取消', value: '已取消'},
-            {text: '分析中', value: '分析中...'},
-            {text: '分析警告', value: '分析警告'},
-            {text: '待设置参数', value: '待设置参数'},
-            {text: '分析失败', value: '分析失败'},
-            {text: '已放弃', value: '已放弃'},
           ],
           total: 0,
           currentPage: 1,
@@ -200,23 +177,23 @@
             },
             {
               label: '审核中',
-              value: '3'
+              value: 0
             },
             {
               label: '审核不过',
-              value: '1'
+              value: 2
             },
             {
               label: '审核通过',
-              value: '2'
+              value: 1
             },
             {
               label: '已发送',
-              value: '2'
+              value: 3
             }
           ],
           inquireLabel: '开票时间',
-          inquireValS: 0,
+          inquireValS: new Date(0),
           inquireValV: new Date(),
           iquireBtn: '查询',
           resetBtn: '重置',
@@ -228,20 +205,7 @@
       modelCalendar
     },
     methods: {
-      // 上传分析 - 筛选 - 状态
-      filterStatus(value, row) {
-        return row.status === value
-      },
-      copySingleNumber(val) {
-        let oInput = document.createElement('INPUT')
-        oInput.style.display = 'none'
-        oInput.value = val
-        document.body.appendChild(oInput)
-        oInput.select()                    // 选中
-        document.execCommand("Copy")       // 复制
-        document.body.removeChild(oInput)
-      },
-      // 充值中心多选
+      // 多选
       handleSelectionChange(val) {
         this.table.selectionList = val
       },
@@ -262,8 +226,11 @@
         })
       },
       // 获取table数据
-      async getList(t) {
-        let data = await getInvoiceList(t)
+      async getList() {
+        let t = this.table,
+          f = this.filter,
+          d = `pageSize=${t.pageSize}&pageIndex=${t.currentPage}&invoiceTitle=${f.tradingtatusVal}&beginTime=${f.inquireValS.getTime()}&endTime=${f.inquireValV.getTime()}&invoiceStatus=${f.paymentMethodVal}&sortColumn=0&sortBy=0`
+        let data = await getInvoiceList(d)
         this.table.total = data.data.total
         this.table.invoicingData = data.data.data.map(curr => {
           let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime)),
@@ -287,7 +254,7 @@
               invoiceNum: curr.taxpayerId,         // 纳税人标识号
               invoiceAmount: curr.invoiceAmount,   // 发票金额（元）
               invoiceType: curr.invoiceType == 0 ? '增值税普票' : '-',           // 发票类型
-              invoiceState: status,     // 发票状态
+              invoiceState: status,                // 发票状态
               email: curr.email,                   // 邮箱
               date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,   // 开票时间
           }
@@ -296,13 +263,12 @@
       // table 筛选条件重置
       reset() {
         Object.assign(this.filter, {
-          tradingtatusVal: '-1',
-          paymentMethodVal: '-1',
-          markVal: '-1',
-          singleNumberVal: '',
-          inquireValS: 0,
+          tradingtatusVal: '',
+          paymentMethodVal: '',
+          inquireValS: new Date(0),
           inquireValV: new Date(),
         })
+        this.$refs.calendar.setNull()
         this.getList()
       },
       // 翻页
@@ -313,33 +279,17 @@
       // 导出记录
       async exportTable() {
         // {
-        //   paymentTitle: 1,   // 支付方式 1支付宝
-        //   paymentStatus: 1,  // 交易状态:1成功，2失败；3待付款
-        //   invoice: 1,        // 开票标识:0不可开票,1未开票,2已开票
+        //   invoiceTitle: 1,   // 支付方式 1支付宝
+        //   invoiceStatus: 1,  // 开票标识:0不可开票,1未开票,2已开票
         //   beginTime: '',     // 查询起始时间,时间戳
         //   endTime: '',       // 查询结束时间,时间戳
         //   sortColumn: '',    // 排序字段:0:交易id, 1:交易状态,2:实际支付金额,3:充值到账金币,4:充值说明,5:支付方式,6:支付单号,7:修改时间
         //   sortBy: ''         // 排序方式:0降序,1升序
         // }
-        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
-          data = await exportUpTopTable(t)
+        let t = `invoiceTitle=${this.filter.tradingtatusVal}&invoiceStatus=${this.filter.paymentMethodVal}&beginTime=${this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=2&sortBy=1`,
+          data = await exportInvoiceTable(t)
         // 导出下载
-        exportDownloadFun(data, '充值记录', 'xlsx')
-      },
-      // 操作
-      async operateFun(item) {
-        let u = {
-          outTradeNo: item.singleNumber,
-          updateTime: item.dateDefault,
-          actualPayment: item.realPay,
-          paymentTitle: item.paymentMethod == '支付宝' ? '1' : '2',
-          account: JSON.parse(sessionStorage.getItem('info'))['account']
-        }
-        let t = `outTradeNo=${u['outTradeNo']}&updateTime=${u['updateTime']}&actualPayment=${u['actualPayment']}&paymentTitle=${u['paymentTitle']}&account=${u['account']}`
-        if (item.operate == "下载收据") {
-          let data = await downloadReceipt(t)
-          exportDownloadFun(data, '收据', 'pdf')
-        }
+        exportDownloadFun(data, '开票记录', 'xlsx')
       },
       // 获取发票抬头list
       async getHeadersListF(){
@@ -353,12 +303,10 @@
       }
     },
     mounted() {
-      let t = this.table,
-          f = this.filter,
-          data = `pageSize=${t.pageSize}&pageIndex=${t.currentPage}&invoiceTitle=${f.tradingtatusVal}&beginTime=${f.inquireValS}&endTime=${f.inquireValV.getTime()}&invoiceStatus=${f.paymentMethodVal}&sortColumn=0&sortBy=0`
-      this.getList(data)
+      this.getList()
       createTableIconList()
       this.getHeadersListF()
+      this.$refs.calendar.setNull()
     }
   }
 </script>
