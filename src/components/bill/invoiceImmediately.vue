@@ -83,7 +83,9 @@
                 show-overflow-tooltip
                 label="">
                 <template slot-scope="scope">
-                  <el-checkbox/>
+                  <el-checkbox :true-label="scope.$index"
+                               false-label=null
+                               v-model="checked" />
                 </template>
               </el-table-column>
 
@@ -129,7 +131,7 @@
           </div>
         </div>
         <!--按钮立即开票-->
-        <div class="btn"><span>{{ btn }}</span></div>
+        <div class="btn" @click="invoicingF"><span>{{ btn }}</span></div>
       </div>
     </div>
     <!--添加发票抬头-->
@@ -176,7 +178,8 @@
     addInvoiceHeader,
     setItemDefault,
     deleteItemIn,
-    editItemIn
+    editItemIn,
+    invoicing
   } from '@/api/bill-api'
   import {
     createDateFun
@@ -197,14 +200,14 @@
         blanceLabel: '开票金额',
         blanceVal: '0.00',
         typeLabel: '开票类型',
-        typeVal: '1',
+        typeVal: '0',
         typeValList: [
           {
             label: '增值税普票',
-            value: '1'
+            value: '0'
           }, {
             label: '增值税专票',
-            value: '2'
+            value: '1'
           }
         ],
         invoiceLabel: '开票抬头',
@@ -222,7 +225,7 @@
           //   updateTime: '',             // 支付时间
           //   invoice: ''
           // }
-        ],
+        ],   // 充值记录table
         invoiceTableData: [
           // {
           //    invoiceSettingUuid: '',    // 发票抬头uuid
@@ -236,7 +239,8 @@
           //    companyBank: '',           // 开户行
           //    bankAccount: ''            // 开户行账号
           // },
-        ],
+        ],     // 发票抬头table
+        recordingSelection: Array(), // 充值记录table多选
         operatingBtn: ['设为默认', '编辑', '删除'],
         addMoreBtn: '添加发票抬头',
         dialogData: {
@@ -292,7 +296,8 @@
           isDefault: '0',
           Uuid: null
         },
-        editHeader: false,         // 添加默认抬头 确认btn 切换
+        editHeader: false,          // 添加默认抬头 确认btn 切换
+        checked: null,              // 开票抬头索引
       }
     },
     methods: {
@@ -327,6 +332,7 @@
         this.blanceVal = list.reduce((total, item) => {
           return total + item.actualPayment
         }, 0).toFixed(2)
+        this.recordingSelection = list
       },
       // 开票抬头tab 多选
       invoiceSelectionChange(list) {
@@ -404,6 +410,20 @@
           this.getInvoiceHeaderList()
         }
       },
+      // 开票
+      async invoicingF(){
+        let data = await invoicing({
+          invoiceType: this.typeVal,                // 开票类型 0:普票 1:专票
+          rechargeUuidList: this.recordingSelection.map(item => item.rechargeUuid),    // 用户选择的充值uuid列表
+          invoiceSettingUuid: this.invoiceTableData[this.checked]['invoiceSettingUuid']     // 发票抬头uuid
+        })
+        if(data.data.code == 200){
+          messageFun('success', '操作成功')
+          this.getRechargeList()
+          this.checked = null
+          this.recordingSelection = []
+        }
+      }
     },
     mounted() {
       this.getRechargeList()

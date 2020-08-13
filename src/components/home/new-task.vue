@@ -862,10 +862,10 @@
         handler: function (e) {
           let data = JSON.parse(e.data)
           if (data.code != 208) return false
-          if (data.msg == '842') {
+          if (data.msg == '602') {
             // 场景文件列表
 
-          } else if (data.msg == '841') {
+          } else if (data.msg == '601') {
             // scenePath 场景文件导航Path / resourcePath 工程路径Path
             this.stepOneBase.netdisc.sceneFilePath = data.data.scenePath.split('/')
             this.stepOneBase.netdisc.pathV = data.data.resourcePath
@@ -1457,7 +1457,7 @@
       this.getRenderFileType()   // 获取可用的场景文件格式
       this.getList()             // 获取渲染模板列表
       this.getItemList()         // 获取项目列表
-      if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', JSON.stringify({'code': 841}))
+      if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', JSON.stringify({'code': 602}))
     },
     directives: {
       operating: {

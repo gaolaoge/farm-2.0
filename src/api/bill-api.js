@@ -75,3 +75,12 @@ export function editItemIn(data) {
     data
   })
 }
+
+// 立即开票 - 立即开票
+export function invoicing(data) {
+  return businessServer({
+    url: `/billing/invoice/addInvoice`,
+    method: 'POST',
+    data
+  })
+}
