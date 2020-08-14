@@ -1,11 +1,7 @@
 <template>
   <div class="outPut-wrapper">
     <div class="outPut-table"
-         ref="outPutTable"
-         element-loading-text="拼命加载中"
-         element-loading-spinner="el-icon-loading"
-         element-loading-background="rgba(255, 255, 255, 0.8)"
-         v-loading.fullscreen.lock="fullscreenLoading">
+         ref="outPutTable">
       <!--面包屑-->
       <div class="bread">
         <span v-for="(item,index) in bread.list"

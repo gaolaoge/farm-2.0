@@ -4,8 +4,21 @@
     <div class="btnGroup">
       <!--我的上传操作-->
       <div class="myUploadBtnGroup" v-show="table.navListActiveIndex == 0">
+        <!--上传-->
+        <div class="more-btn" v-operating2>
+          <span>{{ btnGroup.uploadText }}</span>
+          <img :src="btnGroup.uploadInitialIcon" alt="">
+        </div>
+        <!--上传list-->
+        <div class="uploadBtnList" v-show="btnGroup.showUploadBtnList">
+          <ul class="moreBtnUl">
+            <li v-for="(item,index) in btnGroup.uploadBtnList" :key="index" class="uploadBtnItem">
+              <span class="moreBtnItemSpan" @click="operating('upload', item)">{{ item }}</span>
+            </li>
+          </ul>
+        </div>
         <div class="farm-primary-form-btn" v-for="(item,index) in btnGroup.myUploadBtnGroup" :key="index"
-             @click="operating(item['text'])">
+             @click="operating('upload', item['text'])">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default"
                :style="{'transform': item.css }">
           <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover"
@@ -41,7 +54,7 @@
       <!--渲染输出操作-->
       <div class="outPutBtnGroup" v-show="table.navListActiveIndex == 1">
         <div class="farm-primary-form-btn" v-for="(item,index) in btnGroup.outPutBtnGroup" :key="index"
-             @click="operating(item['text'])">
+             @click="operating('render', item['text'])">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default"
                :style="{'transform': item.css }">
           <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover"
@@ -105,12 +118,12 @@
     data() {
       return {
         btnGroup: {
+          // selectedIcon: require('@/icons/u-white.png'),
+          uploadText: this.$t('assets.myUploadBtnGroup')[0],  // 上传
+          uploadInitialIcon: require('@/icons/u-black.png'),
+          uploadBtnList: ['文件', '文件夹'],                    // ['文件', '文件夹']
+          showUploadBtnList: false,
           myUploadBtnGroup: [
-            {
-              initialIcon: require('@/icons/u-black.png'),
-              selectedIcon: require('@/icons/u-white.png'),
-              text: this.$t('assets.myUploadBtnGroup')[0]  // 上传
-            },
             {
               initialIcon: require('@/icons/addIcon-black.png'),
               selectedIcon: require('@/icons/addIcon-white.png'),
@@ -172,7 +185,28 @@
         unbind(el) {
           document.removeEventListener('click', el.handler)
         }
-      }
+      },
+      operating2: {
+        bind(el, bindings, vnode) {
+          let handler = e => {
+            if (el.contains(e.target)) {
+              if (!vnode.context.btnGroup.showUploadBtnList) vnode.context.btnGroup.showUploadBtnList = true
+              else vnode.context.btnGroup.showUploadBtnList = false
+            } else {
+              if (e.target.classList.contains('moreBtnItemSpan')) return false
+              if (e.target.classList.contains('moreBtnItem')) return false
+              if (e.target.classList.contains('moreBtnUl')) return false
+              if (vnode.context.btnGroup.showUploadBtnList) vnode.context.btnGroup.showUploadBtnList = false
+            }
+          }
+
+          el.handler = handler
+          document.addEventListener('click', handler)
+        },
+        unbind(el) {
+          document.removeEventListener('click', el.handler)
+        }
+      },
     },
     components: {
       outPutRender,
@@ -189,14 +223,25 @@
         this.searchInputVal = ''
       },
       // 操作
-      operating(active) {
-        switch (active) {
-          case this.$t('assets.outPutBtnGroup')[0]:  // 下载
-            this.$refs.outPutTable.downloadFun()
-            break
-          case this.$t('assets.outPutBtnGroup')[1]:  // 删除
-            this.$refs.outPutTable.deleteFun()
-            break
+      operating(type ,active) {
+        if(type == 'render'){
+          switch (active) {
+            case this.$t('assets.outPutBtnGroup')[0]:  // 下载
+              this.$refs.outPutTable.downloadFun()
+              break
+            case this.$t('assets.outPutBtnGroup')[1]:  // 删除
+              this.$refs.outPutTable.deleteFun()
+              break
+          }
+        }else if(type == 'upload'){
+          switch (active) {
+            case '文件':  // 文件
+              this.$refs.myUploadTable.uploadFun('file')
+              break
+            case '文件夹':  // 文件夹
+              this.$refs.myUploadTable.uploadFun('folder')
+              break
+          }
         }
       }
     }
@@ -277,13 +322,12 @@
       }
     }
 
-    .moreBtnList {
+    .moreBtnList,
+    .uploadBtnList {
       position: absolute;
       z-index: 2;
       top: 40px;
-      left: 272px;
       width: 70px;
-      height: 145px;
       background-color: rgba(22, 29, 37, 1);
       box-shadow: 0px 1px 8px 0px rgba(0, 97, 255, 0.2);
       border-radius: 4px;
@@ -294,7 +338,8 @@
         box-sizing: border-box;
         cursor: pointer;
 
-        .moreBtnItem {
+        .moreBtnItem,
+        .uploadBtnItem {
           height: 25px;
           padding: 4px 14px;
           box-sizing: border-box;
@@ -313,6 +358,14 @@
           }
         }
       }
+    }
+    .moreBtnList {
+      left: 290px;
+      height: 145px;
+    }
+    .uploadBtnList {
+      left: 0px;
+      height: 62px;
     }
 
     .howToCreate {

@@ -5,7 +5,7 @@
       <ul>
         <li v-for="(item,index) in navList"
             :key="index"
-            :class="[{'active': navListIndex == index}]"
+            :class="[{'active': messageKey.noticeType == index + 1}]"
             @click="changeNavTable(index)">
           <span class="navLi">{{ item }}</span>
         </li>
@@ -18,20 +18,21 @@
         <ul>
           <li v-for="(item,index) in statusList"
               :key="index"
-              :class="[{'active': statusIndex == index}]"
+              :class="[{'active': messageKey.isRead === item.val}]"
               class="statusBtn"
-              @click="changeStatusBtn(index)">
-            <span>{{ item }}</span>
+              @click="changeStatusBtn(item.val)">
+            <span>{{ item.label }}</span>
           </li>
         </ul>
       </div>
       <!--系统-->
-      <div class="item-system" v-show="navListIndex == '0'">
+      <div class="item-system" v-show="messageKey.noticeType == 1">
         <span v-show="!systemTableData.length" class="null">{{ null_ }}</span>
         <el-table
           v-show="systemTableData.length"
           :show-header=false
           :data="systemTableData"
+          @selection-change="systemSelectionChange"
           style="width: 100%">
           <!--多选-->
           <el-table-column
@@ -40,15 +41,15 @@
             width="45"/>
           <!--消息-->
           <el-table-column
-            prop="message"
+            prop="noticeDetail"
             width="250"/>
           <!--时间-->
           <el-table-column
-            prop="date"/>
+            prop="createTime"/>
         </el-table>
       </div>
       <!--活动-->
-      <div class="item-activity" v-show="navListIndex == '1'">
+      <div class="item-activity" v-show="messageKey.noticeType == 2">
         <span v-show="!activityTableData.length" class="null">{{ null_ }}</span>
         <el-table
           v-show="activityTableData.length"
@@ -62,16 +63,23 @@
             width="45"/>
           <!--消息-->
           <el-table-column
-            prop="message"
+            prop="noticeDetail"
             width="250"/>
           <!--时间-->
           <el-table-column
-            prop="date"/>
+            prop="createTime"/>
         </el-table>
       </div>
       <!--公共模块-footer-->
       <div class="footer">
-        <el-checkbox v-model="checkboxBtnVal" class="checkbox">{{ checkboxBtn }}</el-checkbox>
+        <div>
+          <!--系统-->
+          <el-checkbox v-model="checkboxBtnVal" class="checkbox" v-show="messageKey.isRead != 1 && systemSelectionList.length" />
+          <span class="s" v-show="messageKey.isRead != 1 && systemSelectionList.length" @click="readedAll('system')">{{ checkboxBtn }}</span>
+          <!--活动-->
+          <el-checkbox v-model="checkboxBtnVal" class="checkbox" v-show="messageKey.isRead != 1 && activitySelectionList.length" />
+          <span class="s" v-show="messageKey.isRead != 1 && activitySelectionList.length" @click="readedAll('activity')">{{ checkboxBtn }}</span>
+        </div>
         <span class="showMeAll" @click="showMeAll">{{ all }}</span>
       </div>
     </div>
@@ -79,59 +87,121 @@
 </template>
 
 <script>
+  import {
+    getMessageList,
+    readMessages
+  } from "../../api/header-api"
+  import {
+    createDateFun
+  } from '@/assets/common'
+  import {messageFun} from "../../assets/common";
   export default {
     name: 'messageTable',
     data() {
       return {
         navList: ['系统', '活动'],
-        navListIndex: '0',
-        statusList: ['全部', '未读', '已读'],
-        statusIndex: '0',
-        all: '查看所有消息',
-        checkboxBtn: '备选项',
-        checkboxBtnVal: '',
-        systemTableData: [
-          {
-            date: '2016-05-02',
-            message: '任务[1001_场景一]渲染完成，渲染结果将保留20天，请您',
-          },
-          {
-            date: '2016-05-02',
-            message: '任务[1001_场景一]渲染完成，渲染结果将保留20天，请您',
-          },
-          {
-            date: '2016-05-02',
-            message: '任务[1001_场景一]渲染完成，渲染结果将保留20天，请您',
-          },
-          {
-            date: '2016-05-04',
-            message: '王小虎',
-          },
-          {
-            date: '2016-05-01',
-            message: '王小虎',
-          },
-          {
-            date: '2016-05-03',
-            message: '王小虎',
-          }
+        statusList: [
+          {label: '全部', val: ''},
+          {label: '未读', val: 0},
+          {label: '已读', val: 1}
         ],
+        all: '查看所有消息',
+        checkboxBtn: '标记为已读',
+        checkboxBtnVal: '',
+        systemTableData: [],
         activityTableData: [],
-        null_: '空空如也～'
+        null_: '空空如也～',
+        messageKey: {
+          isRead: '',         // isRead 是否已读 1已读 0未读 null全部
+          noticeType: 1,      // noticeType 1系统 2活动
+          pageIndex: 1        // pageIndex 索引
+        },
+        systemSelectionList: [],    // 系统多选结果
+        activitySelectionList: [],  // 活动多选结果
       }
     },
     methods: {
+      // 标记为已读
+      async readedAll(type){
+        let list = type == 'system' ? this.systemSelectionList : this.activitySelectionList,
+          data = await readMessages({
+          'isRead': 1,
+          'noticeUuidList': list.map(item => item.noticeUuid)
+        })
+        if(data.data.code == 201){
+          messageFun('success', '操作成功')
+          this.getMessageListF()
+        }
+      },
+      // 系统多选
+      systemSelectionChange(val){
+        this.systemSelectionList = val
+      },
+      //活动多选
+      activitySelectionChange(val){
+        this.activitySelectionList = val
+      },
       // 切换Table
       changeNavTable(index) {
-        this.navListIndex = index
+        this.messageKey.noticeType = ++ index
+        this.getMessageListF()
       },
       // 切换btn
-      changeStatusBtn(index) {
-        this.statusIndex = index
+      changeStatusBtn(val) {
+        this.messageKey.isRead = val
+        this.getMessageListF()
       },
       showMeAll() {
         this.$router.push('/messageCenter')
+      },
+      // 获取站内信列表
+      async getMessageListF(){
+        // isRead 是否已读 1已读 0未读 3全部
+        // noticeType 1系统 2活动
+        // keyword 关键字
+        // pageIndex 索引
+        // pageSize 页大小
+        let m = this.messageKey,
+          v = `isRead=${m.isRead}&noticeType=${m.noticeType}&keyword=&pageIndex=${m.pageIndex}&pageSize=10`
+        let data = await getMessageList(v)
+        if(data.data.code == 200){
+          if(m.noticeType == 1) this.systemTableData = data.data.data.map(item => {
+            return Object.assign(item, {
+              createTime: createDateFun(new Date(item.createTime), 'mini')
+            })
+          })
+          else if(m.noticeType == 2) this.activityTableData = data.data.data
+
+          // {
+          //  createBy: "system"
+          //  createTime: 1591061954296
+          //  customerUuid: "1"
+          //  dataStatus: 1
+          //  frameTaskUuid: null
+          //  id: 1
+          //  isRead: 1
+          //  isSend: 0
+          //  noticeCycle: null
+          //  noticeData: null
+          //  noticeDetail: "任务[任务ID_场景名]新建成功，请您查看。"
+          //  noticeIconPath: ""
+          //  noticeParam: ""
+          //  noticeTemplateUuid: "ea37a176-058b-49a0-8c48-02e3874da001"
+          //  noticeTime: null
+          //  noticeTitle: "添加任务通知"
+          //  noticeType: 1
+          //  noticeUrl: ""
+          //  noticeUuid: "1"
+          //  noticeWay: 1
+          //  requestType: null
+          //  updateBy: "1"
+          //  updateTime: 1591942821051
+          // }
+        }
       }
+    },
+    mounted() {
+      this.getMessageListF()  // 获取站内信列表
     }
   }
 </script>
@@ -245,10 +315,19 @@
         padding: 20px;
         box-sizing: border-box;
 
-        .showMeAll {
+        /deep/.el-checkbox {
+          margin-right: 8px;
+        }
+
+        .showMeAll,
+        .s {
           font-size: 12px;
           color: rgba(22, 29, 37, 1);
           cursor: pointer;
+        }
+
+        .s {
+
         }
       }
     }

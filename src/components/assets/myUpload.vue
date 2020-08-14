@@ -1,11 +1,7 @@
 <template>
   <div class="outPut-wrapper">
     <div class="outPut-table"
-         ref="outPutTable"
-         element-loading-text="拼命加载中"
-         element-loading-spinner="el-icon-loading"
-         element-loading-background="rgba(255, 255, 255, 0.8)"
-         v-loading.fullscreen.lock="fullscreenLoading">
+         ref="outPutTable">
       <!--面包屑-->
       <div class="bread">
         <span v-for="(item,index) in bread.list"
@@ -104,6 +100,9 @@
     UuidFun,
     exportDownloadFun
   } from '@/assets/common.js'
+  import {
+    mapState
+  } from 'vuex'
 
   export default {
     name: 'outPut',
@@ -219,7 +218,7 @@
             fileName: curr.taskNo + ' _ ' + curr.fileName,            // 文件名
             project: curr.projectName,          // 所属项目
             fileSize: '-',                      // 文件大小
-            fileType: '文件夹',                 // 文件类型
+            fileType: '文件夹',                  // 文件类型
             downLoadTime,                       // 下载状态
             date: '-',                          // 剩余有效期（天）
             upDate: createDateFun(new Date(curr.updateTime)),  // 更新时间
@@ -392,10 +391,22 @@
             },
             () => { messageFun('info','已取消删除'); return false }
           )
+      },
+      // 上传
+      uploadFun(type){
+        console.log('s')
+        this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+          transferType: type == 'file' ? 0 : 1,
+          userID: this.user.id,
+          networkPath: '/'
+        })
       }
     },
     mounted() {
       this.getList()
+    },
+    computed: {
+      ...mapState(['user'])
     }
   }
 </script>

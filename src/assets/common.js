@@ -16,10 +16,11 @@ const createCalendar = function (date) {
 }
 
 // 获得日期时间
-const createDateFun = function (date) {
+const createDateFun = function (date, mini) {
   if (date.getFullYear() == '1970') return '-'
   let {year, month, day, hour, minutes, seconds} = createCalendar(date)
-  return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
+  if(mini) return `${year}-${month}-${day}`
+  else return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
 }
 
 // 耗时

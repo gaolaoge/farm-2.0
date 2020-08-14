@@ -340,7 +340,19 @@
       },
       // 添加发票抬头
       async addHeader() {
-
+        let list = this.dialogData.list
+        if(!list[0]['Val']){
+          messageFun('info','【发票抬头】为必填项')
+          return false
+        }
+        if(!list[1]['Val']){
+          messageFun('info','【纳税人识别号】为必填项')
+          return false
+        }
+        if(!list[2]['Val']){
+          messageFun('info','【邮箱】为必填项')
+          return false
+        }
         let data = await addInvoiceHeader({
           invoiceTitle: list[0]['Val'],                 // 发票抬头
           taxpayerId: list[1]['Val'],                   // 纳税人识别号
@@ -376,6 +388,18 @@
       // 发票抬头 - 编辑 - 发送
       async editHeaderF(){
         let list = this.dialogData.list
+        if(!list[0]['Val']){
+          messageFun('info','【发票抬头】为必填项')
+          return false
+        }
+        if(!list[1]['Val']){
+          messageFun('info','【纳税人识别号】为必填项')
+          return false
+        }
+        if(!list[2]['Val']){
+          messageFun('info','【邮箱】为必填项')
+          return false
+        }
         let data = await editItemIn({
           invoiceSettingUuid: this.Uuid,
           invoiceTitle: list[0]['Val'],                 // 发票抬头
@@ -412,9 +436,17 @@
       },
       // 开票
       async invoicingF(){
+        if(!this.recordingSelection.length){
+          messageFun('info','未选中充值记录')
+          return false
+        }
+        if(!this.checked){
+          messageFun('info','未选中发票抬头')
+          return false
+        }
         let data = await invoicing({
           invoiceType: this.typeVal,                // 开票类型 0:普票 1:专票
-          rechargeUuidList: this.recordingSelection.map(item => item.rechargeUuid),    // 用户选择的充值uuid列表
+          rechargeUuidList: this.recordingSelection.map(item => item.rechargeUuid),         // 用户选择的充值uuid列表
           invoiceSettingUuid: this.invoiceTableData[this.checked]['invoiceSettingUuid']     // 发票抬头uuid
         })
         if(data.data.code == 200){

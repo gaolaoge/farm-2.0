@@ -16,8 +16,9 @@
         <!--验证码-->
         <div class="farm-item">
           <input type="text" class="farm-input code" v-model="codeVal" :placeholder="codePlaceholder">
-          <div class="getCode" @click="getPhoneCode">
-            <span>{{ codeLabel }}</span>
+          <div class="getCode" :class="[{'cannotBe': getPhoneCodeD.showCountdown}]">
+            <span class="getSpan" v-show="!getPhoneCodeD.showCountdown" @click="getPhoneCode">{{ codeLabel }}</span>
+            <span class="countdown" v-show="getPhoneCodeD.showCountdown">{{ getPhoneCodeD.time }}{{ unit }}</span>
           </div>
         </div>
         <!--新邮箱-->
@@ -27,8 +28,9 @@
         <!--验证码-->
         <div class="farm-item">
           <input type="text" class="farm-input code" v-model="emailCodeVal" :placeholder="emailCodePlaceholder">
-          <div class="getCode" @click="getEmailCode">
-            <span>{{ codeLabel }}</span>
+          <div class="getCode" :class="[{'cannotBe': getEmailCodeD.showCountdown}]">
+            <span class="getSpan" v-show="!getEmailCodeD.showCountdown" @click="getEmailCode">{{ codeLabel }}</span>
+            <span class="countdown" v-show="getEmailCodeD.showCountdown">{{ getEmailCodeD.time }}{{ unit }}</span>
           </div>
         </div>
         <div class="x">
@@ -81,21 +83,45 @@
         editing: true,
         successTit: '更换邮箱成功',
         dire: '3s 后自动返回“个人资料”',
-        btnn: '完成'
+        btnn: '完成',
+        unit: 's',
+        getPhoneCodeD: {
+          showCountdown: false,
+          setF: null,
+          time: 60,
+        },
+        getEmailCodeD: {
+          showCountdown: false,
+          setF: null,
+          time: 60,
+        }
       }
     },
     methods: {
       cancelFun() {
         this.editing = true
         this.$emit('cancel')
+        let p = this.getPhoneCodeD,
+          e = this.getEmailCodeD
+        if (p.setF) {
+          clearTimeout(p.setF)
+          p.showCountdown = false,
+            p.time = 60
+        }
+        if (e.setF) {
+          clearTimeout(p.setF)
+          p.showCountdown = false,
+            p.time = 60
+        }
+        this.reset()
       },
       // 确定修改
       async saveFun() {
-        if(!this.codeVal || !this.emailVal || !this.emailCodeVal) return false
+        if (!this.codeVal || !this.emailVal || !this.emailCodeVal) return false
         let reg = /^\d{6}$/,
-            reg2 = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
-        if(!reg2.test(this.emailVal)) return false
-        if(!reg.test(this.codeVal) || !reg.test(this.emailCodeVal)){
+          reg2 = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+        if (!reg2.test(this.emailVal)) return false
+        if (!reg.test(this.codeVal) || !reg.test(this.emailCodeVal)) {
           messageFun('error', '验证码输入错误')
           return false
         }
@@ -104,36 +130,72 @@
           "email": this.emailVal,
           "emailCode": this.emailCodeVal
         })
-        if(data.data.code == 200){
+        if (data.data.code == 200) {
           messageFun('success', '修改成功')
-          this.codeVal = null
-          this.emailVal = null
-          this.emailCodeVal = null
-          this.editing = false
-        }else if(data.data.msg == '邮箱验证码无效'){
+          this.reset()
+        } else if (data.data.msg == '邮箱验证码无效') {
           messageFun('error', '邮箱验证码无效')
-        }else if(data.data.msg == '手机号验证码无效'){
+        } else if (data.data.msg == '手机号验证码无效') {
           messageFun('error', '手机号验证码无效')
         }
 
       },
+      // 复位
+      reset(){
+        this.codeVal = null
+        this.emailVal = null
+        this.emailCodeVal = null
+        this.editing = false
+      },
       // 获取手机号验证码
-      async getPhoneCode(){
+      async getPhoneCode() {
         let data = await getPhoneCodeFromEmail()
-        if(data.data.code == 200) messageFun('success', '验证码已发送')
+        if (data.data.code == 200) {
+          messageFun('success', '验证码已发送')
+          this.getPhoneCodeD.showCountdown = true
+          this.phoneCountdown()
+        }
+      },
+      // 手机号验证码倒计时
+      phoneCountdown() {
+        let d = this.getPhoneCodeD
+        d.setF = setTimeout(() => {
+          d.time--
+          if (d.time) this.phoneCountdown()
+          else {
+            d.showCountdown = false
+            d.time = 60
+            d.setF = null
+          }
+        }, 1000)
       },
       // 获取新邮箱验证码
-      async getEmailCode(){
-        if(!this.emailVal) return false
+      async getEmailCode() {
+        if (!this.emailVal) return false
         let reg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
-        if(!reg.test(this.emailVal)){
+        if (!reg.test(this.emailVal)) {
           messageFun('error', '邮箱格式错误')
           return false
-        }else {
+        } else {
           let data = await getEmailCodeFromEmail(this.emailVal)
-          if(data.data.code == 200) messageFun('success', '验证码已发送')
+          if (data.data.code == 200) messageFun('success', '验证码已发送')
+          this.getEmailCodeD.showCountdown = true
+          this.emailCountdown()
         }
-      }
+      },
+      // 手机号验证码倒计时
+      emailCountdown() {
+        let d = this.getEmailCodeD
+        d.setF = setTimeout(() => {
+          d.time--
+          if (d.time) this.emailCountdown()
+          else {
+            d.showCountdown = false
+            d.time = 60
+            d.setF = null
+          }
+        }, 1000)
+      },
     },
     computed: {
       ...mapState(['user'])
@@ -209,8 +271,11 @@
       width: 300px;
       height: 36px;
       margin-bottom: 20px;
+      display: flex;
 
       .phone {
+        width: 100%;
+
         span {
           font-size: 14px;
           color: rgba(22, 29, 37, 0.6);
@@ -219,20 +284,32 @@
       }
 
       .getCode {
+        flex-shrink: 1;
         display: inline-block;
         width: 90px;
-        height: 36px;
+        height: 34px;
         border-radius: 8px;
         border: 1px solid rgba(39, 95, 239, 1);
         vertical-align: top;
         margin-left: 8px;
-        cursor: pointer;
         text-align: center;
+
+        &.cannotBe {
+          border: 1px solid rgba(22, 29, 37, 0.3);
+        }
 
         span {
           font-size: 14px;
-          color: rgba(39, 95, 239, 1);
-          line-height: 36px;
+          line-height: 34px;
+
+          &.getSpan {
+            color: rgba(39, 95, 239, 1);
+            cursor: pointer;
+          }
+
+          &.countdown {
+            color: rgba(22, 29, 37, 0.3);
+          }
         }
       }
 

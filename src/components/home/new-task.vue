@@ -133,10 +133,10 @@
                       <div class="f">
                         <span>{{ scope.row.address }}</span>
                         <img src="@/icons/more-btn.png" alt=""
-                             @click="$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
+                             @click="$store.commit('WEBSOCKET_PLUGIN_SEND', {
                           transferType: 4,              // 传输类型
                           sceneFile: scope.$index
-                        }))">
+                        })">
                       </div>
                     </template>
                   </el-table-column>
@@ -898,15 +898,6 @@
           id: Math.floor(Math.random() * Math.pow(10, 16))
         })
       },
-      // 1.选择渲染文件 - 我的电脑 插件 连接插件
-      openWebsocket() {
-        if (this.socket_plugin) return false   // 已连接
-        this.$store.commit('WEBSOCKET_PLUGIN_INIT', 'ws://localhost:15000')
-      },
-      // 4.选择渲染文件 - 我的电脑 插件 断开插件
-      shutWebsocket() {
-        this.$store.commit('WEBSOCKET_PLUGIN_CLOSE')
-      },
       // 0.获取可用场景文件格式
       async getRenderFileType() {
         let data = await getFileType(),
@@ -919,9 +910,6 @@
       // 1.选择渲染文件 - 切换选择场景文件方式
       changeFileSelection(index) {
         this.stepOneBase.index = index
-        // 判断是否已连接插件
-        if (index == 1 && !this.socket_plugin) this.openWebsocket()
-
       },
       // 1.选择渲染文件 - 我的电脑 = 工程路径 问号提示
       renderHeader(h, {column}) {
@@ -1242,10 +1230,10 @@
           return false
         }
         // 通知插件选择本地文件
-        this.$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
+        this.$store.commit('WEBSOCKET_PLUGIN_SEND',{
           transferType: 3,                  // 传输类型
           suffix: this.renderFileTypeList   // 文件后缀
-        }))
+        })
       },
       // 1.选择渲染文件 - 我的电脑 -【删除】新场景文件
       operateBtnDelete() {
@@ -1310,7 +1298,7 @@
           }
         })
         if (data.data.code == 200) {
-          this.$store.commit('WEBSOCKET_PLUGIN_SEND', JSON.stringify({
+          this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
             'transferType': 5,
             'userID': this.user.id,
             'taskList': fir.local.filelist.map((curr, index) => {
@@ -1320,13 +1308,12 @@
                 'taskID': data.data.data[index]
               }
             })
-          }))
+          })
         }
       },
       // 4.创建成功
       createSuc() {
         if (this.stepOneBase.index == 0) this.savePathFun()   // 保存工程路径记录
-        else this.shutWebsocket()                            // 关闭与插件的websocket连接
         messageFun('success', '创建成功')
         this.closeDialogFun()
         this.$router.push('/task')
@@ -1457,7 +1444,7 @@
       this.getRenderFileType()   // 获取可用的场景文件格式
       this.getList()             // 获取渲染模板列表
       this.getItemList()         // 获取项目列表
-      if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', JSON.stringify({'code': 602}))
+      if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', {'code': 602})
     },
     directives: {
       operating: {

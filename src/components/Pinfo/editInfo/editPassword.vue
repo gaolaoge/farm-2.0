@@ -22,8 +22,9 @@
                  :placeholder="codePlaceholder"
                  @blur="verifCode"
                  @focus="status.code = null">
-          <div class="getCode" @click="getCode">
-            <span>{{ codeLabel }}</span>
+          <div class="getCode" :class="[{'cannotBe': !canBeTrigger}]">
+            <span class="getSpan" @click="getCode" v-show="canBeTrigger">{{ codeLabel }}</span>
+            <span class="countdown" v-show="!canBeTrigger">{{ countdown }}{{ unit }}</span>
           </div>
           <span class="errorInfo" v-show="status.code === false">{{ codeTypeErr }}</span>
         </div>
@@ -72,7 +73,7 @@
       <div class="success" v-show="!editing">
         <img src="@/icons/smail.png" alt="">
         <h5 class="tit">{{ successTit }}</h5>
-        <span class="dire">{{ dire }}</span>
+        <span class="dire">{{ time }}{{ unit }}{{ dire }}</span>
         <div class="btnn" @click="cancelFun"><span>{{ btnn }}</span></div>
       </div>
     </div>
@@ -105,11 +106,17 @@
         btnCancel: '取消',
         editing: true,
         successTit: '更换密码成功',
-        dire: '3s 后自动返回“个人资料”',
+        time: 3,
+        unit: 's',
+        dire: ' 后自动返回“个人资料”',
         btnn: '完成',
         codeTypeErr: '',
         psTypeErr: '',
         psaTypeErr: '',
+        countdown: 60,         // 验证码倒计时
+        canBeTrigger: true,    // 验证码按钮可触发
+        setTimeoutF: null,     // 3秒倒计时函数
+        setTimeoutF2: null,    // 60秒倒计时函数
         status: {
           code: null,
           ps: null,
@@ -120,70 +127,110 @@
     computed: {
       ...mapState(['user'])
     },
-    watch: {
-
-    },
+    watch: {},
     methods: {
+      // 取消 - 关闭
       cancelFun() {
         this.editing = true
+        if (this.setTimeoutF) {
+          clearTimeout(this.setTimeoutF)
+          this.setTimeoutF = null
+          this.time = 3
+        }
+        if (this.setTimeoutF2) {
+          clearTimeout(this.setTimeoutF2)
+          this.setTimeoutF2 = null
+          this.canBeTrigger = true
+          this.countdown = 60
+        }
+        this.reset()
         this.$emit('cancel')
       },
       // 确定修改btn
       async saveFun() {
-        if(!this.status.code || !this.status.ps || !this.status.psa) return false
+        if (!this.status.code || !this.status.ps || !this.status.psa) return false
         let data = await editPassWord({
           password: this.passWordVal,
           code: this.codeVal
         })
-        if(data.data.code == 999){
+        if (data.data.code == 999) {
           messageFun('error', '未知错误')
-        }else if(data.data.code == 4043){
+        } else if (data.data.code == 4043) {
           messageFun('error', '验证码已过期')
-        }else if(data.data.code == 200){
-          this.status = {
-            code: null,
-            ps: null,
-            psa: null
-          }
-          this.passWordVal = ''
-          this.passWordAgainVal = ''
-          this.codeVal = ''
+        } else if (data.data.code == 200) {
+          this.reset()
           messageFun('success', '修改成功')
           this.editing = false
+          this.sucLoading()
         }
+      },
+      // 修改成功后3秒
+      sucLoading() {
+        this.setTimeoutF = setTimeout(() => {
+          this.time--
+          if (!this.time) {
+            this.cancelFun()
+          } else this.sucLoading()
+        }, 1000)
+      },
+      // 复位
+      reset() {
+        this.status = {
+          code: null,
+          ps: null,
+          psa: null
+        }
+        this.passWordVal = ''
+        this.passWordAgainVal = ''
+        this.codeVal = ''
       },
       // 获取验证码
       async getCode() {
         let data = await getCodeFromPS()
-        if (data.data.code == 200) messageFun('success', '验证码已发送，请注意查收')
+        if (data.data.code == 200) {
+          messageFun('success', '验证码已发送，请注意查收')
+          this.canBeTrigger = false
+          this.codeCountdown()
+        }
+      },
+      // 获取验证码后60s倒计时
+      codeCountdown() {
+        this.setTimeoutF2 = setTimeout(() => {
+          this.countdown--
+          if (this.countdown) this.codeCountdown()
+          else {
+            this.canBeTrigger = true
+            this.countdown = 60
+          }
+        }, 1000)
       },
       // 验证验证码格式
-      verifCode(){
+      verifCode() {
         // 为空
-        if(!this.codeVal){
+        if (!this.codeVal) {
           this.status.code = null
           return false
         }
-        if(/^\d{6}$/.test(this.codeVal)){
+        if (/^\d{6}$/.test(this.codeVal)) {
           this.status.code = true
-        }else{
+        } else {
           this.codeTypeErr = '验证码格式错误'
           this.status.code = false
         }
       },
       // 验证第一个密码
-      verifPS(){
+      verifPS() {
         // 为空
-        if(!this.passWordVal){
+        if (!this.passWordVal) {
           this.status.ps = null
           return false
         }
-        if(!/^\w{8,18}$/.test(this.passWordVal)){
+        if (!/^\w{8,18}$/.test(this.passWordVal)) {
           this.psTypeErr = '请输入8-18个字符'
           this.status.ps = false
           return false
         }
-        if(!/^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?!^.*[\u4E00-\u9FA5].*$)/.test(this.passWordVal)){
+        if (!/^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?!^.*[\u4E00-\u9FA5].*$)/.test(this.passWordVal)) {
           this.psTypeErr = '请至少包含大小写字母、数字、特殊字符中任意2种字符'
           this.status.ps = false
           return false
@@ -191,12 +238,12 @@
         this.status.ps = true
       },
       // 验证第二个密码
-      verifPSA(){
-        if(!this.passWordAgainVal || !this.status.ps){
+      verifPSA() {
+        if (!this.passWordAgainVal || !this.status.ps) {
           this.status.psa = null
           return false
         }
-        if(this.passWordAgainVal != this.passWordVal){
+        if (this.passWordAgainVal != this.passWordVal) {
           this.status.psa = false
           this.psaTypeErr = '两次密码输入不一致，请重新输入'
           return false
@@ -204,7 +251,7 @@
         this.status.psa = true
       },
       // 检验报错删除input
-      deleteInput(ee){
+      deleteInput(ee) {
         this[ee] = ''
         this.$refs[ee].focus()
       }
@@ -281,8 +328,11 @@
       width: 300px;
       height: 36px;
       margin-bottom: 20px;
+      display: flex;
 
       .phone {
+        width: 100%;
+
         span {
           font-size: 14px;
           color: rgba(22, 29, 37, 0.6);
@@ -291,20 +341,32 @@
       }
 
       .getCode {
+        flex-shrink: 1;
         display: inline-block;
         width: 90px;
-        height: 36px;
+        height: 34px;
         border-radius: 8px;
         border: 1px solid rgba(39, 95, 239, 1);
         vertical-align: top;
         margin-left: 8px;
-        cursor: pointer;
         text-align: center;
+
+        &.cannotBe {
+          border: 1px solid rgba(22, 29, 37, 0.3);
+        }
 
         span {
           font-size: 14px;
-          color: rgba(39, 95, 239, 1);
           line-height: 36px;
+
+          &.getSpan {
+            color: rgba(39, 95, 239, 1);
+            cursor: pointer;
+          }
+
+          &.countdown {
+            color: rgba(22, 29, 37, 0.3);
+          }
         }
       }
 
@@ -342,10 +404,12 @@
         color: rgba(255, 62, 77, 0.79);
         font-size: 12px;
       }
+
       .i {
         position: absolute;
         right: -24px;
         top: 8px;
+
         &.canClick {
           cursor: pointer;
         }

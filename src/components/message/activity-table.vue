@@ -3,10 +3,10 @@
     <div class="btnList">
       <div class="btn"
            v-for="(item,index) in btnList"
-           @click="changeNav(index)"
-           :class="[{'active': index == activeBtnIndex}]"
+           @click="changeNav(item.val)"
+           :class="[{'active': item.val === navIndex}]"
            :key="index">
-        <span>{{ item }}</span>
+        <span>{{ item.label }}</span>
       </div>
     </div>
     <div class="table">
@@ -24,13 +24,13 @@
           width="55" />
         <!--消息-->
         <el-table-column
-          prop="message"
+          prop="noticeDetail"
           label="消息"
           show-overflow-tooltip />
         <!--日期-->
         <el-table-column
           label="日期"
-          prop="date"
+          prop="createTime"
           width="120" />
       </el-table>
     </div>
@@ -40,66 +40,94 @@
         layout="prev, pager, next, jumper"
         @current-change="jump"
         :current-page.sync="table.currentPage"
-        :total="table.outPutTableTotal" />
+        :total="table.total" />
     </div>
   </div>
 </template>
 
 <script>
+  import {getMessageList} from "../../api/header-api"
+  import {
+    createDateFun
+  } from '@/assets/common'
+
   export default {
     name: 'activityTable',
     data(){
       return {
-        btnList: ['全部', '未读', '已读'],
+        btnList: [
+          {label: '全部', val: ''},
+          {label: '未读', val: 0},
+          {label: '已读', val: 1}
+        ],
+        navIndex: '',
         table: {
-          tableData: [
-            {
-              date: '2016-05-03',
-              message: '上海市普陀区金沙江路 1518 弄'
-            },
-            {
-              date: '2016-05-02',
-              message: '上海市普陀区金沙江路 1518 弄'
-            },
-            {
-              date: '2016-05-04',
-              message: '上海市普陀区金沙江路 1518 弄'
-            },
-            {
-              date: '2016-05-01',
-              message: '上海市普陀区金沙江路 1518 弄'
-            },
-            {
-              date: '2016-05-08',
-              message: '上海市普陀区金沙江路 1518 弄'
-            },
-            {
-              date: '2016-05-06',
-              message: '上海市普陀区金沙江路 1518 弄'
-            },
-            {
-              date: '2016-05-07',
-              message: '上海市普陀区金沙江路 1518 弄'
-            }
-          ],
-
-          outPutTableTotal: 82,
+          tableData: [],
+          total: null,
           currentPage: 1,
-          pageSize: 10,
-          selectionList: [],            //渲染输出选中项
+          selectionList: [],            //选中项
         },
-        activeBtnIndex: '0'
       }
     },
     methods: {
-      //
-      changeNav(index){
-        this.activeBtnIndex = index
+      // 切换信息类别
+      changeNav(val){
+        this.navIndex = val
+        this.table.currentPage = 1
+        this.getList()
       },
       // 多选
       handleSelectionChange(val){
 
+      },
+      // 跳转
+      jump(index){
+        this.table.currentPage = index
+        this.getList()
+      },
+      async getList(){
+        // isRead 是否已读 1已读 0未读 3全部
+        // noticeType 1系统 2活动
+        // keyword 关键字
+        // pageIndex 索引
+        // pageSize 页大小
+        let v = `isRead=${this.navIndex}&noticeType=2&keyword=&pageIndex=${this.table.currentPage}&pageSize=10`
+        let data = await getMessageList(v)
+        this.table.tableData = data.data.data.map(item => {
+          return Object.assign(item, {
+            createTime: createDateFun(new Date(item.createTime), 'mini')
+          })
+        })
+        this.table.total = data.data.total
+        // {
+        //  createBy: "system"
+        //  createTime: 1591061954296
+        //  customerUuid: "1"
+        //  dataStatus: 1
+        //  frameTaskUuid: null
+        //  id: 1
+        //  isRead: 1
+        //  isSend: 0
+        //  noticeCycle: null
+        //  noticeData: null
+        //  noticeDetail: "任务[任务ID_场景名]新建成功，请您查看。"
+        //  noticeIconPath: ""
+        //  noticeParam: ""
+        //  noticeTemplateUuid: "ea37a176-058b-49a0-8c48-02e3874da001"
+        //  noticeTime: null
+        //  noticeTitle: "添加任务通知"
+        //  noticeType: 1
+        //  noticeUrl: ""
+        //  noticeUuid: "1"
+        //  noticeWay: 1
+        //  requestType: null
+        //  updateBy: "1"
+        //  updateTime: 1591942821051
+        // }
       }
+    },
+    mounted() {
+      this.getList()
     }
   }
 </script>
@@ -148,7 +176,7 @@
   }
   /deep/.el-table__row{
     td:nth-of-type(3) .cell {
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(22, 29, 37, 0.5);
       font-size: 10px;
     }
   }

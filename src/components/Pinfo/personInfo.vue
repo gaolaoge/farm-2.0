@@ -50,7 +50,7 @@
       <!--邮箱-->
       <div class="form-item">
         <span class="label">{{ info.emailLabel }}：</span>
-        <span class="val">{{ user.email || 'null' }}</span>
+        <span class="val">{{ user.email || '未绑定' }}</span>
         <span class="editBtn" @click="editEmailMoudle = true">{{ editBtn }}</span>
         <span class="remarks">{{ info.emailRemarks }}</span>
       </div>
