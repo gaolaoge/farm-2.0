@@ -269,6 +269,9 @@
     seeBalance
   } from '@/api/api'
   import {
+    uploadTabGetList
+  } from '@/api/task-api'
+  import {
     mapState
   } from 'vuex'
   import {
@@ -518,7 +521,7 @@
         //   renderStatus: ''         // 工程ID
         // }
         let t = `zoneUuid=${this.zoneId}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=${condition == 'null' ? '' : condition}&projectUuid=`
-        let data = await getRenderTableList(t),
+        let data = this.zone == 1 ? await getRenderTableList(t) : await uploadTabGetList(t),
             usersList = new Set()
         this.table.renderTableTotal = data.data.total
         this.$emit('renderTbaleTotalItem', data.data.total)
@@ -890,7 +893,7 @@
       if(!this.$route.params.name) setTimeout(() => this.getList(), 100)
     },
     computed: {
-      ...mapState(['zoneId']),
+      ...mapState(['zoneId', 'zone']),
     },
     watch: {
       'table.renderSelectionList': {

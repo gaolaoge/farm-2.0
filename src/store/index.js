@@ -41,6 +41,7 @@ export default new Vuex.Store({
     WEBSOCKET_BACKS_INIT(state, account) {
       let num = 0
       state.socket_backS = new WebSocket(`ws://192.168.1.176:5002/websocket/web/${account}`)
+      // state.socket_backS = new WebSocket(`ws://223.80.107.190:5002/websocket/web/${account}`)      // 测试环境
       state.socket_backS.addEventListener('open', () => console.log('--与后台连接成功--'))
       state.socket_backS.addEventListener('error', () => {
         if(num >= 5){
@@ -63,7 +64,7 @@ export default new Vuex.Store({
     WEBSOCKET_PLUGIN_INIT(state){
       let num = 0
       state.socket_plugin = new WebSocket('ws://localhost:15000')
-      // state.socket_plugin = new WebSocket('ws://192.168.1.15:15000')
+      // state.socket_plugin = new WebSocket('ws://192.168.1.111:15000')
       state.socket_plugin.addEventListener('open', () => console.log('--与插件连接成功--'))
       state.socket_plugin.addEventListener('error', () => {
         if(num >= 5){

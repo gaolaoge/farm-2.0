@@ -1,13 +1,16 @@
 <template>
   <div class="activityTable">
     <div class="btnList">
-      <div class="btn"
-           v-for="(item,index) in btnList"
-           @click="changeNav(item.val)"
-           :class="[{'active': item.val === navIndex}]"
-           :key="index">
-        <span>{{ item.label }}</span>
+      <div>
+        <div class="btn"
+             v-for="(item,index) in btnList"
+             @click="changeNav(item.val)"
+             :class="[{'active': item.val === navIndex}]"
+             :key="index">
+          <span>{{ item.label }}</span>
+        </div>
       </div>
+      <span class="readAll" v-show="selectionList.length" @click="readAllMessage">{{ readAll }}</span>
     </div>
     <div class="table">
       <el-table
@@ -21,17 +24,17 @@
         <el-table-column
           type="selection"
           align="center"
-          width="55" />
+          width="55"/>
         <!--消息-->
         <el-table-column
           prop="noticeDetail"
           label="消息"
-          show-overflow-tooltip />
+          show-overflow-tooltip/>
         <!--日期-->
         <el-table-column
           label="日期"
           prop="createTime"
-          width="120" />
+          width="120"/>
       </el-table>
     </div>
     <div class="page">
@@ -40,21 +43,26 @@
         layout="prev, pager, next, jumper"
         @current-change="jump"
         :current-page.sync="table.currentPage"
-        :total="table.total" />
+        :total="table.total"/>
     </div>
   </div>
 </template>
 
 <script>
-  import {getMessageList} from "../../api/header-api"
   import {
-    createDateFun
+    getMessageList,
+    readMessages
+  } from "../../api/header-api"
+  import {
+    createDateFun,
+    messageFun
   } from '@/assets/common'
 
   export default {
     name: 'activityTable',
-    data(){
+    data() {
       return {
+        readAll: '标记为已读',
         btnList: [
           {label: '全部', val: ''},
           {label: '未读', val: 0},
@@ -65,27 +73,38 @@
           tableData: [],
           total: null,
           currentPage: 1,
-          selectionList: [],            //选中项
         },
+        selectionList: [],
       }
     },
     methods: {
       // 切换信息类别
-      changeNav(val){
+      changeNav(val) {
         this.navIndex = val
         this.table.currentPage = 1
         this.getList()
       },
+      // 批量标记为已读
+      async readAllMessage() {
+        let data = await readMessages({
+          'isRead': 1,
+          'noticeUuidList': this.selectionList.map(item => item.noticeUuid)
+        })
+        if (data.data.code == 201) {
+          messageFun('success', '操作成功')
+          this.getList()
+        }
+      },
       // 多选
-      handleSelectionChange(val){
-
+      handleSelectionChange(val) {
+        this.selectionList = val
       },
       // 跳转
-      jump(index){
+      jump(index) {
         this.table.currentPage = index
         this.getList()
       },
-      async getList(){
+      async getList() {
         // isRead 是否已读 1已读 0未读 3全部
         // noticeType 1系统 2活动
         // keyword 关键字
@@ -140,8 +159,12 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+
     .btnList {
       padding: 10px 0px;
+      display: flex;
+      justify-content: space-between;
+
       .btn {
         display: inline-block;
         width: 68px;
@@ -151,30 +174,51 @@
         text-align: center;
         margin: 0px 15px;
         cursor: pointer;
+
         span {
           font-size: 14px;
           color: rgba(22, 29, 37, 0.39);
           line-height: 24px;
         }
+
         &.active {
           background-color: rgba(39, 95, 239, 1);
+
           span {
             color: rgba(255, 255, 255, 1);
           }
         }
       }
     }
+
     .table {
       flex-grow: 1;
     }
+
     .page {
       margin: 0px 25px 30px;
     }
+
+    .readAll {
+      font-size: 14px;
+      font-family: PingFangSC-Medium, PingFang SC;
+      font-weight: 500;
+      color: rgba(22, 29, 37, 0.8);
+      margin-right: 40px;
+      cursor: pointer;
+
+      &:hover {
+        color: rgba(22, 29, 37, 1);
+      }
+    }
+
   }
-  /deep/.el-table__body-wrapper {
+
+  /deep/ .el-table__body-wrapper {
     height: calc(100vh - 330px);
   }
-  /deep/.el-table__row{
+
+  /deep/ .el-table__row {
     td:nth-of-type(3) .cell {
       color: rgba(22, 29, 37, 0.5);
       font-size: 10px;

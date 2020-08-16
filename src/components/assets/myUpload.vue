@@ -77,7 +77,7 @@
         @current-change="handleCurrentChange"
         :page-size="table.pageSize"
         layout="prev, pager, next, jumper"
-        :total="table.outPutTableTotal">
+        :total="table.total">
       </el-pagination>
     </div>
   </div>
@@ -85,20 +85,11 @@
 
 <script>
   import {
-    assetsExportMain,
-    assetsExportLayer,
-    assetsExportFrame,
-    assetsDeleteItem,
-    compressionFiles,
-    downloadFrame,
-    seeBalance
-  } from '@/api/api'
+    uploadTabGetList
+  } from '@/api/assets-api'
   import {
-    consum,
     createDateFun,
-    messageFun,
-    UuidFun,
-    exportDownloadFun
+    messageFun
   } from '@/assets/common.js'
   import {
     mapState
@@ -108,7 +99,6 @@
     name: 'outPut',
     data(){
       return {
-        fullscreenLoading: false,
         table: {
           tableData: [
             // {
@@ -126,9 +116,8 @@
                upDate: '2014-01-25 00:00:00'
              },
           ],
-          outPutTableTotal: 0,
+          total: 0,
           pageIndex: 1,
-          pageSize: 10,
           selectionList: [],            // table选中项
           rowUuid: null,                // 选中行Uuid
           nextTbaleType: 'layer',
@@ -149,7 +138,8 @@
               name: 'main'
             }
           ],
-        }
+        },
+        path: '/',        // 当前位置
       }
     },
     props: {
@@ -173,125 +163,7 @@
       filterHandler(value, row, column){
         console.log(value, row, column)
       },
-      // 主任务table 查看层任务
-      seeRow(row){
-        this.$emit('clearInput')
-        this.table.rowUuid = row.itemUuid
-        if(this.table.nextTbaleType == 'layer') {
-          this.getLayerList()
-          this.table.objectName = row.project
-          this.table.layerObj = row
-          this.bread.list.push({
-            text: row.fileName,
-            name: 'layer'
-          })
-        }
-        if(this.table.nextTbaleType == 'frame') {
-          this.getFrameList()
-          this.table.frameObj = row
-          this.bread.list.push({
-            text: row.fileName,
-            name: 'frame'
-          })
-        }
-      },
-      // 查询主任务
-      async getList(){
-        this.$emit('clearInput')
-        this.fullscreenLoading = true
-        // {
-        //   keyword: '',         // 关键字
-        //   pageIndex: '',
-        //   pageSize: '',
-        //   projectUuid: ''      // 选中项Uuid
-        // }
-        let t = `keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
-          data = await assetsExportMain(t),
-          projectList = new Set()
-        this.fullscreenLoading = false
-        this.table.main = true
-        this.table.outPutData = data.data.data.map(curr => {
-          let downLoadTime = curr.downloadFrameCount == 0 ? '未下载' : curr.downloadFrameCount == curr.allFrameCount ? '已下载' : '部分下载'
-          projectList.add(curr.projectName)
-          return {
-            id: curr.taskNo,                    // 任务ID
-            fileName: curr.taskNo + ' _ ' + curr.fileName,            // 文件名
-            project: curr.projectName,          // 所属项目
-            fileSize: '-',                      // 文件大小
-            fileType: '文件夹',                  // 文件类型
-            downLoadTime,                       // 下载状态
-            date: '-',                          // 剩余有效期（天）
-            upDate: createDateFun(new Date(curr.updateTime)),  // 更新时间
-            itemUuid: curr.taskUuid
-          }
-        })
-        this.projectList = [...projectList].map(item => {
-          return {
-            'text': item,
-            'value': item
-          }
-        })
-        this.l.n = data.data.total
-        this.table.outPutTableTotal = data.data.total
-      },
-      // 查询层任务
-      async getLayerList(){
-        this.fullscreenLoading = true
-        // {
-        //   keyword: '',         // 关键字
-        //   pageIndex: '',
-        //   pageSize: '',
-        //   taskUuid: ''      // 选中项Uuid
-        // }
-        let t = `taskUuid=${this.table.rowUuid}&keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
-          data = await assetsExportLayer(t)
-        this.fullscreenLoading = false
-        this.table.nextTbaleType = 'frame'
-        this.table.outPutData = data.data.data.map(curr => {
-          return {
-            id: curr.layerNo,                    // 任务ID
-            fileName: curr.layerName,            // 文件名
-            project: this.table.objectName,      // 所属项目
-            fileSize: curr.fileSize,             // 文件大小
-            fileType: '文件夹',                  // 文件类型
-            downLoadTime: '-',                  // 下载次数
-            date: '',                           // 剩余有效期（天）
-            upDate: createDateFun(new Date(curr.updateTime)),  // 更新时间
-            itemUuid: curr.layerTaskUuid
-          }
-        })
-        this.table.outPutTableTotal = data.data.total
-      },
-      // 查询帧任务
-      async getFrameList(){
-        this.fullscreenLoading = true
-        // {
-        //   keyword: '',           // 关键字
-        //   pageIndex: '',
-        //   pageSize: '',
-        //   layerTaskUuid: ''      // 选中项Uuid
-        // }
-        let t = `layerTaskUuid=${this.table.rowUuid}&keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=${this.table.pageSize}`,
-          data = await assetsExportFrame(t)
-        this.fullscreenLoading = false
-        this.table.nextTbaleType = 'null'
-        this.table.outPutData = data.data.data.map(curr => {
-          let fileType = curr.fileName.split('.')
-          return {
-            fileName: curr.fileName,                        // 文件名
-            project: this.table.objectName,                 // 所属项目
-            fileSize: curr.fileSize,                        // 文件大小
-            fileType: fileType[fileType.length - 1],        // 文件类型
-            downLoadTime: curr.downloadCount,               // 下载次数
-            date: curr.indate == 0 ? '-' : consum(curr.indate - new Date().getTime()), // 剩余有效期（天）
-            upDate: createDateFun(new Date(curr.updateTime)),                        // 更新时间
-            itemUuid: curr.frameTaskUuid,
-            frameTaskUuid: curr.frameTaskUuid,
-            layerTaskUuid: curr.layerTaskUuid
-          }
-        })
-        this.table.outPutTableTotal = data.data.total
-      },
+
       // nav change
       navChange(name){
         switch(name){
@@ -314,92 +186,54 @@
             break
         }
       },
-      // 下载item 申请打包
-      async downloadFun(){
-        let r = await seeBalance()
-        if(r.data.code == 1001){ messageFun('info',`当前账户余额为${r.data.data}，请先进行充值！`); return false }
-        this.$confirm('将下载选中选, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-          .then(
-            async () => {
-              let code = 1,
-                type = 3,
-                uuidList = this.table.selectionList.map(item => item.itemUuid)
-              if(this.table.nextTbaleType == 'layer') type = 1
-              if(this.table.nextTbaleType == 'frame') type = 2
-              if(type != 3){
-                messageFun('success','发起文件打包请求')
-                let code = UuidFun(),
-                  // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
-                  socket_ = new WebSocket(`ws://223.80.107.190:5000/professional/websocket/package/${code}`)
-                socket_.addEventListener('open',function(){
-                  socket_.send(JSON.stringify({
-                    'message': {
-                      type,
-                      uuidList: uuidList
-                    }
-                  }))
-                })
-                socket_.addEventListener('message',e => {
-                  let data = JSON.parse(e.data)
-                  if(data.code == 200){ this.downloadingFun(data.data) }
-                  if(data.code == 209){ socket_.close(); this.downloadingFun(data.data) }
-                })
-              }
-              if(type == 3){
-                this.table.selectionList.forEach(async curr => {
-                  let t = `frameTaskUuid=${curr.frameTaskUuid}&layerTaskUuid=${curr.layerTaskUuid}&type=3`,
-                    data = await downloadFrame(t)
-                  exportDownloadFun(data, data.headers.file, '')
-                })
-              }
-            },
-            () => { messageFun('info','已取消下载'); return false }
-          )
-      },
-      // 打包后下载
-      async downloadingFun(path){
-        let data = await compressionFiles(path)
-        exportDownloadFun(data,data.headers.file,'zip')
-      },
-      // 删除item
-      deleteFun(){
-        this.$confirm('将删除选中选, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-          .then(
-            async () => {
-              let type = 3
-              if(this.table.nextTbaleType == 'layer') type = 1
-              if(this.table.nextTbaleType == 'frame') type = 2
-              let data = await assetsDeleteItem({
-                type,
-                uuidList: this.table.selectionList.map(item => item.itemUuid)
-              })
-
-              if(data.data.code == 204){
-                messageFun('success','操作成功')
-                if(type == 1) this.getList()
-                if(type == 2) this.getLayerList()
-                if(type == 3) this.getFrameList()
-              }else{ messageFun('error','报错，操作失败') }
-            },
-            () => { messageFun('info','已取消删除'); return false }
-          )
+      // 获取列表
+      async getList(){
+        let val = `path=${this.path}&keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=10`
+        let data = await uploadTabGetList(val)
+        if(data.data.code == 200){
+          this.table.tableData = data.data.data.map(item => item)
+          this.table.total = data.data.total
+        }
       },
       // 上传
       uploadFun(type){
-        console.log('s')
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: type == 'file' ? 0 : 1,
           userID: this.user.id,
           networkPath: '/'
         })
+      },
+      // 新建文件夹
+      createFolder(){
+
+      },
+      // 下载
+      downloadFile(){
+        this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+          'transferType': 2,
+          'userID': this.user.id,
+          'fileList': []
+        })
+      },
+      // 移动到
+      moveFile(){
+
+      },
+      // 复制到
+      copyFile(){
+
+      },
+      // 重命名
+      rename(){
+
+      },
+      // 解压
+      unzip(){
+
+      },
+      // 删除
+      deleteFile(){
+
       }
     },
     mounted() {

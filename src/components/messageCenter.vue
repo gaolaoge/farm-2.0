@@ -16,14 +16,14 @@
              class="rechargeTable"
              v-show="table.navListActiveIndex == 0">
           <!--系统表格-->
-          <system-table />
+          <system-table/>
         </div>
         <!--活动-->
         <div ref="consumptionTable"
              class="consumptionTable"
              v-show="table.navListActiveIndex == 1">
           <!--活动表格-->
-          <activity-table />
+          <activity-table/>
         </div>
       </div>
     </div>
@@ -33,9 +33,10 @@
 <script>
   import systemTable from '@/components/message/system-table'
   import activityTable from '@/components/message/activity-table'
+
   export default {
     name: 'messageCenter',
-    data(){
+    data() {
       return {
         table: {
           navListActiveIndex: 0,
@@ -47,7 +48,7 @@
               text: '活动'
             }
           ]
-        }
+        },
       }
     },
     components: {
@@ -61,10 +62,13 @@
   .messageCenter {
     overflow: hidden;
     width: 100%;
+
     .tableGroup {
       height: calc(100% - 20px);
+
       .tableList {
         height: calc(100% - 44px);
+
         .rechargeTable,
         .consumptionTable {
           height: 100%;

@@ -65,16 +65,27 @@
         </div>
       </div>
       <div class="rightOPerate">
-        <div class="searchItem">
+        <div class="searchItem" v-show="table.navListActiveIndex == 0">
           <input type="text"
                  class="farm-form-input"
-                 v-model="searchInputVal"
-                 @keyup.enter="searchFun"
+                 v-model="renderSearchInputVal"
+                 @keyup.enter="searchFun('upload')"
                  placeholder="文件名">
           <img src="@/icons/global-search-icon.png"
                alt=""
                class="searchIcon"
-               @click="searchFun">
+               @click="searchFun('upload')">
+        </div>
+        <div class="searchItem" v-show="table.navListActiveIndex == 1">
+          <input type="text"
+                 class="farm-form-input"
+                 v-model="uploadSearchInputVal"
+                 @keyup.enter="searchFun('render')"
+                 placeholder="文件名">
+          <img src="@/icons/global-search-icon.png"
+               alt=""
+               class="searchIcon"
+               @click="searchFun('render')">
         </div>
       </div>
     </div>
@@ -96,12 +107,12 @@
       <div class="tableList">
         <!--我的上传-->
         <div class="myUploadTable" v-show="table.navListActiveIndex == 0">
-          <my-upload ref="myUploadTable"/>
+          <my-upload ref="myUploadTable" :searchInputVal="uploadSearchInputVal" />
         </div>
         <!--渲染输出-->
         <div class="outPutTable" v-show="table.navListActiveIndex == 1">
           <!--渲染输出Tab-->
-          <out-put-render ref="outPutTable" :searchInputVal="searchInputVal" @clearInput="clearInput"/>
+          <out-put-render ref="outPutTable" :searchInputVal="renderSearchInputVal" @clearInput="clearInput"/>
         </div>
       </div>
     </div>
@@ -161,7 +172,8 @@
           navListActiveIndex: 0,
           navList: this.$t('assets.navList'),            // ['我的上传', '渲染输出']
         },
-        searchInputVal: ''
+        renderSearchInputVal: '',
+        uploadSearchInputVal: '',
       }
     },
     directives: {
@@ -216,8 +228,9 @@
       createTableIconList()
     },
     methods: {
-      searchFun() {
-        this.$refs.outPutTable.getList()
+      searchFun(type) {
+        if(type == 'render') this.$refs.outPutTable.getList()
+        else this.$refs.myUploadTable.getList()
       },
       clearInput() {
         this.searchInputVal = ''
@@ -235,11 +248,32 @@
           }
         }else if(type == 'upload'){
           switch (active) {
-            case '文件':  // 文件
+            case '文件':                                // 文件
               this.$refs.myUploadTable.uploadFun('file')
               break
-            case '文件夹':  // 文件夹
+            case '文件夹':                              // 文件夹
               this.$refs.myUploadTable.uploadFun('folder')
+              break
+            case '新建文件夹':                           // 新建文件夹
+              this.$refs.myUploadTable.createFolder()
+              break
+            case '下载':                                // 下载
+              this.$refs.myUploadTable.downloadFile()
+              break
+            case '移动到':                              // 移动到
+              this.$refs.myUploadTable.moveFile()
+              break
+            case '复制到':                              // 复制到
+              this.$refs.myUploadTable.copyFile()
+              break
+            case '重命名':                              // 重命名
+              this.$refs.myUploadTable.rename()
+              break
+            case '解压':                                // 解压
+              this.$refs.myUploadTable.unzip()
+              break
+            case '删除':                                // 删除
+              this.$refs.myUploadTable.deleteFile()
               break
           }
         }

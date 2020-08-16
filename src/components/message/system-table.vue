@@ -1,13 +1,16 @@
 <template>
   <div class="systemTable">
     <div class="btnList">
-      <div class="btn"
-           v-for="(item,index) in btnList"
-           @click="changeNav(item.val)"
-           :class="[{'active': item.val === navIndex}]"
-           :key="index">
-        <span>{{ item.label }}</span>
+      <div>
+        <div class="btn"
+             v-for="(item,index) in btnList"
+             @click="changeNav(item.val)"
+             :class="[{'active': item.val === navIndex}]"
+             :key="index">
+          <span>{{ item.label }}</span>
+        </div>
       </div>
+      <span class="readAll" v-show="selectionList.length" @click="readAllMessage">{{ readAll }}</span>
     </div>
     <div class="table">
       <el-table
@@ -46,15 +49,20 @@
 </template>
 
 <script>
-  import {getMessageList} from "../../api/header-api"
   import {
-    createDateFun
+    getMessageList,
+    readMessages
+  } from "../../api/header-api"
+  import {
+    createDateFun,
+    messageFun
   } from '@/assets/common'
 
   export default {
     name: 'systemTable',
     data() {
       return {
+        readAll: '标记为已读',
         btnList: [
           {label: '全部', val: ''},
           {label: '未读', val: 0},
@@ -65,8 +73,8 @@
           tableData: [],
           total: null,
           currentPage: 1,
-          selectionList: [],            //选中项
         },
+        selectionList: []
       }
     },
     methods: {
@@ -76,9 +84,20 @@
         this.table.currentPage = 1
         this.getList()
       },
+      // 批量标记为已读
+      async readAllMessage() {
+        let data = await readMessages({
+          'isRead': 1,
+          'noticeUuidList': this.selectionList.map(item => item.noticeUuid)
+        })
+        if(data.data.code == 201){
+          messageFun('success', '操作成功')
+          this.getList()
+        }
+      },
       // 多选
       handleSelectionChange(val) {
-
+        this.selectionList = val
       },
       // 跳转
       jump(index) {
@@ -143,6 +162,8 @@
 
     .btnList {
       padding: 10px 0px;
+      display: flex;
+      justify-content: space-between;
 
       .btn {
         display: inline-block;
@@ -176,6 +197,19 @@
 
     .page {
       margin: 0px 25px 30px;
+    }
+  }
+
+  .readAll {
+    font-size: 14px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: 500;
+    color: rgba(22, 29, 37, 0.8);
+    margin-right: 40px;
+    cursor: pointer;
+
+    &:hover {
+      color: rgba(22, 29, 37, 1);
     }
   }
 
