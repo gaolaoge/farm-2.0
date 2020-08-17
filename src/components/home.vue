@@ -60,27 +60,27 @@
                 @click="recentIndex = index">
               <div class="a">
                 <div class="avatarBox">
-                  <img src="@/assets/demo.jpeg" alt="">
+                  <img :src="item.thumbnail" alt="">
                 </div>
                 <div class="t">
-                  <h6>{{ item.name || 'null'}}</h6>
-                  <span class="date">{{ item.date || 'null-null-null'}}</span>
+                  <h6>{{ item.projectName || 'null'}}</h6>
+                  <span class="date">{{ item.updateTime || 'null-null-null'}}</span>
                 </div>
               </div>
               <div class="l">
-                <span>分析中：{{ item.analysis_ing || 'null' }}</span>
-                <span>分析失败：{{ item.analysis_err || 'null' }}</span>
-                <span>分析警告：{{ item.analysis_warn || 'null' }}</span>
-                <span>待设置参数：{{ item.toBeSet || 'null' }}</span>
-                <span>渲染中：{{ item.render_ing || 'null' }}</span>
-                <span>待全部渲染：{{ item.toBeRenderAll || 'null' }}</span>
-                <span>渲染失败：{{ item.render_err || 'null' }}</span>
-                <span>渲染完成：{{ item.render_done || 'null' }}</span>
+                <span>分析中：{{ item.analyzing }}</span>
+                <span>分析失败：{{ item.analyseFail }}</span>
+                <span>分析警告：{{ item.analyseWarn }}</span>
+                <span>待设置参数：{{ item.waitSetUpParam }}</span>
+                <span>渲染中：{{ item.rendering }}</span>
+                <span>待全部渲染：{{ item.waitAllRender }}</span>
+                <span>渲染失败：{{ item.renderPause }}</span>
+                <span>渲染完成：{{ item.finishRender }}</span>
               </div>
             </li>
           </ul>
           <div class="occlusion"></div>
-          <div class="btnList">
+          <div class="btnList" v-show="recentList.length > 3">
             <div class="btnL btn">
               <img src="@/icons/recentLeftA.png" alt="" class="c" v-show="recentShowIndex > 0" @click="recentShowIndex --">
               <img src="@/icons/recentLeft.png" alt="" v-show="recentShowIndex == 0">
@@ -106,8 +106,11 @@
     putNewZoneID
   } from '@/api/api.js'
   import {
-    messageFun,
-    IEVersion
+    getRecentTaskList
+  } from '@/api/home-api'
+  import {
+    IEVersion,
+    createDateFun
   } from "../assets/common"
 
   export default {
@@ -161,22 +164,7 @@
         // 工程文件
         fileList: [],
         hi: 'Hello,',
-        recentList: [
-          {
-            projectImgUrl: '',
-            name: '流浪地球渲染项目',
-            date: '2019-01-24',
-            analysis_ing: '12',
-            analysis_err: '2',
-            analysis_warn: '5',
-            toBeSet: '8',
-            render_ing: '32',
-            toBeRenderAll: '4',
-            render_err: '2',
-            render_done: '9'
-          },
-          {}, {}, {},{},{}
-        ],
+        recentList: [],
         recentIndex: 0,        // 近期项目相中项
         recentShowIndex: 0,    // 近期项目显示位第一索引
       }
@@ -191,6 +179,7 @@
           this.getHomeTData(val)
           this.getEchartsData(val)
           putNewZoneID({"zoneUuid": val})   // 传达切换分区事件
+          this.getTaskList()                // 获取近期项目列表
         },
         immediate: true
       },
@@ -213,6 +202,28 @@
       newTask
     },
     methods: {
+      async getTaskList(){
+        let data = await getRecentTaskList(`zoneUuid=${this.zoneId}`)
+        this.recentList = data.data.data.map(item => {
+          return Object.assign(item, {
+            updateTime: createDateFun(new Date(item.updateTime), 'mini')
+          })
+        })
+        // {
+        //   analyseFail: 0,       分析失败
+        //   analyseWarn: 0,       分析警告
+        //   analyzing: 0,         分析中
+        //   finishRender: 0,      渲染完成
+        //   projectName: "项目一", 项目名
+        //   projectUuid: "1",     项目Uuid
+        //   renderPause: 0,       渲染失败
+        //   rendering: 0,         渲染中
+        //   updateTime: 1597649061283,   时间
+        //   waitAllRender: 1,     待全部渲染
+        //   waitSetUpParam: 0,    待设置参数
+        //   thumbnail:            图像
+        // }
+      },
       // 关闭
       closeDialogFun() {
         this.showNewTask = false

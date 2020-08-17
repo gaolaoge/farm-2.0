@@ -4,11 +4,10 @@
          ref="outPutTable">
       <!--面包屑-->
       <div class="bread">
-        <span v-for="(item,index) in bread.list"
+        <span v-for="(item,index) in nav"
               :key="index"
-              @click="navChange(item.name)"
               class="h">
-          {{ item.text }}
+          {{ item }}
           <img src="@/icons/enter.png" alt="" class="img">
         </span>
       </div>
@@ -108,19 +107,11 @@
             //   remainingValidity: '',     //剩余有效期（天）
             //   upDate: '',                //更新时间
             // },
-             {
-               fileName: '1001_CJ1_第一层',
-               fileSize: '3kb',
-               fileType: '文件夹',
-               remainingValidity: '20',
-               upDate: '2014-01-25 00:00:00'
-             },
           ],
           total: 0,
           pageIndex: 1,
           selectionList: [],            // table选中项
           rowUuid: null,                // 选中行Uuid
-          nextTbaleType: 'layer',
           objectName: null,             // 项目名
           layerObj: {},                 // 层名
           frameObj: {}                  // 帧名
@@ -131,14 +122,7 @@
           n: '0',
           p: '个'
         },
-        bread: {
-          list: [
-            {
-              text: '资产',
-              name: 'main'
-            }
-          ],
-        },
+        nav: ['资产'],
         path: '/',        // 当前位置
       }
     },
@@ -151,9 +135,7 @@
     methods: {
       // 翻页
       handleCurrentChange(val){
-        if(this.table.nextTbaleType == 'layer'){ this.getList() }
-        else if(this.table.nextTbaleType == 'frame'){ this.getLayerList() }
-        else { this.getFrameList() }
+
       },
       // 多选
       handleSelectionChange(val){
@@ -164,28 +146,6 @@
         console.log(value, row, column)
       },
 
-      // nav change
-      navChange(name){
-        switch(name){
-          case 'main':
-            this.table.nextTbaleType = 'layer'
-            this.table.objectName = null
-            this.table.layerObj = {}
-            this.table.frameObj = {}
-            this.bread.list.splice(1,2)
-            this.getList()
-            break
-          case 'layer':
-            this.table.nextTbaleType = 'frame'
-            this.table.frameObj = {}
-            this.bread.list.splice(2,1)
-            this.table.rowUuid = this.table.layerObj.itemUuid
-            this.getLayerList()
-            break
-          case 'frame':
-            break
-        }
-      },
       // 获取列表
       async getList(){
         let val = `path=${this.path}&keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=10`
@@ -234,10 +194,20 @@
       // 删除
       deleteFile(){
 
+      },
+      // 获取各级目录
+      getAssetsCatalog(filePath, keyword){
+        this.$store.commit('WEBSOCKET_BACKS_SEND', {
+          'code': 601,
+          'customerUuid': this.user.id,
+          keyword,
+          filePath
+        })
       }
     },
     mounted() {
       this.getList()
+      this.getAssetsCatalog(this.path, '')
     },
     computed: {
       ...mapState(['user'])

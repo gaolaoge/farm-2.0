@@ -49,8 +49,8 @@ export default new Vuex.Store({
     // 创建与后台的websocket
     WEBSOCKET_BACKS_INIT(state, account) {
       let num = 0
-      // state.socket_backS = new WebSocket(`ws://192.168.1.176:5002/websocket/web/${account}`)
-      state.socket_backS = new WebSocket(`ws://223.80.107.190:5002/websocket/web/${account}`)      // 测试环境
+      state.socket_backS = new WebSocket(`ws://192.168.1.176:5002/websocket/web/${account}`)
+      // state.socket_backS = new WebSocket(`ws://223.80.107.190:5002/websocket/web/${account}`)      // 测试环境
       state.socket_backS.addEventListener('open', () => console.log('--与后台连接成功--'))
       state.socket_backS.addEventListener('error', () => {
         if(num >= 5){
