@@ -25,6 +25,15 @@ export default new Vuex.Store({
       sex: null,
       id: null
     },
+    regExp: {
+      email: null,
+      phone: /^1(3|4|5|6|7|8|9)\d{9}$/,
+      pwLength: /^[\w\W]{8,18}$/,
+      pwFormat: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?!^.*[\u4E00-\u9FA5].*$)/,
+      code: /^\d{6}$/,
+      accountLength: /^[\w\W]{8,14}$/,
+      accountFormat: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5\w]+$)/
+    },
     login: false,
     zoneId: null,           // 所在区ID
     zone: null,             // 分区 1影视区 2效果图区
@@ -40,8 +49,8 @@ export default new Vuex.Store({
     // 创建与后台的websocket
     WEBSOCKET_BACKS_INIT(state, account) {
       let num = 0
-      state.socket_backS = new WebSocket(`ws://192.168.1.176:5002/websocket/web/${account}`)
-      // state.socket_backS = new WebSocket(`ws://223.80.107.190:5002/websocket/web/${account}`)      // 测试环境
+      // state.socket_backS = new WebSocket(`ws://192.168.1.176:5002/websocket/web/${account}`)
+      state.socket_backS = new WebSocket(`ws://223.80.107.190:5002/websocket/web/${account}`)      // 测试环境
       state.socket_backS.addEventListener('open', () => console.log('--与后台连接成功--'))
       state.socket_backS.addEventListener('error', () => {
         if(num >= 5){
@@ -63,8 +72,8 @@ export default new Vuex.Store({
     // 创建与插件的websocket
     WEBSOCKET_PLUGIN_INIT(state){
       let num = 0
-      state.socket_plugin = new WebSocket('ws://localhost:15000')
-      // state.socket_plugin = new WebSocket('ws://192.168.1.111:15000')
+      // state.socket_plugin = new WebSocket('ws://localhost:15000')
+      state.socket_plugin = new WebSocket('ws://192.168.1.111:15000')  // 李杨
       state.socket_plugin.addEventListener('open', () => console.log('--与插件连接成功--'))
       state.socket_plugin.addEventListener('error', () => {
         if(num >= 5){

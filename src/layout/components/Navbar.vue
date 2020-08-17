@@ -60,8 +60,9 @@
     <el-dialog :visible.sync="createTaskDialog"
                :show-close=false
                top="8vh"
+               @opened="r()"
                width="862px">
-      <newTask @closeDialogFun="closeDialogFun" />
+      <newTask @closeDialogFun="closeDialogFun" ref="dialog" />
     </el-dialog>
   </div>
 </template>
@@ -124,6 +125,9 @@
       newTask
     },
     methods: {
+      r(){
+        this.$refs.dialog.readyToWork()
+      },
       jump(index, url) {
         this.navActive = index
         this.$router.push(url)

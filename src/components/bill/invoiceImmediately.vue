@@ -138,18 +138,23 @@
     <el-dialog
       title="添加发票抬头"
       :visible.sync="dialogData.visible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
       :show-close="false"
-      width="426px"
-      :before-close="closeDialog">
-      <img src="@/icons/shutDialogIcon.png" alt="" class="shutDialogIcon mini">
+      width="426px">
+      <img src="@/icons/shutDialogIcon.png" alt="" class="shutDialogIcon mini" @click="closeDialog">
       <div class="farm-form">
         <div class="farm-form-item" v-for="(item,index) in dialogData.list">
           <label :for="item.id" class="farm-form-label">
             <span v-if="item.required" class="star">*</span>
             {{ item.Label }}：
           </label>
-          <input type="text" :id="item.id" class="farm-form-input" v-model="item.Val"
-                 :placeholder="item.Placeholder">
+          <input type="text"
+                 :id="item.id"
+                 :placeholder="item.Placeholder"
+                 class="farm-form-input"
+                 v-model="item.Val"
+                 @blur="VerifType(item.id)">
         </div>
         <div class="sw">
           <el-switch
@@ -162,7 +167,7 @@
         </div>
       </div>
       <div class="btnList">
-        <div class="farm-form-btn cancel" @click="dialogData.visible = false"><span>取消</span></div>
+        <div class="farm-form-btn cancel" @click="closeDialog"><span>取消</span></div>
         <div class="farm-form-btn" type="primary" @click="addHeader" v-show="!editHeader"><span>确定</span></div>
         <div class="farm-form-btn" type="primary" @click="editHeaderF" v-show="editHeader"><span>确定</span></div>
       </div>
@@ -184,7 +189,10 @@
   import {
     createDateFun
   } from '@/assets/common'
-  import {messageFun} from "../../assets/common";
+  import {messageFun} from "../../assets/common"
+  import {
+    mapState
+  } from 'vuex'
 
   export default {
     name: '',
@@ -301,13 +309,22 @@
       }
     },
     methods: {
+      // 验证格式
+      VerifType(type){
+        let list = this.dialogData.list
+        if(type == 'email' && list[2]['Val']){
+          this.regExp.email.test(list[2]['Val'])
+        }
+
+      },
       // 添加发票抬头
       addNewHeader() {
         this.dialogData.visible = true
       },
       // 关闭【添加发票抬头】弹窗
       closeDialog() {
-
+        this.dialogData.visible = false
+        this.reset()
       },
       // 获取可开票的充值记录
       async getRechargeList() {
@@ -367,6 +384,7 @@
           messageFun('success', '操作成功')
           this.getInvoiceHeaderList()
           this.dialogData.visible = false
+          this.reset()
         }
       },
       // 发票抬头 - 编辑 - 打开
@@ -427,12 +445,20 @@
         }
       },
       // 发票抬头 - 删除
-      async deleteItem(index) {
-        let data = await deleteItemIn(this.invoiceTableData[index]['invoiceSettingUuid'])
-        if (data.data.code == 200) {
-          messageFun('success', '操作成功')
-          this.getInvoiceHeaderList()
-        }
+      deleteItem(index) {
+        this.$confirm('删除后将无法找回，确认删除?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(async () => {
+            let data = await deleteItemIn(this.invoiceTableData[index]['invoiceSettingUuid'])
+            if (data.data.code == 200) {
+              messageFun('success', '操作成功')
+              this.getInvoiceHeaderList()
+            }
+        })
+          .catch(() => messageFun('info', '已取消删除'))
       },
       // 开票
       async invoicingF(){
@@ -455,11 +481,26 @@
           this.checked = null
           this.recordingSelection = []
         }
+      },
+      // 复位
+      reset(){
+        let list = this.dialogData.list
+        list[0]['Val'] = ''
+        list[1]['Val'] = ''
+        list[2]['Val'] = ''
+        list[3]['Val'] = ''
+        list[4]['Val'] = ''
+        list[5]['Val'] = ''
+        list[6]['Val'] = ''
+        this.dialogData.isDefault = 0
       }
     },
     mounted() {
       this.getRechargeList()
       this.getInvoiceHeaderList()
+    },
+    computed: {
+      ...mapState(['regExp'])
     }
   }
 </script>

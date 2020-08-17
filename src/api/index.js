@@ -4,8 +4,8 @@ import {Message} from "element-ui";
 
 // 业务服务
 const businessServer = new axios.create({
-  baseURL: 'http://192.168.1.179/',
-  // baseURL: '223.80.107.190:18146',    // 测试环境
+  // baseURL: 'http://192.168.1.179/',
+  baseURL: 'http://223.80.107.190:18146',    // 测试环境
   // timeout: 5000,
   // headers: {}
 })

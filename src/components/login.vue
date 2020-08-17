@@ -408,6 +408,9 @@
     exportDownloadFun,
     setInfo
   } from '@/assets/common.js'
+  import {
+    mapState
+  } from 'vuex'
 
   export default {
     name: 'login',
@@ -509,12 +512,6 @@
           codeObtained: false,               // 已获取验证码
         },
         // sliderVerification: false         // 注册滑块验证
-        reg: {
-          phoneReg: /^1(3|4|5|6|7|8|9)\d{9}$/,
-          codeReg: /^\d{6}$/,
-          passwordReg1: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?!^.*[\u4E00-\u9FA5].*$)/,
-          passwordReg2: /^[\w\W]{8,18}$/
-        },
         pdf: null,
         screenWidth: '',
         screenHeight: ''
@@ -656,15 +653,15 @@
           return false
         }
         // 验证帐号长度
-        if (!/^[\w\W]{8,14}$/.test(rfa)) {
+        if (!this.regExp.accountFormat.test(rfa)) {
           w.account = this.$t('login_page.message.ac_verif_one')
           rs.account = false
           return false
         }
         // 验证帐号格式
-        let reg = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5]+$)/,
-          reg2 = /^[\u4E00-\u9FA5\w]+$/
-        if (!reg.test(rfa) || !reg2.test(rfa)) {
+        // let reg = /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5]+$)/,
+        //   reg2 = /^[\u4E00-\u9FA5\w]+$/
+        if (!this.regExp.accountFormat) {
           w.account = this.$t('login_page.message.ac_verif_two')
           rs.account = false
           return false
@@ -707,13 +704,13 @@
           return false
         }
         // 验证密码长度
-        if (!this.reg.passwordReg2.test(t)) {
+        if (!this.regExp.pwLength.test(t)) {
           this.registered.warnInfo.password = this.$t('login_page.message.ps_verif_two')
           s.password = false
           return false
         }
         // 验证密码复杂度
-        if (!this.reg.passwordReg1.test(t)) {
+        if (!this.regExp.pwFormat.test(t)) {
           this.registered.warnInfo.password = this.$t('login_page.message.ps_verif_one')
           s.password = false
           return false
@@ -737,7 +734,7 @@
           r.status.phone = null;
           return false
         }
-        if (!this.reg.phoneReg.test(r.form.phone)) {
+        if (!this.regExp.phone.test(r.form.phone)) {
           this.registered.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_one')
           r.status.phone = false
           return false
@@ -827,7 +824,7 @@
           f.phoneVerif = null
           return false
         }
-        if (!this.reg.phoneReg.test(f.phone)) {
+        if (!this.regExp.phone.test(f.phone)) {
           this.login.warnInfo.phone = this.$t('login_page.SMS_verif.phone_warnInfo')
           f.phoneVerif = false
           return false
@@ -941,7 +938,7 @@
       findBackPhoneVerif() {
         let f = this.login.forgetMode
         if (!f.phone) return false
-        if (!this.reg.phoneReg.test(f.phone)) {
+        if (!this.regExp.phone.test(f.phone)) {
           f.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_one')
           f.phoneFormat = false
           return false
@@ -954,7 +951,7 @@
         // 若手机号格式不正确或验证码未空，不进行验证
         if (!f.phoneFormat || !f.code) return false
         // 验证码格式不正确
-        if (!this.reg.codeReg.test(f.code)) {
+        if (!this.regExp.code.test(f.code)) {
           f.warnInfo.code = this.$t('login_page.message.codeTypeErr_two')
           f.codeFormat = false
           return false
@@ -999,7 +996,7 @@
       psFormat() {
         let t = this.login.forgetMode,
           f = this.login.formStatus
-        if (!this.reg.passwordReg1.test(t.newPassWord) || !this.reg.passwordReg2.test(t.newPassWord)) {
+        if (!this.regExp.pwLength.test(t.newPassWord) || !this.regExp.pwFormat.test(t.newPassWord)) {
           t.warnInfo.newPassWord = this.$t('login_page.message.psTypeErr_one')
           f.newPassWord = false
           return false
@@ -1129,6 +1126,9 @@
         level: '',
         balance: ''
       }))
+    },
+    computed: {
+      ...mapState(['regExp'])
     }
   }
 </script>

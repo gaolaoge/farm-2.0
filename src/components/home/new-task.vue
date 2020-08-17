@@ -48,14 +48,19 @@
                 <div class="farm-form-item">
                   <div class="farm-form-item-label">{{ stepOneBase.netdisc.pathLabel }}：</div>
                   <div class="farm-form-item-input p" @click="expandDiskDirectory">
-                    <span class="sp">{{ stepOneBase.netdisc.pathV }}</span>
-                    <img src="@/icons/more-btn.png" alt="" class="im" :class="[{'active': stepOneBase.showMe}]">
+                    <span class="sp">
+                      {{ stepOneBase.netdisc.pathV }}
+                    </span>
+                    <img src="@/icons/more-btn.png"
+                         class="im"
+                         :class="[{'active': stepOneBase.showMe}]">
                   </div>
                   <div class="netCatalogue" :class="[{'active': stepOneBase.showMe}]">
                     <el-tree
                       :data="stepOneBase.netdisc.catalogData"
                       node-key="id"
-                      @node-click="projectTreeNodeClick"
+                      :load="catalogDataGetChildNode"
+                      lazy
                       :props="stepOneBase.netdisc.defaultProps">
                       <span class="custom-tree-node" slot-scope="{ node, data }">
                         <img src="@/icons/folder.png" alt="">
@@ -71,6 +76,8 @@
                        :class="[{'null': !stepOneBase.netdisc.treeData.length}]">
                     <!--面包屑-->
                     <div class="pathList">
+                      <span class="base"
+                            @click="jumpThroughNav(null, 'base')">{{ stepOneBase.netdisc.myAssets }}：</span>
                       <span class="filePathLi" v-for="(item,index) in stepOneBase.netdisc.sceneFilePath" :key="index">
                         <span class="s" @click="jumpThroughNav(item)">{{ item }}</span>
                         <img src="@/icons/enter.png" alt="" class="im">
@@ -83,7 +90,9 @@
                         node-key="id"
                         :props="stepOneBase.netdisc.defaultProps">
                         <span class="custom-tree-node" slot-scope="{ node, data }">
-                          <el-checkbox v-model="stepOneBase.netdisc.sceneFileSelection" :label="data.id" v-show="data.type == 'file'">
+                          <el-checkbox v-model="stepOneBase.netdisc.sceneFileSelection" :label="data.id"
+                                       v-show="data.type == 'file'">
+                            <img src="@/icons/maya-icon.png" v-if="node.format == 'ma' || data.format == 'mb'">
                             <span>{{ node.label }}</span>
                           </el-checkbox>
                           <span v-show="data.type == 'folder'" @click="scenesTreeNodeClick(data.label)">
@@ -394,7 +403,9 @@
       <div v-show="stepBtnActive == 1">
         <!--下一步-->
         <div class="btnGroup-btn confirm"
-             :class="[{'cannotTrigger': stepOneBase.local.filelist.length == 0}]"
+             :class="[
+               {'cannotTrigger': stepOneBase.index == 1 ? stepOneBase.local.filelist.length == 0 : stepOneBase.netdisc.sceneFileSelection.length == 0}
+              ]"
              @click="goToMode('next')">
           <span class="nextStep">{{ btn.next }}</span>
         </div>
@@ -614,6 +625,8 @@
             }
           ],
           netdisc: {     // 我的资产
+            firstOpenCatalogTree: true,
+            myAssets: '资产',
             pathLabel: '工程路径',
             pathV: '选择工程路径',
             fileLabel: '场景文件',
@@ -626,6 +639,7 @@
             sceneFileSelection: [], // 场景文件 - 选中项
             treeData: [],           // 场景文件 - 树状图
             catalogData: [],        // 工程路径 - 树状图
+            cDataGetChildNodeCB: null,   // 工程路径获取子节点回调
           },
           local: {   // 我的电脑
             operateBtnGroup: [
@@ -848,6 +862,7 @@
                 // icon: 'el-icon-success',
                 size: item.size ? item.size : null,
                 updateTime: item.updateTime ? item.updateTime : null,
+                format: type == 'file' ? item.split('.')[1] : null,
                 type
               }
             })
@@ -860,14 +875,20 @@
             // } else if (data.msg == '6023') {
           } else if (data.msg == '612') {
             // 工程路径的tree
-            this.stepOneBase.netdisc.catalogData = data.data.map((item, index) => {
+            let list = data.data.map((item, index) => {
+              let list = item.split('/')
               return {
                 id: index,
-                label: item.slice(0, item.length - 1),
+                label: list[list.length - 2],
+                position: item,
                 size: item.size ? item.size : null,
                 updateTime: item.updateTime ? item.updateTime : null,
               }
             })
+            if (this.cDataGetChildNodeCB) {
+              this.cDataGetChildNodeCB(list)
+              this.cDataGetChildNodeCB = null
+            } else this.stepOneBase.netdisc.catalogData = list
           }
         },
         immediate: true
@@ -885,8 +906,10 @@
     },
     methods: {
       // 1.选择渲染文件 - 我的资产 - 工程文件 - 树状图 - 进入文件夹
-      projectTreeNodeClick(data){
-        this.projectJump(this.stepOneBase.netdisc.pathV + '/' + data.label)
+      catalogDataGetChildNode(node, resolve) {
+        this.stepOneBase.netdisc.pathV = node.data.position
+        this.projectJump(node.data.position)
+        this.cDataGetChildNodeCB = resolve
       },
       // 1.选择渲染文件 - 我的资产 - 场景文件 - 树状图 - 选择文件
       scenesTreeNodeCheck(data, bool) {
@@ -901,14 +924,21 @@
       scenesTreeNodeClick(label) {
         let path = '',
           list = this.stepOneBase.netdisc.sceneFilePath
-        for (let i = 0; i < list.length; i++) path = path + list[i] + '/'
-        console.log(list)
+        for (let i = 0; i < list.length; i++) {
+          if (list[i]) path = path + list[i] + '/'
+        }
         path += label
         path += '/'
         this.scenesJump(path)
+        this.stepOneBase.netdisc.sceneFilePath = path.split('/')
       },
       // 1.选择渲染文件 - 我的资产 跳转【场景文件】目录
-      jumpThroughNav(nav) {
+      jumpThroughNav(nav, base) {
+        if (base) {
+          this.scenesJump('/')
+          this.stepOneBase.netdisc.sceneFilePath = []
+          return false
+        }
         let path = '',
           list = this.stepOneBase.netdisc.sceneFilePath
         for (let i = 0; i < list.length; i++) {
@@ -916,15 +946,17 @@
           if (list[i] == nav) break
         }
         this.scenesJump(path)
+        this.stepOneBase.netdisc.sceneFilePath = path.split('/')
       },
       // 1.选择渲染文件 - 我的资产 【场景文件】跳转目录 - 执行
       scenesJump(path) {
+        this.stepOneBase.netdisc.sceneFileSelection = []
+        this.stepOneBase.netdisc.treeData = []
         this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 602,
           'customerUuid': this.user.id,
           path
         })  // 向后台获取网盘目录 工程路径
-        this.stepOneBase.netdisc.sceneFileSelection = []
       },
       // 1.选择渲染文件 - 我的资产 【工程路径】跳转目录 - 执行
       projectJump(path) {
@@ -1264,6 +1296,8 @@
       // 1.选择渲染文件 - 我的资产 - 展开网盘目录
       expandDiskDirectory() {
         this.stepOneBase.showMe = !this.stepOneBase.showMe
+        if (!this.stepOneBase.netdisc.firstOpenCatalogTree) return false
+        this.stepOneBase.netdisc.firstOpenCatalogTree = false
         this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 612,
           'customerUuid': this.user.id,
@@ -1316,36 +1350,17 @@
         let data = await newTaskProfession({
           zoneUuid: this.zoneId,                             // 分区uuid
           templateUuid: sec.renderList[sec.renderListActive]['renderTemplate']['templateUuid'],    //选中模板uuid
-          taskCount: fir.index == 0 ? null : fir.local.filelist.length,                            // 要创建任务的数量
+          taskCount: fir.index == 0 ? this.stepOneBase.netdisc.sceneFileSelection.length : fir.local.filelist.length,                            // 要创建任务的数量
           pattern: this.taskType == 'easy' ? 1 : 2,          // 渲染模式
           patternNorm: fir.index == 0 ? 2 : 1,               // 提交模式
           source: 1,                                         // 任务来源
-          //filePathList: fir.index == 1 ? null : [            // 选中的文件
-          // {
-          //   filePath: {
-          //     fileType: '1',                // 存储类型： "1" 本地挂载 ；"2" 分布式文件系统
-          //     inFileName: 'sdfsdf',         // 场景源文件上传后保存路径-分布系统名
-          //     fileName: 'sdf',              // 场景源文件上传后保存路径-文件名称+后缀
-          //     inResourceName: 'sdf',        // 工程资源(服务器存放地址)-分布系统名
-          //     inFilePath: 'fgb',            // 场景文件服务器地址
-          //     inResourcePath: 'sdf',        // 工程路径服务器地址
-          //     pathScene: 'sdf',             // 场景文件用户本地地址
-          //     pathResource: 'sdf'           // 工程路径用户本地地址
-          //   }
-          // },
-          //],
           filePathList: fir.index == 1 ? null : this.stepOneBase.netdisc.sceneFileSelection.map(item => {
             let task = this.stepOneBase.netdisc.treeData.find(curr => curr.id == item)
             return {
               filePath: {
-                fileType: '1',                // 存储类型： "1" 本地挂载 ；"2" 分布式文件系统
-                inFileName: null,             // 场景源文件上传后保存路径-分布系统名
-                fileName: 'sdf',              // 场景源文件上传后保存路径-文件名称+后缀
-                inResourceName: 'sdf',        // 工程资源(服务器存放地址)-分布系统名
-                inFilePath: 'fgb',            // 场景文件服务器地址
-                inResourcePath: 'sdf',        // 工程路径服务器地址
-                pathScene: 'sdf',             // 场景文件用户本地地址
-                pathResource: 'sdf'           // 工程路径用户本地地址
+                pathResource: this.stepOneBase.netdisc.pathV,        // 工程路径
+                pathScene: this.stepOneBase.netdisc.sceneFilePath.reduce((total, curr_) => total + curr_ + '/', ''),  // 场景文件路径
+                fileName: task.label                                 // 场景文件名
               }
             }
           }),
@@ -1368,7 +1383,8 @@
           }
         })
         if (data.data.code == 200) {
-          this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+          if (fir.index == 0) this.createSuc()
+          else this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
             'transferType': 5,
             'userID': this.user.id,
             'taskList': fir.local.filelist.map((curr, index) => {
@@ -1498,9 +1514,10 @@
       goToMode(dire) {
         if (dire == 'previous') this.stepBtnActive = 2
         else {
-          if (this.stepOneBase.index == 0) {
+          if (this.stepOneBase.index == 0 && this.stepOneBase.netdisc.sceneFileSelection.length == 0) {
             // 我的资产
-
+            messageFun('error', '尚未选择场景文件')
+            return false
           } else if (this.stepOneBase.index == 1 && this.stepOneBase.local.filelist.length == 0) {
             // 我的电脑
             messageFun('error', '尚未选择场景文件')
@@ -1508,17 +1525,20 @@
           }
           this.stepBtnActive = 2
         }
+      },
+      // 0.预备事件
+      readyToWork() {
+        if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', {
+          'code': 602,
+          'customerUuid': this.user.id,
+          'path': ''
+        })  // 向后台获取网盘目录 场景路径
       }
     },
     mounted() {
       this.getRenderFileType()   // 获取可用的场景文件格式
       this.getList()             // 获取渲染模板列表
       this.getItemList()         // 获取项目列表
-      if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', {
-        'code': 602,
-        'customerUuid': this.user.id,
-        'path': ''
-      })  // 向后台获取网盘目录 场景路径
     },
     directives: {
       operating: {
@@ -1714,6 +1734,17 @@
                     padding: 0px 20px;
 
                     /*选择渲染文件 - 我的资产 - 场景文件 - nav*/
+
+                    .base {
+                      color: rgba(22, 29, 37, 0.6);
+                      font-size: 14px;
+                      cursor: pointer;
+                      font-family: PingFangSC-Regular, PingFang SC;
+
+                      &:hover {
+                        color: rgba(22, 29, 37, 0.8);
+                      }
+                    }
 
                     .pathList {
                       position: absolute;
@@ -2455,6 +2486,15 @@
     img {
       margin-left: 22px;
       margin-right: 4px;
+      width: 15px;
+    }
+
+    .el-checkbox {
+      display: flex;
+      align-items: center;
+      img {
+        margin-left: 0px;
+      }
     }
   }
 
