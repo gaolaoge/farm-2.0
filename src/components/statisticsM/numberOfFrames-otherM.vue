@@ -41,7 +41,7 @@
     </div>
     <section>
       <div class="selectData">
-        <el-select v-model="taskV" placeholder="请选择">
+        <el-select v-model="taskV" multiple collapse-tags placeholder="请选择">
           <el-option
             v-for="item in taskList"
             :key="item.value"
@@ -177,7 +177,6 @@
       }
     },
     mounted() {
-      this.init()
       window.addEventListener('resize', this.ec.resize)
       this.$refs.selectDateM.setDateInterval(this.dateInterval)
     },

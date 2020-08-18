@@ -16,9 +16,19 @@
                     :chartsData="framesTemplate"
                     v-show="screen.showNumOfFrames"/>
     <!--消费统计-->
-    <consumption ref="consumption" v-show="screen.showConsumption"/>
+    <consumption ref="consumption"
+                 @fullScreen="fullScreen"
+                 @miniScreen="miniScreen"
+                 :taskList="projectList"
+                 :chartsData="consumptionTemplate"
+                 v-show="screen.showConsumption"/>
     <!--任务状态统计-->
-    <taskStatus ref="taskStatus" v-show="screen.showTaskStatus"/>
+    <taskStatus ref="taskStatus"
+                @fullScreen="fullScreen"
+                @miniScreen="miniScreen"
+                :taskList="projectList"
+                :chartsData="statusTemplate"
+                v-show="screen.showTaskStatus"/>
   </div>
 </template>
 
@@ -45,9 +55,11 @@
           showConsumption: true,
           showTaskStatus: true
         },
-        projectList: null,     // 项目列表
-        taskTemplate: null,    // 任务数统计数据
-        framesTemplate: null,    // 任务数统计数据
+        projectList: null,            // 项目列表
+        taskTemplate: null,           // 任务数统计数据
+        framesTemplate: null,         // 帧数数统计数据
+        consumptionTemplate: null,    // 消费统计数据
+        statusTemplate: null,    // 消费统计数据
       }
     },
     methods: {
@@ -86,7 +98,9 @@
           }
         })
         this.taskTemplate = data.data.data.chart.taskTemplate
-        this.framesTemplate = data.data.data.chart.taskTemplate
+        this.framesTemplate = data.data.data.chart.frameTemplate
+        this.consumptionTemplate = data.data.data.chart.consumeTemplate
+        this.statusTemplate = data.data.data.chart.statusTemplate
       }
     },
     mounted() {

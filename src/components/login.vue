@@ -107,6 +107,7 @@
                        :placeholder="$t('login_page.account_verif.ps_placeholder')"
                        @keyup.enter="accountloginFun"
                        @focus="login.formStatus.password = null"
+                       @blur="passwVerif('login')"
                        autocomplete="new-password"
                        type="password"
                        class="farm-input"/>
@@ -133,7 +134,7 @@
                 <span @click="navActive = 2">{{ $t('login_page.account_verif.register') }}</span>
               </span>
               <!--登录按钮-->
-              <div class="btnLogin" :class="[{'canBeClick': login.formStatus.account && !login.formStatus.password}]"
+              <div class="btnLogin" :class="[{'canBeClick': login.formStatus.account && login.formStatus.password}]"
                    @click="accountloginFun">
                 <span>{{ $t('login_page.loginText') }}</span>
               </div>
@@ -285,7 +286,7 @@
             <div class="u">
               <input v-model="registered.form.password" type="password"
                      :placeholder="$t('login_page.register.ps_placeholder')"
-                     @blur="passwVerifTurn"
+                     @blur="passwVerif('register')"
                      @focus="inputGetFocus('password')"
                      ref="passwordRegister"
                      class="farm-input"/>
@@ -417,7 +418,7 @@
         login: {
           mode: 'login',
           nav: {
-            activeIndex: 1
+            activeIndex: '1'
           },
           phoneForm: {
             phone: '',
@@ -533,6 +534,12 @@
         this.screenHeight = document.body.clientHeight
         setTimeout(() => this.setCanvas(), 0)
       })
+
+      if (this.login.accountForm.account) this.accouVerif('login')
+      if (this.login.accountForm.password) this.passwVerif('login')
+
+      this.login.nav.activeIndex = localStorage.getItem('loginPageIndex') || '1'
+      // if(this.login.accountForm.password) this.
 
       // //一、定义一个获取DOM元素的方法
       // let box = this.$refs.drag,//容器
@@ -687,19 +694,12 @@
           }
         }
       },
-      // 注册-密码验证
-      passwVerifTurn() {
-        setTimeout(this.passwVerif, 200)
-      },
-      // 注册-密码验证
-      passwVerif() {
-        // 操作为打开密码预览，则不做校验动作
-        if (this.registered.clickEye) {
-          this.registered.clickEye = false
-          return false
-        }
-        let t = this.registered.form.password,
-          s = this.registered.status
+      // 密码验证
+      passwVerif(type) {
+        // type == 'login' 登录 : 'register' 注册
+        let t = type == 'register' ? this.registered.form.password : this.login.accountForm.password,
+          s = type == 'register' ? this.registered.status : this.login.formStatus,
+          i = type == 'register' ? this.registered.warnInfo : this.login.warnInfo
         s.passwordInit = false
         // 若密码值为空，不显示校验结果icon提示
         if (!t) {
@@ -708,13 +708,13 @@
         }
         // 验证密码长度
         if (!this.reg.passwordReg2.test(t)) {
-          this.registered.warnInfo.password = this.$t('login_page.message.ps_verif_two')
+          i.password = this.$t('login_page.message.ps_verif_two')
           s.password = false
           return false
         }
         // 验证密码复杂度
         if (!this.reg.passwordReg1.test(t)) {
-          this.registered.warnInfo.password = this.$t('login_page.message.ps_verif_one')
+          i.password = this.$t('login_page.message.ps_verif_one')
           s.password = false
           return false
         }
@@ -869,10 +869,7 @@
           if (data.data.code == '4032') {
             this.login.formStatus.password = false
             return false
-          }
-          sessionStorage.setItem('token', data.data.data.token)
-          this.autoLogin(isAutoLogin, '', account, data.data.data.token)
-          this.getUserInfo()
+          } else if (data.data.code == 200) this.loginSuc(isAutoLogin, '', account, data.data.data.token)
         } catch (err) {
           console.log('登录连接失败, ' + err)
         }
@@ -886,7 +883,7 @@
         if (data.data.code == 200) {
           f.v = true
           messageFun('info', this.$t('login_page.message.code_is_coming'))
-        }else if (data.data.code == 10001){
+        } else if (data.data.code == 10001) {
           this.login.warnInfo.phone = this.$t('login_page.message.need_to_register')
           f.phoneVerif = false
         }
@@ -926,15 +923,23 @@
           this.login.phoneForm.codeVerif = false
           return false
         }
-        // 判断验证码是否正确
-        let data = await phoneLogin({phone, code, isAutoLogin})
-        if (data.data.code == 4032) {
-          messageFun('error', this.$t('login_page.message.code_err'));
-          return false
+        try {
+          // 判断验证码是否正确
+          let data = await phoneLogin({phone, code, isAutoLogin})
+          if (data.data.code == 4032) {
+            messageFun('error', this.$t('login_page.message.code_err'));
+            return false
+          } else if (data.data.code == 200) this.loginSuc(isAutoLogin, phone, data.data.data.account, data.data.data.token)
+        } catch (err) {
+          console.log('登录连接失败, ' + err)
         }
-        if (data.data.code == 200) messageFun('success', this.$t('login_page.message.login_suc'))
-        this.autoLogin(isAutoLogin, phone, data.data.data.account, data.data.data.token)
-        sessionStorage.setItem('token', data.data.data.token)
+      },
+      // 登录成功
+      loginSuc(isAutoLogin, phone, account, token) {
+        messageFun('success', this.$t('login_page.message.login_suc'))
+        this.autoLogin(isAutoLogin, phone, account, token)
+        sessionStorage.setItem('token', token)
+        localStorage.setItem('loginPageIndex', this.login.nav.activeIndex)
         this.getUserInfo()
       },
       // 找回密码 验证手机号格式是否有效

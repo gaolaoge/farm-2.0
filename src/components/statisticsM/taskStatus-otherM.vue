@@ -6,6 +6,21 @@
         <span class="name fc">{{ $t('statistics_mainM.taskStatus.name') }}</span>
       </div>
       <div class="c filter">
+        <!--时间区间-->
+        <div class="filter-item">
+          <calendar @changeSelectDate="changeSelectDate" @changeSelect="dateInterval = 'customize'" ref="selectDateM"/>
+        </div>
+        <!--下拉框-->
+        <div class="select bl">
+          <el-select v-model="dateInterval" placeholder="请选择" @change="$refs.selectDateM.setDateInterval(dateInterval)">
+            <el-option
+              v-for="item in dateIntervalList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </div>
         <!--全屏-->
         <span class="bigger fc bl" v-show="fullBtn">
           <img src="@/icons/bigger.png" alt="" @click="f">
@@ -35,6 +50,16 @@
 </template>
 
 <script>
+  import calendar from '@/components/farm-model/farm-calendar.vue'
+  import {
+    getStatusData
+  } from '@/api/statistics-api.js'
+  import {
+    mapState
+  } from 'vuex'
+  import {
+    messageFun
+  } from "../../assets/common"
 
   export default {
     name: '',
@@ -70,11 +95,35 @@
             label: '自定义'
           }
         ],
+        statusList: {
+          'daiquanbuxuanran': '待全部渲染',
+          'fenxizhong': '分析中',
+          'fenxijinggao': '分析警告',
+          'daishezhicanshu': '待设置参数',
+          'shangchuanzanting': '上传暂停',
+          'fenxishibai': '分析失败',
+          'xuanranzanting': '渲染暂停',
+          'xuanranzhong': '渲染中',
+          'shangchuanzhong': '上传中',
+          'shangchuanshibai': '上传失败',
+          'xuanranwancheng': '渲染完成'
+        },
         dateInterval: 'nearlySevenDays',
-        value1: '选项1',
+        taskV: [],
+        taskL: [],
         startDate: '',
         endDate: '',
-        fullBtn: true
+        fullBtn: true,
+        chartsSeries: [],
+        lock: false,
+        cProjectUuid: [],
+      }
+    },
+    props: {
+      taskList: Array,
+      chartsData: {
+        type: Object,
+        default: null
       }
     },
     watch: {
@@ -83,19 +132,34 @@
       },
       endDate() {
         this.$emit('monitorVal', [this.startDate, this.endDate, 'taskData'])
+      },
+      taskV(v) {
+        this.aisle()
+        let t = []
+        v.forEach(curr => t.push(this.taskList.find(item => item.value == curr)))
+        this.taskL = t
+      },
+      navIndex() {
+        this.taskV = this.cProjectUuid
+        this.aisle()
+      },
+      'chartsData': {
+        handler: function (val) {
+          if (!val) return false
+          else {
+            this.cProjectUuid = val.projectUuid
+            this.taskV = this.cProjectUuid
+          }
+        },
+        immediate: true
       }
-      //   cData(val) {
-      //     this.init()
-      //   },
-      //   cDate(val) {
-      //     this.init()
-      //     window.addEventListener("resize", this.ec.resize);
-      //   }
     },
     mounted() {
-      this.init()
       window.addEventListener('resize', this.ec.resize)
       this.$refs.selectDateM.setDateInterval(this.dateInterval)
+    },
+    computed: {
+      ...mapState(['zoneId'])
     },
     methods: {
       // echarts 初始化
@@ -107,33 +171,15 @@
             formatter: '{a} <br/>{b} : {c} ({d}%)'
           },
           legend: {
-            type: 'scroll',
             orient: 'vertical',
             right: 10,
             top: 20,
             bottom: 20,
-            data: ['rose1', 'rose2', 'rose3', 'rose4', 'rose5', 'rose6', 'rose7', 'rose8']
+            data: ['待全部渲染', '分析中', '分析警告', '待设置参数', '上传暂停', '分析失败', '渲染暂停', '渲染中', '上传中', '上传失败', '渲染完成']
           },
-          series: [
+          calculable : true,//手柄拖拽调整选中的范围
 
-            {
-              name: '面积模式',
-              type: 'pie',
-              radius: [30, 160],
-              center: ['50%', '50%'],
-              roseType: 'area',
-              data: [
-                {value: 10, name: 'rose1'},
-                {value: 5, name: 'rose2'},
-                {value: 15, name: 'rose3'},
-                {value: 25, name: 'rose4'},
-                {value: 20, name: 'rose5'},
-                {value: 35, name: 'rose6'},
-                {value: 30, name: 'rose7'},
-                {value: 40, name: 'rose8'}
-              ]
-            }
-          ]
+          series: this.chartsSeries
         })
       },
       // 日期选择模块选择结果
@@ -142,23 +188,91 @@
         this.endDate = endDate
       },
       // 全屏
-      f(){
-        this.$emit('fullScreen', 'showTaskData')
+      f() {
+        this.$emit('fullScreen', 'showTaskStatus')
         setTimeout(this.ec.resize, 120)
         this.fullBtn = false
       },
       // 取消全屏
-      e(){
+      e() {
         this.$emit('miniScreen')
         setTimeout(this.ec.resize, 120)
         this.fullBtn = true
-      }
+      },
+      // 获取charts数据通道
+      aisle() {
+        if (this.lock) return false
+        this.lock = true
+        this.getChartsData()
+        setTimeout(() => this.lock = false, 200)
+      },
+      // 获取charts数据
+      async getChartsData() {
+        let num
+        if (this.dateInterval == 'nearlySevenDays') num = '1'
+        else if (this.dateInterval == 'nearlyThirtyDays') num = '2'
+        else if (this.dateInterval == 'customize') num = '3'
+        let data = await getStatusData(this.taskV)
+        if (data.data.code != 200) messageFun('error', '获取数据失败')
+        else {
+          this.chartsSeries = [
+            {
+              type: 'pie',
+              radius: ['10%', '60%'],
+              center: ['50%', '50%'],
+              roseType: 'radius',
+              data: Object.keys(data.data.data).map(item => {
+                return {
+                  name: this.statusList[item],
+                  value: data.data.data[item]
+                }
+              }),
+              animationType: 'scale',
+              animationEasing: 'elasticOut',
+              animationDelay: function (idx) {
+                return Math.random() * 200;
+              }
+            }
+          ]
+          this.init()
+        }
+      },
+      // 格式转换
+      transformType(data) {
+        let l = []
+        Object.keys(data).forEach(item => {
+          l.push([item, data[item]])
+        })
+        return l
+      },
     },
+    components: {
+      calendar
+    }
   }
 </script>
 
 <style lang="less" scoped>
   .taskStatusEchart-wrapper {
+    /deep/ .el-tag.el-tag--info.el-tag--small.el-tag--light {
+      display: flex;
+      align-items: center;
 
+      .el-select__tags-text {
+        display: inline-block;
+        width: 54px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .el-tag__close.el-icon-close {
+        margin: 0px;
+        position: inherit;
+      }
+
+      &:nth-last-of-type(1) {
+        width: 38px;
+      }
+    }
   }
 </style>

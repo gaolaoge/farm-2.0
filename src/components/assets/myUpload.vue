@@ -84,9 +84,6 @@
 
 <script>
   import {
-    uploadTabGetList
-  } from '@/api/assets-api'
-  import {
     createDateFun,
     messageFun
   } from '@/assets/common.js'
@@ -123,7 +120,7 @@
           p: '个'
         },
         nav: ['资产'],
-        path: '/',        // 当前位置
+        path: '',        // 当前位置
       }
     },
     props: {
@@ -146,15 +143,6 @@
         console.log(value, row, column)
       },
 
-      // 获取列表
-      async getList(){
-        let val = `path=${this.path}&keyword=${this.searchInputVal}&pageIndex=${this.table.pageIndex}&pageSize=10`
-        let data = await uploadTabGetList(val)
-        if(data.data.code == 200){
-          this.table.tableData = data.data.data.map(item => item)
-          this.table.total = data.data.total
-        }
-      },
       // 上传
       uploadFun(type){
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
@@ -197,7 +185,8 @@
       },
       // 获取各级目录
       getAssetsCatalog(filePath, keyword){
-        this.$store.commit('WEBSOCKET_BACKS_SEND', {
+        if(!this.socket_backS) setTimeout(() => this.getAssetsCatalog(filePath, keyword), 1000)
+        else this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 601,
           'customerUuid': this.user.id,
           keyword,
@@ -206,11 +195,10 @@
       }
     },
     mounted() {
-      this.getList()
       this.getAssetsCatalog(this.path, '')
     },
     computed: {
-      ...mapState(['user'])
+      ...mapState(['user', 'socket_backS'])
     }
   }
 </script>

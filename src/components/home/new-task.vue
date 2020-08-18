@@ -14,11 +14,16 @@
       <div class="navL">
         <ul :class="[{'professionC': taskType == 'profession'}]">
           <li class="li" :class="[{'active': index + 1 == stepBtnActive}]" v-for="(item,index) in navL" :key="index">
-            <svg width="277" height="37" class="f svg" v-show="index == 0">
-              <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 Z" fill="rgba(27, 83, 244, 1)" v-if="taskType != 'profession'"/>
-              <path d="M 0 0 H 389.25 L 406.75 18.5 L 389.25 37 H 0 Z" fill="rgba(27, 83, 244, 1)" v-if="taskType == 'profession'"/>
+            <svg width="406.75" height="37" class="f svg" v-show="index == 0 && taskType == 'profession'">
+              <path d="M 0 0 H 389.25 L 406.75 18.5 L 389.25 37 H 0 Z" fill="rgba(27, 83, 244, 1)"/>
             </svg>
-            <svg width="277" height="37" class="st svg" v-show="index != 0">
+            <svg width="277" height="37" class="f svg" v-show="index == 0 && taskType != 'profession'">
+              <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 Z" fill="rgba(27, 83, 244, 1)"/>
+            </svg>
+            <svg width="406.75" height="37" class="st svg" v-show="index != 0 && taskType == 'profession'">
+              <path d="M 0 0 H 389.25 L 406.75 18.5 L 389.25 37 H 0 L 18.5 18.5 Z" fill="rgba(27, 83, 244, 1)"/>
+            </svg>
+            <svg width="277" height="37" class="st svg" v-show="index != 0 && taskType != 'profession'">
               <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 L 18.5 18.5 Z" fill="rgba(27, 83, 244, 1)"/>
             </svg>
             <span class="i">{{ index + 1 }}</span>
