@@ -9,7 +9,12 @@
               :chartsData="taskTemplate"
               v-show="screen.showTaskData"/>
     <!--帧数统计-->
-    <numberOfFrames ref="numOfFrames" v-show="screen.showNumOfFrames"/>
+    <numberOfFrames ref="numOfFrames"
+                    @fullScreen="fullScreen"
+                    @miniScreen="miniScreen"
+                    :taskList="projectList"
+                    :chartsData="framesTemplate"
+                    v-show="screen.showNumOfFrames"/>
     <!--消费统计-->
     <consumption ref="consumption" v-show="screen.showConsumption"/>
     <!--任务状态统计-->
@@ -42,6 +47,7 @@
         },
         projectList: null,     // 项目列表
         taskTemplate: null,    // 任务数统计数据
+        framesTemplate: null,    // 任务数统计数据
       }
     },
     methods: {
@@ -80,6 +86,7 @@
           }
         })
         this.taskTemplate = data.data.data.chart.taskTemplate
+        this.framesTemplate = data.data.data.chart.taskTemplate
       }
     },
     mounted() {
@@ -130,7 +137,7 @@
         .navLi {
           position: relative;
           margin-left: 30px;
-          width: 98px;
+          width: 130px;
           cursor: pointer;
           user-select: none;
           color: rgba(22, 29, 37, 0.6);
@@ -144,7 +151,7 @@
               bottom: -2px;
               left: 0px;
               content: '';
-              width: 98px;
+              width: 130px;
               height: 1px;
               background-color: rgba(27, 83, 244, 1);
               box-shadow: 0px 0px 1px 1px rgba(27, 83, 244, 0.6);
