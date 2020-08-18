@@ -15,7 +15,8 @@
         <ul :class="[{'professionC': taskType == 'profession'}]">
           <li class="li" :class="[{'active': index + 1 == stepBtnActive}]" v-for="(item,index) in navL" :key="index">
             <svg width="277" height="37" class="f svg" v-show="index == 0">
-              <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 Z" fill="rgba(27, 83, 244, 1)"/>
+              <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 Z" fill="rgba(27, 83, 244, 1)" v-if="taskType != 'profession'"/>
+              <path d="M 0 0 H 389.25 L 406.75 18.5 L 389.25 37 H 0 Z" fill="rgba(27, 83, 244, 1)" v-if="taskType == 'profession'"/>
             </svg>
             <svg width="277" height="37" class="st svg" v-show="index != 0">
               <path d="M 0 0 H 259.5 L 277 18.5 L 259.5 37 H 0 L 18.5 18.5 Z" fill="rgba(27, 83, 244, 1)"/>
@@ -90,14 +91,16 @@
                         node-key="id"
                         :props="stepOneBase.netdisc.defaultProps">
                         <span class="custom-tree-node" slot-scope="{ node, data }">
+                          <!--文件-->
                           <el-checkbox v-model="stepOneBase.netdisc.sceneFileSelection" :label="data.id"
                                        v-show="data.type == 'file'">
                             <img src="@/icons/maya-icon.png" v-if="node.format == 'ma' || data.format == 'mb'">
                             <span>{{ node.label }}</span>
                           </el-checkbox>
+                          <!--文件夹-->
                           <span v-show="data.type == 'folder'" @click="scenesTreeNodeClick(data.label)">
-                            <img src="@/icons/folder.png" alt="">
-                            <span>{{ node.label }}</span>
+                            <img src="@/icons/folder-icon.png" alt="">
+                            <span>{{ node.label }}{{ stepOneBase.netdisc.folderText }}</span>
                           </span>
                        </span>
                       </el-tree>
@@ -397,6 +400,13 @@
         </div>
       </div>
     </section>
+    <div class="checked">
+      <span class="base">
+        {{ checkedSpan[0] }}
+        <span class="num">{{ stepOneBase.index == 0 ? stepOneBase.netdisc.sceneFileSelection.length : stepOneBase.local.filelist.length }}</span>
+        {{ checkedSpan[1] }}
+      </span>
+    </div>
     <!--前进或后退按钮-->
     <div class="btnGroup">
       <!--选择渲染文件-->
@@ -611,6 +621,7 @@
           previous: '上一步',
           confirm: '确认'
         },    // 按钮集合
+        checkedSpan: ['已选择', '个场景文件'],
         stepOneBase: {              // 选择渲染文件
           showMe: false,            // 我的资产 - 工程路径 - 展开网盘目录
           index: 0,                 // 0.我的资产 1.我的电脑
@@ -630,6 +641,7 @@
             pathLabel: '工程路径',
             pathV: '选择工程路径',
             fileLabel: '场景文件',
+            folderText: '文件夹',
             warnSpan: '请先选择工程路径',
             defaultProps: {
               children: 'children',
@@ -1599,8 +1611,11 @@
           flex-direction: row;
 
           &.professionC {
-            li:nth-of-type(3) {
-              display: none;
+            li {
+              width: 406.75px;
+              &:nth-of-type(3) {
+                display: none;
+              }
             }
           }
         }
@@ -2060,6 +2075,27 @@
       }
     }
 
+    .checked {
+      float: left;
+      margin-left: 30px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+
+      .base {
+        font-size: 14px;
+        font-family: PingFangSC-Regular, PingFang SC;
+        color: rgba(22, 29, 37, 0.6);
+
+        .num {
+          font-size: 20px;
+          font-family: PingFangSC-Semibold, PingFang SC;
+          font-weight: 600;
+          color: rgba(27, 83, 244, 1);
+        }
+      }
+    }
+
     .btnGroup {
       height: 72px;
       display: flex;
@@ -2477,6 +2513,7 @@
   /deep/ .custom-tree-node {
     display: flex;
     align-items: center;
+    font-size: 14px;
 
     & > span {
       display: flex;
@@ -2484,16 +2521,22 @@
     }
 
     img {
-      margin-left: 22px;
+      margin-left: 23px;
       margin-right: 4px;
-      width: 15px;
     }
 
     .el-checkbox {
       display: flex;
       align-items: center;
+
+      .el-checkbox__label {
+        display: flex;
+        align-items: center;
+      }
+
       img {
         margin-left: 0px;
+        margin-right: 4px;
       }
     }
   }

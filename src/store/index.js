@@ -72,8 +72,8 @@ export default new Vuex.Store({
     // 创建与插件的websocket
     WEBSOCKET_PLUGIN_INIT(state){
       let num = 0
-      // state.socket_plugin = new WebSocket('ws://localhost:15000')
-      state.socket_plugin = new WebSocket('ws://192.168.1.111:15000')  // 李杨
+      state.socket_plugin = new WebSocket('ws://localhost:15000')
+      // state.socket_plugin = new WebSocket('ws://192.168.1.111:15000')  // 李杨
       state.socket_plugin.addEventListener('open', () => console.log('--与插件连接成功--'))
       state.socket_plugin.addEventListener('error', () => {
         if(num >= 5){
