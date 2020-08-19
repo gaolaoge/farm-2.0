@@ -51,13 +51,14 @@ export default new Vuex.Store({
       let num = 0
       state.socket_backS = new WebSocket(`ws://192.168.1.176:5002/websocket/web/${account}`)
       // state.socket_backS = new WebSocket(`ws://223.80.107.190:5002/websocket/web/${account}`)      // 测试环境
+      // state.socket_backS = new WebSocket(`ws://10.2.2.142:5002/websocket/web/${account}`)          // 测试环境2
       state.socket_backS.addEventListener('open', () => console.log('--与后台连接成功--'))
       state.socket_backS.addEventListener('error', () => {
-        if(num >= 5){
+        if (num >= 5) {
           console.log('--与后台连接失败--')
           state.socket_backS = 'err'
-        }else {
-          num ++
+        } else {
+          num++
           console.log('--与后台连接失败，尝试重新连接--')
           this.WEBSOCKET_BACKS_INIT(state, account)
         }
@@ -66,21 +67,21 @@ export default new Vuex.Store({
     },
     // 对与后台的websocket发送消息
     WEBSOCKET_BACKS_SEND(state, data) {
-      if(!state.socket_backS) return false
+      if (!state.socket_backS) return false
       state.socket_backS.send(JSON.stringify(data))
     },
     // 创建与插件的websocket
-    WEBSOCKET_PLUGIN_INIT(state){
+    WEBSOCKET_PLUGIN_INIT(state) {
       let num = 0
       state.socket_plugin = new WebSocket('ws://localhost:15000')
       // state.socket_plugin = new WebSocket('ws://192.168.1.111:15000')  // 李杨
       state.socket_plugin.addEventListener('open', () => console.log('--与插件连接成功--'))
       state.socket_plugin.addEventListener('error', () => {
-        if(num >= 5){
+        if (num >= 5) {
           console.log('--与插件连接失败--')
           state.socket_plugin = 'err'
-        }else {
-          num ++
+        } else {
+          num++
           console.log('--与插件连接失败，尝试重新连接--')
           this.WEBSOCKET_PLUGIN_INIT(state, url)
         }
@@ -88,23 +89,23 @@ export default new Vuex.Store({
       state.socket_plugin.addEventListener('message', data => state.socket_plugin_msg = data)
     },
     // 对与插件的websocket发送消息
-    WEBSOCKET_PLUGIN_SEND(state, data){
-      if(!state.socket_plugin) return false
+    WEBSOCKET_PLUGIN_SEND(state, data) {
+      if (!state.socket_plugin) return false
       state.socket_plugin.send(JSON.stringify(data))
     },
     // 与插件的websocket断开连接
-    WEBSOCKET_PLUGIN_CLOSE(state){
-      if(!state.socket_plugin) return false
+    WEBSOCKET_PLUGIN_CLOSE(state) {
+      if (!state.socket_plugin) return false
       state.socket_plugin.close()
       state.socket_plugin = null
     },
-    changeTotalInvoiceAble(s, val){
+    changeTotalInvoiceAble(s, val) {
       s.user.totalInvoiceAble = val
     },
-    changeTotalInvoiceAmount(s, val){
+    changeTotalInvoiceAmount(s, val) {
       s.user.totalInvoiceAmount = val
     },
-    changeTaskType(s, val){
+    changeTaskType(s, val) {
       s.taskType = val
     },
     changeIsGpu(s, val) {

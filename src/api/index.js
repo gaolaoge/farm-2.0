@@ -6,6 +6,7 @@ import {Message} from "element-ui";
 const businessServer = new axios.create({
   baseURL: 'http://192.168.1.179/',
   // baseURL: 'http://223.80.107.190:18146',    // 测试环境
+  // baseURL: 'http://10.2.2.146',              // 测试环境2
   // timeout: 5000,
   // headers: {}
 })
