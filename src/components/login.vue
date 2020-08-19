@@ -192,14 +192,14 @@
                 </span>
                 </div>
               </div>
-              <!--返回登录-->
-              <div class="returnToLogin" @click="login.mode = 'login'">{{ $t('login_page.forgetMode.return') }}</div>
               <!--按钮-->
               <div class="btnLogin"
                    :class="[{'canBeClick': login.forgetMode.codeFormat && login.forgetMode.phoneFormat}]"
                    @click="verificationCode">
                 <span>{{ $t('login_page.forgetMode.confirm') }}</span>
               </div>
+              <!--返回登录-->
+              <div class="returnToLogin" @click="login.mode = 'login'">{{ $t('login_page.forgetMode.return') }}</div>
             </div>
             <!--新密码-->
             <div class="n" v-show="login.forgetMode.step == 'two'">
@@ -1233,7 +1233,8 @@
         }
 
         .returnToLogin {
-          float: right;
+          display: flex;
+          justify-content: center;
           color: rgba(22, 29, 37, 1);
           font-size: 12px;
           cursor: pointer;
@@ -1632,6 +1633,14 @@
     top: 0px;
     left: 0px;
 
+  }
+
+  .findBack {
+    .loginNav .forgetPW {
+      font-size: 18px;
+      font-family: PingFangSC-Regular, PingFang SC;
+      color: rgba(22, 29, 37, 1)!important;
+    }
   }
 
 </style>

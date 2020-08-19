@@ -35,9 +35,9 @@
     </div>
     <section>
       <div class="selectData">
-        <el-select v-model="value1" placeholder="请选择">
+        <el-select v-model="taskV" placeholder="请选择">
           <el-option
-            v-for="item in options"
+            v-for="item in taskList"
             :key="item.value"
             :label="item.label"
             :value="item.value">
@@ -110,7 +110,6 @@
         },
         dateInterval: 'nearlySevenDays',
         taskV: [],
-        taskL: [],
         startDate: '',
         endDate: '',
         fullBtn: true,
@@ -135,9 +134,6 @@
       },
       taskV(v) {
         this.aisle()
-        let t = []
-        v.forEach(curr => t.push(this.taskList.find(item => item.value == curr)))
-        this.taskL = t
       },
       navIndex() {
         this.taskV = this.cProjectUuid
@@ -208,10 +204,6 @@
       },
       // 获取charts数据
       async getChartsData() {
-        let num
-        if (this.dateInterval == 'nearlySevenDays') num = '1'
-        else if (this.dateInterval == 'nearlyThirtyDays') num = '2'
-        else if (this.dateInterval == 'customize') num = '3'
         let data = await getStatusData(this.taskV)
         if (data.data.code != 200) messageFun('error', '获取数据失败')
         else {
