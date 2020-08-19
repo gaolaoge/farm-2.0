@@ -41,8 +41,9 @@ export default {
       code_placeholder: '请输入验证码',
       ps_new: '请输入新密码',
       ps_again: '请再次输入新密码',
-      return: '返回登录',
-      confirm: '确定'
+      toLogin: '登录',
+      toRegister: '注册',
+      confirm: '下一步'
     },
     // 注册
     register: {

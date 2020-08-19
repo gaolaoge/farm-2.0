@@ -198,8 +198,6 @@
                    @click="verificationCode">
                 <span>{{ $t('login_page.forgetMode.confirm') }}</span>
               </div>
-              <!--返回登录-->
-              <div class="returnToLogin" @click="login.mode = 'login'">{{ $t('login_page.forgetMode.return') }}</div>
             </div>
             <!--新密码-->
             <div class="n" v-show="login.forgetMode.step == 'two'">
@@ -258,6 +256,13 @@
                    :class="[{'canBeClick': login.formStatus.newPassWord && login.formStatus.newPassWordAgain}]"
                    @click="c">
                 <span>{{ $t('login_page.forgetMode.btnAgain') }}</span>
+              </div>
+            </div>
+            <div class="operateBtn">
+              <!--返回登录-->
+              <div class="returnToLogin" @click="login.mode = 'login'">{{ $t('login_page.forgetMode.toLogin') }}</div>
+              <!--返回注册-->
+              <div class="returnToLogin" @click="toRegisterF">{{ $t('login_page.forgetMode.toRegister') }}
               </div>
             </div>
           </div>
@@ -626,6 +631,11 @@
 
     },
     methods: {
+      // 找回密码 - 退回到注册
+      toRegisterF(){
+        this.login.mode = 'login'
+        this.navActive = 2
+      },
       // 创建画布
       setCanvas() {
         let canvas = document.getElementsByClassName('canvas')[0]
@@ -1232,12 +1242,26 @@
           }
         }
 
-        .returnToLogin {
+        .operateBtn {
+          margin-top: 60px;
           display: flex;
           justify-content: center;
-          color: rgba(22, 29, 37, 1);
-          font-size: 12px;
-          cursor: pointer;
+
+          .returnToLogin {
+            color: rgba(27, 83, 244, 1);
+            font-size: 12px;
+            cursor: pointer;
+            line-height: 1em;
+
+            &:nth-of-type(1) {
+              padding-right: 9px;
+              border-right: 1px solid rgba(22, 29, 37, 0.29);
+            }
+
+            &:nth-of-type(2) {
+              padding-left: 9px;
+            }
+          }
         }
 
         .b {
@@ -1639,7 +1663,11 @@
     .loginNav .forgetPW {
       font-size: 18px;
       font-family: PingFangSC-Regular, PingFang SC;
-      color: rgba(22, 29, 37, 1)!important;
+      color: rgba(22, 29, 37, 1) !important;
+    }
+
+    .btnLogin {
+      margin-top: 0px;
     }
   }
 

@@ -323,7 +323,7 @@
       },
       workBenchVal: {
         handler: function (val) {
-          if(val == this.zoneId) return false
+          if (val == this.zoneId) return false
           this.$store.commit('changeZoneId', val)
           sessionStorage.setItem('zoneUuid', val)
         },
@@ -346,8 +346,8 @@
         immediate: true
       },
       'user.account': {
-        handler: function(val){
-          if(!val || this.socket_backS) return false
+        handler: function (val) {
+          if (!val || this.socket_backS) return false
           this.$store.commit('WEBSOCKET_PLUGIN_INIT')
           this.$store.commit('WEBSOCKET_BACKS_INIT', val)
         },
@@ -391,19 +391,19 @@
         homeSelect()
           .then(data => {
             let d = data.data
-            if (d.code == 200) {
-              d.data.forEach(curr => {
-                this.workBenchList.push({
-                  name: curr.zoneName,
-                  val: curr.zoneUuid,
-                  isGpu: curr.isGpu
-                })
-              })
-            }
+            if (d.code != 200) return false
+            this.workBenchList = d.data.map(curr => {
+              return {
+                name: curr.zoneName,
+                val: curr.zoneUuid,
+                isGpu: curr.isGpu
+              }
+            })
+
           })
           .catch(error => console.log(`工作台下拉框获取报错，${error}`))
       },
-      changeIsGpu(){
+      changeIsGpu() {
         this.$store.commit('changeIsGpu', this.workBenchList.find(curr => curr.val == this.workBenchVal).isGpu)
       },
       async getUserInfo() {
