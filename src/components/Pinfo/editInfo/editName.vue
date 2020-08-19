@@ -36,6 +36,10 @@
     methods: {
       // 确定
       async enterFun() {
+        if(!this.name){
+          messageFun('info', '输入为空')
+          return false
+        }
         let data = await editBasicInfo({
             "nickname": this.name,
             "headImg": null,

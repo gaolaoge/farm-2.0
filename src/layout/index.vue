@@ -85,8 +85,8 @@
 
     .gz {
       position: fixed;
-      bottom: 20px;
-      right: 40px;
+      bottom: 40px;
+      right: 60px;
       width: 86px;
       height: 24px;
       border-radius: 2px;
