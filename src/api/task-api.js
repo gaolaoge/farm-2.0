@@ -10,3 +10,10 @@ export function uploadTabGetList(data) {
   })
 }
 
+// 任务 - 渲染下载 - 缩略图
+export function getThumbnail(data) {
+  return businessServer({
+    url: `/professional/file/getFrameImage?${data}`,
+    method: 'GET'
+  })
+}

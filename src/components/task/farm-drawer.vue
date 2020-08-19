@@ -940,8 +940,10 @@
     getFrameHistoryTable,
     downloadLog,
     analyseAgain,
-    getThumbnail,
   } from '@/api/api'
+  import {
+    getThumbnail
+  } from '@/api/task-api'
   import {
     createDateFun,
     consum,
@@ -1343,8 +1345,10 @@
         let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}`,
         //   data = await getThumbnail(t)
         // this.result.miniImgHref = window.URL.createObjectURL(data.data)
-          data = await downloadFrame(t)
-        this.result.miniImgHref = window.URL.createObjectURL(data.data)
+        //   data = await downloadFrame(t)
+        // this.result.miniImgHref = window.URL.createObjectURL(data.data)
+          data = await getThumbnail(t)
+        this.result.miniImgHref = window.URL.createObjectURL(new Blob([data.data],))
       },
       // 渲染下载 - 详情 - 主table 获取列表
       async getRenderItemMoreTableF() {
@@ -1795,7 +1799,7 @@
           messageFun('error', '报错，操作失败')
         }
       },
-      // 渲染结果 - 主 - 操作 - 5 526 u6 uy6 下载完成帧
+      // 渲染结果 - 主 - 操作 - 下载完成帧
       async operateDownloadFrame() {
         if (this.result.operateBtnList[2]['classState']) return false
         let data = await seeBalance()
