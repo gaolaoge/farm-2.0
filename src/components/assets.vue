@@ -36,7 +36,7 @@
         <div class="moreBtnList" v-show="btnGroup.showMoreBtnList">
           <ul class="moreBtnUl">
             <li v-for="(item,index) in btnGroup.moreBtnList" :key="index" class="moreBtnItem">
-              <span class="moreBtnItemSpan">{{ item }}</span>
+              <span class="moreBtnItemSpan" @click="operating('upload', item)">{{ item }}</span>
             </li>
           </ul>
         </div>

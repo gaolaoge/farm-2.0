@@ -326,6 +326,7 @@
           if (val == this.zoneId) return false
           this.$store.commit('changeZoneId', val)
           sessionStorage.setItem('zoneUuid', val)
+          this.$store.commit('changeZone', this.workBenchList.find(item => item.val == val).zone)
         },
         immediate: true,
         deep: true
@@ -396,7 +397,8 @@
               return {
                 name: curr.zoneName,
                 val: curr.zoneUuid,
-                isGpu: curr.isGpu
+                isGpu: curr.isGpu,
+                zone: curr.zone
               }
             })
 

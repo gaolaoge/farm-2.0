@@ -41,22 +41,23 @@ export default new Vuex.Store({
     isGup: null,
     socket_plugin: null,    // 与插件关联的websocket
     socket_plugin_msg: null,// 与插件关联的websocket接收的参数
+    socket_plugin_time: 0,  // 重连次数
     socket_backS: null,     // 与后台关联的websocket
     socket_backS_msg: null, // 与后台关联的websocket接收的参数
+    socket_backS_time: 0,
   },
   getter: {},
   mutations: {
     // 创建与后台的websocket
     WEBSOCKET_BACKS_INIT(state, account) {
-      let num = 0
       state.socket_backS = new WebSocket(`${process.env.BACK_WS_API}${account}`)
       state.socket_backS.addEventListener('open', () => console.log('--与后台连接成功--'))
       state.socket_backS.addEventListener('error', () => {
-        if (num >= 5) {
+        if (state.socket_backS_time >= 5) {
           console.log('--与后台连接失败--')
           state.socket_backS = 'err'
         } else {
-          num++
+          state.socket_backS_time ++
           console.log('--与后台连接失败，尝试重新连接--')
           this.WEBSOCKET_BACKS_INIT(state, account)
         }
@@ -70,18 +71,16 @@ export default new Vuex.Store({
     },
     // 创建与插件的websocket
     WEBSOCKET_PLUGIN_INIT(state) {
-      let num = 0
-      state.socket_plugin = new WebSocket('ws://localhost:15000')
-      // state.socket_plugin = new WebSocket('ws://192.168.1.111:15000')  // 李杨
+      state.socket_plugin = new WebSocket(process.env.PLUGIN_WS_API)
       state.socket_plugin.addEventListener('open', () => console.log('--与插件连接成功--'))
       state.socket_plugin.addEventListener('error', () => {
-        if (num >= 5) {
+        if (state.socket_plugin_time >= 5) {
           console.log('--与插件连接失败--')
           state.socket_plugin = 'err'
         } else {
-          num++
+          state.socket_plugin_time ++
           console.log('--与插件连接失败，尝试重新连接--')
-          this.WEBSOCKET_PLUGIN_INIT(state, url)
+          this.commit('WEBSOCKET_PLUGIN_INIT')
         }
       })
       state.socket_plugin.addEventListener('message', data => state.socket_plugin_msg = data)

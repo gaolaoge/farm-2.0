@@ -241,7 +241,7 @@
         <div class="stepBody-item">
           <div class="farm-drawer-body">
             <!--优先渲染-->
-            <div class="farm-drawer-body-item">
+            <div class="farm-drawer-body-item" v-if="zone == '1'">
               <!--标题-->
               <div class="farm-drawer-body-item-header">
                 <span class="farm-drawer-body-item-header-main">{{ stepThreeBase.priority.title }}</span>
@@ -346,10 +346,30 @@
                   </span>
                 </div>
                 <!--分层渲染-->
-                <div class="farm-drawer-item">
+                <div class="farm-drawer-item"v-if="zone == '1'">
                   <span class="farm-drawer-item-label">{{ stepThreeBase.other.stratifyLabel }}</span>
                   <el-switch
                     v-model="stepThreeBase.other.stratifyVal"
+                    inactive-color="RGBA(200, 202, 203, 1)"
+                    active-color="rgba(10, 98, 241, 1)"
+                    active-value="1"
+                    inactive-value="0"/>
+                </div>
+                <!--分相机-->
+                <div class="farm-drawer-item"v-if="zone == '2'">
+                  <span class="farm-drawer-item-label">{{ stepThreeBase.other.bCLabel }}</span>
+                  <el-switch
+                    v-model="stepThreeBase.other.bCVal"
+                    inactive-color="RGBA(200, 202, 203, 1)"
+                    active-color="rgba(10, 98, 241, 1)"
+                    active-value="1"
+                    inactive-value="0"/>
+                </div>
+                <!--颜色通道图-->
+                <div class="farm-drawer-item" v-if="zone == '2'">
+                  <span class="farm-drawer-item-label">{{ stepThreeBase.other.cCLabel }}</span>
+                  <el-switch
+                    v-model="stepThreeBase.other.cCVal"
                     inactive-color="RGBA(200, 202, 203, 1)"
                     active-color="rgba(10, 98, 241, 1)"
                     active-value="1"
@@ -764,6 +784,10 @@
           },
           // 其它设置
           other: {
+            cCLabel: '颜色通道图',
+            bCLabel: '分相机',
+            cCVal: '1',
+            bCVal: '1',
             title: '其他设置',
             btn: '新建项目',
             viewLabel: '所属项目',
@@ -1375,15 +1399,15 @@
             let task = this.stepOneBase.netdisc.treeData.find(curr => curr.id == item)
             return {
               filePath: {
-                pathResource: this.stepOneBase.netdisc.pathV,        // 工程路径
-                pathScene: this.stepOneBase.netdisc.sceneFilePath.reduce((total, curr_) => total + curr_ + '/', ''),  // 场景文件路径
-                fileName: task.label                                 // 场景文件名
+                pathResource: fir.netdisc.pathV,                     // 工程路径
+                pathScene: fir.netdisc.sceneFilePath.reduce((total, curr_) => total + curr_ + '/', ''),  // 场景文件路径
+                fileName: task.label,                                // 场景文件名
               }
             }
           }),
           commitTaskDTO: this.taskType == 'profession' ? null : {
-            layer: Number(thi.other.stratifyVal),        // 是否开启分层渲染。1开启，0关闭
-            renderPattern: thi.mode.modeList.find(curr => curr.val == thi.mode.mode).id,          // 渲染模式编号
+            layer: this.zone == '1' ? Number(thi.other.stratifyVal) : Number(thi.other.bCVal),          // 是否开启分层渲染。1开启，0关闭 : 开启分相机
+            renderPattern: thi.mode.modeList.find(curr => curr.val == thi.mode.mode).id,                // 渲染模式编号
             taskType: this.zone,                         // 任务类型 看分区
             otherSettings: {                             // 其它设置
               projectName: thi.other.viewList.find(curr => curr.value == thi.other.view).label,
@@ -1391,12 +1415,14 @@
               frameTimeoutWarn: thi.other.remindVal,
               frameTimeoutStop: thi.other.stopVal
             },
-            testRender: {                     // 优先渲染
+            testRender: this.zone == '1' ? {
               testRendering: thi.priority.topVal == '1' || thi.priority.middleVal == '1' || thi.priority.bottomVal == '1' ? 1 : 0,              // 是否开启测试渲染
               frameFirst: Number(thi.priority.topVal),                // 首帧
               frameMiddle: Number(thi.priority.middleVal),            // 末帧
               frameFinally: Number(thi.priority.bottomVal)            // 中间帧
-            },
+            } : null, // 优先渲染
+            aoChannel: 0,
+            colorChannel: this.zone == '1' ? null : thi.other.cCVal,                                   // 颜色通道
           }
         })
         if (data.data.code == 200) {
