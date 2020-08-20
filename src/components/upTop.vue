@@ -102,7 +102,7 @@
             <div class="farm-form-item-label">
             </div>
             <div class="farm-form-item-val">
-              <div class="btn" @click="payFun">
+              <div class="btn" :class="[{'cannotBeGo': !canBeUpTop}]" @click="payFun">
                 {{ btn.upTopNow }}
               </div>
             </div>
@@ -190,6 +190,7 @@
     name: 'upTop',
     data() {
       return {
+        canBeUpTop: true,
         navListActiveIndex: 0,
         form: {
           navList: [
@@ -201,7 +202,7 @@
             }
           ],
           balanceLabel: '金币余额',
-          balanceVal: '210.137',
+          balanceVal: '0.000',
           upTopLabel: '充值金额',
           upTopVal: '',
           realLabel: '充值到账金币',
@@ -339,6 +340,7 @@
     },
     watch: {
       'form.ChineseYuan': function (val) {
+        this.canBeUpTop = true
         if (val == 100) {
           this.form.realVal = '200.000'
           return false
@@ -361,7 +363,8 @@
       // 计算金币
       async computeFun() {
         if (!this.form.ChineseYuan) {
-          this.form.realVal = '0.000';
+          this.form.realVal = '0.000'
+          this.canBeUpTop = false
           return false
         }
         let data = await computeGold(this.form.ChineseYuan)
@@ -369,6 +372,7 @@
       },
       // 立即充值
       payFun() {
+        if(!this.canBeUpTop) return false
         if (this.payMethods == 'zfb') this.aLiPayFun()
         if (this.payMethods == 'wx') this.wxPayFun()
       },
@@ -641,6 +645,18 @@
 
       .gpuPriceList {
 
+      }
+    }
+
+    .btn.cannotBeGo {
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 1);
+      opacity: 0.19;
+      border: 1px solid rgba(22, 29, 37, 1);
+      color: rgba(22, 29, 37, 1);
+      cursor: no-drop;
+      &:hover {
+        background-color: rgba(255, 255, 255, 1);
       }
     }
   }

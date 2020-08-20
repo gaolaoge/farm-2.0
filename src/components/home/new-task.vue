@@ -366,15 +366,15 @@
                     inactive-value="0"/>
                 </div>
                 <!--颜色通道图-->
-                <div class="farm-drawer-item" v-if="zone == '2'">
-                  <span class="farm-drawer-item-label">{{ stepThreeBase.other.cCLabel }}</span>
-                  <el-switch
-                    v-model="stepThreeBase.other.cCVal"
-                    inactive-color="RGBA(200, 202, 203, 1)"
-                    active-color="rgba(10, 98, 241, 1)"
-                    active-value="1"
-                    inactive-value="0"/>
-                </div>
+<!--                <div class="farm-drawer-item" v-if="zone == '2'">-->
+<!--                  <span class="farm-drawer-item-label">{{ stepThreeBase.other.cCLabel }}</span>-->
+<!--                  <el-switch-->
+<!--                    v-model="stepThreeBase.other.cCVal"-->
+<!--                    inactive-color="RGBA(200, 202, 203, 1)"-->
+<!--                    active-color="rgba(10, 98, 241, 1)"-->
+<!--                    active-value="1"-->
+<!--                    inactive-value="0"/>-->
+<!--                </div>-->
                 <!--超时提醒-->
                 <div class="farm-drawer-item">
                   <span class="farm-drawer-item-label">
@@ -1422,7 +1422,8 @@
               frameFinally: Number(thi.priority.bottomVal)            // 中间帧
             } : null, // 优先渲染
             aoChannel: 0,
-            colorChannel: this.zone == '1' ? null : thi.other.cCVal,                                   // 颜色通道
+            // colorChannel: this.zone == '1' ? null : thi.other.cCVal,                                   // 颜色通道
+            colorChannel: 0,
           }
         })
         if (data.data.code == 200) {

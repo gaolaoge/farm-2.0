@@ -170,7 +170,11 @@
               createTime: createDateFun(new Date(item.createTime), 'mini')
             })
           })
-          else if(m.noticeType == 2) this.activityTableData = data.data.data
+          else if(m.noticeType == 2) this.activityTableData = data.data.data.map(item => {
+            return Object.assign(item, {
+              createTime: createDateFun(new Date(item.createTime), 'mini')
+            })
+          })
 
           // {
           //  createBy: "system"

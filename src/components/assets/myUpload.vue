@@ -4,8 +4,11 @@
          ref="outPutTable">
       <!--面包屑-->
       <div class="bread">
+        <span class="h" @click="navClickF(null, navF)">{{ navF }}</span>
+        <img src="@/icons/enter.png" alt="" class="img">
         <span v-for="(item,index) in nav"
               :key="index"
+              @click="navClickF(index)"
               class="h">
           {{ item }}
           <img src="@/icons/enter.png" alt="" class="img">
@@ -16,6 +19,7 @@
         :data="table.tableData"
         @selection-change="handleSelectionChange"
         @filter-change="filterHandler"
+        @row-click="enterFolder"
         class="o"
         :border=true
         style="width: 100%">
@@ -25,41 +29,41 @@
           align="right"
           show-overflow-tooltip
           min-width="58"
-          width="58" />
+          width="58"/>
         <!--文件名-->
         <el-table-column
           prop="fileName"
           label="文件名"
           sortable
           show-overflow-tooltip
-          min-width="180" />
+          min-width="180"/>
         <!--文件大小-->
         <el-table-column
           prop="size"
           label="文件大小"
           sortable
           show-overflow-tooltip
-          width="120" />
+          width="120"/>
         <!--文件类型-->
         <el-table-column
           prop="fileType"
           label="文件类型"
           show-overflow-tooltip
-          width="140" />
+          width="140"/>
         <!--剩余有效期-->
         <el-table-column
           prop="validPeriod"
           label="剩余有效期（天）"
           sortable
           show-overflow-tooltip
-          width="220" />
+          width="220"/>
         <!--更新时间-->
         <el-table-column
           prop="updateTime"
           label="更新时间"
           sortable
           show-overflow-tooltip
-          width="280" />
+          width="280"/>
 
       </el-table>
     </div>
@@ -92,7 +96,7 @@
 
   export default {
     name: 'outPut',
-    data(){
+    data() {
       return {
         table: {
           tableData: [],
@@ -104,13 +108,14 @@
           layerObj: {},                 // 层名
           frameObj: {}                  // 帧名
         },
-        projectList:[],
+        projectList: [],
         l: {
           x: '已加载全部，共',
           n: '0',
           p: '个'
         },
-        nav: ['资产'],
+        navF: '资产',
+        nav: [],
         path: '/',        // 当前位置
       }
     },
@@ -122,7 +127,7 @@
     },
     watch: {
       'socket_backS_msg': {
-        handler: function(e){
+        handler: function (e) {
           let data = JSON.parse(e.data)
           if (data.code != 208) return false
           if (data.msg == '601') {
@@ -132,18 +137,26 @@
             // size: 351602
             // updateTime: 1597815708850     // 更新时间
             // validPeriod: 1727777014       // 有效期
+            let nav = []
+            data.other.split('/').forEach(item => {
+              if (item) nav.push(item)
+            })
+            this.nav = nav
+            this.path = data.other
+
             this.table.tableData = data.data.map(item => {
               return Object.assign(item, {
                 'updateTime': item.updateTime,
                 'completedTime': item.completedTime,
-                'validPeriod': item.validPeriod
+                'validPeriod': item.validPeriod,
+                'fileName': item.fileType == '文件夹' ? item.fileName.slice(0, item.fileName.length - 1) : item.fileName
               })
             })
-          }else if (data.msg == '6031') {
+          } else if (data.msg == '6031') {
             // 新建文件夹 创建成功
             messageFun('success', '创建成功')
             this.getAssetsCatalog(this.path, this.searchInputVal)
-          }else if (data.msg == '6032') {
+          } else if (data.msg == '6032') {
             // 新建文件夹 文件夹名已存在
             messageFun('info', '文件名已存在，无法创建')
           }
@@ -151,21 +164,42 @@
       }
     },
     methods: {
+      // 导航跳转
+      navClickF(index, nav) {
+        if (nav == '资产') {
+          this.path = '/'
+          this.searchInputVal = ''
+          this.getAssetsCatalog(this.path, this.searchInputVal)
+        }else {
+          let path = '/'
+          for(let i = 0; i < index; i ++){
+            path += (this.nav[i] + '/')
+          }
+          this.getAssetsCatalog(path, this.searchInputVal)
+        }
+      },
+      // 进入文件夹
+      enterFolder(row, column, event) {
+        if (row.fileType != '文件夹') return false
+        this.path += (row.fileName + '/')
+        this.searchInputVal = ''
+        this.getAssetsCatalog(this.path, this.searchInputVal)
+      },
       // 翻页
-      handleCurrentChange(val){
+      handleCurrentChange(val) {
 
       },
       // 多选
-      handleSelectionChange(val){
+      handleSelectionChange(val) {
         this.table.selectionList = val
       },
       // 筛选条件发生变化
-      filterHandler(value, row, column){
+      filterHandler(value, row, column) {
         console.log(value, row, column)
       },
 
       // 上传
-      uploadFun(type){
+      uploadFun(type) {
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: type == 'file' ? 0 : 1,
           userID: this.user.id,
@@ -173,12 +207,12 @@
         })
       },
       // 新建文件夹
-      createFolder(){
+      createFolder() {
         this.$prompt('请输入新文件夹名称', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
         })
-          .then(({ value }) => {
+          .then(({value}) => {
             this.$store.commit('WEBSOCKET_BACKS_SEND', {
               'code': 603,
               'customerUuid': this.user.id,
@@ -189,37 +223,37 @@
           .catch(() => null)
       },
       // 下载
-      downloadFile(){
+      downloadFile() {
 
       },
       // 移动到
-      moveFile(){
+      moveFile() {
 
       },
       // 复制到
-      copyFile(){
+      copyFile() {
 
       },
       // 重命名
-      rename(){
+      rename() {
 
       },
       // 解压
-      unzip(){
+      unzip() {
 
       },
       // 删除
-      deleteFile(){
-        if(!this.table.selectionList.length) return false
+      deleteFile() {
+        if (!this.table.selectionList.length) return false
         this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 604,
           'customerUuid': this.user.id,
           filePathList: this.table.selectionList.map(item => this.path + item.fileName)
         })
       },
-      // 获取各级目录
-      getAssetsCatalog(filePath, keyword){
-        if(!this.socket_backS) setTimeout(() => this.getAssetsCatalog(filePath, keyword), 1000)
+      // 获取网盘各级目录
+      getAssetsCatalog(filePath, keyword) {
+        if (!this.socket_backS) setTimeout(() => this.getAssetsCatalog(filePath, keyword), 1000)
         else this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 601,
           'customerUuid': this.user.id,
@@ -246,29 +280,36 @@
     font-weight: 400;
     color: rgba(22, 29, 37, 0.6);
     line-height: 32px;
+
     .ll {
       color: rgba(0, 97, 255, 1);
     }
   }
 
-  /deep/.el-table__body-wrapper {
+  /deep/ .el-table__body-wrapper {
     height: calc(100vh - 395px);
+
     tr {
       cursor: pointer;
     }
   }
 
 
-
   .page {
     margin: 4px 25px 30px;
   }
+
   .outPut-wrapper {
     overflow: hidden;
   }
 
+  .bread {
+    display: flex;
+    align-items: center;
+  }
+
   @media screen and (orientation: portrait) {
-    /deep/.el-table__body-wrapper {
+    /deep/ .el-table__body-wrapper {
       height: calc(100vw - 395px);
     }
   }

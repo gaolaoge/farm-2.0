@@ -107,7 +107,7 @@
       <div class="tableList">
         <!--我的上传-->
         <div class="myUploadTable" v-show="table.navListActiveIndex == 0">
-          <my-upload ref="myUploadTable" :searchInputVal="uploadSearchInputVal" />
+          <my-upload ref="myUploadTable" :searchInputVal="uploadSearchInputVal"/>
         </div>
         <!--渲染输出-->
         <div class="outPutTable" v-show="table.navListActiveIndex == 1">
@@ -229,15 +229,15 @@
     },
     methods: {
       searchFun(type) {
-        if(type == 'render') this.$refs.outPutTable.getList()
+        if (type == 'render') this.$refs.outPutTable.getList()
         else this.$refs.myUploadTable.getList()
       },
       clearInput() {
         this.searchInputVal = ''
       },
       // 操作
-      operating(type ,active) {
-        if(type == 'render'){
+      operating(type, active) {
+        if (type == 'render') {
           switch (active) {
             case this.$t('assets.outPutBtnGroup')[0]:  // 下载
               this.$refs.outPutTable.downloadFun()
@@ -246,7 +246,7 @@
               this.$refs.outPutTable.deleteFun()
               break
           }
-        }else if(type == 'upload'){
+        } else if (type == 'upload') {
           switch (active) {
             case '文件':                                // 文件
               this.$refs.myUploadTable.uploadFun('file')
@@ -362,10 +362,10 @@
       z-index: 2;
       top: 40px;
       width: 70px;
-      background-color: rgba(22, 29, 37, 1);
+      background-color: rgba(255, 255, 255, 1);
       box-shadow: 0px 1px 8px 0px rgba(0, 97, 255, 0.2);
       border-radius: 4px;
-      border: 1px solid rgba(0, 97, 255, 0.5);
+      border: 1px solid rgba(22, 29, 37, 0.1);
 
       ul {
         padding: 6px 0px;
@@ -382,21 +382,23 @@
           span {
             display: inline-block;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(28, 36, 47, 0.6);
             line-height: 17px;
             user-select: none;
           }
 
           &:hover {
-            background-color: rgba(28, 36, 47, 1);
+            background-color: rgba(22, 29, 37, 0.1);
           }
         }
       }
     }
+
     .moreBtnList {
       left: 290px;
       height: 145px;
     }
+
     .uploadBtnList {
       left: 0px;
       height: 62px;
