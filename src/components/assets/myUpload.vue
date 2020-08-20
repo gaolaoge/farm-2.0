@@ -82,6 +82,34 @@
         :total="table.total">
       </el-pagination>
     </div>
+    <el-dialog
+      :show-close="false"
+      :visible.sync="dialogVisible"
+      width="50%">
+      <header class="dl_header">
+        <span>{{ dl.title }}</span>
+        <img src="@/icons/shutDialogIcon.png" alt="" class="closeIcon" @click="shutDialog">
+      </header>
+      <div class="dl-wrapper">
+        <div class="tree">
+          <el-tree
+            :data="dl.treeData"
+            node-key="id"
+            :load="dlGetTreeData"
+            lazy
+            :props="dl.defaultProps">
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <el-checkbox v-model="dl.checkPath" :true-label="data.position"/>
+              <span>{{ node.label }}</span>
+            </span>
+          </el-tree>
+        </div>
+        <div class="btnGroup">
+          <div class="btn confirm" @click="configMove"><span>{{ dl.btn[0] }}</span></div>
+          <div class="btn cancel" @click="shutDialog"><span>{{ dl.btn[1] }}</span></div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -116,7 +144,20 @@
         },
         navF: '资产',
         nav: [],
-        path: '/',        // 当前位置
+        path: '/',               // 当前位置
+        dialogVisible: false,    // 弹窗
+        dl: {
+          title: '选择路径',
+          treeData: [],
+          path: '/',
+          btn: ['确定', '取消'],
+          checkPath: '',        // 选中路径
+          defaultProps: {
+            children: 'children',
+            label: 'label'
+          },
+          resolve: null,         // 回调函数
+        }
       }
     },
     props: {
@@ -130,7 +171,7 @@
         handler: function (e) {
           let data = JSON.parse(e.data)
           if (data.code != 208) return false
-          if (data.msg == '601') {
+          if (data.msg == '601' && !this.dialogVisible) {
             // completedTime: 1597815711001  // 完成时间  => 为0修改名字
             // fileName: "Makefile.Release"
             // fileType: "Release"
@@ -142,16 +183,31 @@
               if (item) nav.push(item)
             })
             this.nav = nav
-            this.path = data.other
+            this.path = data.other == '' ? '/' : data.other
 
             this.table.tableData = data.data.map(item => {
               return Object.assign(item, {
                 'updateTime': item.updateTime,
                 'completedTime': item.completedTime,
                 'validPeriod': item.validPeriod,
-                'fileName': item.fileType == '文件夹' ? item.fileName.slice(0, item.fileName.length - 1) : item.fileName
+                'fileName': item.fileType == '文件夹' ? item.fileName.slice(0, item.fileName.length - 1) : item.fileName,
+                'position': this.path + item.fileName
               })
             })
+          } else if (data.msg == '601' && this.dialogVisible) {
+            // 网盘tree
+            let x = data.data.map(item => {
+              return {
+                id: Math.floor(Math.random() * 1000000000),
+                label: item.fileName.slice(0, item.fileName.length - 1),
+                position: data.other + item.fileName
+              }
+            })
+            if (!this.dl.resolve) this.dl.treeData = x
+            else {
+              this.dl.resolve(x)
+              this.dl.resolve = null
+            }
           } else if (data.msg == '6031') {
             // 新建文件夹 创建成功
             messageFun('success', '创建成功')
@@ -159,20 +215,58 @@
           } else if (data.msg == '6032') {
             // 新建文件夹 文件夹名已存在
             messageFun('info', '文件名已存在，无法创建')
+          } else if (data.msg == '6041') {
+            // 新建文件夹 创建成功
+            messageFun('success', '操作成功')
+            this.getAssetsCatalog(this.path, this.searchInputVal)
+          } else if (data.msg == '6051') {
+            messageFun('success', '操作成功')
+            this.shutDialog()
+          } else if (data.msg == '6052') {
+            messageFun('info', '选定目标内已存在相同名称文件或文件夹，操作失败')
+          } else if (data.msg == '6053') {
+            message('error', '报错，操作失败')
           }
         },
       }
     },
     methods: {
+      // 关闭tree窗
+      shutDialog() {
+        this.dialogVisible = false
+        Object.assign(this.dl, {
+          treeData: [],
+          path: '/',
+          checkPath: '',
+          resolve: null
+        })
+      },
+      // 弹窗进一步获取结构
+      dlGetTreeData(node, resolve) {
+        if (node.label) this.dl.path += (node.label + '/')
+        if (node.level == 0) {
+          return resolve([{
+            id: 0,
+            label: '我的资产',
+            position: '/'
+          }])
+        } else this.$store.commit('WEBSOCKET_BACKS_SEND', {
+          'code': 601,
+          'customerUuid': this.user.id,
+          'filePath': this.dl.path.slice(5),
+          'keyword': ''
+        })  // 向后台获取网盘目录 工程路径
+        this.dl.resolve = resolve
+      },
       // 导航跳转
       navClickF(index, nav) {
         if (nav == '资产') {
           this.path = '/'
           this.searchInputVal = ''
           this.getAssetsCatalog(this.path, this.searchInputVal)
-        }else {
+        } else {
           let path = '/'
-          for(let i = 0; i < index; i ++){
+          for (let i = 0; i < index; i++) {
             path += (this.nav[i] + '/')
           }
           this.getAssetsCatalog(path, this.searchInputVal)
@@ -228,7 +322,18 @@
       },
       // 移动到
       moveFile() {
-
+        if (!this.table.selectionList.length) return false
+        this.dialogVisible = true
+      },
+      // 确认移动
+      configMove() {
+        if (!this.dl.checkPath) return
+        this.$store.commit('WEBSOCKET_BACKS_SEND', {
+          'code': 605,
+          'customerUuid': this.user.id,
+          'targetFolderPath': this.dl.checkPath,
+          'filePathList': this.table.selectionList.map(item => item.position)
+        })
       },
       // 复制到
       copyFile() {
@@ -294,7 +399,6 @@
     }
   }
 
-
   .page {
     margin: 4px 25px 30px;
   }
@@ -306,6 +410,96 @@
   .bread {
     display: flex;
     align-items: center;
+  }
+
+  /deep/ .el-dialog__body {
+    padding: 0px;
+  }
+
+  .dl_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 36px;
+    background-color: rgba(241, 244, 249, 1);
+    box-shadow: 0px 1px 6px 0px rgba(27, 83, 244, 0.3);
+    border-radius: 8px 8px 0px 0px;
+    padding: 0px 20px 0px 30px;
+
+    span {
+      user-select: none;
+    }
+
+    .closeIcon {
+      cursor: pointer;
+    }
+  }
+
+  .custom-tree-node {
+    display: flex;
+    align-items: center;
+
+    span {
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 14px;
+      font-family: SourceHanSansCN-Regular, SourceHanSansCN;
+      color: rgba(22, 29, 37, 0.6);
+    }
+  }
+
+  .dl-wrapper {
+    position: relative;
+    padding: 8px;
+    height: 540px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 0px 0px 8px 8px;
+
+    .tree {
+      height: 100%;
+    }
+
+    .btnGroup {
+      position: absolute;
+      bottom: 12px;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+
+      .btn {
+        width: 76px;
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 20px;
+
+        span {
+          font-family: PingFangSC-Medium, PingFang SC;
+          font-weight: 500;
+          font-size: 14px;
+        }
+
+        &.confirm {
+          background-color: rgba(27, 83, 244, 1);
+          border: 1px solid rgba(27, 83, 244, 1);
+
+          span {
+            color: rgba(255, 255, 255, 1);
+          }
+        }
+
+        &.cancel {
+          background-color: rgba(248, 248, 248, 1);
+          border: 1px solid rgba(22, 29, 37, 0.2);
+
+          span {
+            color: rgba(22, 29, 37, 0.79);
+          }
+        }
+      }
+    }
   }
 
   @media screen and (orientation: portrait) {
