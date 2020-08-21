@@ -350,7 +350,7 @@
             {text: '已下载', value: '已下载'}
           ],
           usersList: [],                // 筛选 - 创建人
-          itemList: [],                // 筛选 - 所属项目
+          itemList: [],                 // 筛选 - 所属项目
           statusList: [                 // 筛选 - 状态
             {text: '待全部渲染', value: '待全部渲染'},
             {text: '渲染中', value: '渲染中'},
@@ -520,12 +520,14 @@
         //   uploadStatus '',         // 渲染状态
         //   renderStatus: ''         // 工程ID
         // }
-        let t = `zoneUuid=${this.zoneId}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=${condition == 'null' ? '' : condition}&projectUuid=`
-        let data = this.zone == 1 ? await getRenderTableList(t) : await uploadTabGetList(t),
+        let t = `zoneUuid=${this.zoneId}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=${condition == 'null' ? '' : condition}&projectUuid=`,
+          f = `/${this.zoneId}/${this.table.current}/${this.table.pageSize}`,
+          data = this.zone == 1 ? await getRenderTableList(t) : await uploadTabGetList(f),
             usersList = new Set()
-        this.table.renderTableTotal = data.data.total
-        this.$emit('renderTbaleTotalItem', data.data.total)
-        this.table.RenderDownloadData = data.data.data.map((curr,fatherIndex) => {
+        this.table.renderTableTotal = data.data.total  // 【渲染下载】翻页长度
+        this.$emit('renderTbaleTotalItem', data.data.total)  // 【渲染下载】标签后显示长度
+        this.$emit('archiveNum',data.data.other)  // 【归档记录】长度
+        this.table.RenderDownloadData = this.zone == 1 ? data.data.data.map((curr,fatherIndex) => {
           let children = [],
               downloadStatusS = [],
               downloadStatus = '部分下载'
@@ -622,9 +624,65 @@
             rowId: curr.taskNo,                                    // 唯一值
             selfIndex: fatherIndex
           }
+        }) : data.data.data.map((curr,fatherIndex) => {
+          // account: "gaoge1834"         // 任务创建人
+          // allFrameCount: 1             // 所有帧
+          // await: 0                     // 等待中任务数
+          // camera: null
+          // cost: 0                      // 已用金额
+          // createBy: "1"                // 任务创建人编号
+          // createTime:                  // 创建时间
+          // designTaskDTOList: []        // 子任务组
+          // downloadFrameCount: 0        // 下载情况
+          // endTime: null                // 结束时间。可能为null
+          // fileName: ""                 // 文件名称
+          // layerNo: null                // 主任务作业号
+          // layerTaskStatus: null
+          // layerTaskUuid: null
+          // lose: 0                      // 失败任务数
+          // pageIndex: null
+          // pageSize: null
+          // projectName: ""              // 项目名称
+          // renderStatus: 3              // 渲染各个阶段的状态。1，等待；2，渲染中，3，渲染结束；4，渲染暂停；5，待全速渲染； 6，渲染放弃
+          // rendering: 0                 // 渲染中任务数
+          // startTime: null              // 开始时间。可能为null
+          // stopped: 0                   // 停止中任务数
+          // taskNo: "SWT-413"
+          // taskUuid: ""                 // 任务uuid
+          // useTime: 37860               // 已用时间
+          // win: 1                       // 成功任务数
+          // zoneUuid: null
+          return {
+            taskUuid: curr.taskUuid,
+            id: curr.taskNo,                                       // 任务ID
+            sceneName: curr.fileName,                              // 场景名
+            status: itemDownloadStatus(curr.renderStatus),         // 状态
+            renderingProgress: (curr.wine + curr.lose) + '/' + (curr.wine + curr.lose + curr.rendering + curr.await + curr.stopped),          //渲染进度
+            percent: curr.frameCount.total == null ? 0 : Math.floor(curr.frameCount.done / curr.frameCount.total * 100),
+            viewProject: curr.projectName,                         // 所属项目
+            rendering: curr.frameCount.rendering,                    // 渲染中
+            wait: curr.frameCount.await,                            // 等待
+            timeOut: curr.frameCount.stopped,                        // 暂停
+            carryOut: curr.frameCount.wine,                        // 完成
+            failure: curr.frameCount.lose,                         // 失败
+            renderingTime: consum(curr.useTime),                   // 渲染时长
+            renderingCost: curr.cost,                              // 渲染费用（金币）
+            frameRange: '-',                                       // 帧范围
+            intervalFrame: '-',                                    // 间隔帧
+            camera: '-',                                           // 相机
+            layerName: '-',                                        // 层名
+            downloadStatus,                                        // 下载情况
+            renderingStartTime: createDateFun(new Date(curr.startTime)),                    // 渲染开始时间
+            renderingEndTime: createDateFun(new Date(curr.endTime)),                        // 渲染结束时间
+            founder: curr.account,                                 // 创建人
+            creationTime: createDateFun(new Date(curr.createTime)),// 创建时间
+            children,
+            rowId: curr.taskNo,                                    // 唯一值
+            selfIndex: fatherIndex
+          }
         })
-        this.table.usersList = [...usersList].map(curr => { return {'text': curr, 'value':curr }})
-        this.$emit('archiveNum',data.data.other)
+        this.table.usersList = [...usersList].map(curr => { return {'text': curr, 'value':curr }})  // 创建人列表
+
       },
       // 操作 - 开始
       startFun(){
@@ -906,6 +964,9 @@
           this.$emit('j',[...r])
         },
         deep: true
+      },
+      'zoneId': function(val){
+        this.getList()
       }
     },
     // props: {

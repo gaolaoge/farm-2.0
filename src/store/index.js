@@ -55,9 +55,9 @@ export default new Vuex.Store({
       state.socket_backS.addEventListener('error', () => {
         if (state.socket_backS_time >= 5) {
           console.log('--与后台连接失败--')
-          state.socket_backS = 'err'
+          this.commit('becomeErr', 'socket_backS')
         } else {
-          state.socket_backS_time ++
+          this.commit('addOne', 'socket_backS_time')
           console.log('--与后台连接失败，尝试重新连接--')
           this.WEBSOCKET_BACKS_INIT(state, account)
         }
@@ -76,9 +76,9 @@ export default new Vuex.Store({
       state.socket_plugin.addEventListener('error', () => {
         if (state.socket_plugin_time >= 5) {
           console.log('--与插件连接失败--')
-          state.socket_plugin = 'err'
+          this.commit('becomeErr', 'socket_plugin')
         } else {
-          state.socket_plugin_time ++
+          this.commit('addOne', 'socket_plugin_time')
           console.log('--与插件连接失败，尝试重新连接--')
           this.commit('WEBSOCKET_PLUGIN_INIT')
         }
@@ -101,6 +101,12 @@ export default new Vuex.Store({
     },
     changeTotalInvoiceAmount(s, val) {
       s.user.totalInvoiceAmount = val
+    },
+    becomeErr(s, val){
+      s[val] = 'err'
+    },
+    addOne(s, val) {
+      s[val] ++
     },
     changeTaskType(s, val) {
       s.taskType = val

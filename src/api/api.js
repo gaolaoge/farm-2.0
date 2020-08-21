@@ -535,9 +535,9 @@ export function assetsDeleteItem(data){
 }
 
 // 任务 - 缩略图
-export function getThumbnail(data){
-  return businessServer({
-    url: `/professional/file/getFrameImage?${data}`,
-    method: 'GET'
-  })
-}
+// export function getThumbnail(data){
+//   return businessServer({
+//     url: `/professional/file/getFrameImage?${data}`,
+//     method: 'GET'
+//   })
+// }

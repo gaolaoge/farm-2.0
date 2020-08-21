@@ -1342,13 +1342,13 @@
       // 渲染下载 - 详情 - 缩略图
       async showMiniImg(row, column, event) {
         this.result.statusData = row['status']
-        let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}`,
+        let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=240`,
         //   data = await getThumbnail(t)
         // this.result.miniImgHref = window.URL.createObjectURL(data.data)
         //   data = await downloadFrame(t)
         // this.result.miniImgHref = window.URL.createObjectURL(data.data)
           data = await getThumbnail(t)
-        this.result.miniImgHref = window.URL.createObjectURL(new Blob([data.data],))
+        this.result.miniImgHref = data.data.data
       },
       // 渲染下载 - 详情 - 主table 获取列表
       async getRenderItemMoreTableF() {

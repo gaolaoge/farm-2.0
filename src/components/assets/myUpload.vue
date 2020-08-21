@@ -97,6 +97,7 @@
             node-key="id"
             :load="dlGetTreeData"
             lazy
+            :destroy-on-close="true"
             :props="dl.defaultProps">
             <span class="custom-tree-node" slot-scope="{ node, data }">
               <el-checkbox v-model="dl.checkPath" :true-label="data.position"/>
@@ -105,7 +106,10 @@
           </el-tree>
         </div>
         <div class="btnGroup">
-          <div class="btn confirm" @click="configMove"><span>{{ dl.btn[0] }}</span></div>
+          <div class="btn confirm" @click="configF('move')" v-show="dl.dlType == 'move'"><span>{{ dl.btn[0] }}</span>
+          </div>
+          <div class="btn confirm" @click="configF('copy')" v-show="dl.dlType == 'copy'"><span>{{ dl.btn[0] }}</span>
+          </div>
           <div class="btn cancel" @click="shutDialog"><span>{{ dl.btn[1] }}</span></div>
         </div>
       </div>
@@ -147,6 +151,7 @@
         path: '/',               // 当前位置
         dialogVisible: false,    // 弹窗
         dl: {
+          dlType: null,
           title: '选择路径',
           treeData: [],
           path: '/',
@@ -164,7 +169,10 @@
       searchInputVal: {
         type: String,
         default: ''
-      }
+      },
+      uploadtype: {
+        type: Number,
+      },
     },
     watch: {
       'socket_backS_msg': {
@@ -208,38 +216,40 @@
               this.dl.resolve(x)
               this.dl.resolve = null
             }
-          } else if (data.msg == '6031') {
-            // 新建文件夹 创建成功
-            messageFun('success', '创建成功')
-            this.getAssetsCatalog(this.path, this.searchInputVal)
-          } else if (data.msg == '6032') {
-            // 新建文件夹 文件夹名已存在
-            messageFun('info', '文件名已存在，无法创建')
-          } else if (data.msg == '6041') {
-            // 新建文件夹 创建成功
+          } else if (data.msg == '6031' || data.msg == '6041' || data.msg == '6071') {
+            // 新建文件夹 创建成功 || 删除
             messageFun('success', '操作成功')
             this.getAssetsCatalog(this.path, this.searchInputVal)
-          } else if (data.msg == '6051') {
+          } else if (data.msg == '6032' || data.msg == '6072') {
+            // 新建文件夹 文件夹名已存在
+            messageFun('info', '指定文件名已存在，操作失败')
+          }else if (data.msg == '6042') {
+            // 删除失败
+            messageFun('info', data.data)
+            this.getAssetsCatalog(this.path, this.searchInputVal)
+          } else if (data.msg == '6051' || data.msg == '6061') {
             messageFun('success', '操作成功')
             this.shutDialog()
-          } else if (data.msg == '6052') {
-            messageFun('info', '选定目标内已存在相同名称文件或文件夹，操作失败')
-          } else if (data.msg == '6053') {
-            message('error', '报错，操作失败')
-          }
+            this.getAssetsCatalog(this.path, this.searchInputVal)
+          } else if (data.msg == '6052' || data.msg == '6062') messageFun('info', '选定目标内已存在相同名称文件或文件夹，操作失败')
+          else if (data.msg == '6053' || data.msg == '6063' || data.msg == '6073') messageFun('error', '报错，操作失败')
         },
-      }
+      },
+      // 'dialogVisible': function(val){
+      //   if(val) this.dlGetTreeData()
+      // }
     },
     methods: {
       // 关闭tree窗
       shutDialog() {
         this.dialogVisible = false
-        Object.assign(this.dl, {
-          treeData: [],
-          path: '/',
-          checkPath: '',
-          resolve: null
-        })
+        // Object.assign(this.dl, {
+        //   treeData: [],
+        //   // path: '/',
+        //   // checkPath: '',
+        //   resolve: null,
+        //   dlType: null,
+        // })
       },
       // 弹窗进一步获取结构
       dlGetTreeData(node, resolve) {
@@ -253,7 +263,7 @@
         } else this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 601,
           'customerUuid': this.user.id,
-          'filePath': this.dl.path.slice(5),
+          'filePath': node.data.position || '/',
           'keyword': ''
         })  // 向后台获取网盘目录 工程路径
         this.dl.resolve = resolve
@@ -297,7 +307,7 @@
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: type == 'file' ? 0 : 1,
           userID: this.user.id,
-          networkPath: this.path
+          networkPath: this.uploadType == 1 ? '' : this.path
         })
       },
       // 新建文件夹
@@ -324,28 +334,55 @@
       moveFile() {
         if (!this.table.selectionList.length) return false
         this.dialogVisible = true
+        this.dl.dlType = 'move'
       },
-      // 确认移动
-      configMove() {
+      // 确认 - 移动/复制
+      configF(type) {
         if (!this.dl.checkPath) return
         this.$store.commit('WEBSOCKET_BACKS_SEND', {
-          'code': 605,
+          'code': type == 'move' ? 605 : 606,
           'customerUuid': this.user.id,
           'targetFolderPath': this.dl.checkPath,
-          'filePathList': this.table.selectionList.map(item => item.position)
+          'filePathList': this.table.selectionList.map(item => {
+            let p = item.position,
+              r = p.slice(p.length - 1) == '/'
+            if (r) return p.slice(0, p.length - 1)
+            else return p
+          })
         })
       },
       // 复制到
       copyFile() {
-
+        if (!this.table.selectionList.length) return false
+        this.dialogVisible = true
+        this.dl.dlType = 'copy'
       },
       // 重命名
       rename() {
-
+        if (this.table.selectionList.length != 1) return false
+        this.$prompt('请输入新名称', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        })
+          .then(({ value }) => {
+            console.log(this.table.selectionList[0])
+            this.$store.commit('WEBSOCKET_BACKS_SEND', {
+              'code': 607,
+              'customerUuid': this.user.id,
+              'renameFilePath': this.path + this.table.selectionList[0]['fileName'],   // 被重命名的文件路径
+              'newFileName': value                                                     // 新文件名
+            })
+          })
+          .catch(() => messageFun('info', '操作取消'))
       },
       // 解压
       unzip() {
-
+        if (!this.table.selectionList.length) return false
+        this.$store.commit('WEBSOCKET_BACKS_SEND', {
+          'code': 608,
+          'customerUuid': this.user.id,
+          filePathList: this.table.selectionList.map(item => this.path + item.fileName)
+        })
       },
       // 删除
       deleteFile() {

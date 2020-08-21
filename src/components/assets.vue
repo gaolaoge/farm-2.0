@@ -107,7 +107,7 @@
       <div class="tableList">
         <!--我的上传-->
         <div class="myUploadTable" v-show="table.navListActiveIndex == 0">
-          <my-upload ref="myUploadTable" :searchInputVal="uploadSearchInputVal"/>
+          <my-upload ref="myUploadTable" :uploadType="btnGroup.howToCreateIindex" :searchInputVal="uploadSearchInputVal"/>
         </div>
         <!--渲染输出-->
         <div class="outPutTable" v-show="table.navListActiveIndex == 1">
