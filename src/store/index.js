@@ -26,13 +26,17 @@ export default new Vuex.Store({
       id: null
     },
     regExp: {
-      email: null,
+      email: /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/,
       phone: /^1(3|4|5|6|7|8|9)\d{9}$/,
       pwLength: /^[\w\W]{8,18}$/,
       pwFormat: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?!^.*[\u4E00-\u9FA5].*$)/,
       code: /^\d{6}$/,
       accountLength: /^[\w\W]{8,14}$/,
-      accountFormat: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5\w]+$)/
+      accountFormat: /^(?![\d]+$)(?![a-z]+$)(?![A-Z]+$)(?![_]+$)(?![\u4E00-\u9FA5\w]+$)/,
+      // 纳税人识别号
+      identificationNumber: /^[\w]{15,20}$/,
+      // 发票抬头
+      header: /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/,
     },
     login: false,
     zoneId: null,           // 所在区ID

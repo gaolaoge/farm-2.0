@@ -5,7 +5,7 @@ import {
 // 获取用户协议
 export function getProtocal(){
   return businessServer({
-    url: '/professional/file/getProtocol',
+    url: '/file/getProtocol',
     method: 'GET',
     responseType: "blob",
   })

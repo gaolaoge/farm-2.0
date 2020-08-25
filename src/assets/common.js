@@ -118,7 +118,6 @@ const createTableIconList = function () {
     })
     // 展开图标
     let s = [...document.getElementsByClassName('el-table__expand-icon')]
-    console.log(s)
     s.forEach(curr => {
       let img = document.createElement('IMG')
       img.src = require('@/icons/iii.png')

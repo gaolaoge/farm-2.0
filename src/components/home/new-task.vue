@@ -346,7 +346,7 @@
                   </span>
                 </div>
                 <!--分层渲染-->
-                <div class="farm-drawer-item"v-if="zone == '1'">
+                <div class="farm-drawer-item" v-if="zone == '1'">
                   <span class="farm-drawer-item-label">{{ stepThreeBase.other.stratifyLabel }}</span>
                   <el-switch
                     v-model="stepThreeBase.other.stratifyVal"
@@ -356,7 +356,7 @@
                     inactive-value="0"/>
                 </div>
                 <!--分相机-->
-                <div class="farm-drawer-item"v-if="zone == '2'">
+                <div class="farm-drawer-item" v-if="zone == '2'">
                   <span class="farm-drawer-item-label">{{ stepThreeBase.other.bCLabel }}</span>
                   <el-switch
                     v-model="stepThreeBase.other.bCVal"
@@ -366,15 +366,15 @@
                     inactive-value="0"/>
                 </div>
                 <!--颜色通道图-->
-<!--                <div class="farm-drawer-item" v-if="zone == '2'">-->
-<!--                  <span class="farm-drawer-item-label">{{ stepThreeBase.other.cCLabel }}</span>-->
-<!--                  <el-switch-->
-<!--                    v-model="stepThreeBase.other.cCVal"-->
-<!--                    inactive-color="RGBA(200, 202, 203, 1)"-->
-<!--                    active-color="rgba(10, 98, 241, 1)"-->
-<!--                    active-value="1"-->
-<!--                    inactive-value="0"/>-->
-<!--                </div>-->
+                <!--                <div class="farm-drawer-item" v-if="zone == '2'">-->
+                <!--                  <span class="farm-drawer-item-label">{{ stepThreeBase.other.cCLabel }}</span>-->
+                <!--                  <el-switch-->
+                <!--                    v-model="stepThreeBase.other.cCVal"-->
+                <!--                    inactive-color="RGBA(200, 202, 203, 1)"-->
+                <!--                    active-color="rgba(10, 98, 241, 1)"-->
+                <!--                    active-value="1"-->
+                <!--                    inactive-value="0"/>-->
+                <!--                </div>-->
                 <!--超时提醒-->
                 <div class="farm-drawer-item">
                   <span class="farm-drawer-item-label">
@@ -499,10 +499,10 @@
             <input type="text"
                    id="templateName"
                    class="farm-form-item-input"
-                   :class="[{'inputError': !dialogAdd.form.formatName}]"
+                   :class="[{'inputError': dialogAdd.form.formatName == false}]"
                    :placeholder="dialogAdd.namePlaceholder"
                    @blur="nameVerif"
-                   @focus="dialogAdd.form.formatName = true"
+                   @focus="dialogAdd.form.formatName = null"
                    v-model="dialogAdd.form.valName">
           </div>
           <!--渲染软件-->
@@ -819,7 +819,7 @@
           form: {
             labelName: '模板名称',
             valName: '',
-            formatName: false,
+            formatName: null,
             labelSoftware: '渲染软件',
             valSoftware: '',
             labelPlugin: '渲染插件',
@@ -1050,12 +1050,14 @@
       },
       // 2.设置渲染模板 - 添加模板 - 检验模板名格式
       nameVerif() {
-        if (this.dialogAdd.form.valName.length > 50) {
+        if (!this.dialogAdd.form.valName) {
+          this.dialogAdd.form.formatName = null
+          return false
+        } else if (this.dialogAdd.form.valName.length > 50) {
           messageFun('error', '最多输入50个字符')
           this.dialogAdd.form.formatName = false
           return false
-        }
-        this.dialogAdd.form.formatName = true
+        } else this.dialogAdd.form.formatName = true
       },
       // 4.关闭窗口
       closeDialogFun() {
@@ -1645,6 +1647,7 @@
           &.professionC {
             li {
               width: 406.75px;
+
               &:nth-of-type(3) {
                 display: none;
               }

@@ -45,7 +45,8 @@
             {'cannotDownload': !btnGroup.downloadTableBtnDownload},
             {'cannotRenderAll': !btnGroup.downloadTableBtnRenderAll},
             {'cannotRenderAgain': !btnGroup.downloadTableBtnRenderAgain},
-            {'cannotArchive': !btnGroup.downloadTableBtnArchive}
+            {'cannotArchive': !btnGroup.downloadTableBtnArchive},
+            {'cannotCopy': !btnGroup.downloadTableBtnCopy}
            ]"
            v-show="table.navListActiveIndex == 1">
         <div class="farm-primary-form-btn"
@@ -53,8 +54,8 @@
              @click="renderOperating(item['text'])"
              v-for="(item,index) in btnGroup.renderBtnGroup"
              :key="index">
-          <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
-          <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
+          <img :src="item.initialIcon" v-if="item.initialIcon" class="btnIcon default">
+          <img :src="item.selectedIcon" v-if="item.selectedIcon" class="btnIcon hover">
           <span>
             {{ item['text'] }}
           </span>
@@ -211,6 +212,10 @@
             },
             {
               text: this.$t('task.renderBtnGroup')[8],
+              class: 'copyBtn'
+            },
+            {
+              text: this.$t('task.renderBtnGroup')[9],
               class: 'refresh'
             }
           ],
@@ -226,7 +231,8 @@
           downloadTableBtnDownload: false,         // 渲染下载 - 下载完成帧 - 可用状态
           downloadTableBtnRenderAll: false,        // 渲染下载 - 全部渲染 - 可用状态
           downloadTableBtnRenderAgain: false,      // 渲染下载 - 重新渲染 - 可用状态
-          downloadTableBtnArchive: false           // 渲染下载 - 归档 - 可用状态
+          downloadTableBtnArchive: false,          // 渲染下载 - 归档 - 可用状态
+          downloadTableBtnCopy: false,             // 渲染下载 - 拷贝 - 可用状态
         },
         dialogTable: {
           status: false,
@@ -268,6 +274,7 @@
       },
       // 渲染下载 多选结果
       j(val) {
+        console.log(val.length)
         let t = this.btnGroup
         t.downloadTableBtnStart = true       // 渲染下载 - 开始
         t.downloadTableBtnPause = true       // 渲染下载 - 暂停
@@ -281,18 +288,15 @@
           t.downloadTableBtnStart = false
           // t.downloadTableBtnRenderAll = false
           t.downloadTableBtnArchive = false
-        }
-        if (val.includes(this.$t('task.status.render_timeOut'))) {
+        } else if (val.includes(this.$t('task.status.render_timeOut'))) {
           t.downloadTableBtnPause = false
           t.downloadTableBtnRenderAll = false
           t.downloadTableBtnArchive = false
-        }
-        if (val.includes(this.$t('task.status.render_all'))) {
+        } else if (val.includes(this.$t('task.status.render_all'))) {
           t.downloadTableBtnStart = false
           t.downloadTableBtnPause = false
           t.downloadTableBtnArchive = false
-        }
-        if (val.includes(this.$t('task.status.render_done'))) {
+        } else if (val.includes(this.$t('task.status.render_done'))) {
           t.downloadTableBtnStart = false
           t.downloadTableBtnPause = false
           t.downloadTableBtnRenderAll = false
@@ -306,6 +310,8 @@
           t.downloadTableBtnRenderAgain = false // 渲染下载 - 重新渲染
           t.downloadTableBtnArchive = false     // 渲染下载 - 归档
         }
+        if (val.length == 1) t.downloadTableBtnCopy = true     // 渲染下载 - 拷贝
+        else t.downloadTableBtnCopy = false
       },
       // 【归档记录】触发重新获取数据
       x() {
@@ -368,7 +374,11 @@
             if (!this.btnGroup.downloadTableBtnArchive) return false
             this.$refs.renderMode.archiveFun()
             break
-          case this.$t('task.renderBtnGroup')[8]: // 刷新
+          case this.$t('task.renderBtnGroup')[8]: // 拷贝
+            if (!this.btnGroup.downloadTableBtnCopy) return false
+            this.$refs.renderMode.copyFun()
+            break
+          case this.$t('task.renderBtnGroup')[9]: // 刷新
             this.$refs.renderMode.getList()
             break
         }
@@ -390,8 +400,10 @@
       }
     },
     mounted() {
+      // 选择上次关闭时选中的Table
       if (sessionStorage.getItem('taskListActive') == '1') this.table.navListActiveIndex = 1
-      createTableIconList()
+      createTableIconList()  // 图标
+      // Table 筛选条件
       let name = this.$route.params.name ? this.$route.params.name : null
       if (!name) return false
       switch (name) {
@@ -450,53 +462,43 @@
       }
 
       .uploadBtnGroup {
-        &.cannotDelete,
-        &.cannotAgain {
-          .deleteBtn,
-          .againBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-            background-color: rgba(255, 255, 255, 1);
+        &.cannotDelete .deleteBtn,
+        &.cannotAgain .againBtn {
+          cursor: no-drop;
+          color: rgba(22, 29, 37, 0.29);
+          background-color: rgba(255, 255, 255, 1);
 
-            .default {
-              display: inline-block;
-              opacity: 0.29;
-            }
+          .default {
+            display: inline-block;
+            opacity: 0.29;
+          }
 
-            .hover {
-              display: none;
-            }
+          .hover {
+            display: none;
           }
         }
       }
 
       .renderBtnGroup {
-        &.cannotState,
-        &.cannotPause,
-        &.cannotDelete,
-        &.cannotDownload,
-        &.cannotRenderAll,
-        &.cannotRenderAgain,
-        &.cannotArchive {
-          .startBtn,
-          .pauseBtn,
-          .deleteBtn,
-          .downloadBtn,
-          .renderAllBtn,
-          .renderAgainBtn,
-          .archiveBtn {
-            cursor: no-drop;
-            color: rgba(22, 29, 37, 0.29);
-            background-color: rgba(255, 255, 255, 1);
+        &.cannotState .startBtn,
+        &.cannotPause .pauseBtn,
+        &.cannotDelete .deleteBtn,
+        &.cannotDownload .downloadBtn,
+        &.cannotRenderAll .renderAllBtn,
+        &.cannotRenderAgain .renderAgainBtn,
+        &.cannotArchive .archiveBtn,
+        &.cannotCopy .copyBtn {
+          cursor: no-drop;
+          color: rgba(22, 29, 37, 0.29);
+          background-color: rgba(255, 255, 255, 1);
 
-            .default {
-              display: inline-block;
-              opacity: 0.29;
-            }
+          .default {
+            display: inline-block;
+            opacity: 0.29;
+          }
 
-            .hover {
-              display: none;
-            }
+          .hover {
+            display: none;
           }
         }
       }
@@ -540,8 +542,8 @@
       }
     }
 
-    /deep/.el-dialog {
-      background-color: rgba(238,242,249,1);
+    /deep/ .el-dialog {
+      background-color: rgba(238, 242, 249, 1);
     }
   }
 

@@ -29,6 +29,7 @@
                        autofocus
                        :placeholder="$t('login_page.SMS_verif.phone_placeholder')"
                        @blur="jk"
+                       @input="jkC"
                        @focus="login.phoneForm.phoneVerif = null"
                        ref="phoneForm_phone"
                        class="farm-input"
@@ -53,13 +54,12 @@
                 <!--获取验证码-->
                 <div class="verif">
                   <div class="btn"
+                       :class="[{'suc': login.phoneForm.phoneVerif}]"
                        @click="verifPhone"
                        v-show="login.phoneForm.verifShow">
-                    {{ $t('login_page.SMS_verif.getCodeBtn') }}
+                    {{ login.phoneForm.btnText }}
                   </div>
-                  <span class="delayDate" v-show="!login.phoneForm.verifShow">
-                  {{ login.phoneForm.countdown }}
-                </span>
+                  <span class="delayDate" v-show="!login.phoneForm.verifShow">{{ login.phoneForm.countdown }}</span>
                 </div>
                 <span class="warnInfo" v-show="login.phoneForm.codeVerif === false">{{ login.warnInfo.code }}</span>
                 <img src="@/icons/login-success.png" class="i"
@@ -185,7 +185,7 @@
                   <div class="btn"
                        @click="findBackGetCode"
                        v-show="login.forgetMode.verifShow">
-                    {{ $t('login_page.forgetMode.btn') }}
+                    {{ login.forgetMode.btnText }}
                   </div>
                   <span class="delayDate" v-show="!login.forgetMode.verifShow">
                   {{ login.forgetMode.countdown }}
@@ -334,7 +334,7 @@
                      :class="[{'canClick': registered.status.phone}]"
                      @click="den"
                      v-show="registered.verifShow">
-                  {{ $t('login_page.register.text') }}
+                  {{ registered.verifShow.btnText }}
                 </div>
                 <span class="delayDate" v-show="!registered.verifShow">
               {{ registered.countdown }}
@@ -435,6 +435,7 @@
             intervalFun: null,
             phoneVerif: null,
             codeVerif: null,
+            btnText: this.$t('login_page.getCode')
           },
           accountForm: {
             account: 'gaoge1834',
@@ -465,9 +466,9 @@
             step: 'one',
             phoneFormat: null,
             codeFormat: null,
-
             intervalFun: null,
             codeObtained: false,               // 已获取验证码
+            btnText: this.$t('login_page.getCode'),
             warnInfo: {
               phone: '',
               newPassWord: '',
@@ -513,6 +514,7 @@
             phoneInit: false
           },
           codeObtained: false,               // 已获取验证码
+          btnText: this.$t('login_page.getCode')
         },
         // sliderVerification: false         // 注册滑块验证
         reg: {
@@ -632,7 +634,7 @@
     },
     methods: {
       // 找回密码 - 退回到注册
-      toRegisterF(){
+      toRegisterF() {
         this.login.mode = 'login'
         this.navActive = 2
       },
@@ -704,7 +706,6 @@
           }
         }
       },
-      // 密码验证
       passwVerif(type) {
         // type == 'login' 登录 : 'register' 注册
         let t = type == 'register' ? this.registered.form.password : this.login.accountForm.password,
@@ -836,13 +837,16 @@
         if (!f.phone) {
           f.phoneVerif = null
           return false
-        }
-        if (!this.reg.phoneReg.test(f.phone)) {
+        } else if (!this.reg.phoneReg.test(f.phone)) {
           this.login.warnInfo.phone = this.$t('login_page.SMS_verif.phone_warnInfo')
           f.phoneVerif = false
           return false
         }
-        f.phoneVerif = true
+      },
+      jkC() {
+        let f = this.login.phoneForm
+        if (this.reg.phoneReg.test(f.phone)) f.phoneVerif = true
+        else f.phoneVerif = null
       },
       // 登录 点击errIcon
       loginDeleteInput(list, item) {
@@ -900,17 +904,10 @@
       },
       // 手机号验证事件60秒延迟
       delayFun(obj) {
-        let showDom,
-          num
-        if (obj == 'login') {
-          showDom = this.login.phoneForm
-        }
-        if (obj == 'registered') {
-          showDom = this.registered
-        }
-        if (obj == 'findBack') {
-          showDom = this.login.forgetMode
-        }
+        let showDom
+        if (obj == 'login') showDom = this.login.phoneForm
+        else if (obj == 'registered') showDom = this.registered
+        else if (obj == 'findBack') showDom = this.login.forgetMode
         // arguments showDom=>显示切换
         showDom.verifShow = false
         showDom.intervalFun = window.setInterval(() => {
@@ -919,6 +916,7 @@
             window.clearInterval(showDom.intervalFun)
             showDom.verifShow = true
             showDom.countdown = '60s'
+            showDom.btnText = this.$t('login_page.getCodeAgain')
           }
         }, 1000)
       },
@@ -1080,7 +1078,6 @@
       },
       // 用户服务协议
       async showPDF() {
-        // window.open('@/assets/protocal.pdf', "_blank")
         let data = await getProtocal()
         exportDownloadFun(data, '《用户服务协议》', 'pdf', true)
       },
@@ -1238,6 +1235,14 @@
             .verif {
               right: 10px;
               height: 40px;
+
+              .btn.suc {
+                cursor: pointer;
+
+                &:hover {
+                  color: rgba(22, 29, 37, 0.6);
+                }
+              }
             }
           }
         }

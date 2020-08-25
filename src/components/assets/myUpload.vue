@@ -120,6 +120,7 @@
 <script>
   import {
     createDateFun,
+    consum,
     messageFun
   } from '@/assets/common.js'
   import {
@@ -195,10 +196,10 @@
 
             this.table.tableData = data.data.map(item => {
               return Object.assign(item, {
-                'updateTime': item.updateTime,
+                'updateTime': createDateFun(new Date(item.updateTime)),
                 'completedTime': item.completedTime,
-                'validPeriod': item.validPeriod,
-                'fileName': item.fileType == '文件夹' ? item.fileName.slice(0, item.fileName.length - 1) : item.fileName,
+                'validPeriod': consum(item.validPeriod),
+                'fileName': item.fileType == '文件夹' ? item.fileName.slice(0, item.fileName.length - 1) : (item.completedTime != 0 ? item.fileName : item.fileName + '.cloudtransfer.uploading'),
                 'position': this.path + item.fileName
               })
             })
@@ -235,6 +236,12 @@
           else if (data.msg == '6053' || data.msg == '6063' || data.msg == '6073') messageFun('error', '报错，操作失败')
         },
       },
+      'socket_plugin_msg': {
+        handler: function (e) {
+          let data = JSON.parse(e.data)
+          // if (data.code == 100 || data.code == 101) this.getAssetsCatalog(this.path, this.searchInputVal)
+        }
+      }
       // 'dialogVisible': function(val){
       //   if(val) this.dlGetTreeData()
       // }
@@ -328,7 +335,14 @@
       },
       // 下载
       downloadFile() {
-
+        if (!this.table.selectionList.length) return false
+        console.log(this.table.selectionList)
+        this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+          transferType: 2,
+          userID: this.user.id,
+          fileDownType: 0,
+          fileList: this.table.selectionList.map(item => item.position)
+        })
       },
       // 移动到
       moveFile() {
@@ -408,7 +422,7 @@
       this.getAssetsCatalog('', this.searchInputVal)
     },
     computed: {
-      ...mapState(['user', 'socket_backS', 'socket_backS_msg'])
+      ...mapState(['user', 'socket_backS', 'socket_backS_msg', 'socket_plugin_msg'])
     }
   }
 </script>

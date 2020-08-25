@@ -18,20 +18,20 @@
         <el-table-column
           type="selection"
           align="right"
-          width="92" />
+          width="92"/>
         <!--任务ID-->
         <el-table-column
           prop="id"
           label="任务ID"
           sortable
           show-overflow-tooltip
-          width="100" />
+          width="100"/>
         <!--场景名-->
         <el-table-column
           prop="sceneName"
           label="场景名"
           show-overflow-tooltip
-          width="200" />
+          width="200"/>
         <!--状态-->
         <el-table-column
           label="状态"
@@ -46,7 +46,8 @@
             <span v-if="scope.row.status == '渲染完成'" style="color: rgba(0, 227, 255, 1)">
               {{ scope.row.status }}
             </span>
-            <span v-if="scope.row.status == '渲染暂停' || scope.row.status == '待全速渲染'" style="color: rgba(229, 199, 138, 1)">
+            <span v-if="scope.row.status == '渲染暂停' || scope.row.status == '待全速渲染'"
+                  style="color: rgba(229, 199, 138, 1)">
               {{ scope.row.status }}
             </span>
 
@@ -61,7 +62,7 @@
           <template slot-scope="scope">
             <el-progress :percentage="isNaN(scope.row.percent) ? 0 : scope.row.percent"
                          :show-text="false"
-                         class="progressL" />
+                         class="progressL"/>
             <span clas="progressS">
               {{ scope.row.renderingProgress }}
             </span>
@@ -74,49 +75,49 @@
           show-overflow-tooltip
           :filter-method="filterStatus"
           :filters="table.itemList"
-          width="180" />
+          width="180"/>
         <!--渲染中-->
         <el-table-column
           prop="rendering"
           sortable
           width="100"
           show-overflow-tooltip
-          label="渲染中" />
+          label="渲染中"/>
         <!--等待-->
         <el-table-column
           prop="wait"
           sortable
           width="100"
           show-overflow-tooltip
-          label="等待" />
+          label="等待"/>
         <!--暂停-->
         <el-table-column
           prop="timeOut"
           sortable
           width="100"
           show-overflow-tooltip
-          label="暂停" />
+          label="暂停"/>
         <!--完成-->
         <el-table-column
           prop="carryOut"
           sortable
           width="100"
           show-overflow-tooltip
-          label="完成" />
+          label="完成"/>
         <!--失败-->
         <el-table-column
           prop="failure"
           label="失败"
           width="100"
           show-overflow-tooltip
-          sortable />
+          sortable/>
         <!--渲染时长-->
         <el-table-column
           prop="renderingTime"
           label="渲染时长"
           sortable
           show-overflow-tooltip
-          width="180" />
+          width="180"/>
         <!--渲染费用（金币）-->
         <el-table-column
           prop="renderingCost"
@@ -130,28 +131,28 @@
           label="帧范围"
           sortable
           show-overflow-tooltip
-          width="100" />
+          width="100"/>
         <!--间隔帧-->
         <el-table-column
           prop="intervalFrame"
           label="间隔帧"
           sortable
           show-overflow-tooltip
-          width="100" />
+          width="100"/>
         <!--相机-->
         <el-table-column
           prop="camera"
           width="100"
           sortable
           show-overflow-tooltip
-          label="相机" />
+          label="相机"/>
         <!--层名-->
         <el-table-column
           prop="layerName"
           label="层名"
           sortable
           show-overflow-tooltip
-          width="100" />
+          width="100"/>
         <!--下载情况-->
         <el-table-column
           label="下载情况"
@@ -184,7 +185,7 @@
           label="渲染结束时间"
           sortable
           show-overflow-tooltip
-          width="180" />
+          width="180"/>
         <!--创建人-->
         <el-table-column
           prop="founder"
@@ -192,7 +193,7 @@
           show-overflow-tooltip
           :filter-method="filterStatus"
           :filters="table.usersList"
-          width="100" />
+          width="100"/>
         <!--创建时间-->
         <el-table-column
           prop="creationTime"
@@ -285,7 +286,7 @@
 
   export default {
     name: 'download-table',
-    data(){
+    data() {
       return {
         s: ['4'],
         table: {
@@ -371,21 +372,21 @@
     },
     methods: {
       // 筛选 - 状态
-      filterStatus(value, row){
+      filterStatus(value, row) {
         return row.status === value
       },
       // table 行样式
-      tableRowStyle({row, rowIndex}){
+      tableRowStyle({row, rowIndex}) {
         let y = []
-        if('FatherIndex' in row) y.push('son-row')
-        switch(row.status){
+        if ('FatherIndex' in row) y.push('son-row')
+        switch (row.status) {
           case '渲染暂停':
           case '等待':
             y.push('warning-row')
             y.push('style-row')
             break
-          // case '分析失败':
-          //   return 'error-row style-row'
+            // case '分析失败':
+            //   return 'error-row style-row'
             break
           case '渲染结束':
             y.push('wait-row')
@@ -395,81 +396,84 @@
         return y.join(' ')
       },
       // 关键字检索
-      searchFun(val){
+      searchFun(val) {
         this.searchInput = val
         this.getList()
       },
       // 翻页
-      handleCurrentChange(val){
+      handleCurrentChange(val) {
         this.table.current = val
         this.getList()
       },
       // 【非业务逻辑】手动勾选数据行 Checkbox 时触发
-      tableSelect(selection, row){
+      tableSelect(selection, row) {
         let result = selection.some(curr => curr.rowId == row.rowId),     // 【选中事件】or【取消事件】
-            tableData = this.table.RenderDownloadData,
-            allSonSelected = false,
-            fatherSelected = false,
-            selectionList = this.table.renderSelectionList,
-            table = this.$refs.renderTableImportant
+          tableData = this.table.RenderDownloadData,
+          allSonSelected = false,
+          fatherSelected = false,
+          selectionList = this.table.renderSelectionList,
+          table = this.$refs.renderTableImportant
 
         // 事件触发在子项
-        if('FatherId' in row && result){
+        if ('FatherId' in row && result) {
           selectionList.push(row)
           // 判断该组子项是否已全部选中进而选中父项
           allSonSelected = tableData[row.FatherIndex]['children'].every(son => selection.some(item => item.rowId == son.rowId))
-          if(allSonSelected){ fatherSelected = selection.some(item => tableData[row.FatherIndex].rowId == item.rowId ) }
+          if (allSonSelected) {
+            fatherSelected = selection.some(item => tableData[row.FatherIndex].rowId == item.rowId)
+          }
           // 将父级推入选中项
-          if(allSonSelected && !fatherSelected) {
-            table.toggleRowSelection(tableData[row.FatherIndex],true)
+          if (allSonSelected && !fatherSelected) {
+            table.toggleRowSelection(tableData[row.FatherIndex], true)
             selectionList.push(tableData[row.FatherIndex])
           }
         }
-        if('FatherId' in row && !result){
-          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
+        if ('FatherId' in row && !result) {
+          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId), 1)
           // 父项是否被选中 取消选中
-          fatherSelected = selection.findIndex(item => tableData[row.FatherIndex].rowId == item.rowId )
+          fatherSelected = selection.findIndex(item => tableData[row.FatherIndex].rowId == item.rowId)
           // 取消父级选中状态
-          if(fatherSelected != -1) {
-            table.toggleRowSelection(tableData[row.FatherIndex],false)
-            selectionList.splice(fatherSelected,1)
+          if (fatherSelected != -1) {
+            table.toggleRowSelection(tableData[row.FatherIndex], false)
+            selectionList.splice(fatherSelected, 1)
           }
         }
 
         // 事件触发在父项
-        if(!('FatherId' in row) && result){
+        if (!('FatherId' in row) && result) {
           selectionList.push(row)
           // 勾选全部子项
           tableData[row.selfIndex]['children'].forEach(son => {
             // 将此子项勾选
-            if(!selection.some(item => item.rowId == son.rowId)) {
-              table.toggleRowSelection(son,true)
+            if (!selection.some(item => item.rowId == son.rowId)) {
+              table.toggleRowSelection(son, true)
               selectionList.push(son)
             }
           })
         }
-        if(!('FatherId' in row) && !result){
+        if (!('FatherId' in row) && !result) {
           // 取消勾选全部子项
           tableData[row.selfIndex]['children'].forEach(son => {
             // 将此子项取消勾选
             let sonDefault = selection.some(item => item.rowId == son.rowId)
-            if(sonDefault != -1) {
-              table.toggleRowSelection(son,false)
-              selectionList.splice(sonDefault,1)
+            if (sonDefault != -1) {
+              table.toggleRowSelection(son, false)
+              selectionList.splice(sonDefault, 1)
             }
           })
           // 取消自身勾选
-          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId),1)
-          table.toggleRowSelection(row,false)
+          selectionList.splice(selection.findIndex(curr => curr.rowId == row.rowId), 1)
+          table.toggleRowSelection(row, false)
         }
       },
       // 渲染下载多选
-      RenderDownloadSelectionChange(val){},
+      RenderDownloadSelectionChange(val) {
+      },
       // 【非业务逻辑】全选
-      selectAll(selection){
-        if(!('children' in selection[0])){
+      selectAll(selection) {
+        if (!('children' in selection[0])) {
           this.table.renderSelectionList = []
-          this.table.RenderDownloadData.forEach(curr => curr.children.forEach(item => this.$refs.renderTableImportant.toggleRowSelection(item,false) ))
+          this.table.RenderDownloadData.forEach(curr => curr.children.forEach(item => this.$refs.renderTableImportant.toggleRowSelection(item, false)))
           return false
         }
         let data = []
@@ -477,41 +481,44 @@
           data.push(curr)
           curr.children.forEach(item => {
             data.push(item)
-            this.$refs.renderTableImportant.toggleRowSelection(item,true)
+            this.$refs.renderTableImportant.toggleRowSelection(item, true)
           })
         })
         this.table.renderSelectionList = data
       },
       // 渲染下载详情查看
-      showDetails(row, column, event){
+      showDetails(row, column, event) {
         // 若事件承受者为项目组
-        if(row.children){ this.unfoldFun(row); return false}
+        if (row.children) {
+          this.unfoldFun(row);
+          return false
+        }
         //打开抽屉
         this.showDrawer = true
         this.drawerTaskData = row
         // debugger
         let tableDomList = this.$refs.downLoadTable.getElementsByClassName('el-table__row'),
-            d = this.$refs.downLoadTable.getElementsByClassName('farmTableSelected')[0]
-        if(d) d.classList.remove('farmTableSelected')
+          d = this.$refs.downLoadTable.getElementsByClassName('farmTableSelected')[0]
+        if (d) d.classList.remove('farmTableSelected')
         // 计算选中行
         let n = 0
-        this.table.RenderDownloadData.find((curr,inde) => {
-          n ++
-          return -1 < curr.children.findIndex((c,i) => {
-            n ++
+        this.table.RenderDownloadData.find((curr, inde) => {
+          n++
+          return -1 < curr.children.findIndex((c, i) => {
+            n++
             return c.taskUuid == row.taskUuid
           })
         })
         tableDomList[--n].classList.add('farmTableSelected')
       },
       // 渲染下载关闭详情
-      closeDrawer(){
+      closeDrawer() {
         this.showDrawer = false
         let d = this.$refs.downLoadTable.getElementsByClassName('farmTableSelected')[0]
         d.classList.remove('farmTableSelected')
       },
       // 获取列表
-      async getList(condition = 'null'){
+      async getList(condition = 'null') {
         // {
         //   zoneUuid: '',            // 分区ID
         //   keyword: '',             // 关键字
@@ -523,17 +530,17 @@
         let t = `zoneUuid=${this.zoneId}&keyword=${this.searchInput}&pageIndex=${this.table.current}&pageSize=${this.table.pageSize}&renderStatus=${condition == 'null' ? '' : condition}&projectUuid=`,
           f = `/${this.zoneId}/${this.table.current}/${this.table.pageSize}`,
           data = this.zone == 1 ? await getRenderTableList(t) : await uploadTabGetList(f),
-            usersList = new Set()
-        this.table.renderTableTotal = data.data.total  // 【渲染下载】翻页长度
+          usersList = new Set()
+        this.table.renderTableTotal = data.data.total              // 【渲染下载】翻页长度
         this.$emit('renderTbaleTotalItem', data.data.total)  // 【渲染下载】标签后显示长度
-        this.$emit('archiveNum',data.data.other)  // 【归档记录】长度
-        this.table.RenderDownloadData = this.zone == 1 ? data.data.data.map((curr,fatherIndex) => {
+        this.$emit('archiveNum', data.data.other)             // 【归档记录】长度
+        this.table.RenderDownloadData = this.zone == 1 ? data.data.data.map((curr, fatherIndex) => {
           let children = [],
-              downloadStatusS = [],
-              downloadStatus = '部分下载'
+            downloadStatusS = [],
+            downloadStatus = '部分下载'
           // 兼容数据结构错误 生产时删除判断
-          if(curr.renderLayerTaskDTOList[0]){
-            children = curr.renderLayerTaskDTOList.map((item,sonIndex) => {
+          if (curr.renderLayerTaskDTOList[0]) {
+            children = curr.renderLayerTaskDTOList.map((item, sonIndex) => {
               // let status
               // switch(item.layerTaskStatus){
               //   case 1:
@@ -552,10 +559,10 @@
               //     status = '渲染放弃'
               //     break
               // }
-              let downloadStatus = !Boolean(item.downloadFrameCount) ? '待下载' : ( item.downloadFrameCount == item.allFrameCount ? '已下载' : '部分下载' )
+              let downloadStatus = !Boolean(item.downloadFrameCount) ? '待下载' : (item.downloadFrameCount == item.allFrameCount ? '已下载' : '部分下载')
               downloadStatusS.push(downloadStatus)
               let status = itemDownloadStatus(item.layerTaskStatus)
-              if(status == '渲染暂停' && item.result == 5) status = '待全速渲染'
+              if (status == '渲染暂停' && item.result == 5) status = '待全速渲染'
               return {
                 id: '-',                                                // 任务ID
                 sceneName: curr.fileName + '-' + item.layerName,        // 场景名
@@ -593,8 +600,8 @@
               }
             })
           }
-          if(downloadStatusS.every(item => item == '待下载')) downloadStatus = '待下载'
-          if(downloadStatusS.every(item => item == '已下载')) downloadStatus = '已下载'
+          if (downloadStatusS.every(item => item == '待下载')) downloadStatus = '待下载'
+          if (downloadStatusS.every(item => item == '已下载')) downloadStatus = '已下载'
           usersList.add(curr['account'])
           return {
             taskUuid: curr.taskUuid,
@@ -624,7 +631,7 @@
             rowId: curr.taskNo,                                    // 唯一值
             selfIndex: fatherIndex
           }
-        }) : data.data.data.map((curr,fatherIndex) => {
+        }) : data.data.data.map((curr, fatherIndex) => {
           // account: "gaoge1834"         // 任务创建人
           // allFrameCount: 1             // 所有帧
           // await: 0                     // 等待中任务数
@@ -652,19 +659,66 @@
           // useTime: 37860               // 已用时间
           // win: 1                       // 成功任务数
           // zoneUuid: null
+          let downloadStatus,
+            framesTotal = curr.win + curr.lose + curr.rendering + curr.await + curr.stopped,   // 总帧数
+            children = []
+          if (curr.downloadFrameCount == 0) downloadStatus = '待下载'
+          else if (curr.downloadFrameCount < framesTotal) downloadStatus = '部分下载'
+          else if (curr.downloadFrameCount >= framesTotal) downloadStatus = '已下载'
+          children = curr.designTaskDTOList.length ? curr.designTaskDTOList.map((item, sonIndex) => {
+            let itemTotal = item.win + item.lose + item.rendering + item.await + item.stopped,
+              status = itemDownloadStatus(item.layerTaskStatus)
+            // if(status == '渲染暂停' && item.result == 5) status = '待全速渲染'
+            return {
+              id: '-',                                               // 任务ID
+              sceneName: curr.fileName + '-' + item.fileName,        // 场景名
+              status,                                                // 状态
+              renderingProgress: item.win + '/' + itemTotal,        //渲染进度
+              percent: itemTotal == null ? 0 : Math.floor(item.win / itemTotal * 100),
+              viewProject: curr.projectName,                         // 所属项目
+              rendering: item.rendering,                             // 渲染中
+              wait: item.await,                                      // 等待
+              timeOut: item.stopped,                                 // 暂停
+              carryOut: item.win,                                    // 完成
+              failure: item.lose,                                    // 失败
+              renderingTime: consum(item.useTime),                   // 渲染时长
+              renderingCost: item.cost,                              // 渲染费用（金币）
+              frameRange: 1,                                         // 帧范围
+              intervalFrame: '-',                                    // 间隔帧
+              camera: item.camera,                                   // 相机
+              layerName: item.camera,                                // 层名
+              downloadStatus,                                        // 下载情况
+              renderingStartTime: createDateFun(new Date(item.startTime)),                    // 渲染开始时间
+              renderingEndTime: createDateFun(new Date(item.endTime)),                        // 渲染结束时间
+              founder: curr.account,                                 // 创建人
+              creationTime: createDateFun(new Date(curr.createTime)),                         // 创建时间
+              rowId: curr.taskNo + '-' + sonIndex,                   // 唯一值
+              // resolutionVal: item.width + '*' + item.height,         // 分辨率
+              // formatName: item.formatName,                           // 输出格式
+              // modeVal: curr.core + '核' + '-' + curr.memory + 'G' + '（' + curr.patternName + '）',   // 渲染模式
+              // softwareVal: curr.softName + ' ' + curr.softVer,                                // 软件+版本
+              // pluginVal: curr.pluginName + ' ' + curr.pluginVersion,                          // 插件+版本
+              taskUuid: item.layerTaskUuid,                          // 子项目ID 查看详情用
+              layerTaskUuid: item.layerTaskUuid,
+              FatherId: curr.taskNo,
+              FatherTaskUuId: curr.taskUuid,
+              FatherIndex: fatherIndex
+            }
+          }) : null
+
           return {
             taskUuid: curr.taskUuid,
             id: curr.taskNo,                                       // 任务ID
             sceneName: curr.fileName,                              // 场景名
             status: itemDownloadStatus(curr.renderStatus),         // 状态
-            renderingProgress: (curr.wine + curr.lose) + '/' + (curr.wine + curr.lose + curr.rendering + curr.await + curr.stopped),          //渲染进度
-            percent: curr.frameCount.total == null ? 0 : Math.floor(curr.frameCount.done / curr.frameCount.total * 100),
+            renderingProgress: (curr.win + curr.lose) + '/' + framesTotal,          //渲染进度
+            percent: curr.win + curr.lose == 0 ? 0 : Math.floor((curr.win + curr.lose) / framesTotal * 100),
             viewProject: curr.projectName,                         // 所属项目
-            rendering: curr.frameCount.rendering,                    // 渲染中
-            wait: curr.frameCount.await,                            // 等待
-            timeOut: curr.frameCount.stopped,                        // 暂停
-            carryOut: curr.frameCount.wine,                        // 完成
-            failure: curr.frameCount.lose,                         // 失败
+            rendering: curr.rendering,                             // 渲染中
+            wait: curr.await,                                      // 等待
+            timeOut: curr.stopped,                                 // 暂停
+            carryOut: curr.win,                                    // 完成
+            failure: curr.lose,                                    // 失败
             renderingTime: consum(curr.useTime),                   // 渲染时长
             renderingCost: curr.cost,                              // 渲染费用（金币）
             frameRange: '-',                                       // 帧范围
@@ -681,12 +735,14 @@
             selfIndex: fatherIndex
           }
         })
-        this.table.usersList = [...usersList].map(curr => { return {'text': curr, 'value':curr }})  // 创建人列表
+        this.table.usersList = [...usersList].map(curr => {
+          return {'text': curr, 'value': curr}
+        })  // 创建人列表
 
       },
       // 操作 - 开始
-      startFun(){
-        if(!this.table.renderSelectionList.length) return false
+      startFun() {
+        if (!this.table.renderSelectionList.length) return false
         this.$confirm('选中项将开始渲染, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -696,14 +752,14 @@
             async () => {
               let dataList = []
               this.table.renderSelectionList.forEach(curr => {
-                if('selfIndex' in curr) return false
+                if ('selfIndex' in curr) return false
                 let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
-                if(dataListIndex == -1){
+                if (dataListIndex == -1) {
                   dataList.push({
                     taskUuid: curr.FatherTaskUuId,
                     layerUuidList: [curr.taskUuid]
                   })
-                }else{
+                } else {
                   dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
                 }
               })
@@ -711,16 +767,19 @@
                 "instructType": 1,
                 "instructTaskList": dataList
               })
-              if(data.data.code == 1001){ messageFun('info','您已欠费'); return false }
-              if(data.data.code == 200) messageFun('success','操作成功')
+              if (data.data.code == 1001) {
+                messageFun('info', '您已欠费');
+                return false
+              }
+              if (data.data.code == 200) messageFun('success', '操作成功')
             },
-            () => messageFun('info','已取消操作')
+            () => messageFun('info', '已取消操作')
           )
-          .catch(() => messageFun('error','报错，操作失败'))
+          .catch(() => messageFun('error', '报错，操作失败'))
       },
       // 操作 - 归档
-      archiveFun(){
-        if(!this.table.renderSelectionList.length) return false
+      archiveFun() {
+        if (!this.table.renderSelectionList.length) return false
         this.$confirm('确认归档选中项目?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -730,24 +789,27 @@
             async () => {
               let taskUuidList = []
               this.table.renderSelectionList.forEach(curr => {
-                if('FatherIndex' in curr) return false
+                if ('FatherIndex' in curr) return false
                 taskUuidList.push(curr.taskUuid)
               })
               let data = await itemArchive({
                 zoneUuid: this.zoneId,
                 taskUuids: taskUuidList
               })
-              if(data.data.code == 200){ this.getList(); messageFun('success','操作成功') }
+              if (data.data.code == 200) {
+                this.getList();
+                messageFun('success', '操作成功')
+              }
             },
-            () => messageFun('info','已取消归档')
+            () => messageFun('info', '已取消归档')
           )
-          .catch(() => messageFun('error','报错，操作失败') )
+          .catch(() => messageFun('error', '报错，操作失败'))
 
 
       },
       // 操作 - 全部渲染
-      renderAllFun(){
-        if(!this.table.renderSelectionList.length) return false
+      renderAllFun() {
+        if (!this.table.renderSelectionList.length) return false
         this.$confirm('选中项将开始全部渲染, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -757,14 +819,14 @@
             async () => {
               let dataList = []
               this.table.renderSelectionList.forEach(curr => {
-                if('selfIndex' in curr) return false
+                if ('selfIndex' in curr) return false
                 let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
-                if(dataListIndex == -1){
+                if (dataListIndex == -1) {
                   dataList.push({
                     taskUuid: curr.FatherTaskUuId,
                     layerUuidList: [curr.taskUuid]
                   })
-                }else{
+                } else {
                   dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
                 }
               })
@@ -772,15 +834,15 @@
                 "instructType": 111,
                 "instructTaskList": dataList
               })
-              if(data.data.code == 200) messageFun('success','操作成功')
+              if (data.data.code == 200) messageFun('success', '操作成功')
             },
-            () => messageFun('info','已取消操作')
+            () => messageFun('info', '已取消操作')
           )
-          .catch(() => messageFun('error','报错，操作失败') )
+          .catch(() => messageFun('error', '报错，操作失败'))
       },
       // 操作 - 删除
-      deleteFun(){
-        if(!this.table.renderSelectionList.length) return false
+      deleteFun() {
+        if (!this.table.renderSelectionList.length) return false
         this.$confirm('将删除选中选, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -789,21 +851,24 @@
           .then(
             async () => {
               let dataList = [],
-                  fat = []
+                fat = []
               this.table.renderSelectionList.forEach(curr => {
-                if('selfIndex' in curr) { fat.push(curr['taskUuid']); return false }
+                if ('selfIndex' in curr) {
+                  fat.push(curr['taskUuid']);
+                  return false
+                }
                 let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
-                if(dataListIndex == -1){
+                if (dataListIndex == -1) {
                   dataList.push({
                     taskUuid: curr.FatherTaskUuId,
                     layerUuidList: [curr.taskUuid]
                   })
-                }else{
+                } else {
                   dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
                 }
               })
               dataList.forEach(curr => {
-                if(!fat.some(item => {
+                if (!fat.some(item => {
                   return item == curr.taskUuid
                 })) curr.taskUuid = ''
               })
@@ -811,15 +876,20 @@
                 "instructType": 4,
                 "instructTaskList": dataList
               })
-              if(data.data.code == 204){ messageFun('success','操作成功'); this.getList() }else {throw ''}
+              if (data.data.code == 204) {
+                messageFun('success', '操作成功');
+                this.getList()
+              } else {
+                throw ''
+              }
             },
-            () => messageFun('info','已取消删除')
+            () => messageFun('info', '已取消删除')
           )
-          .catch(() => messageFun('error','报错，操作失败') )
+          .catch(() => messageFun('error', '报错，操作失败'))
       },
       // 操作 - 暂停
-      pauseFun(){
-        if(!this.table.renderSelectionList.length) return false
+      pauseFun() {
+        if (!this.table.renderSelectionList.length) return false
         this.$confirm('将暂停选中选, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -829,14 +899,14 @@
             async () => {
               let dataList = []
               this.table.renderSelectionList.forEach(curr => {
-                if('selfIndex' in curr) return false
+                if ('selfIndex' in curr) return false
                 let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
-                if(dataListIndex == -1){
+                if (dataListIndex == -1) {
                   dataList.push({
                     taskUuid: curr.FatherTaskUuId,
                     layerUuidList: [curr.taskUuid]
                   })
-                }else{
+                } else {
                   dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
                 }
               })
@@ -844,44 +914,47 @@
                 "instructType": 2,
                 "instructTaskList": dataList
               })
-              if(data.data.code == 200) messageFun('success','操作成功')
+              if (data.data.code == 200) messageFun('success', '操作成功')
             },
-            () => messageFun('info','已取消暂停')
+            () => messageFun('info', '已取消暂停')
           )
-          .catch(() => messageFun('error','报错，操作失败') )
+          .catch(() => messageFun('error', '报错，操作失败'))
       },
       // 操作 - 重新渲染
-      renderAgainFun(){
+      renderAgainFun() {
         this.dialogTableVisible = true
       },
       // 操作 - 下载完成帧
-      async downloadFils(){
-        if(!this.table.renderSelectionList.length) return false
+      async downloadFils() {
+        if (!this.table.renderSelectionList.length) return false
         let r = await seeBalance()
-        if(r.data.code == 1001){ messageFun('info',`当前账户余额为${r.data.data}，请先进行充值！`); return false }
+        if (r.data.code == 1001) {
+          messageFun('info', `当前账户余额为${r.data.data}，请先进行充值！`);
+          return false
+        }
         let taskList = []
         this.table.renderSelectionList.forEach(curr => {
-          if('selfIndex' in curr){
+          if ('selfIndex' in curr) {
             let i = taskList.findIndex(item => item['taskUuid'] == curr['taskUuid'])
-            if(i == -1) taskList.push({ taskUuid: curr.taskUuid, layerUuidList: [], hasFather: true })
-            if(i != -1) taskList[i]['hasFather'] = true
-          }else{
+            if (i == -1) taskList.push({taskUuid: curr.taskUuid, layerUuidList: [], hasFather: true})
+            if (i != -1) taskList[i]['hasFather'] = true
+          } else {
             let i = taskList.findIndex(item => {
               return item['taskUuid'] == curr['FatherTaskUuId']
             })
-            if(i != -1) taskList[i]['layerUuidList'].push(curr['layerTaskUuid'])
-            if(i == -1) taskList.push({ taskUuid: curr.FatherTaskUuId, layerUuidList: [curr.layerTaskUuid]})
+            if (i != -1) taskList[i]['layerUuidList'].push(curr['layerTaskUuid'])
+            if (i == -1) taskList.push({taskUuid: curr.FatherTaskUuId, layerUuidList: [curr.layerTaskUuid]})
           }
         })
         taskList = taskList.map(curr => {
-          if(curr['hasFather']) return {'taskUuid': curr.taskUuid, 'layerUuidList': []}
+          if (curr['hasFather']) return {'taskUuid': curr.taskUuid, 'layerUuidList': []}
           else return {'taskUuid': '', 'layerUuidList': curr['layerUuidList']}
         })
-        messageFun('success','发起文件打包请求')
+        messageFun('success', '发起文件打包请求')
         let code = UuidFun(),
           // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
-            socket_ = new WebSocket(`ws://223.80.107.190:5000/professional/websocket/package/${code}`)
-        socket_.addEventListener('open',function(){
+          socket_ = new WebSocket(`ws://223.80.107.190:5000/professional/websocket/package/${code}`)
+        socket_.addEventListener('open', function () {
           socket_.send(JSON.stringify({
             'message': {
               type: 3,
@@ -889,48 +962,58 @@
             }
           }))
         })
-        socket_.addEventListener('message',e => {
+        socket_.addEventListener('message', e => {
           let data = JSON.parse(e.data)
-          if(data.code == 200){ this.downloadingFun(data.data) }
-          if(data.code == 209){ socket_.close(); this.downloadingFun(data.data) }
+          if (data.code == 200) {
+            this.downloadingFun(data.data)
+          }
+          if (data.code == 209) {
+            socket_.close();
+            this.downloadingFun(data.data)
+          }
         })
       },
+      // 操作 - 拷贝
+      copyFun() {
+        this.showDrawer = false
+        this.itemName = 'result'
+      },
       // 打包后下载
-      async downloadingFun(path){
+      async downloadingFun(path) {
         let data = await compressionFiles(path)
-        exportDownloadFun(data,data.headers.file,'zip')
+        exportDownloadFun(data, data.headers.file, 'zip')
       },
       // 展开项目组
-      unfoldFun(row){
+      unfoldFun(row) {
         let r = this.table.unfoldList.findIndex(curr => curr == row.rowId)
-        if(r >= 0){
-          this.table.unfoldList.splice(r,1)
-          this.$refs.renderTableImportant.toggleRowExpansion(row,false)
-        } else{
+        if (r >= 0) {
+          this.table.unfoldList.splice(r, 1)
+          this.$refs.renderTableImportant.toggleRowExpansion(row, false)
+        } else {
           this.table.unfoldList.push(row.rowId)
           this.$refs.renderTableImportant.toggleRowExpansion(row)
         }
       },
       // 操作 - 重新渲染 - 取消
-      cancelBtn(){
+      cancelBtn() {
         this.dialogTableVisible = false
         this.s = []
-        messageFun('info','已取消操作')
+        messageFun('info', '已取消操作')
       },
       // 操作 - 重新渲染 - 确定
-      async certainBtn(){
+      async certainBtn() {
         this.dialogTableVisible = false
-        if(!this.s.length) return false
+        if (!this.s.length) return false
         let dataList = []
         this.table.renderSelectionList.forEach(curr => {
-          if('selfIndex' in curr) return false
+          if ('selfIndex' in curr) return false
           let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
-          if(dataListIndex == -1){
+          if (dataListIndex == -1) {
             dataList.push({
               taskUuid: curr.FatherTaskUuId,
               layerUuidList: [curr.taskUuid]
             })
-          }else{
+          } else {
             dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
           }
         })
@@ -940,32 +1023,35 @@
           "instructTaskList": dataList
         })
         this.s = []
-        if(data.data.code == 1001){ messageFun('info','您已欠费'); return false }
-        if(data.data.code == 200) messageFun('success','操作成功')
+        if (data.data.code == 1001) {
+          messageFun('info', '您已欠费');
+          return false
+        }
+        if (data.data.code == 200) messageFun('success', '操作成功')
       }
     },
     components: {
       farmDrawer
     },
     mounted() {
-      if(!this.$route.params.name) setTimeout(() => this.getList(), 100)
+      if (!this.$route.params.name) setTimeout(() => this.getList(), 100)
     },
     computed: {
       ...mapState(['zoneId', 'zone']),
     },
     watch: {
       'table.renderSelectionList': {
-        handler: function(val){
+        handler: function (val) {
           let r = new Set()
           val.forEach(curr => {
-            if('children' in curr) curr['children'].forEach(item => r.add(item.status))
+            if ('children' in curr) curr['children'].forEach(item => r.add(item.status))
             r.add(curr.status)
           })
-          this.$emit('j',[...r])
+          this.$emit('j', [...r])
         },
         deep: true
       },
-      'zoneId': function(val){
+      'zoneId': function (val) {
         this.getList()
       }
     },
@@ -981,49 +1067,59 @@
   .download-table {
     position: relative;
     height: 100%;
+
     .page {
       position: absolute;
       left: 25px;
       bottom: 30px;
     }
+
     .progressL {
       display: inline-block;
       width: 110px;
       vertical-align: middle;
       padding-right: 8px;
     }
+
     .progressS {
       color: rgba(255, 255, 255, 0.6);
     }
   }
-  /deep/.el-dialog__header {
+
+  /deep/ .el-dialog__header {
     height: 14px;
     padding: 20px 20px 10px;
   }
-  /deep/.el-dialog__title {
+
+  /deep/ .el-dialog__title {
     color: rgba(255, 255, 255, 0.7);
   }
+
   .kk {
     font-size: 14px;
     display: block;
     margin: 10px 0px;
     color: rgba(255, 255, 255, 0.8);
   }
+
   .nn {
     width: 76px;
     height: 32px;
     border-radius: 8px;
     margin-left: 20px;
   }
+
   .nx {
     color: rgba(255, 255, 255, 0.59);
     background-color: transparent;
     border: 1px solid rgba(255, 255, 255, 0.4);
   }
+
   .nz {
     background-color: #3582fe;
     border: 1px solid rgba(53, 130, 254, 0.8);
   }
+
   .renderAgainBoxTit {
     color: rgba(255, 255, 255, 0.7);
     display: block;

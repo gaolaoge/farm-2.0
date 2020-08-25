@@ -300,10 +300,13 @@
 <style scoped lang="less">
   .home-wrapper {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    flex-direction: column;
     padding: 0px 50px;
     flex-grow: 1;
     align-content: flex-start;
+    height: calc(100vh - 120px - 24px);
+    overflow: hidden;
 
     .hi {
       position: absolute;
@@ -315,6 +318,7 @@
     .firRow {
       height: 148px;
       display: flex;
+      flex-shrink: 1;
       flex-wrap: nowrap;
 
       .taskStatus {
@@ -326,13 +330,14 @@
 
         .statusList {
           width: 100%;
+          height: 100%;
           display: flex;
           justify-content: space-between;
           flex-wrap: nowrap;
 
           .item {
             position: relative;
-            height: 148px;
+            height: 100%;
             flex-grow: 1;
             flex-shrink: 1;
             margin-right: 20px;
@@ -443,9 +448,10 @@
     }
 
     .secRow {
-      height: 262px;
       display: flex;
       flex-wrap: nowrap;
+      flex-shrink: 1;
+      flex-grow: 1;
 
       .addBtn,
       .pastWeek,
@@ -487,9 +493,13 @@
       .statistics {
         width: 516px;
         border-radius: 14px;
+        display: flex;
+        align-items: center;
+        /*justify-content: space-around;*/
 
         .s {
-          padding: 40px 0px;
+          width: 100%;
+          /*padding: 40px 0px;*/
           box-sizing: border-box;
           display: flex;
           flex-wrap: nowrap;
@@ -584,22 +594,22 @@
     }
 
     .thiRow {
-      height: calc(100vh - 740px);
-      min-height: 140px;
       display: flex;
       margin-top: 30px;
       box-sizing: border-box;
       background-color: rgba(255, 255, 255, 1);
       border-radius: 14px;
+      flex-shrink: 1;
+      flex-grow: 1;
 
       .recentProjects {
         position: relative;
         width: 100%;
-        padding: 50px;
+        padding: 2vh;
 
         .g {
           width: 100%;
-          height: 100%;
+          height: 222px;
           position: relative;
           overflow: hidden;
 

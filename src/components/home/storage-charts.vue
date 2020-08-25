@@ -20,11 +20,6 @@
       //   type: Array
       // }
     },
-    mounted() {
-      setTimeout(() => {
-        this.init()
-      }, 800)
-    },
     computed: {
       maxNum() {
         let m = Math.max.apply(null, this.cData)
@@ -51,7 +46,7 @@
             },
             itemGap: 10, // 主副标题距离
             left: 'center',
-            top: '120'
+            top: '90'
           },
           // legend: {
           //   orient: 'vertical',
@@ -215,6 +210,15 @@
       cDate(val) {
         this.init()
         window.addEventListener("resize", this.ec.resize)
+      },
+      '$route.path': {
+        handler: function(val){
+          if(val != '/') return false
+          setTimeout(() => {
+            this.init()
+          }, 800)
+        },
+        immediate: true
       }
     }
   }

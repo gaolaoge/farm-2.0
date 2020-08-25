@@ -21,7 +21,6 @@ export default {
       phone_warnInfo: '手机号格式错误',
       code_placeholder: '请输入验证码',
       auto_login: '5天内自动登录',
-      getCodeBtn: '获取验证码',
 
     },
     // 账号验证
@@ -35,7 +34,6 @@ export default {
     // 忘记密码
     forgetMode: {
       tit: '找回密码',
-      btn: '获取验证码',
       btnAgain: '确认修改',
       phone_placeholder: '请输入手机号',
       code_placeholder: '请输入验证码',
@@ -50,7 +48,6 @@ export default {
       label : '注册',
       text1: '我已阅读并同意',
       text2: '《用户服务协议》',
-      text: '获取验证码',
       type: '类型',
       typeRadio: ['影视版', '效果图'],
       ac_placeholder: '请输入帐号',
@@ -103,7 +100,9 @@ export default {
     record: {
       text1: '京ICP备11017824号-4 / 京ICP证130164号 北京市公安局朝阳分局备案编号:110105000501',
       text2: 'Copyright © 2018-2020 国家电影云制作服务平台'
-    }
+    },
+    getCode: '获取验证码',
+    getCodeAgain: '重新发送',
   },
   // 首页 home
   home: {
@@ -152,7 +151,7 @@ export default {
   task: {
     tableNavList: ['上传分析', '渲染下载'],
     uploadBtnGroup: ['新建任务', '删除', '重新分析', '刷新'],
-    renderBtnGroup: ['新建任务', '开始', '暂停', '删除', '下载完成帧', '全部渲染', '重新渲染', '归档', '刷新'],
+    renderBtnGroup: ['新建任务', '开始', '暂停', '删除', '下载完成帧', '全部渲染', '重新渲染', '归档', '拷贝', '刷新'],
     archiveRecords: '归档记录',
     status: {
       canceled: '已取消',

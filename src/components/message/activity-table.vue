@@ -10,12 +10,15 @@
           <span>{{ item.label }}</span>
         </div>
       </div>
-      <span class="readAll" v-show="selectionList.length" @click="readAllMessage">{{ readAll }}</span>
+      <span class="readAll"
+            v-show="selectionList.length && navIndex != 1"
+            @click="readAllMessage">
+        {{ readAll }}
+      </span>
     </div>
     <div class="table">
       <el-table
         ref="multipleTable"
-        :show-header=false
         :data="table.tableData"
         tooltip-effect="dark"
         style="width: 100%"
@@ -28,7 +31,7 @@
         <!--消息-->
         <el-table-column
           prop="noticeDetail"
-          label="消息"
+          label="消息详情"
           show-overflow-tooltip/>
         <!--日期-->
         <el-table-column

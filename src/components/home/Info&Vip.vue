@@ -173,17 +173,21 @@
     .userInfo {
       width: 366px;
       height: calc(100% - 340px);
-      min-height: 670px;
+      /*min-height: 670px;*/
       background-color: rgba(255, 255, 255, 1);
       box-shadow: 0px 4px 20px 0px rgba(27, 83, 244, 0.05);
       border-radius: 20px;
       padding: 15px 50px;
       box-sizing: border-box;
+      flex-shrink: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
 
       .f {
         position: relative;
         display: flex;
-        margin-bottom: 30px;
+        /*margin-bottom: 30px;*/
 
         .avatar {
           width: 70px;
@@ -309,7 +313,7 @@
       }
 
       .s {
-        margin-bottom: 15px;
+        /*margin-bottom: 15px;*/
       }
 
       .s,
@@ -366,15 +370,15 @@
         width: 267px;
         height: 1px;
         background-color: rgba(22, 29, 37, 0.09);
-        margin: 35px 0px;
       }
 
       .echarts {
         position: relative;
         width: 266px;
-        height: 288px;
+        height: 228px;
         background-color: rgba(27, 83, 244, 0.04);
         border-radius: 10px;
+        flex-shrink: 1;
 
         .tt {
           position: relative;
@@ -399,6 +403,7 @@
     }
 
     .recharge {
+      /*margin-top: 20px;*/
       position: relative;
       width: 366px;
       height: 300px;
@@ -408,6 +413,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex-shrink: 1;
 
       .l {
         position: relative;

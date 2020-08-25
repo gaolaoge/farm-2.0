@@ -85,7 +85,7 @@
                 <template slot-scope="scope">
                   <el-checkbox :true-label="scope.$index"
                                false-label=null
-                               v-model="checked" />
+                               v-model="checked"/>
                 </template>
               </el-table-column>
 
@@ -152,8 +152,10 @@
           <input type="text"
                  :id="item.id"
                  :placeholder="item.Placeholder"
+                 :class="[{'errorVal': item.errInfo ? item.errInfo : null}]"
                  class="farm-form-input"
                  v-model="item.Val"
+                 @input="instantVerif(item.id)"
                  @blur="VerifType(item.id)">
         </div>
         <div class="sw">
@@ -259,21 +261,24 @@
               Val: '',
               Placeholder: '请输入发票抬头',
               id: 'header',
-              required: true
+              required: true,
+              errInfo: false
             },
             {
               Label: '纳税人识别号',
               Val: '',
               Placeholder: '请输入纳税人识别号',
               id: 'number',
-              required: true
+              required: true,
+              errInfo: false
             },
             {
               Label: '邮箱',
               Val: '',
               Placeholder: '请输入邮箱',
               id: 'email',
-              required: true
+              required: true,
+              errInfo: false
             },
             {
               Label: '注册地址',
@@ -285,7 +290,8 @@
               Label: '注册电话',
               Val: '',
               Placeholder: '请输入公司电话',
-              id: 'phone'
+              id: 'phone',
+              errInfo: false
             },
             {
               Label: '开户银行',
@@ -310,12 +316,42 @@
     },
     methods: {
       // 验证格式
-      VerifType(type){
+      VerifType(type) {
         let list = this.dialogData.list
-        if(type == 'email' && list[2]['Val']){
-          this.regExp.email.test(list[2]['Val'])
+        if (type == 'email' && list[2]['Val']) {  // 邮箱
+          if (!this.regExp.email.test(list[2]['Val'])) {
+            messageFun('error', '请输入正确的邮箱')
+            list[2]['errInfo'] = true
+          } else list[2]['errInfo'] = false
+        } else if (type == 'header' && list[0]['Val']) {  // 发票抬头
+          if (!this.regExp.header.test(list[0]['Val'])) {
+            messageFun('error', '输入内容不能包含空格或特殊字符')
+            list[0]['errInfo'] = true
+          } else list[0]['errInfo'] = false
+        } else if (type == 'number' && list[1]['Val']) {  // 纳税人识别号
+          if (!this.regExp.identificationNumber.test(list[1]['Val'])) {
+            messageFun('error', '请输入15-20位数字或字母')
+            list[1]['errInfo'] = true
+          } else list[1]['errInfo'] = false
+        } else if (type == 'phone' && list[4]['Val']) {  // 纳税人识别号
+          if (!this.regExp.phone.test(list[4]['Val'])) {
+            messageFun('error', '请输入15-20位数字或字母')
+            list[4]['errInfo'] = true
+          } else list[4]['errInfo'] = false
         }
-
+      },
+      // 即时验证
+      instantVerif(type){
+        let list = this.dialogData.list
+        if (type == 'email' && list[2]['Val']) {  // 邮箱
+          if (this.regExp.email.test(list[2]['Val'])) list[2]['errInfo'] = false
+        } else if (type == 'header' && list[0]['Val']) {  // 发票抬头
+          if (this.regExp.header.test(list[0]['Val'])) list[0]['errInfo'] = false
+        } else if (type == 'number' && list[1]['Val']) {  // 纳税人识别号
+          if (this.regExp.identificationNumber.test(list[1]['Val'])) list[1]['errInfo'] = false
+        } else if (type == 'phone' && list[4]['Val']) {  // 纳税人识别号
+          if (this.regExp.phone.test(list[4]['Val'])) list[4]['errInfo'] = false
+        }
       },
       // 添加发票抬头
       addNewHeader() {
@@ -358,19 +394,20 @@
       // 添加发票抬头
       async addHeader() {
         let list = this.dialogData.list
-        if(!list[0]['Val']){
-          messageFun('info','【发票抬头】为必填项')
+        if (!list[0]['Val']) {
+          messageFun('info', '【发票抬头】为必填项')
+          return false
+        } else if (!list[1]['Val']) {
+          messageFun('info', '【纳税人识别号】为必填项')
+          return false
+        } else if (!list[2]['Val']) {
+          messageFun('info', '【邮箱】为必填项')
+          return false
+        } else if (list[0]['errInfo'] || list[1]['errInfo'] || list[2]['errInfo'] || list[4]['errInfo']){
+          messageFun('info', '已填项存在错误')
           return false
         }
-        if(!list[1]['Val']){
-          messageFun('info','【纳税人识别号】为必填项')
-          return false
-        }
-        if(!list[2]['Val']){
-          messageFun('info','【邮箱】为必填项')
-          return false
-        }
-        let data = await addInvoiceHeader({
+          let data = await addInvoiceHeader({
           invoiceTitle: list[0]['Val'],                 // 发票抬头
           taxpayerId: list[1]['Val'],                   // 纳税人识别号
           email: list[2]['Val'],                        // 邮箱
@@ -404,18 +441,18 @@
         this.dialogData.isDefault = item['isDefault']
       },
       // 发票抬头 - 编辑 - 发送
-      async editHeaderF(){
+      async editHeaderF() {
         let list = this.dialogData.list
-        if(!list[0]['Val']){
-          messageFun('info','【发票抬头】为必填项')
+        if (!list[0]['Val']) {
+          messageFun('info', '【发票抬头】为必填项')
           return false
         }
-        if(!list[1]['Val']){
-          messageFun('info','【纳税人识别号】为必填项')
+        if (!list[1]['Val']) {
+          messageFun('info', '【纳税人识别号】为必填项')
           return false
         }
-        if(!list[2]['Val']){
-          messageFun('info','【邮箱】为必填项')
+        if (!list[2]['Val']) {
+          messageFun('info', '【邮箱】为必填项')
           return false
         }
         let data = await editItemIn({
@@ -429,7 +466,7 @@
           bankAccount: list[6]['Val'],                  // 公司开户行账号
           isDefault: this.dialogData.isDefault          // 0:非默认 1:默认
         })
-        if(data.data.code == 200){
+        if (data.data.code == 200) {
           this.editHeader = false
           messageFun('success', '操作成功')
           this.dialogData.visible = false
@@ -457,17 +494,17 @@
               messageFun('success', '操作成功')
               this.getInvoiceHeaderList()
             }
-        })
+          })
           .catch(() => messageFun('info', '已取消删除'))
       },
       // 开票
-      async invoicingF(){
-        if(!this.recordingSelection.length){
-          messageFun('info','未选中充值记录')
+      async invoicingF() {
+        if (!this.recordingSelection.length) {
+          messageFun('info', '未选中充值记录')
           return false
         }
-        if(!this.checked){
-          messageFun('info','未选中发票抬头')
+        if (!this.checked) {
+          messageFun('info', '未选中发票抬头')
           return false
         }
         let data = await invoicing({
@@ -475,7 +512,7 @@
           rechargeUuidList: this.recordingSelection.map(item => item.rechargeUuid),         // 用户选择的充值uuid列表
           invoiceSettingUuid: this.invoiceTableData[this.checked]['invoiceSettingUuid']     // 发票抬头uuid
         })
-        if(data.data.code == 200){
+        if (data.data.code == 200) {
           messageFun('success', '操作成功')
           this.getRechargeList()
           this.checked = null
@@ -483,7 +520,7 @@
         }
       },
       // 复位
-      reset(){
+      reset() {
         let list = this.dialogData.list
         list[0]['Val'] = ''
         list[1]['Val'] = ''
@@ -626,6 +663,10 @@
         border: 1px solid rgba(22, 29, 37, 0.2);
         padding-left: 20px;
         box-sizing: border-box;
+
+        &.errorVal {
+          color: rgba(255, 62, 77, 1);
+        }
       }
     }
   }

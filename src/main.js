@@ -8,6 +8,7 @@ import App from './App'
 import router from './router'
 import 'babel-polyfill'
 import i18n from './lang'
+import 'babel-polyfill'
 // import websocket_back from './assets/websocketStore_back'
 
 // process.env.Mock && require('./mock')

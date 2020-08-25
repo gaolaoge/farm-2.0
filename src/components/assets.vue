@@ -419,6 +419,7 @@
 
       .bgi {
         position: absolute;
+        top: 1px;
         width: 116px;
         height: 20px;
         background-color: rgba(39, 95, 239, 1);

@@ -287,6 +287,7 @@
     .systemList {
       position: absolute;
       bottom: 10px;
+      left: calc(50% - 26px);
     }
 
     .addTask {

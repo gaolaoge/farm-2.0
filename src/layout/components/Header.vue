@@ -164,7 +164,6 @@
           <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
           <div class="step-content">
             <img src="@/assets/step-two.png" class="newTesk" alt="">
-            <img src="@/assets/step-two2.png" class="newTaskIntroduction" alt="">
             <div class="step-btn">
               <img src="@/icons/step-previous.png" alt="" class="previous first">
               <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 3">
@@ -176,7 +175,6 @@
           <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
           <div class="step-content">
             <img src="@/assets/step-three.png" alt="" class="newMode">
-            <img src="@/assets/step-three2.png" alt="" class="step-threeDialogue">
             <div class="step-btn">
               <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)"
                    @click="guideShowStep = 2">
@@ -189,7 +187,6 @@
           <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
           <div class="step-content">
             <img src="@/assets/step-four.png" alt="" class="set">
-            <img src="@/assets/step-four2.png" alt="" class="set2">
             <div class="step-btn">
               <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)"
                    @click="guideShowStep = 3">
@@ -202,7 +199,6 @@
           <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
           <div class="step-content">
             <img src="@/assets/step-five.png" alt="" class="down">
-            <img src="@/assets/step-five2.png" alt="" class="down2">
             <div class="step-btn">
               <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)"
                    @click="guideShowStep = 4">
@@ -210,10 +206,22 @@
             </div>
           </div>
         </div>
-        <!--第六步-->
-        <div class="guide-step step-six" v-show="guideShowStep == 6" @click="showGuide">
+        <!--第六步 补加-->
+        <div class="guide-step step-additional" v-show="guideShowStep == 6">
+          <img src="@/icons/step-jump-over.png" alt="" class="jump-btn" @click="showGuide">
           <div class="step-content">
-            <img src="@/assets/six-main.png" alt="" class="">
+            <img src="@/assets/step-six.png" alt="" class="additional">
+            <div class="step-btn">
+              <img src="@/icons/step-next.png" alt="" class="previous" style="transform: rotate(180deg)"
+                   @click="guideShowStep = 5">
+              <img src="@/icons/step-next.png" alt="" class="next" @click="guideShowStep = 7">
+            </div>
+          </div>
+        </div>
+        <!--第7步-->
+        <div class="guide-step step-six" v-show="guideShowStep == 7" @click="showGuide">
+          <div class="step-content">
+            <img src="@/assets/six-main.png" alt="" class="main">
             <img src="@/assets/six-top-left.png" alt="" class="tl">
             <img src="@/assets/six-top-right.png" alt="" class="tr">
             <img src="@/assets/six-bottom-left.png" alt="" class="bl">
@@ -732,7 +740,7 @@
           }
 
           .switch {
-            position: absolute;
+            position: relative;
             left: 4px;
             width: 40px;
             height: 38px;
@@ -742,14 +750,14 @@
             cursor: pointer;
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 8px;
-
+            flex-shrink: 0;
           }
         }
 
         //下拉选择框
         .workBench-optionBase {
           /deep/ .el-input.el-input--suffix {
-            margin-left: 0px;
+            margin-left: -40px;
 
             .el-input__inner {
               background-color: transparent;
@@ -863,12 +871,7 @@
             }
 
             .newTesk {
-              margin: 140px 0px 0px 200px;
-            }
-
-            .newTaskIntroduction {
-              vertical-align: top;
-              margin: 220px 0px 0px 60px;
+              margin: 50vh 0px 0px 0px;
             }
 
             .newMode {
@@ -877,32 +880,23 @@
               margin: 90px auto;
             }
 
-            .step-threeDialogue {
-              position: absolute;
-              top: 400px;
-              left: 760px;
-            }
-
             .set {
               position: absolute;
-              right: 10px;
-            }
-
-            .set2 {
-              position: absolute;
-              right: 890px;
-              top: 590px;
+              right: 0px;
+              height: 100vh;
             }
 
             .down {
               position: absolute;
+              width: 96vw;
               right: 10px;
             }
 
-            .down2 {
+            .additional {
               position: absolute;
-              left: 430px;
-              top: 440px;
+              bottom: 10px;
+              left: 10px;
+              height: 94vh;
             }
 
             .step-btn {
@@ -955,17 +949,22 @@
             right: 0px;
           }
 
+          .main {
+            width: 100vw;
+          }
+
           &.step-two {
             .step-btn {
-              margin: 340px 0px 0px -200px;
+              margin-top: 70vh;
+              margin-left: -200px;
             }
           }
 
           &.step-three {
             .step-btn {
               position: absolute;
-              top: 500px;
-              left: 1000px;
+              bottom: 30vh;
+              left: 50%;
             }
           }
 
@@ -982,6 +981,14 @@
               position: absolute;
               top: 550px;
               left: 550px;
+            }
+          }
+
+          &.step-additional {
+            .step-btn {
+              position: absolute;
+              top: 44vh;
+              left: 44vw;
             }
           }
 

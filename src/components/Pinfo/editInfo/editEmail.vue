@@ -45,9 +45,9 @@
       <!--修改成功-->
       <div class="success" v-show="!editing">
         <img src="@/icons/smail.png" alt="">
-        <h5 class="tit">{{ successTit }}</h5>
-        <span class="dire">{{ dire }}</span>
-        <div class="btnn" @click="cancelFun"><span>{{ btnn }}</span></div>
+        <h5 class="tit">{{ countdown.successTit }}</h5>
+        <span class="dire">{{ countdown.num }}{{ unit }} {{ countdown.dire }}</span>
+        <div class="btnn" @click="cancelFun"><span>{{ countdown.btnn }}</span></div>
       </div>
     </div>
   </div>
@@ -81,10 +81,14 @@
         btnSave: '确定',
         btnCancel: '取消',
         editing: true,
-        successTit: '更换邮箱成功',
-        dire: '3s 后自动返回“个人资料”',
-        btnn: '完成',
         unit: 's',
+        countdown: {
+          successTit: '更换邮箱成功',
+          dire: '后自动返回“个人资料”',
+          btnn: '完成',
+          num: 3,
+          fun: null
+        },
         getPhoneCodeD: {
           showCountdown: false,
           setF: null,
@@ -105,15 +109,16 @@
           e = this.getEmailCodeD
         if (p.setF) {
           clearTimeout(p.setF)
-          p.showCountdown = false,
-            p.time = 60
+          p.showCountdown = false
+          p.time = 60
         }
         if (e.setF) {
           clearTimeout(p.setF)
-          p.showCountdown = false,
-            p.time = 60
+          p.showCountdown = false
+          p.time = 60
         }
         this.reset()
+        this.countdownFun()
       },
       // 确定修改
       async saveFun() {
@@ -132,6 +137,8 @@
         })
         if (data.data.code == 200) {
           messageFun('success', '修改成功')
+          this.$store.commit('changeEmail', this.emailVal)
+          this.sucCountdown()
           this.reset()
         } else if (data.data.msg == '邮箱验证码无效') {
           messageFun('error', '邮箱验证码无效')
@@ -141,11 +148,24 @@
 
       },
       // 复位
-      reset(){
+      reset() {
         this.codeVal = null
         this.emailVal = null
         this.emailCodeVal = null
+      },
+      // 3秒倒计时
+      sucCountdown() {
         this.editing = false
+        this.countdown.fun = setTimeout(() => {
+          this.countdown.num--
+          if (this.countdown.num > 0) this.sucCountdown()
+          else this.countdownFun()
+        }, 1000)
+      },
+      countdownFun() {
+        this.countdown.fun = null
+        this.countdown.num = 3
+        this.editing = true
       },
       // 获取手机号验证码
       async getPhoneCode() {
