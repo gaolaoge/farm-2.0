@@ -606,7 +606,7 @@
           return {
             taskUuid: curr.taskUuid,
             id: curr.taskNo,                                       // 任务ID
-            sceneName: curr.fileName,                              // 场景名
+            sceneName: curr.isExpire == 1 ? '(过期)' + curr.fileName : curr.fileName,        // 场景名
             status: itemDownloadStatus(curr.renderStatus),         // 状态
             renderingProgress: curr.frameCount.done + '/' + curr.frameCount.total,          //渲染进度
             percent: curr.frameCount.total == null ? 0 : Math.floor(curr.frameCount.done / curr.frameCount.total * 100),
@@ -629,7 +629,8 @@
             creationTime: createDateFun(new Date(curr.createTime)),// 创建时间
             children,
             rowId: curr.taskNo,                                    // 唯一值
-            selfIndex: fatherIndex
+            selfIndex: fatherIndex,
+            isExpire: curr.isExpire,                               // 1过期 0未过期
           }
         }) : data.data.data.map((curr, fatherIndex) => {
           // account: "gaoge1834"         // 任务创建人
@@ -732,7 +733,8 @@
             creationTime: createDateFun(new Date(curr.createTime)),// 创建时间
             children,
             rowId: curr.taskNo,                                    // 唯一值
-            selfIndex: fatherIndex
+            selfIndex: fatherIndex,
+            isExpire: 0,                                           // 未过期
           }
         })
         this.table.usersList = [...usersList].map(curr => {
@@ -975,8 +977,8 @@
       },
       // 操作 - 拷贝
       copyFun() {
-        this.showDrawer = false
-        this.itemName = 'result'
+        this.showDrawer = true
+        this.itemName = 'setting'
       },
       // 打包后下载
       async downloadingFun(path) {

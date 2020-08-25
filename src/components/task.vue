@@ -274,7 +274,6 @@
       },
       // 渲染下载 多选结果
       j(val) {
-        console.log(val.length)
         let t = this.btnGroup
         t.downloadTableBtnStart = true       // 渲染下载 - 开始
         t.downloadTableBtnPause = true       // 渲染下载 - 暂停

@@ -340,7 +340,7 @@
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: 2,
           userID: this.user.id,
-          fileDownType: 0,
+          isRender: 0,
           fileList: this.table.selectionList.map(item => item.position)
         })
       },

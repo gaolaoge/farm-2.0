@@ -99,6 +99,9 @@
         <div class="con">
           <input type="text"
                  class="name"
+                 :class="[{'err': newNameErr}]"
+                 @focus="newNameErr = false"
+                 @keyup.enter="createSaveBtnFun"
                  v-model="createProject.name"
                  :placeholder="createProject.placeholder">
           <el-checkbox v-model="createProject.checked" true-label='1' false-label='0' label="设为当前项目"/>
@@ -185,6 +188,7 @@
     name: 'projectSetting',
     data() {
       return {
+        newNameErr: false,     // 新建项目 项目名状态
         tableData: [],
         tableOperateBtn: ['编辑', '设为当前项目'],
         btnGroup: [
@@ -253,7 +257,7 @@
     },
     methods: {
       // 编辑头像
-      avatarEditFun(){
+      avatarEditFun() {
         let input = document.createElement('INPUT')
         input.type = 'file'
         input.accept = '.jpg,.jpeg,.png'
@@ -267,7 +271,7 @@
         this.selectionList = val
       },
       // 保存裁剪好的头像
-      saveAvatar(src){
+      saveAvatar(src) {
         this.editProject.thumbnail = src
         this.showCutter = false
       },
@@ -332,6 +336,9 @@
             checked: 0
           })
           this.getList('', 1, this.page.size)
+        } else if (data.data.code == 101) {
+          messageFun('info', '项目名已存在')
+          this.newNameErr = true
         }
       },
       // 编辑项目 - 关闭
@@ -384,7 +391,7 @@
         let data = await setDefault({
           'taskProjectUuid': id
         })
-        if(data.data.code == 201){
+        if (data.data.code == 201) {
           messageFun('success', '设置成功')
           this.getList('', 1, this.page.size)
         }
@@ -510,6 +517,9 @@
       .con {
         .name {
           width: 428px;
+          &.err {
+            color: rgba(255, 62, 77, 1);
+          }
         }
       }
     }
