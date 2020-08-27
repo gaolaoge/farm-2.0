@@ -19,7 +19,7 @@ const createCalendar = function (date) {
 const createDateFun = function (date, mini) {
   if (date.getFullYear() == '1970') return '-'
   let {year, month, day, hour, minutes, seconds} = createCalendar(date)
-  if(mini) return `${year}-${month}-${day}`
+  if (mini) return `${year}-${month}-${day}`
   else return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
 }
 
@@ -243,6 +243,20 @@ const IEVersion = function () {
   }
 }
 
+const clearUserCookie = function (phone, account, token) {
+  if (!document.cookie) return false
+  let s = {},
+    f = false
+  document.cookie.split(';').forEach(curr => s[curr.split('=')[0].trim()] = curr.split('=')[1].trim())
+  if ('phone' in s) f = s['phone'] == phone
+  else if ('account' in s) f = s['account'] == account
+  if (f) {
+    document.cookie = `token=${token};max-age=-1`
+    if ('phone' in s) document.cookie = `phone=${phone};max-age=-1`
+    if ('account' in s) document.cookie = `account=${account};max-age=-1`
+  }
+}
+
 export {
   createCalendar,
   createDateFun,
@@ -255,7 +269,8 @@ export {
   itemDownloadStatus,
   UuidFun,
   setInfo,
-  IEVersion
+  IEVersion,
+  clearUserCookie
 }
 
 

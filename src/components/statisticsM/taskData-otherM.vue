@@ -181,7 +181,7 @@
       }
     },
     mounted() {
-      window.addEventListener('resize', this.ec.resize)
+      window.addEventListener('resize', () => this.ec.resize())
       this.$refs.selectDateM.setDateInterval(this.dateInterval)
     },
     computed: {

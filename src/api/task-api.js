@@ -17,3 +17,11 @@ export function getThumbnail(data) {
     method: 'GET'
   })
 }
+
+// 任务 - 渲染下载 - 拷贝 - 获取预设参数
+export function getCopySetData(data) {
+  return businessServer({
+    url: `/professional/task/getCopyInfo/${data}`,
+    method: 'GET'
+  })
+}

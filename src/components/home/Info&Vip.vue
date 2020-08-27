@@ -65,6 +65,10 @@
 <script>
   import storageCharts from '@/components/home/storage-charts'
   import {mapState} from 'vuex'
+  import {
+    messageFun,
+    clearUserCookie
+  } from "../../assets/common"
 
   export default {
     name: 'iv',
@@ -114,19 +118,12 @@
           type: 'warning'
         })
           .then(() => {
-            sessionStorage.setItem('token', '')
+            messageFun('success', '退出成功')
             this.$router.push('/login')
-            this.$message({
-              type: 'success',
-              message: '退出成功!'
-            })
+            sessionStorage.setItem('token', '')
+            // clearUserCookie(this.user.phone, this.user.account, sessionStorage.getItem('token'))
           })
-          .catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消退出'
-            })
-          })
+          .catch(() => messageFun('info', '已取消退出'))
 
       },
     },
@@ -384,6 +381,7 @@
           position: relative;
           width: 100%;
           text-align: center;
+
           .main {
             font-size: 20px;
             font-family: SourceHanSansCN-Regular, SourceHanSansCN;

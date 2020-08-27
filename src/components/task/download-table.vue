@@ -270,7 +270,8 @@
     seeBalance
   } from '@/api/api'
   import {
-    uploadTabGetList
+    uploadTabGetList,
+    getCopySetData
   } from '@/api/task-api'
   import {
     mapState
@@ -976,7 +977,22 @@
         })
       },
       // 操作 - 拷贝
-      copyFun() {
+      async copyFun() {
+        let item = this.table.renderSelectionList.find((item,index) => item.children)
+        let data = await getCopySetData(item.taskUuid)
+        let list = data.data.data.layerSettingList
+        // camera: []       // 相机
+        // format: []       // 格式
+        // frameEnd: null
+        // frameIterval: 1  // 帧间隔
+        // frameRange: "1-10"// 帧范围
+        // frameStart: null
+        // height: 226
+        // imageName: null   //
+        // layerName: "defaultRenderLayer"
+        // layerUuid: null
+        // ratio: null
+        // width: 300
         this.showDrawer = true
         this.itemName = 'setting'
       },

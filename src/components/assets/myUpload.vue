@@ -114,6 +114,30 @@
         </div>
       </div>
     </el-dialog>
+    <el-dialog
+      :show-close="false"
+      :visible.sync="dialogUnzip">
+      <header class="dl_header">
+        <span>{{ dz.title }}</span>
+        <img src="@/icons/shutDialogIcon.png" alt="" class="closeIcon" @click="shutDialog">
+      </header>
+      <div class="dl-wrapper">
+        <div class="unzipItem" v-for="(item,index) in dz.list" :key="index">
+          <!--文件名-->
+          <span class="name">{{ item.fileName }}</span>
+          <!--密码-->
+          <input type="password" class="ps" v-model="item.password" :placeholder="dz.placeholder">
+        </div>
+        <div class="btnGroup">
+          <div class="btn confirm" @click="configDZ">
+            <span>{{ dz.btn[0] }}</span>
+          </div>
+          <div class="btn cancel" @click="shutDialogDZ">
+            <span>{{ dz.btn[1] }}</span>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -163,6 +187,13 @@
             label: 'label'
           },
           resolve: null,         // 回调函数
+        },
+        dialogUnzip: false,
+        dz: {
+          title: '解压列表',
+          btn: ['解压', '取消'],
+          list: new Array(0),
+          placeholder: '文件解压密码，选填'
         }
       }
     },
@@ -217,14 +248,14 @@
               this.dl.resolve(x)
               this.dl.resolve = null
             }
-          } else if (data.msg == '6031' || data.msg == '6041' || data.msg == '6071') {
+          } else if (data.msg == '6031' || data.msg == '6041' || data.msg == '6071' || data.msg == '6081') {
             // 新建文件夹 创建成功 || 删除
             messageFun('success', '操作成功')
             this.getAssetsCatalog(this.path, this.searchInputVal)
           } else if (data.msg == '6032' || data.msg == '6072') {
             // 新建文件夹 文件夹名已存在
             messageFun('info', '指定文件名已存在，操作失败')
-          }else if (data.msg == '6042') {
+          } else if (data.msg == '6042') {
             // 删除失败
             messageFun('info', data.data)
             this.getAssetsCatalog(this.path, this.searchInputVal)
@@ -233,6 +264,7 @@
             this.shutDialog()
             this.getAssetsCatalog(this.path, this.searchInputVal)
           } else if (data.msg == '6052' || data.msg == '6062') messageFun('info', '选定目标内已存在相同名称文件或文件夹，操作失败')
+          else if (data.msg == '6081') messageFun('info', '解压失败')
           else if (data.msg == '6053' || data.msg == '6063' || data.msg == '6073') messageFun('error', '报错，操作失败')
         },
       },
@@ -247,6 +279,24 @@
       // }
     },
     methods: {
+      // 确认解压
+      configDZ() {
+        this.$store.commit('WEBSOCKET_BACKS_SEND', {
+          'code': 608,
+          'customerUuid': this.user.id,
+          'unzipFilePathList': this.dz.list.map(item => {
+            return {
+              'path': item.position + item.fileName,
+              'password': item.password
+            }
+          })
+        })
+      },
+      // 关闭解压弹窗
+      shutDialogDZ() {
+        this.dialogUnzip = false
+        this.dz.list = new Array(0)
+      },
       // 关闭tree窗
       shutDialog() {
         this.dialogVisible = false
@@ -336,7 +386,6 @@
       // 下载
       downloadFile() {
         if (!this.table.selectionList.length) return false
-        console.log(this.table.selectionList)
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: 2,
           userID: this.user.id,
@@ -378,7 +427,7 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消',
         })
-          .then(({ value }) => {
+          .then(({value}) => {
             console.log(this.table.selectionList[0])
             this.$store.commit('WEBSOCKET_BACKS_SEND', {
               'code': 607,
@@ -392,11 +441,11 @@
       // 解压
       unzip() {
         if (!this.table.selectionList.length) return false
-        this.$store.commit('WEBSOCKET_BACKS_SEND', {
-          'code': 608,
-          'customerUuid': this.user.id,
-          filePathList: this.table.selectionList.map(item => this.path + item.fileName)
-        })
+        let type = ['zip', 'rar', 'tar', 'tar.gz', 'tar.bz2', 'tar.Z']
+        // this.dz.list = Object.assign(this.table.selectionList.filter(item => type.some(t => t == item.fileType)), { password: null })
+        this.dz.list = Object.assign(this.table.selectionList, {password: null})
+        console.log(this.dz.list)
+        this.dialogUnzip = true
       },
       // 删除
       deleteFile() {
@@ -505,6 +554,30 @@
     height: 540px;
     background-color: rgba(255, 255, 255, 1);
     border-radius: 0px 0px 8px 8px;
+
+    .unzipItem {
+      /*display: flex;*/
+      /*justify-content: center;*/
+      /*align-items: center;*/
+
+      .name {
+        display: inline-block;
+        width: 160px;
+        font-size: 14px;
+        color: rgba(22, 29, 37, 0.6);
+        text-align: right;
+        margin-right: 12px;
+      }
+
+      .ps {
+        width: 320px;
+        height: 36px;
+        border-radius: 6px;
+        opacity: 0.2;
+        border: 1px solid rgba(22, 29, 37, 1);
+        padding-left: 12px;
+      }
+    }
 
     .tree {
       height: 100%;

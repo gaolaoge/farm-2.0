@@ -28,6 +28,7 @@
 
               <el-table-column
                 prop="outTradeNo"
+                min-width="300"
                 label="交易ID"/>
 
               <el-table-column
@@ -36,7 +37,8 @@
                 label="实际支付金额（元）"/>
 
               <el-table-column
-                label="支付方式">
+                label="支付方式"
+                width="100">
                 <template slot-scope="scope">
                   <span>{{ scope.paymentTitle == 1 ? '支付宝' : '微信' }}</span>
                 </template>
@@ -44,10 +46,12 @@
 
               <el-table-column
                 prop="productOrderUuid"
+                min-width="300"
                 label="支付单号"/>
 
               <el-table-column
                 prop="updateTime"
+                width="200"
                 label="支付时间"/>
 
             </el-table>

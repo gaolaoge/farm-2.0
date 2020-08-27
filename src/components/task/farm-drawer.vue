@@ -478,6 +478,7 @@
     </div>
     <!--渲染结果-->
     <div class="farm-drawer r" :class="[{'active': showDrawer}]" v-show="typeInfo == 'result'">
+      <!--表头-->
       <div class="farm-drawer-title">
         <div class="drawer-t">
           <span class="drawer-text">
@@ -514,7 +515,9 @@
           <img src="@/icons/icon_ close1.png" alt="" @click="closeDrawer">
         </div>
       </div>
+      <!--表体-->
       <div class="farm-drawer-body r">
+        <!--任务描述-->
         <div class="info">
           <div class="thumbnail">
             <span class="status"
@@ -527,7 +530,14 @@
                   ]">
               {{ result.statusData }}
             </span>
-            <img :src="result.miniImgHref" alt="" class="img">
+<!--            <img :src="result.miniImgHref" class="img" @click="showLargeThumb">-->
+            <div class="demo-image__preview">
+              <el-image
+                class="img"
+                :src="result.miniImgHref"
+                :preview-src-list="result.LargeImgHrefList">
+              </el-image>
+            </div>
           </div>
           <div class="dataList">
 
@@ -659,6 +669,7 @@
 
           </div>
         </div>
+        <!--任务table-->
         <div class="list">
           <div class="table">
             <!--主-操作-->
@@ -922,6 +933,10 @@
 
         </div>
       </div>
+      <!--帧大图-->
+<!--      <div class="thumb" v-show="result.showLargeThumbWin">-->
+<!--        <img :src="result.LargeImgHref" alt="">-->
+<!--      </div>-->
     </div>
   </div>
 </template>
@@ -1234,7 +1249,10 @@
           x: '暂无数据',
           showDetails: false,
           searchInpVal: '',            // 渲染结果 - 主table 操作 关键帧查询
-          miniImgHref: ''              // 渲染结果 - 缩略图
+          miniImgHref: '',             // 渲染结果 - 缩略图
+          // getLargeImgHref: null,       // 渲染结果 - 获取大尺寸缩略图所需参数
+          LargeImgHrefList: [],          // 渲染结果 - 大尺寸缩略图
+          showLargeThumbWin: false,    // 渲染结果 - 显示大尺寸缩略图
         },
         demo: ``,
         loading: null
@@ -1339,16 +1357,25 @@
       mainTableAddMoreItem() {
         this.getRenderItemMoreTableF()
       },
+      // 渲染下载 - 详情 - 缩略图放大
+      // async showLargeThumb() {
+      //   console.log('s')
+      //   if (!this.result.getLargeImgHref) return false
+      //   let data = await getThumbnail(this.result.getLargeImgHref)
+      //   this.result.LargeImgHref = data.data.data
+      //   this.result.showLargeThumbWin = true
+      // },
       // 渲染下载 - 详情 - 缩略图
       async showMiniImg(row, column, event) {
-        this.result.statusData = row['status']
-        let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=240`,
-        //   data = await getThumbnail(t)
-        // this.result.miniImgHref = window.URL.createObjectURL(data.data)
-        //   data = await downloadFrame(t)
-        // this.result.miniImgHref = window.URL.createObjectURL(data.data)
-          data = await getThumbnail(t)
-        this.result.miniImgHref = data.data.data
+        try {
+          this.result.statusData = row['status']
+          let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=240`,
+            data = await getThumbnail(t)
+          this.result.miniImgHref = data.data.data
+          let a = await getThumbnail(`frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=900`)
+          this.result.LargeImgHrefList = [a.data.data]
+        } catch (err) {
+        }
       },
       // 渲染下载 - 详情 - 主table 获取列表
       async getRenderItemMoreTableF() {
@@ -1475,31 +1502,31 @@
       },
       // 帧范围修改
       rangeChange(e, index, val, row) {
-        // debugger
         row['rangeEdit'] = false
         row['range'] = val
-        if (!val) {
-          this.rangeChangeErr('empty', index);
-          return false
-        }
-        if (!val.includes('-')) {
-          this.rangeChangeErr('err', index);
-          return false
-        }
-        let h = Number(val.split('-')[0]),
-          f = Number(val.split('-')[1])
-        if (!/^[0-9]+$/.test(h) || !/^[0-9]+$/.test(f)) {
-          this.rangeChangeErr('err', index);
-          return false
-        }
-        if (h >= 999 || f > 999) {
-          this.rangeChangeErr('max', index);
-          return false
-        }
-        if (h >= f) {
-          this.rangeChangeErr('err', index);
-          return false
-        }
+        // 暂时关闭验证
+        // if (!val) {
+        //   this.rangeChangeErr('empty', index);
+        //   return false
+        // }
+        // if (!val.includes('-')) {
+        //   this.rangeChangeErr('err', index);
+        //   return false
+        // }
+        // let h = Number(val.split('-')[0]),
+        //   f = Number(val.split('-')[1])
+        // if (!/^[0-9]+$/.test(h) || !/^[0-9]+$/.test(f)) {
+        //   this.rangeChangeErr('err', index);
+        //   return false
+        // }
+        // if (h >= 999 || f > 999) {
+        //   this.rangeChangeErr('max', index);
+        //   return false
+        // }
+        // if (h >= f) {
+        //   this.rangeChangeErr('err', index);
+        //   return false
+        // }
 
         row['rangeErr'] = false
         if (this.setting.num.tableData.every(curr => !curr.rangeErr)) this.setting.num.randerError = false
@@ -1677,12 +1704,10 @@
         if (tt.priority.customizeInputError) {
           messageFun('error', '自定义帧错误');
           return false
-        }
-        if (tt.num.randerError) {
-          messageFun('error', '帧范围设定存在错误');
-          return false
-        }
-        if (tt.num.numError) {
+          // }else if (tt.num.randerError) {
+          //   messageFun('error', '帧范围设定存在错误');
+          //   return false
+        } else if (tt.num.numError) {
           messageFun('error', '帧间隔设定存在错误');
           return false
         }
@@ -1699,8 +1724,9 @@
           return {
             layerName: curr.name,                                 // 层名
             // layerUuid: curr.id,                                // 层ID
-            frameStart: Number(curr.range.split('-')[0]),         // 帧范围起始帧
-            frameEnd: Number(curr.range.split('-')[1]),           // 帧范围结束帧
+            // frameStart: Number(curr.range.split('-')[0]),         // 帧范围起始帧
+            // frameEnd: Number(curr.range.split('-')[1]),           // 帧范围结束帧
+            frameRange: curr.range,                               // 帧范围
             frameIterval: Number(curr.num),                       // 间隔帧数
             camera: curr.camera,                                  // 相机
             width: curr.w,                                        // 图像宽度
@@ -1871,8 +1897,11 @@
           messageFun('error', '报错，数据请求失败');
           return false
         }
+        // 翻到【设置参数】
         this.$emit('changeTypeInfo', 'setting')
+        // 【设置参数】-【渲染层数】- 启动分层渲染时的table
         this.setting.num.tableDataAll = data.data.layerSettingList.map(curr => {
+          // this.zone  1影视区 2效果图区
           let formatList = [],
             cameraList = []
           if (curr.format) {
@@ -1894,7 +1923,8 @@
           return {
             id: curr.layerUuid,
             name: curr.layerName,
-            range: curr.frameStart + '-' + curr.frameEnd,
+            // range: curr.frameStart + '-' + curr.frameEnd,
+            range: curr.frameRange,
             num: '1',
             w: curr.width,
             h: curr.height,
@@ -1910,10 +1940,10 @@
             cameraList: cameraList
           }
         })
+        // 【设置参数】-【渲染层数】- 未启动分层渲染时的table
         this.setting.num.tableData = [this.setting.num.tableDataAll[0]]
-        setTimeout(() => {
-          this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0], true)
-        }, 0)
+        // 渲染层数默认选中索引1
+        setTimeout(() => this.$refs.renderTable.toggleRowSelection(this.setting.num.tableData[0], true), 0)
       },
       // 设置参数 - 返回分析结果
       settingBack() {
@@ -2581,4 +2611,17 @@
       }
     }
   }
+
+  /*.thumb {*/
+  /*  position: fixed;*/
+  /*  z-index: 9999;*/
+  /*  top: 0px;*/
+  /*  left: 0px;*/
+  /*  width: 100vw;*/
+  /*  height: 100vh;*/
+  /*  background-color: rgba(0, 0, 0, 0.2);*/
+  /*  display: flex;*/
+  /*  justify-content: center;*/
+  /*  align-items: center;*/
+  /*}*/
 </style>

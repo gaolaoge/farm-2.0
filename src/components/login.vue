@@ -334,7 +334,7 @@
                      :class="[{'canClick': registered.status.phone}]"
                      @click="den"
                      v-show="registered.verifShow">
-                  {{ registered.verifShow.btnText }}
+                  {{ registered.btnText }}
                 </div>
                 <span class="delayDate" v-show="!registered.verifShow">
               {{ registered.countdown }}
@@ -414,6 +414,7 @@
     exportDownloadFun,
     setInfo
   } from '@/assets/common.js'
+  import {clearUserCookie} from "../assets/common";
 
   export default {
     name: 'login',
@@ -1085,23 +1086,12 @@
       autoLogin(boolean, phone, account, token) {
         // 勾选
         if (boolean) {
-          document.cookie = `token=${token};max-age=43200`
-          if (phone) document.cookie = `phone=${phone};max-age=43200`
-          if (account) document.cookie = `account=${account};max-age=43200`
+          document.cookie = `token=${token};max-age=432000`
+          if (phone) document.cookie = `phone=${phone};max-age=432000`
+          if (account) document.cookie = `account=${account};max-age=432000`
           return false
-        }
-        // 未勾选
-        if (!document.cookie) return false
-        let s = {},
-          f = false
-        document.cookie.split(';').forEach(curr => s[curr.split('=')[0].trim()] = curr.split('=')[1].trim())
-        if ('phone' in s) f = s['phone'] == phone
-        if ('account' in s) f = s['account'] == account
-        if (f) {
-          document.cookie = `token=${token};max-age=-1`
-          if ('phone' in s) document.cookie = `phone=${phone};max-age=-1`
-          if ('account' in s) document.cookie = `account=${account};max-age=-1`
-        }
+          // 未勾选
+        } else clearUserCookie(phone, account, sessionStorage.getItem('token'))
       },
     },
     watch: {
