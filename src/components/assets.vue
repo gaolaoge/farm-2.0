@@ -12,8 +12,11 @@
         <!--上传list-->
         <div class="uploadBtnList" v-show="btnGroup.showUploadBtnList">
           <ul class="moreBtnUl">
-            <li v-for="(item,index) in btnGroup.uploadBtnList" :key="index" class="uploadBtnItem">
-              <span class="moreBtnItemSpan" @click="operating('upload', item)">{{ item }}</span>
+            <li v-for="(item,index) in btnGroup.uploadBtnList"
+                :key="index"
+                class="uploadBtnItem"
+                @click="operating('upload', item)">
+              <span class="moreBtnItemSpan">{{ item }}</span>
             </li>
           </ul>
         </div>

@@ -25,3 +25,12 @@ export function getCopySetData(data) {
     method: 'GET'
   })
 }
+
+// 任务 - 渲染下载 - 拷贝 - 发送
+export function setCopySetData(data) {
+  return businessServer({
+    url: `/professional/task/copyTask`,
+    method: 'POST',
+    data
+  })
+}

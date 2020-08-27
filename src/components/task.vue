@@ -458,6 +458,22 @@
         height: 100%;
         display: flex;
         align-items: center;
+        flex-shrink: 0;
+      }
+
+      .rightOPerate {
+        flex-shrink: 1;
+        flex-grow: 1;
+        max-width: 400px;
+        .farm-primary-form-btn {
+          flex-shrink: 0;
+        }
+        .searchItem {
+          flex-grow: 1;
+          .farm-form-input {
+            width: 100%;
+          }
+        }
       }
 
       .uploadBtnGroup {

@@ -222,10 +222,12 @@
       </el-pagination>
     </div>
     <!--详情抽屉-->
-    <farmDrawer :showDrawer="showDrawer"
+    <farmDrawer ref="drawer"
+                :showDrawer="showDrawer"
                 :typeInfo="itemName"
                 :taskData="drawerTaskData"
                 @getListAgain="getList()"
+                @changeTypeInfo="changeTypeInfo"
                 @closeDrawer="closeDrawer"/>
     <!--重新渲染弹框-->
     <el-dialog :visible.sync="dialogTableVisible"
@@ -372,6 +374,10 @@
       }
     },
     methods: {
+      // farm-drawer 翻页
+      changeTypeInfo(val){
+        this.itemName = val
+      },
       // 筛选 - 状态
       filterStatus(value, row) {
         return row.status === value
@@ -980,21 +986,10 @@
       async copyFun() {
         let item = this.table.renderSelectionList.find((item,index) => item.children)
         let data = await getCopySetData(item.taskUuid)
-        let list = data.data.data.layerSettingList
-        // camera: []       // 相机
-        // format: []       // 格式
-        // frameEnd: null
-        // frameIterval: 1  // 帧间隔
-        // frameRange: "1-10"// 帧范围
-        // frameStart: null
-        // height: 226
-        // imageName: null   //
-        // layerName: "defaultRenderLayer"
-        // layerUuid: null
-        // ratio: null
-        // width: 300
+        this.drawerTaskData = item
+        this.$refs.drawer.getItemList()
+        this.$refs.drawer.setParameterNext(data.data)
         this.showDrawer = true
-        this.itemName = 'setting'
       },
       // 打包后下载
       async downloadingFun(path) {

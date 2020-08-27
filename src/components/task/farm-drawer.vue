@@ -178,11 +178,12 @@
 
             <el-table-column
               prop="name"
-              label="层名"
+              :label="zone == 1 ? '层名' : '图像名称'"
               width="180"/>
             <!--帧范围-->
             <el-table-column
               label="帧范围"
+              v-if="zone == 1"
               width="80">
               <template slot-scope="scope">
                 <span :class="[
@@ -203,6 +204,7 @@
             <!--间隔帧数-->
             <el-table-column
               width="80"
+              v-if="zone == 1"
               label="间隔帧数">
               <template slot-scope="scope">
                 <span :class="[
@@ -220,6 +222,12 @@
                        class="farm-table-td-input">
               </template>
             </el-table-column>
+            <!--图像比例-->
+            <el-table-column
+              prop="ratio"
+              label="图像比例"
+              v-show="zone == 2"
+              width="100"/>
             <!--图像宽度-->
             <el-table-column
               label="图像宽度"
@@ -287,7 +295,7 @@
           </el-table>
         </div>
         <!--优先渲染-->
-        <div class="farm-drawer-body-item ">
+        <div class="farm-drawer-body-item" v-show="zone == 1">
           <!--标题-->
           <div class="farm-drawer-body-item-header">
             <span class="farm-drawer-body-item-header-main">
@@ -957,7 +965,8 @@
     analyseAgain,
   } from '@/api/api'
   import {
-    getThumbnail
+    getThumbnail,
+    setCopySetData
   } from '@/api/task-api'
   import {
     createDateFun,
@@ -977,6 +986,7 @@
     },
     data() {
       return {
+        isCopy: false,      // 是否为拷贝任务
         details: {
           t: '分析结果',
           labelId: '任务ID',
@@ -1586,11 +1596,18 @@
       wChange(e, index) {
         this.setting.num.tableData[index]['wEdit'] = false
         this.setting.num.tableData[index]['w'] = e.target.value
+        if(this.zone == 2) this.rChange(index)
       },
       // 图像高度修改
       hChange(e, index) {
         this.setting.num.tableData[index]['hEdit'] = false
         this.setting.num.tableData[index]['h'] = e.target.value
+        if(this.zone == 2) this.rChange(index)
+      },
+      // 图像宽高比变动
+      rChange(index){
+        let t = this.setting.num.tableData[index]
+        t['ratio'] = (t['w'] / t['h']).toFixed(3)
       },
       // 主table多选事件
       handleSelectionChange(val) {
@@ -1701,14 +1718,14 @@
       // 设置参数 - 开始渲染
       async startRenderFun() {
         let tt = this.setting
-        if (tt.priority.customizeInputError) {
-          messageFun('error', '自定义帧错误');
+        if (this.zone == 1 && tt.priority.customizeInputError) {
+          messageFun('error', '自定义帧错误')
           return false
-          // }else if (tt.num.randerError) {
-          //   messageFun('error', '帧范围设定存在错误');
+          // }else if (this.zone == 1 && tt.num.randerError) {
+          //   messageFun('error', '帧范围设定存在错误')
           //   return false
-        } else if (tt.num.numError) {
-          messageFun('error', '帧间隔设定存在错误');
+        } else if (this.zone == 1 && tt.num.numError) {
+          messageFun('error', '帧间隔设定存在错误')
           return false
         }
 
@@ -1722,48 +1739,47 @@
           // format: 'cin',
           // camera: '相机二',
           return {
-            layerName: curr.name,                                 // 层名
+            layerName: this.zone == 1 ? curr.name : '',           // 层名
+            imageName: this.zone == 1 ? '' : curr.name,           // 图像名称
             // layerUuid: curr.id,                                // 层ID
-            // frameStart: Number(curr.range.split('-')[0]),         // 帧范围起始帧
-            // frameEnd: Number(curr.range.split('-')[1]),           // 帧范围结束帧
-            frameRange: curr.range,                               // 帧范围
-            frameIterval: Number(curr.num),                       // 间隔帧数
+            // frameStart: Number(curr.range.split('-')[0]),      // 帧范围起始帧
+            // frameEnd: Number(curr.range.split('-')[1]),        // 帧范围结束帧
+            frameRange: this.zone == 1 ? curr.range : '',         // 帧范围
+            frameIterval: this.zone == 1 ? Number(curr.num) : '', // 间隔帧数
             camera: curr.camera,                                  // 相机
             width: curr.w,                                        // 图像宽度
             height: curr.h,                                       // 图像高度
             formatName: curr.format.split('-')[1],                // 输出格式Val
             // codeUuid: curr.format.split('-')[2],               // 输出格式Uuid
-            imageName: '',
-            ratio: 0
+            ratio: this.zone == 1 ? 0 : curr.ratio                // 宽高比
           }
         })
-
-        let data = await startRender({
+        let v = {
           taskUuid: this.taskData.taskUuid,                       // 项目Uuid
           layer: Number(tt.num.singleChoiceVal),                  // 启动分层渲染
           frameCustomNo: tt.priority.customize.match(/\d/g) || [],// 自定义帧
           layerSettingsList,
-          // ----------------------
           isGpu: this.isGup,                                       // 是否为gpu，分区信息对象可找到
           taskType: this.zone,                                     // 任务类型 1，影视版；2，效果图.
           taskSource: 1,                                           // 任务来源 ，网页端 1
           frameCustom: Number(tt.priority.selfVal),                // 是否开启自定义帧1是，0否
-          colorChannel: this.zone == 1 ? 0 : null,                 // 颜色通道。影视版固定值0
-          aoChannel: this.zone == 1 ? 0 : null,                    // AO通道。影视版固定值0
+          colorChannel: this.zone == 1 ? 0 : 0,                 // 颜色通道。影视版固定值0
+          aoChannel: this.zone == 1 ? 0 : 0,                    // AO通道。影视版固定值0
           renderPattern: tt.mode.modeList.find(curr => curr.val == tt.mode.mode).id,   // 选中的配置编号 渲染模式
-          testRender: {                                            // 测试帧对象
+          testRender: this.zone == 1 ? {                                            // 测试帧对象
             testRendering: tt.priority.topVal == '1' || tt.priority.middleVal == '1' || tt.priority.bottomVal == '1' ? '1' : '0',        // 是否开启测试帧（优先渲染）1是0否
             frameFirst: tt.priority.topVal,                        // 首帧 1是 0否
             frameMiddle: tt.priority.middleVal,                    // 中间帧
             frameFinally: tt.priority.bottomVal                    // 末帧
-          },
+          } : null,
           otherSettings: {                                         // 其他设置
             projectName: tt.other.view.split('-/-')[1],            // 项目名称
             projectUuid: tt.other.view.split('-/-')[0],            // 项目uuid
             frameTimeoutWarn: tt.other.remindVal,                  // 超时警告
             frameTimeoutStop: tt.other.stopVal                     // 超时停止
           }
-        })
+        }
+        let data = this.isCopy ? await setCopySetData(v) : await startRender(v)
         if (data.data.code == 200) {
           this.closeDrawer()
           this.$emit('toRenderTable')
@@ -1882,7 +1898,7 @@
         let data = await downloadLog(`layerTaskUuid=${this.result.detailsTableData[0]['layerTaskUuid']}&frameTaskUuid=${this.result.detailsTableData[0]['frameTaskUuid']}`)
         // exportDownloadFun(data, data.headers.file, 'text')  事件交接给C
       },
-      // 分析结果 - 进入设置参数
+      // 分析结果 - 进入设置参数 - 获取预设信息
       async setParameter() {
         const loading = this.$loading({
           lock: true,
@@ -1897,11 +1913,15 @@
           messageFun('error', '报错，数据请求失败');
           return false
         }
+        this.setParameterNext(data)
+      },
+      // 分析结果 - 进入设置参数 - 配置预设信息
+      setParameterNext(data){
         // 翻到【设置参数】
         this.$emit('changeTypeInfo', 'setting')
         // 【设置参数】-【渲染层数】- 启动分层渲染时的table
+        // this.zone  1影视区 2效果图区
         this.setting.num.tableDataAll = data.data.layerSettingList.map(curr => {
-          // this.zone  1影视区 2效果图区
           let formatList = [],
             cameraList = []
           if (curr.format) {
@@ -1922,22 +1942,23 @@
           }
           return {
             id: curr.layerUuid,
-            name: curr.layerName,
+            name: this.zone == 1 ? curr.layerName : curr.imageName,
             // range: curr.frameStart + '-' + curr.frameEnd,
-            range: curr.frameRange,
-            num: '1',
+            range: this.zone == 1 ? curr.frameRange : null,
+            num: this.zone == 1 ? '1' : null,
             w: curr.width,
             h: curr.height,
             format: formatList.length ? formatList[0]['val'] : null,
             camera: cameraList.length ? cameraList[0]['val'] : null,
-            rangeEdit: false,         // 帧范围 - 状态切换 勿动
-            rangeErr: false,          // 帧范围 - 报错切换 勿动
-            numEdit: false,           // 间隔帧数 - 状态切换 勿动
-            numErr: false,            // 间隔帧数 - 报错切换 勿动
-            wEdit: false,             // 图像宽度 - 状态切换 勿动
-            hEdit: false,             // 图像高度 - 状态切换 勿动
+            rangeEdit: this.zone == 1 ? false : null,    // 帧范围 - 状态切换 勿动
+            rangeErr: this.zone == 1 ? false : null,     // 帧范围 - 报错切换 勿动
+            numEdit: this.zone == 1 ? false : null,      // 间隔帧数 - 状态切换 勿动
+            numErr: this.zone == 1 ? false : null,       // 间隔帧数 - 报错切换 勿动
+            wEdit: false,                                // 图像宽度 - 状态切换 勿动
+            hEdit: false,                                // 图像高度 - 状态切换 勿动
             formatList: formatList,
-            cameraList: cameraList
+            cameraList: cameraList,
+            ratio: this.zone == 1 ? null : curr.ratio,
           }
         })
         // 【设置参数】-【渲染层数】- 未启动分层渲染时的table

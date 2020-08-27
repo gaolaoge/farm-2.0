@@ -114,30 +114,6 @@
         </div>
       </div>
     </el-dialog>
-    <el-dialog
-      :show-close="false"
-      :visible.sync="dialogUnzip">
-      <header class="dl_header">
-        <span>{{ dz.title }}</span>
-        <img src="@/icons/shutDialogIcon.png" alt="" class="closeIcon" @click="shutDialog">
-      </header>
-      <div class="dl-wrapper">
-        <div class="unzipItem" v-for="(item,index) in dz.list" :key="index">
-          <!--文件名-->
-          <span class="name">{{ item.fileName }}</span>
-          <!--密码-->
-          <input type="password" class="ps" v-model="item.password" :placeholder="dz.placeholder">
-        </div>
-        <div class="btnGroup">
-          <div class="btn confirm" @click="configDZ">
-            <span>{{ dz.btn[0] }}</span>
-          </div>
-          <div class="btn cancel" @click="shutDialogDZ">
-            <span>{{ dz.btn[1] }}</span>
-          </div>
-        </div>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -188,13 +164,6 @@
           },
           resolve: null,         // 回调函数
         },
-        dialogUnzip: false,
-        dz: {
-          title: '解压列表',
-          btn: ['解压', '取消'],
-          list: new Array(0),
-          placeholder: '文件解压密码，选填'
-        }
       }
     },
     props: {
@@ -259,19 +228,23 @@
             // 删除失败
             messageFun('info', data.data)
             this.getAssetsCatalog(this.path, this.searchInputVal)
-          } else if (data.msg == '6051' || data.msg == '6061') {
+          } else if (data.msg == '6051' || data.msg == '6061' || data.msg == '6081') {
             messageFun('success', '操作成功')
             this.shutDialog()
             this.getAssetsCatalog(this.path, this.searchInputVal)
           } else if (data.msg == '6052' || data.msg == '6062') messageFun('info', '选定目标内已存在相同名称文件或文件夹，操作失败')
           else if (data.msg == '6081') messageFun('info', '解压失败')
-          else if (data.msg == '6053' || data.msg == '6063' || data.msg == '6073') messageFun('error', '报错，操作失败')
+          else if (data.msg == '6053' || data.msg == '6063' || data.msg == '6073' || data.msg == '6082') messageFun('error', '报错，操作失败')
+          else if (data.msg == '6083') {
+            this.sendPassword()
+            messageFun('error', data.other)
+          }
         },
       },
       'socket_plugin_msg': {
         handler: function (e) {
           let data = JSON.parse(e.data)
-          // if (data.code == 100 || data.code == 101) this.getAssetsCatalog(this.path, this.searchInputVal)
+          if (data.code == 100 || data.code == 101) this.getAssetsCatalog(this.path, this.searchInputVal)
         }
       }
       // 'dialogVisible': function(val){
@@ -279,23 +252,14 @@
       // }
     },
     methods: {
-      // 确认解压
-      configDZ() {
-        this.$store.commit('WEBSOCKET_BACKS_SEND', {
-          'code': 608,
-          'customerUuid': this.user.id,
-          'unzipFilePathList': this.dz.list.map(item => {
-            return {
-              'path': item.position + item.fileName,
-              'password': item.password
-            }
-          })
+      // 解压 输入密码
+      sendPassword(){
+        this.$prompt('请输入密码', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
         })
-      },
-      // 关闭解压弹窗
-      shutDialogDZ() {
-        this.dialogUnzip = false
-        this.dz.list = new Array(0)
+          .then(({ value }) => this.unzip(value))
+          .catch(() => messageFun('info', '操作已取消'))
       },
       // 关闭tree窗
       shutDialog() {
@@ -439,13 +403,19 @@
           .catch(() => messageFun('info', '操作取消'))
       },
       // 解压
-      unzip() {
-        if (!this.table.selectionList.length) return false
+      unzip(password) {
+        if (this.table.selectionList.length != 1) return false
         let type = ['zip', 'rar', 'tar', 'tar.gz', 'tar.bz2', 'tar.Z']
-        // this.dz.list = Object.assign(this.table.selectionList.filter(item => type.some(t => t == item.fileType)), { password: null })
-        this.dz.list = Object.assign(this.table.selectionList, {password: null})
-        console.log(this.dz.list)
-        this.dialogUnzip = true
+        if(type.find(curr => curr == this.table.selectionList[0]['type']) == -1) return false
+        this.unzipAction(this.table.selectionList[0]['position'], password)
+      },
+      unzipAction(unzipFilePath, password){
+        this.$store.commit('WEBSOCKET_BACKS_SEND', {
+          'code': 608,
+          'customerUuid': this.user.id,
+          unzipFilePath,
+          'password': password || ''
+        })
       },
       // 删除
       deleteFile() {

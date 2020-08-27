@@ -155,13 +155,13 @@
                     :render-header="renderHeader"
                     label="工程路径">
                     <template slot-scope="scope">
-                      <div class="f">
-                        <span>{{ scope.row.address }}</span>
-                        <img src="@/icons/more-btn.png" alt=""
-                             @click="$store.commit('WEBSOCKET_PLUGIN_SEND', {
+                      <div class="f"
+                           @click="$store.commit('WEBSOCKET_PLUGIN_SEND', {
                           transferType: 4,              // 传输类型
                           sceneFile: scope.$index
                         })">
+                        <span>{{ scope.row.address }}</span>
+                        <img src="@/icons/more-btn.png">
                       </div>
                     </template>
                   </el-table-column>
@@ -1445,7 +1445,6 @@
       },
       // 4.创建成功
       createSuc() {
-        if (this.stepOneBase.index == 0) this.savePathFun()   // 保存工程路径记录
         messageFun('success', '创建成功')
         this.closeDialogFun()
         this.$router.push('/task')
@@ -1465,10 +1464,6 @@
 
           this.stepOneBase.netdisc.catalogData = this.stepOneBase.netdisc.catalogData.concat(g(JSON.parse(item)))
         })
-      },
-      // 4.设置渲染参数 - 上传工程路径记录
-      savePathFun() {
-        savePath({'sceneFilePath': '/demo'})
       },
       // 4.复位
       dataReset() {
