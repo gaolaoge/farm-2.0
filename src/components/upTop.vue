@@ -411,6 +411,7 @@
       padding: 30px;
       margin-bottom: 20px;
       box-sizing: border-box;
+      min-width: 1440px;
 
       .g {
         display: flex;

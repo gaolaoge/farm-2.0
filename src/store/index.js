@@ -49,6 +49,10 @@ export default new Vuex.Store({
     socket_backS: null,     // 与后台关联的websocket
     socket_backS_msg: null, // 与后台关联的websocket接收的参数
     socket_backS_time: 0,
+    thumb: {
+      showLargeThumbWin: false,
+      LargeImgHref: null
+    }
   },
   getter: {},
   mutations: {
@@ -99,6 +103,14 @@ export default new Vuex.Store({
       if (!state.socket_plugin) return false
       state.socket_plugin.close()
       state.socket_plugin = null
+    },
+    // 渲染结果 缩略图 展示
+    setShowThumb(s, bool){
+      s.thumb.showLargeThumbWin = bool
+    },
+    // 渲染结果 缩略图 地址
+    setThumbURL(s, url){
+      s.thumb.LargeImgHref = url
     },
     changeTotalInvoiceAble(s, val) {
       s.user.totalInvoiceAble = val

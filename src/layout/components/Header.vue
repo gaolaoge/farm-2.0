@@ -2,10 +2,14 @@
   <div class="header-wrapper" :class="[{'non-home': !inHome}]">
     <div class="wrapper">
       <!--公告-->
-      <div class="bulletin" v-show="bulletin.bulletinVal">
-        <img src="@/icons/bulletin-icon.png" alt="" class="bulletin-icon">
-        <span class="tit">{{ bulletin.bulletinTit }}</span>
-        <span class="val">{{ bulletin.bulletinVal }}</span>
+      <div class="bulletin" v-show="bulletin.length">
+        <div class="c" :style="{'margin-top': bulletinIndex * -44 + 'px'}">
+          <div v-for="(item,index) in bulletin" :key="index" class="k">
+            <img src="@/icons/bulletin-icon.png" class="bulletin-icon">
+            <span class="tit">{{ item.tit }}：</span>
+            <span class="val">{{ item.detail }}</span>
+          </div>
+        </div>
       </div>
       <div class="oper" :class="[{'inhome': inHome}]">
         <!--选择分区-->
@@ -234,7 +238,6 @@
 </template>
 
 <script>
-  import {mapState} from 'vuex'
   import {
     homeSelect,
     getInfo
@@ -242,8 +245,13 @@
   import {
     identify
   } from '@/api/newTask-api'
+  import {
+    getBulletin
+  } from '@/api/header-api'
   import {setInfo} from '@/assets/common'
+  import {mapState} from 'vuex'
   import messageTable from '@/components/headerM/message-table'
+
 
   export default {
     name: 'headerM',
@@ -297,11 +305,9 @@
         guideShow: false,
         guideShowStep: 1,
         uptop: this.$t('header.uptopBtn'),
-        // 公告
-        bulletin: {
-          bulletinTit: this.$t('header.bulletinT'),
-          bulletinVal: `1.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊。 2.这是一条很重要的公告，快看啊哈重要公告12，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧，免费获取会员资格快落肥宅属诗歌晒糊底晒胆红素和毒素的火速海湖上和毒素海还是独爱好玩的吧…`,
-        },
+        bulletin: [],             // 公告
+        bulletinRealLength: null, // 公告真实长度
+        bulletinIndex: 0          // 显示的公告索引
       }
     },
     computed: {
@@ -311,6 +317,7 @@
       this.getList()
       this.getUserInfo()
       this.getIdentify()
+      this.getBulletinF()   // 获取公告
     },
     watch: {
       login: {
@@ -364,6 +371,29 @@
       }
     },
     methods: {
+      // 公告滚动
+      top() {
+        if(!this.bulletinRealLength) return false
+        this.bulletinIndex ++
+        if(this.bulletinIndex == this.bulletinRealLength) this.bulletinIndex = 0
+        setTimeout(() => this.top(), 10000)
+      },
+      // 获取公告
+      async getBulletinF() {
+        let data = await getBulletin()
+        if (data.data.code != 200) return false
+        else {
+          this.bulletin = data.data.data.map(item => {
+            return {
+              'tit': item.newsTitle,
+              'detail': item.newsDetail
+            }
+          })
+          this.bulletinRealLength = this.bulletin.length
+          if(this.bulletinRealLength) this.bulletin.push(this.bulletin[0])
+          this.top()
+        }
+      },
       // 跳转到帮助网站
       w() {
         window.open('http://223.80.107.190:8081', '_blank')
@@ -809,29 +839,42 @@
         align-items: center;
         flex-shrink: 1;
         flex-grow: 1;
+        flex-direction: column;
+        overflow: hidden;
 
-        .bulletin-icon {
-          vertical-align: center;
-          margin-right: 10px;
+        .c,
+        .k {
+          width: 100%;
         }
 
-        span {
-          font-size: 14px;
-          font-family: PingFangSC-Semibold, PingFang SC;
-          vertical-align: text-bottom;
+        .k {
+          height: 44px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
 
-          &.tit {
-            font-weight: 600;
-            color: rgba(22, 29, 37, 1);
+          .bulletin-icon {
+            margin-right: 10px;
           }
 
-          &.val {
-            width: calc(100% - 100px);
-            font-weight: 400;
-            color: rgba(22, 29, 37, 0.6);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+          span {
+            font-size: 14px;
+            line-height: 44px;
+            font-family: PingFangSC-Semibold, PingFang SC;
+            vertical-align: text-bottom;
+
+            &.tit {
+              font-weight: 600;
+              color: rgba(22, 29, 37, 1);
+            }
+
+            &.val {
+              width: calc(100% - 140px);
+              color: rgba(22, 29, 37, 0.6);
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
           }
         }
       }

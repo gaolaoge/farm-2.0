@@ -375,7 +375,7 @@
     },
     methods: {
       // farm-drawer 翻页
-      changeTypeInfo(val){
+      changeTypeInfo(val) {
         this.itemName = val
       },
       // 筛选 - 状态
@@ -497,13 +497,13 @@
       showDetails(row, column, event) {
         // 若事件承受者为项目组
         if (row.children) {
-          this.unfoldFun(row);
+          this.unfoldFun(row)   // 展开项目组
           return false
         }
         //打开抽屉
         this.showDrawer = true
+        this.$refs.drawer.turnPage('result')
         this.drawerTaskData = row
-        // debugger
         let tableDomList = this.$refs.downLoadTable.getElementsByClassName('el-table__row'),
           d = this.$refs.downLoadTable.getElementsByClassName('farmTableSelected')[0]
         if (d) d.classList.remove('farmTableSelected')
@@ -603,7 +603,8 @@
                 layerTaskUuid: item.layerTaskUuid,
                 FatherId: curr.taskNo,
                 FatherTaskUuId: curr.taskUuid,
-                FatherIndex: fatherIndex
+                FatherIndex: fatherIndex,
+                inFilePath: curr.inFilePath
               }
             })
           }
@@ -638,6 +639,7 @@
             rowId: curr.taskNo,                                    // 唯一值
             selfIndex: fatherIndex,
             isExpire: curr.isExpire,                               // 1过期 0未过期
+            inFilePath: curr.inFilePath
           }
         }) : data.data.data.map((curr, fatherIndex) => {
           // account: "gaoge1834"         // 任务创建人
@@ -710,7 +712,8 @@
               layerTaskUuid: item.layerTaskUuid,
               FatherId: curr.taskNo,
               FatherTaskUuId: curr.taskUuid,
-              FatherIndex: fatherIndex
+              FatherIndex: fatherIndex,
+              inFilePath: curr.inFilePath
             }
           }) : null
 
@@ -742,6 +745,7 @@
             rowId: curr.taskNo,                                    // 唯一值
             selfIndex: fatherIndex,
             isExpire: 0,                                           // 未过期
+            inFilePath: curr.inFilePath
           }
         })
         this.table.usersList = [...usersList].map(curr => {
@@ -872,25 +876,19 @@
                     taskUuid: curr.FatherTaskUuId,
                     layerUuidList: [curr.taskUuid]
                   })
-                } else {
-                  dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
-                }
+                } else dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
               })
               dataList.forEach(curr => {
-                if (!fat.some(item => {
-                  return item == curr.taskUuid
-                })) curr.taskUuid = ''
+                if (!fat.some(item => item == curr.taskUuid)) curr.taskUuid = ''
               })
               let data = await itemDelete({
                 "instructType": 4,
                 "instructTaskList": dataList
               })
               if (data.data.code == 204) {
-                messageFun('success', '操作成功');
+                messageFun('success', '操作成功')
                 this.getList()
-              } else {
-                throw ''
-              }
+              } else messageFun('error', '操作报错')
             },
             () => messageFun('info', '已取消删除')
           )
@@ -941,50 +939,22 @@
           messageFun('info', `当前账户余额为${r.data.data}，请先进行充值！`);
           return false
         }
-        let taskList = []
-        this.table.renderSelectionList.forEach(curr => {
-          if ('selfIndex' in curr) {
-            let i = taskList.findIndex(item => item['taskUuid'] == curr['taskUuid'])
-            if (i == -1) taskList.push({taskUuid: curr.taskUuid, layerUuidList: [], hasFather: true})
-            if (i != -1) taskList[i]['hasFather'] = true
-          } else {
-            let i = taskList.findIndex(item => {
-              return item['taskUuid'] == curr['FatherTaskUuId']
-            })
-            if (i != -1) taskList[i]['layerUuidList'].push(curr['layerTaskUuid'])
-            if (i == -1) taskList.push({taskUuid: curr.FatherTaskUuId, layerUuidList: [curr.layerTaskUuid]})
-          }
-        })
-        taskList = taskList.map(curr => {
-          if (curr['hasFather']) return {'taskUuid': curr.taskUuid, 'layerUuidList': []}
-          else return {'taskUuid': '', 'layerUuidList': curr['layerUuidList']}
-        })
-        messageFun('success', '发起文件打包请求')
-        let code = UuidFun(),
-          // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
-          socket_ = new WebSocket(`ws://223.80.107.190:5000/professional/websocket/package/${code}`)
-        socket_.addEventListener('open', function () {
-          socket_.send(JSON.stringify({
-            'message': {
-              type: 3,
-              taskList
-            }
-          }))
-        })
-        socket_.addEventListener('message', e => {
-          let data = JSON.parse(e.data)
-          if (data.code == 200) {
-            this.downloadingFun(data.data)
-          }
-          if (data.code == 209) {
-            socket_.close();
-            this.downloadingFun(data.data)
-          }
+        let list = this.computedResult()
+        console.log(list)
+        let fileList = list.map(item => {
+            if(item['selfIndex']) return item['taskUuid'] + '/'
+            else return item['taskUuid'] + '/' + item['layerName'] + '/'
+          })
+        this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+          'transferType': 2,
+          'userID': this.user.id,
+          isRender: 1,
+          fileList
         })
       },
       // 操作 - 拷贝
       async copyFun() {
-        let item = this.table.renderSelectionList.find((item,index) => item.children)
+        let item = this.table.renderSelectionList.find((item, index) => item.children)
         let data = await getCopySetData(item.taskUuid)
         this.drawerTaskData = item
         this.$refs.drawer.getItemList()
@@ -1041,6 +1011,20 @@
           return false
         }
         if (data.data.code == 200) messageFun('success', '操作成功')
+      },
+      // 获取选中的主任务和单独层任务
+      computedResult() {
+        let fatId = [],
+          fatItem = [],
+          sonItem = []
+        // 因为指定主任务顺序肯定在其层任务前 所以无需先识别全部主任务
+        this.table.renderSelectionList.forEach(curr => {
+          if ('selfIndex' in curr) {
+            fatId.push(curr['id'])
+            fatItem.push(curr)
+          } else if(!fatId.some(item => item == curr.FatherId)) sonItem.push(curr)
+        })
+        return [...fatItem, ...sonItem]
       }
     },
     components: {
@@ -1050,7 +1034,7 @@
       if (!this.$route.params.name) setTimeout(() => this.getList(), 100)
     },
     computed: {
-      ...mapState(['zoneId', 'zone']),
+      ...mapState(['zoneId', 'zone', 'user']),
     },
     watch: {
       'table.renderSelectionList': {

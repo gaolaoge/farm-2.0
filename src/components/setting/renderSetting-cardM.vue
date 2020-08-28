@@ -144,9 +144,12 @@
   .renderSetting {
     padding: 50px 30px;
     box-sizing: border-box;
+    height: 100%;
+    overflow-x: scroll;
 
     .farm-item {
       height: 36px;
+      min-width: 1100px;
       display: flex;
       align-items: center;
       margin-bottom: 14px;

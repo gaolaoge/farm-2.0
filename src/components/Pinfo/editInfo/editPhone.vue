@@ -501,7 +501,6 @@
       // 根据密码修改 - 确认修改
       async editPhoneForPS() {
         let {passWordError: pc, newPhoneCodeError: nc, newPhoneError: np} = this.passwordVeri
-        console.log(pc, nc, np)
         if (!pc || !nc || !np) return false
         let {newPhone, password, newCode: newPhoneCode} = this.psFrom
         let data = await editPhonePS({newPhone, password, newPhoneCode})

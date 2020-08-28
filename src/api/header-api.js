@@ -10,11 +10,19 @@ export function getMessageList(data) {
   })
 }
 
-// 开票记录 - 批量设置已读
+// 站内信 - 批量设置已读
 export function readMessages(data) {
   return businessServer({
     url: `/professional/notice/message/makeNoticeMessageIsRead`,
     method: 'POST',
     data
+  })
+}
+
+// 获取公告
+export function getBulletin() {
+  return businessServer({
+    url: `/professional/news/getAllNewsList`,
+    method: 'GET',
   })
 }

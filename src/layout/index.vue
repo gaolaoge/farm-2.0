@@ -13,6 +13,10 @@
       <img src="@/icons/gz-blue.png" alt="" class="h">
       <span>{{ $t('transportBtn') }}</span>
     </div>
+    <!--帧大图-->
+    <div class="thumb" v-show="thumb.showLargeThumbWin" @click="$store.commit('setShowThumb', false)">
+      <img :src="thumb.LargeImgHref" alt="">
+    </div>
   </div>
 </template>
 
@@ -40,7 +44,7 @@
       iv
     },
     computed: {
-      ...mapState(['login'])
+      ...mapState(['login', 'thumb'])
     },
     watch: {
       '$route': {
@@ -122,6 +126,24 @@
           display: inline-block;
         }
       }
+    }
+  }
+
+  .thumb {
+    position: fixed;
+    z-index: 9;
+    top: 0vh;
+    left: 0vw;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    img {
+      max-width: 80vw;
+      max-height: 80vh;
     }
   }
 

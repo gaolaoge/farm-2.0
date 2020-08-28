@@ -43,8 +43,11 @@
       <!--生日-->
       <div class="form-item">
         <span class="label">{{ info.birthdayLabel }}：</span>
-        <modelCalendar style="display: inline-block"
-                       @changeSelectDate="changeBirthdayDate" />
+        <el-date-picker
+          v-model="info.birthdayVal"
+          type="date"
+          @change="changeBirthdayDate"
+          placeholder="选择日期" />
         <span class="remarks">{{ info.birthdayRemarks }}</span>
       </div>
       <!--邮箱-->
@@ -93,6 +96,7 @@
     name: 'infoTable',
     data() {
       return {
+        value1: new Date(),
         editBtn: '修改',
         editAvatar: '修改头像',
         info: {
@@ -106,7 +110,7 @@
           sexVal: null,
           sexRadio: ['男', '女'],
           birthdayLabel: '生日',
-          birthdayVal: 'Admin',
+          birthdayVal: null,
           emailLabel: '邮箱',
           sexRemarks: '（*填写赠送5金币）',
           birthdayRemarks: '（*填写赠送5金币）',
@@ -122,19 +126,17 @@
     },
     methods: {
       // 修改生日
-      async changeBirthdayDate(val) {
+      async changeBirthdayDate() {
         let data = await editBasicInfo({
           "nickname": null,
           "headImg": null,
           "sex": null,
-          "birthday": val,
+          "birthday": this.info.birthdayVal.getTime(),
         })
         if (data.data.code == 200) {
           this.$store.commit('changeBirthday', val)
           messageFun('success', this.$t('message.editSuc'))
-        } else if (data.data.code == 999) {
-          messageFun('warning', this.$t('message.noTimes'))
-        }
+        } else if (data.data.code == 999) messageFun('warning', this.$t('message.noTimes'))
       },
       // 修改性别
       async changeSex() {
@@ -147,9 +149,7 @@
         if (data.data.code == 200) {
           this.$store.commit('changeSex', this.info.sexVal)
           messageFun('success', this.$t('message.editSuc'))
-        } else if (data.data.code == 999) {
-          messageFun('warning', this.$t('message.noTimes'))
-        }
+        } else if (data.data.code == 999) messageFun('warning', this.$t('message.noTimes'))
       },
       // 上传裁剪好的头像
       async uploadAvatar(src) {
@@ -162,9 +162,7 @@
         if (data.data.code == 200) {
           this.$store.commit('changeAvatar', src)
           messageFun('success', this.$t('message.editSuc'))
-        } else if (data.data.code == 999) {
-          messageFun('warning', this.$t('message.noTimes'))
-        }
+        } else if (data.data.code == 999) messageFun('warning', this.$t('message.noTimes'))
         this.showCutter = false
       },
       // 编辑头像
@@ -192,6 +190,8 @@
     },
     mounted() {
       this.info.sexVal = this.user.sex
+      console.log(this.user)
+      this.info.birthdayVal = this.user.birthday ? new Date(this.user.birthday) : null
     }
   }
 </script>

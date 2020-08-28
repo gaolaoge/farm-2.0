@@ -93,10 +93,6 @@
 
       </el-table>
     </div>
-    <!--备注-->
-    <div class="l">
-      {{ l.x }} <span class="ll"> {{ l.n }} </span> {{ l.p }}
-    </div>
     <!--分页-->
     <div class="page">
       <el-pagination
@@ -158,11 +154,6 @@
           frameObj: {}                  // 帧名
         },
         projectList:[],
-        l: {
-          x: '已加载全部，共',
-          n: '0',
-          p: '个'
-        },
         bread: {
           list: [
             {
@@ -252,7 +243,6 @@
             'value': item
           }
         })
-        this.l.n = data.data.total
         this.table.outPutTableTotal = data.data.total
       },
       // 查询层任务
@@ -421,18 +411,6 @@
 </script>
 
 <style lang="less" scoped>
-  .l {
-    position: absolute;
-    right: 30px;
-    bottom: 25px;
-    font-size: 12px;
-    font-weight: 400;
-    color: rgba(22, 29, 37, 0.6);
-    line-height: 32px;
-    .ll {
-      color: rgba(0, 97, 255, 1);
-    }
-  }
 
   /deep/.el-table__body-wrapper {
     height: calc(100vh - 395px);

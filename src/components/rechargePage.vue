@@ -13,7 +13,6 @@
       }
     },
     mounted(){
-      // console.log(2)
       setTimeout(() => {
           document.write(sessionStorage.getItem('aliPay'))
       },0)

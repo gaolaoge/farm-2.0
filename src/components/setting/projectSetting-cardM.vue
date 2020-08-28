@@ -47,30 +47,32 @@
           prop="projectName"
           label="项目名称"
           show-overflow-tooltip
-          width="400"/>
+          min-width="400"/>
 
         <el-table-column
           prop="projectStatus"
           label="项目状态"
-          width="160"/>
+          width="120"/>
 
         <el-table-column
           prop="isDefault"
           label="当前项目"
-          width="168"/>
+          width="120"/>
 
         <el-table-column
           prop="customerName"
           label="创建人"
           show-overflow-tooltip
-          width="180"/>
+          width="120"/>
 
         <el-table-column
           prop="createTime"
           label="创建时间"
+          width="180"
           show-overflow-tooltip/>
 
         <el-table-column
+          width="200"
           label="操作">
           <template slot-scope="scope">
             <span class="operateBtn" @click="editItem(scope.$index)">{{ tableOperateBtn[0] }}</span>
@@ -398,7 +400,7 @@
       },
       // 删除
       async deleteFun() {
-        let data = await deleteTask({'projectList': this.selectionList.map(curr => curr.id)})
+        let data = await deleteTask({'projectList': this.selectionList.map(curr => curr.taskProjectUuid)})
         if (data.data.code == 201) {
           messageFun('success', '操作成功')
           this.getList(this.searchInputVal, this.page.index, this.page.size)

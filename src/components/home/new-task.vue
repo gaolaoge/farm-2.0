@@ -1402,7 +1402,7 @@
             return {
               filePath: {
                 pathResource: fir.netdisc.pathV,                     // 工程路径
-                pathScene: fir.netdisc.sceneFilePath.reduce((total, curr_) => total + curr_ + '/', ''),  // 场景文件路径
+                pathScene: fir.netdisc.sceneFilePath.join('/'),      // 场景文件路径
                 fileName: task.label,                                // 场景文件名
               }
             }

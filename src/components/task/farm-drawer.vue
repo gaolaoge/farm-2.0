@@ -226,7 +226,7 @@
             <el-table-column
               prop="ratio"
               label="图像比例"
-              v-show="zone == 2"
+              v-if="zone == 2"
               width="100"/>
             <!--图像宽度-->
             <el-table-column
@@ -538,14 +538,9 @@
                   ]">
               {{ result.statusData }}
             </span>
-<!--            <img :src="result.miniImgHref" class="img" @click="showLargeThumb">-->
-            <div class="demo-image__preview">
-              <el-image
-                class="img"
-                :src="result.miniImgHref"
-                :preview-src-list="result.LargeImgHrefList">
-              </el-image>
-            </div>
+            <img :src="result.miniImgHref"
+                 class="img"
+                 @click="$store.commit('setShowThumb', true)">
           </div>
           <div class="dataList">
 
@@ -941,10 +936,7 @@
 
         </div>
       </div>
-      <!--帧大图-->
-<!--      <div class="thumb" v-show="result.showLargeThumbWin">-->
-<!--        <img :src="result.LargeImgHref" alt="">-->
-<!--      </div>-->
+
     </div>
   </div>
 </template>
@@ -1259,10 +1251,7 @@
           x: '暂无数据',
           showDetails: false,
           searchInpVal: '',            // 渲染结果 - 主table 操作 关键帧查询
-          miniImgHref: '',             // 渲染结果 - 缩略图
-          // getLargeImgHref: null,       // 渲染结果 - 获取大尺寸缩略图所需参数
-          LargeImgHrefList: [],          // 渲染结果 - 大尺寸缩略图
-          showLargeThumbWin: false,    // 渲染结果 - 显示大尺寸缩略图
+          miniImgHref: null,           // 渲染结果 - 缩略图
         },
         demo: ``,
         loading: null
@@ -1294,11 +1283,11 @@
       },
       'setting.priority.selfVal': function (val) {
         // 选中【单选】时取消【首帧】【中间帧】【末帧】，反之复原
-        if (val == 1) {
-          this.setting.priority.topVal = 0
-          this.setting.priority.middleVal = 0
-          this.setting.priority.bottomVal = 0
-        }
+        if (val == 1) Object.assign(this.setting.priority, {
+          topVal: 0,
+          middleVal: 0,
+          bottomVal: 0
+        })
       }
     },
     methods: {
@@ -1367,14 +1356,6 @@
       mainTableAddMoreItem() {
         this.getRenderItemMoreTableF()
       },
-      // 渲染下载 - 详情 - 缩略图放大
-      // async showLargeThumb() {
-      //   console.log('s')
-      //   if (!this.result.getLargeImgHref) return false
-      //   let data = await getThumbnail(this.result.getLargeImgHref)
-      //   this.result.LargeImgHref = data.data.data
-      //   this.result.showLargeThumbWin = true
-      // },
       // 渲染下载 - 详情 - 缩略图
       async showMiniImg(row, column, event) {
         try {
@@ -1383,7 +1364,7 @@
             data = await getThumbnail(t)
           this.result.miniImgHref = data.data.data
           let a = await getThumbnail(`frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=900`)
-          this.result.LargeImgHrefList = [a.data.data]
+          this.$store.commit('setThumbURL', a.data.data)
         } catch (err) {
         }
       },
@@ -1434,6 +1415,7 @@
             layerTaskUuid: curr.layerTaskUuid,                    // 层uuid
             frameTaskUuid: curr.frameTaskUuid,                    // 帧uuid
             taskTaskUuid: curr.taskUuid,                          // 主uuid
+            inFilePath: curr.inFilePath
           }
         })
         this.result.happen[0]['num'] = data_.frameCount['running']
@@ -1596,16 +1578,16 @@
       wChange(e, index) {
         this.setting.num.tableData[index]['wEdit'] = false
         this.setting.num.tableData[index]['w'] = e.target.value
-        if(this.zone == 2) this.rChange(index)
+        if (this.zone == 2) this.rChange(index)
       },
       // 图像高度修改
       hChange(e, index) {
         this.setting.num.tableData[index]['hEdit'] = false
         this.setting.num.tableData[index]['h'] = e.target.value
-        if(this.zone == 2) this.rChange(index)
+        if (this.zone == 2) this.rChange(index)
       },
       // 图像宽高比变动
-      rChange(index){
+      rChange(index) {
         let t = this.setting.num.tableData[index]
         t['ratio'] = (t['w'] / t['h']).toFixed(3)
       },
@@ -1676,40 +1658,29 @@
           inputPlaceholder: '请输入项目名称'
         })
           .then(
-            value => {
-              newItemName = value.value
-              return addNewItem({
-                projectName: value.value,
-                isDefault: 1
-              })
+            ({value}) => {
+              if(!value) messageFun('info', '项目名为必填项')
+              else {
+                newItemName = value.value
+                return addNewItem({
+                  projectName: value.value,
+                  isDefault: 1
+                })
+              }
             },
             () => {
-              this.$message({
-                type: 'info',
-                message: '取消输入'
-              })
+              messageFun('info', '取消创建')
               return Promise.reject()
             }
           )
-          .then(
-            data => {
+          .then(data => {
               if (data.data.code == '201') {
-                this.$message({
-                  message: '创建项目成功',
-                  type: 'success'
-                })
-                this.getItemList(newItemName)
-              }
-              if (data.data.code == '101') {
-                this.$message({
-                  message: '创建失败，项目名已存在',
-                  type: 'error'
-                })
-              }
+                messageFun('success', '创建项目成功')
+                this.getItemList(newItemName)   // 刷新并选中新创建的项目
+              } else if (data.data.code == '101') messageFun('error', '创建失败，项目名已存在')
             }
           )
-          .catch(() => {
-          })
+          .catch(() => null)
       },
       // 设置参数 - table - 多选
       settingTableItemChange(val) {
@@ -1726,6 +1697,11 @@
           //   return false
         } else if (this.zone == 1 && tt.num.numError) {
           messageFun('error', '帧间隔设定存在错误')
+          return false
+        }
+
+        if(!tt.num.selected.length) {
+          messageFun('info', '未选中层')
           return false
         }
 
@@ -1844,18 +1820,20 @@
       // 渲染结果 - 主 - 操作 - 下载完成帧
       async operateDownloadFrame() {
         if (this.result.operateBtnList[2]['classState']) return false
+        if (!this.result.selectionResult.length) return false
         let data = await seeBalance()
         if (data.data.code == 1001) {
           messageFun('error', `当前账户余额为${data.data.data}，请先进行充值！`);
           return false
         }
-
-        this.result.selectionResult.forEach(async curr => {
-          if (curr.status != '渲染成功') return false
-          let t = `frameTaskUuid=${curr.frameTaskUuid}&layerTaskUuid=${curr.layerTaskUuid}&type=0`,
-            data = await downloadFrame(t)
-          exportDownloadFun(data, data.headers.file, '')
+        let fileList = this.result.selectionResult.map(item => item['taskUuid'] + '/' + item['layerName'] + '/' + item['outputFilePath'])
+        this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+          'transferType': 2,
+          'userID': this.user.id,
+          isRender: 1,
+          fileList
         })
+
       },
       // 渲染结果 - 主 - 操作 - 重新渲染
       operateRenderAgain() {
@@ -1910,15 +1888,19 @@
         loading.close()
         let data = data_.data
         if (data.code != 200) {
-          messageFun('error', '报错，数据请求失败');
+          messageFun('error', '报错，数据请求失败')
           return false
         }
         this.setParameterNext(data)
       },
+      // 翻到指定页 【分析结果-details】【设置参数-setting】【渲染结果-result】
+      turnPage(path) {
+        this.$emit('changeTypeInfo', path)
+      },
       // 分析结果 - 进入设置参数 - 配置预设信息
-      setParameterNext(data){
+      setParameterNext(data) {
         // 翻到【设置参数】
-        this.$emit('changeTypeInfo', 'setting')
+        this.turnPage('setting')
         // 【设置参数】-【渲染层数】- 启动分层渲染时的table
         // this.zone  1影视区 2效果图区
         this.setting.num.tableDataAll = data.data.layerSettingList.map(curr => {
@@ -2632,17 +2614,4 @@
       }
     }
   }
-
-  /*.thumb {*/
-  /*  position: fixed;*/
-  /*  z-index: 9999;*/
-  /*  top: 0px;*/
-  /*  left: 0px;*/
-  /*  width: 100vw;*/
-  /*  height: 100vh;*/
-  /*  background-color: rgba(0, 0, 0, 0.2);*/
-  /*  display: flex;*/
-  /*  justify-content: center;*/
-  /*  align-items: center;*/
-  /*}*/
 </style>

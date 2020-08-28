@@ -14,9 +14,10 @@
         prop="noticeSettingDetail"
         label="通知描述"
         show-overflow-tooltip
-        width="600"/>
+        min-width="600"/>
 
       <el-table-column
+        width="340"
         label="通知方式">
         <template slot-scope="scope">
           <el-checkbox v-model="scope.row.isMessage" true-label="1" false-label="0" label="站内信"

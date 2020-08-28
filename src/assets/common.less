@@ -630,10 +630,10 @@ thead {
       width: 100px;
       text-align: right;
       font-size: 14px;
-      font-weight: 400;
       line-height: 36px;
       color: rgba(22, 29, 37, 0.8);
       margin-right: 10px;
+      flex-shrink: 0;
     }
 
     .farm-form-item-input {
@@ -1264,6 +1264,8 @@ td {
   align-items: center;
 
   .filter-item {
+    flex-shrink: 0;
+
     .filter-item-label {
       font-size: 13px;
       font-weight: 400;
@@ -1318,6 +1320,7 @@ td {
     margin-right: 20px;
     padding: 0px 20px;
     background-color: rgba(248, 248, 248, 1);
+    flex-shrink: 0;
 
     &.primary {
       height: 30px;
@@ -1658,4 +1661,17 @@ td {
     background-color: rgba(255, 255, 255, 1);
     border-radius: 0px 0px 8px 8px;
   }
+}
+
+.el-input__inner {
+  height: 30px;
+  line-height: 30px;
+}
+
+.el-input__icon {
+  line-height: 30px;
+}
+
+.el-date-table td span {
+  font-size: 14px;
 }
