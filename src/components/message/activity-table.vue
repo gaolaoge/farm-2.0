@@ -37,7 +37,7 @@
         <el-table-column
           label="日期"
           prop="createTime"
-          width="120"/>
+          width="160"/>
       </el-table>
     </div>
     <div class="page">
@@ -117,7 +117,7 @@
         let data = await getMessageList(v)
         this.table.tableData = data.data.data.map(item => {
           return Object.assign(item, {
-            createTime: createDateFun(new Date(item.createTime), 'mini')
+            createTime: createDateFun(new Date(item.createTime))
           })
         })
         this.table.total = data.data.total

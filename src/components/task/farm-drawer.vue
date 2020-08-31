@@ -2558,7 +2558,7 @@
 
     input.el-input__inner {
       border: 0px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.29);
+      border-bottom: 1px solid rgba(22, 29, 37, 0.29);
       border-radius: 0px;
       background-color: transparent;
       outline: none;
@@ -2566,16 +2566,16 @@
       padding-left: 0px;
       margin-left: 10px;
       width: 100px;
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(22, 29, 37, 0.8);
 
       &::-webkit-input-placeholder {
-        color: rgba(255, 255, 255, 0.4);
+        color: rgba(22, 29, 37, 0.4);
       }
     }
 
     &.customizeInputError {
       input.el-input__inner {
-        color: tomato;
+        color: rgba(255, 62, 77, 1);
       }
     }
   }

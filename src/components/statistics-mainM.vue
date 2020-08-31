@@ -10,6 +10,7 @@
               v-show="screen.showTaskData"/>
     <!--帧数统计-->
     <numberOfFrames ref="numOfFrames"
+                    @monitorVal="monitorVal"
                     @fullScreen="fullScreen"
                     @miniScreen="miniScreen"
                     :taskList="projectList"
@@ -17,6 +18,7 @@
                     v-show="screen.showNumOfFrames"/>
     <!--消费统计-->
     <consumption ref="consumption"
+                 @monitorVal="monitorVal"
                  @fullScreen="fullScreen"
                  @miniScreen="miniScreen"
                  :taskList="projectList"
@@ -24,6 +26,7 @@
                  v-show="screen.showConsumption"/>
     <!--任务状态统计-->
     <taskStatus ref="taskStatus"
+                @monitorVal="monitorVal"
                 @fullScreen="fullScreen"
                 @miniScreen="miniScreen"
                 :taskList="projectList"
@@ -67,12 +70,16 @@
       monitorVal([s, e, dom]) {
         let {year, month, day} = createCalendar(new Date()),
           t = `${year}-${month}-${day}`
-        if (t != e) this.$refs[dom].dateInterval = 'customize'
+        if (t != e) {
+          this.$refs[dom].dateInterval = 'customize'
+          return false
+        }
         let num = 1000 * 60 * 60 * 24
         let {year: y, month: m, day: d} = createCalendar(new Date(new Date().getTime() - 6 * num))
         let {year: y2, month: m2, day: d2} = createCalendar(new Date(new Date().getTime() - 29 * num))
         if (s == `${y}-${m}-${d}`) this.$refs[dom].dateInterval = 'nearlySevenDays'
-        if (s == `${y2}-${m2}-${d2}`) this.$refs[dom].dateInterval = 'nearlyThirtyDays'
+        else if (s == `${y2}-${m2}-${d2}`) this.$refs[dom].dateInterval = 'nearlyThirtyDays'
+        else this.$refs[dom].dateInterval = 'customize'
       },
       // 全屏
       fullScreen(selectScreen) {
@@ -101,6 +108,12 @@
         this.framesTemplate = data.data.data.chart.frameTemplate
         this.consumptionTemplate = data.data.data.chart.consumeTemplate
         this.statusTemplate = data.data.data.chart.statusTemplate
+        setTimeout(() => {
+          this.$refs.taskData.getChartsData()
+          this.$refs.numOfFrames.getChartsData()
+          this.$refs.consumption.getChartsData()
+          this.$refs.taskStatus.getChartsData()
+        }, 500)
       }
     },
     mounted() {
@@ -117,6 +130,23 @@
 
 // echarts公共样式
 <style lang="less">
+
+  .el-picker-panel.el-date-range-picker.el-popper {
+    transform: scale(0.84);
+    transform-origin: 0 0;
+  }
+  .el-date-editor .el-input__icon.el-range__close-icon,
+  .el-date-editor .el-range-separator {
+    line-height: 30px!important;
+  }
+  .el-input__inner {
+    height: 35px;
+    line-height: 35px;
+  }
+  .el-input__icon.el-range__icon.el-icon-date {
+    display: none;
+  }
+
   .statisticsM-wrapper {
     .echartsM {
       background-color: rgba(255, 255, 255, 1);
@@ -146,11 +176,11 @@
           font-size: 14px;
           user-select: none;
           border-radius: 14px 0px 0px;
+          margin-right: 30px;
         }
 
         .navLi {
           position: relative;
-          margin-left: 30px;
           width: 130px;
           cursor: pointer;
           user-select: none;

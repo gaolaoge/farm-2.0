@@ -13,8 +13,8 @@ const businessServer = new axios.create({
 
 businessServer.interceptors.request.use(config => {
   let token = null
-  if(document.cookie) token = document.cookie.split(';').find(curr => /token/.test(curr)).split('=')[1]
-  if(sessionStorage.getItem('token')) token = sessionStorage.getItem('token')
+  if (document.cookie) token = document.cookie.split(';').find(curr => /token/.test(curr)).split('=')[1]
+  if (sessionStorage.getItem('token')) token = sessionStorage.getItem('token')
   config.headers['token'] = token
   return config
 })
@@ -30,14 +30,23 @@ businessServer.interceptors.response.use(
     return response
     // }
   },
-    error => {
-    if(vue.$route.path == '/login') return false
-    if(error.response.status == 401){
-      messageFun('error', '授权失效，需要重新登录')
+  error => {
+    if (vue.$route.path == '/login') return false
+    if (error.response.status == 401) {
+      createEM()
       // sessionStorage.setItem('token','')
       vue.$router.push('/login')
     }
-})
+  })
+
+let lock = false
+
+function createEM() {
+  if(lock) lock = false
+  else return false
+  messageFun('error', '授权失效，需要重新登录')
+  setTimeout(() => lock = true, 200)
+}
 
 export {
   businessServer,

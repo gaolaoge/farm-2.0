@@ -215,9 +215,6 @@
             // 新建文件夹 创建成功 || 删除
             messageFun('success', '操作成功')
             this.getAssetsCatalog(this.path, this.searchInputVal)
-          } else if (data.msg == '6032' || data.msg == '6072') {
-            // 新建文件夹 文件夹名已存在
-            messageFun('info', '指定文件名已存在，操作失败')
           } else if (data.msg == '6042') {
             // 删除失败
             messageFun('info', data.data)
@@ -226,7 +223,7 @@
             messageFun('success', '操作成功')
             this.shutDialog()
             this.getAssetsCatalog(this.path, this.searchInputVal)
-          } else if (data.msg == '6052' || data.msg == '6062') messageFun('info', '选定目标内已存在相同名称文件或文件夹，操作失败')
+          } else if (data.msg == '6052' || data.msg == '6062' || data.msg == '6032' || data.msg == '6072') messageFun('info', '选定目标内已存在相同名称文件或文件夹，操作失败')
           else if (data.msg == '6081') messageFun('info', '解压失败')
           else if (data.msg == '6053' || data.msg == '6063' || data.msg == '6073' || data.msg == '6082') messageFun('error', '报错，操作失败')
           else if (data.msg == '6083') {
@@ -345,7 +342,7 @@
       downloadFile() {
         if (!this.table.selectionList.length) return false
         let result = this.table.selectionList.find(item => item['ing'])
-        if (!result) {
+        if (result) {
           messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
           return false
         }
@@ -360,7 +357,7 @@
       moveFile() {
         if (!this.table.selectionList.length) return false
         let result = this.table.selectionList.find(item => item['ing'])
-        if (!result) {
+        if (result) {
           messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
           return false
         }
@@ -374,19 +371,20 @@
           'code': type == 'move' ? 605 : 606,
           'customerUuid': this.user.id,
           'targetFolderPath': this.dl.checkPath,
-          'filePathList': this.table.selectionList.map(item => {
-            let p = item.position,
-              r = p.slice(p.length - 1) == '/'
-            if (r) return p.slice(0, p.length - 1)
-            else return p
-          })
+          'filePathList': this.table.selectionList.map(item => item.position)
+          // 'filePathList': this.table.selectionList.map(item => {
+          //   let p = item.position,
+          //     r = p.slice(p.length - 1) == '/'
+          //   if (r) return p.slice(0, p.length - 1)
+          //   else return p
+          // })
         })
       },
       // 复制到
       copyFile() {
         if (!this.table.selectionList.length) return false
         let result = this.table.selectionList.find(item => item['ing'])
-        if(!result) {
+        if(result) {
           messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
           return false
         }

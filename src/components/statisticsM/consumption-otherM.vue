@@ -14,11 +14,17 @@
       <div class="c filter">
         <!--时间区间-->
         <div class="filter-item">
-          <calendar @changeSelectDate="changeSelectDate" @changeSelect="dateInterval = 'customize'" ref="selectDateM"/>
+          <el-date-picker
+            v-model="date"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
         </div>
         <!--下拉框-->
         <div class="select bl">
-          <el-select v-model="dateInterval" placeholder="请选择" @change="$refs.selectDateM.setDateInterval(dateInterval)">
+          <el-select v-model="dateInterval" placeholder="请选择" @change="changeDateInterval">
             <el-option
               v-for="item in dateIntervalList"
               :key="item.value"
@@ -70,6 +76,7 @@
     mapState
   } from 'vuex'
   import {
+    createCalendar,
     messageFun
   } from "../../assets/common"
 
@@ -110,8 +117,7 @@
         dateInterval: 'nearlySevenDays',
         taskV: [],
         taskL: [],
-        startDate: '',
-        endDate: '',
+        date: [],
         fullBtn: true,
         chartsSeries: [],
         lock: false,
@@ -148,19 +154,20 @@
       }
     },
     watch: {
-      startDate() {
-        this.$emit('monitorVal', [this.startDate, this.endDate, 'taskData'])
-      },
-      endDate() {
-        this.$emit('monitorVal', [this.startDate, this.endDate, 'taskData'])
+      date(val) {
+        let {year, month, day} = createCalendar(val[0])
+        let {year: year2, month: month2, day: day2} = createCalendar(val[1])
+        this.$emit('monitorVal', [`${year}-${month}-${day}`, `${year2}-${month2}-${day2}`, 'taskData'])
+        this.aisle()
       },
       taskV(v) {
+        if (!v) return false
         this.aisle()
         let t = []
         v.forEach(curr => t.push(this.taskList.find(item => item.value == curr)))
         this.taskL = t
       },
-      navIndex(){
+      navIndex() {
         this.navIndex == 0 ? this.taskV = this.cProjectUuid : this.taskV = this.nProjectUuid
         this.aisle()
       },
@@ -178,9 +185,28 @@
     },
     mounted() {
       window.addEventListener('resize', () => this.ec.resize())
-      this.$refs.selectDateM.setDateInterval(this.dateInterval)
+      this.date = [this.getDateE(6), this.getDateE(0)]
+    },
+    computed: {
+      ...mapState(['zoneId'])
     },
     methods: {
+      // 日期区间下拉框修改
+      changeDateInterval(val) {
+        switch (val) {
+          case 'nearlySevenDays':   // 近7天
+            this.date = [this.getDateE(6), new Date()]
+            break
+          case 'nearlyThirtyDays':   // 近30天
+            this.date = [this.getDateE(29), new Date()]
+            break
+        }
+      },
+      // 获取指定日期date
+      getDateE(num) {
+        let date = new Date().getTime() - num * 1000 * 60 * 60 * 24
+        return new Date(date)
+      },
       // echarts 初始化
       init() {
         this.ec = this.$echarts.init(this.$refs.ec)
@@ -241,13 +267,13 @@
         this.endDate = endDate
       },
       // 全屏
-      f(){
+      f() {
         this.$emit('fullScreen', 'showConsumption')
         setTimeout(this.ec.resize, 120)
         this.fullBtn = false
       },
       // 取消全屏
-      e(){
+      e() {
         this.$emit('miniScreen')
         setTimeout(this.ec.resize, 120)
         this.fullBtn = true
@@ -268,8 +294,8 @@
         let data = await getConsumptionData({
           "type": String(this.navIndex + 1),
           "projectUuid": this.taskV,
-          "dateBegin": new Date(this.startDate).getTime(),
-          "dateEnd": new Date(this.endDate).getTime(),
+          "dateBegin": this.date[0].getTime(),
+          "dateEnd": this.date[1].getTime(),
           "defaultDateStatus": num,
           "zoneuuid": this.zoneId
         })
@@ -320,16 +346,28 @@
 </script>
 
 <style lang="less" scoped>
+  .el-date-editor {
+    border: 0px;
+
+    .el-range__icon,
+    .el-range-separator,
+    .el-input__icon.el-range__close-icon {
+      line-height: 22px;
+    }
+  }
+
   .consumption-wrapper {
-    /deep/.el-tag.el-tag--info.el-tag--small.el-tag--light {
+    /deep/ .el-tag.el-tag--info.el-tag--small.el-tag--light {
       display: flex;
       align-items: center;
+
       .el-select__tags-text {
         display: inline-block;
         width: 54px;
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
       .el-tag__close.el-icon-close {
         margin: 0px;
         position: inherit;

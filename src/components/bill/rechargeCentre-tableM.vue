@@ -65,11 +65,17 @@
                  v-model="filter.singleNumberVal">
         </div>
         <!--查询时间-->
-        <div class="filter-item">
+        <div class="filter-item f">
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
           </span>
-          <model-calendar style="display: inline-block;" @changeSelectDate="changeFilterDate"/>
+          <el-date-picker
+            v-model="filter.date"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
         </div>
         <!--查询-->
         <div class="filter-btn primary" @click="getList">
@@ -85,7 +91,7 @@
         </div>
       </div>
 
-      <div class="l" />
+      <div class="l"/>
 
       <!--table-->
       <el-table
@@ -165,7 +171,9 @@
           show-overflow-tooltip
           width="200">
           <template slot-scope="scope">
-            <div class="download-tab" @click="operateFun(scope.row)" v-show="scope.row.operate != '-'">
+            <div class="download-tab"
+                 @click="operateFun(scope.row)"
+                 v-show="scope.row.operate != '-'">
               {{ scope.row.operate }}
             </div>
             <div class="download-tab-none" v-show="scope.row.operate == '-'">
@@ -200,6 +208,9 @@
     exportUpTopTable,
     downloadReceipt
   } from '@/api/api'
+  import {
+    peddingPayment
+  } from '@/api/bill-api'
 
   export default {
     name: 'recharge-centre',
@@ -284,8 +295,9 @@
           singleNumberLabel: '支付单号',
           singleNumberVal: '',
           inquireLabel: '查询时间',
-          inquireValS: 0,
-          inquireValV: new Date(),
+          date: null,
+          // inquireValS: 0,
+          // inquireValV: new Date(),
           iquireBtn: '查询',
           resetBtn: '重置',
           exportBtn: '导出记录'
@@ -327,7 +339,8 @@
       },
       // 获取table数据
       async getList() {
-        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&productOrderUuid=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
+        let f = this.filter,
+          t = `paymentStatus=${f.tradingtatusVal}&paymentTitle=${f.paymentMethodVal}&invoice=${f.markVal}&productOrderUuid=${f.singleNumberVal}&beginTime=${f.date ? f.date[0].getTime() : 0}&endTime=${f.date ? f.date[1].getTime() : new Date().getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
           data = await getUpTopTable(t)
         this.table.outPutTableTotal = data.data.total
         this.table.rechargeData = data.data.data.map(curr => {
@@ -369,8 +382,9 @@
           paymentMethodVal: '-1',
           markVal: '-1',
           singleNumberVal: '',
-          inquireValS: 0,
-          inquireValV: new Date(),
+          // inquireValS: 0,
+          // inquireValV: new Date(),
+          date: null
         })
         this.getList()
       },
@@ -390,7 +404,8 @@
         //   sortColumn: '',    // 排序字段:0:交易id, 1:交易状态,2:实际支付金额,3:充值到账金币,4:充值说明,5:支付方式,6:支付单号,7:修改时间
         //   sortBy: ''         // 排序方式:0降序,1升序
         // }
-        let t = `paymentStatus=${this.filter.tradingtatusVal}&paymentTitle=${this.filter.paymentMethodVal}&invoice=${this.filter.markVal}&outTradeNo=${this.filter.singleNumberVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
+        let f = this.filter,
+          t = `paymentStatus=${f.tradingtatusVal}&paymentTitle=${f.paymentMethodVal}&invoice=${f.markVal}&outTradeNo=${f.singleNumberVal}&beginTime=${f.date ? f.date[0].getTime() : 0}&endTime=${f.date ? f.date[1].getTime() : new Date().getTime()}&sortColumn=1&sortBy=1&pageIndex=${this.table.currentPage}&pageSize=${Number(this.table.pageSize)}`,
           data = await exportUpTopTable(t)
         // 导出下载
         exportDownloadFun(data, '充值记录', 'xlsx')
@@ -408,6 +423,11 @@
         if (item.operate == "下载收据") {
           let data = await downloadReceipt(t)
           exportDownloadFun(data, '收据', 'pdf')
+        } else if (item.operate == "待付款") {
+          let data = await peddingPayment(item.id)
+          sessionStorage.setItem('aliPay', data.data.data)
+          let routerData = this.$router.resolve({name: 'rechargePage'})
+          window.open(routerData.href, '_blank')
         }
       }
     },
@@ -418,6 +438,23 @@
 </script>
 
 <style lang="less" scoped>
+  /deep/ .el-date-editor {
+    .el-range__icon,
+    .el-range-separator,
+    .el-input__icon.el-range__close-icon {
+      line-height: 22px;
+    }
+  }
+
+  .filter-item {
+    display: flex;
+    align-items: center;
+
+    &.f {
+      margin-right: 20px;
+    }
+  }
+
   .recharge-centre {
     overflow: hidden;
   }
@@ -452,6 +489,7 @@
         right: 0px;
       }
     }
+
     .l {
       margin-top: 8px;
       background-color: rgba(22, 29, 37, 0.1);

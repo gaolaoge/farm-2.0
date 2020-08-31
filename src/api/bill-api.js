@@ -84,3 +84,11 @@ export function invoicing(data) {
     data
   })
 }
+
+// 充值记录 - 待付款
+export function peddingPayment(id) {
+  return businessServer({
+    url: `/recharge/alipay/continuePay?outTradeNo=${id}`,
+    method: 'GET'
+  })
+}

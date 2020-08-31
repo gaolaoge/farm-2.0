@@ -155,7 +155,9 @@
             <div class="farm-btn cancel" @click="editCancelBtnFun">
               <span>{{ btnCancel }}</span>
             </div>
-            <div class="farm-btn save" @click="editSaveBtnFun">
+            <div class="farm-btn save"
+                 :class="[{'cannotBeGo': !editProject.nameV}]"
+                 @click="editSaveBtnFun">
               <span>{{ btnSave }}</span>
             </div>
           </div>
@@ -350,6 +352,7 @@
       // 编辑项目 - 保存
       async editSaveBtnFun() {
         let c = this.editProject
+        if(!c.nameV) return false
         let data = await editTask({
           'projectName': c.nameV,
           'projectStatus': c.statusV,

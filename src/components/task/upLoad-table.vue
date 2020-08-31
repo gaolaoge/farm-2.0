@@ -225,7 +225,10 @@
       },
       // 上传分析 - 打开详情
       showDetails(row, column, event){
-        if(row.status == '分析中...' || row.status == '等待') return false
+        if(row.status == '分析中...' || row.status == '等待' || !row.status) {
+          this.showDrawer = false
+          return false
+        }
         this.showDrawer = true
         this.drawerTaskData = row
         let tableDomList = this.$refs.uploadTable.getElementsByClassName('el-table__row'),
@@ -411,12 +414,6 @@
     components: {
       farmDrawer
     },
-    // props: {
-    //   searchInput: {
-    //     type: String,
-    //
-    //   }
-    // }
   }
 </script>
 

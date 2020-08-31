@@ -231,32 +231,37 @@
                 @closeDrawer="closeDrawer"/>
     <!--重新渲染弹框-->
     <el-dialog :visible.sync="dialogTableVisible"
+               :show-close="false"
                top="calc(50vh - 135px)"
-               title="提示"
                width="400px">
-      <span class="renderAgainBoxTit">{{ renderAgainBoxTit }}</span>
-      <el-checkbox-group v-model="s">
-        <el-checkbox label="4" class="kk">
-          {{ renderAgainBoxcheckbox[0] }}
-        </el-checkbox>
-        <el-checkbox label="3" class="kk">
-          {{ renderAgainBoxcheckbox[1] }}
-          <span>
+      <div class="header">
+        <span>提示</span>
+        <img src="@/icons/shutDialogIcon.png" alt="">
+      </div>
+      <div class="b">
+        <span class="renderAgainBoxTit">{{ renderAgainBoxTit }}</span>
+        <el-checkbox-group v-model="s">
+          <el-checkbox label="4" class="kk">
+            {{ renderAgainBoxcheckbox[0] }}
+          </el-checkbox>
+          <el-checkbox label="3" class="kk">
+            {{ renderAgainBoxcheckbox[1] }}
+            <span>
             {{ renderAgainBoxSupplement }}
           </span>
-        </el-checkbox>
-      </el-checkbox-group>
-      <div style="text-align: right;margin-top: 50px;">
-        <button class="el-button el-button--default el-button--small nn nx"
-                @click="cancelBtn">
-          <span>{{ renderAgainBoxBtnList[0] }}</span>
-        </button>
-        <button class="el-button el-button--default el-button--small el-button--primary nn nz"
-                @click="certainBtn">
-          <span>{{ renderAgainBoxBtnList[1] }}</span>
-        </button>
+          </el-checkbox>
+        </el-checkbox-group>
+        <div style="text-align: right;margin-top: 50px;">
+          <button class="el-button el-button--default el-button--small nn nx"
+                  @click="cancelBtn">
+            <span>{{ renderAgainBoxBtnList[0] }}</span>
+          </button>
+          <button class="el-button el-button--default el-button--small el-button--primary nn nz"
+                  @click="certainBtn">
+            <span>{{ renderAgainBoxBtnList[1] }}</span>
+          </button>
+        </div>
       </div>
-
     </el-dialog>
   </div>
 </template>
@@ -942,9 +947,9 @@
         let list = this.computedResult()
         console.log(list)
         let fileList = list.map(item => {
-            if(item['selfIndex']) return item['taskUuid'] + '/'
-            else return item['taskUuid'] + '/' + item['layerName'] + '/'
-          })
+          if (item['selfIndex']) return item['taskUuid'] + '/'
+          else return item['taskUuid'] + '/' + item['layerName'] + '/'
+        })
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           'transferType': 2,
           'userID': this.user.id,
@@ -1022,7 +1027,7 @@
           if ('selfIndex' in curr) {
             fatId.push(curr['id'])
             fatItem.push(curr)
-          } else if(!fatId.some(item => item == curr.FatherId)) sonItem.push(curr)
+          } else if (!fatId.some(item => item == curr.FatherId)) sonItem.push(curr)
         })
         return [...fatItem, ...sonItem]
       }
@@ -1079,24 +1084,41 @@
     }
 
     .progressS {
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(22, 29, 37, 0.6);
     }
   }
 
-  /deep/ .el-dialog__header {
-    height: 14px;
-    padding: 20px 20px 10px;
+  .header {
+    height: 36px;
+    box-shadow: 0px 1px 6px 0px rgba(27, 83, 244, 0.3);
+    border-radius: 8px 8px 0px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 20px;
+
+    span {
+      font-size: 14px;
+      font-family: PingFangSC-Semibold, PingFang SC;
+      font-weight: 600;
+      color: rgba(22, 29, 37, 1);
+    }
+
   }
 
-  /deep/ .el-dialog__title {
-    color: rgba(255, 255, 255, 0.7);
+  .b {
+    padding: 20px;
+  }
+
+  /deep/ .el-dialog__body {
+    padding: 0px;
   }
 
   .kk {
     font-size: 14px;
     display: block;
     margin: 10px 0px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(22, 29, 37, 0.8);
   }
 
   .nn {
@@ -1107,9 +1129,9 @@
   }
 
   .nx {
-    color: rgba(255, 255, 255, 0.59);
+    color: rgba(22, 29, 37, 0.59);
     background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(22, 29, 37, 0.4);
   }
 
   .nz {
@@ -1118,8 +1140,9 @@
   }
 
   .renderAgainBoxTit {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(22, 29, 37, 0.7);
     display: block;
     margin-bottom: 32px;
+    font-size: 14px;
   }
 </style>

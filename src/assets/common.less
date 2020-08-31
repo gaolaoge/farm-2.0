@@ -569,6 +569,18 @@ thead {
     &:hover {
 
     }
+
+    &.cannotBeGo {
+      border-radius: 8px;
+      background-color: #ffffff;
+      opacity: 0.19;
+      border: 1px solid #161d25;
+      cursor: no-drop;
+
+      span {
+        color: #161d25;
+      }
+    }
   }
 
   &.cancel {
@@ -1674,4 +1686,12 @@ td {
 
 .el-date-table td span {
   font-size: 14px;
+}
+
+.el-date-editor--daterange.el-input__inner {
+  width: 264px;
+}
+
+.el-range-input {
+  width: 100px !important;
 }

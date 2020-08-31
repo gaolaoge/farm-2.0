@@ -223,9 +223,6 @@
                 </span>
               </div>
               <div class="bodyB">
-                <!--<span class="hardware">-->
-                <!--{{ item.renderTemplate.softUuid }}-->
-                <!--</span>-->
                 <span class="software">
                   {{ item.renderTemplate.softName }}
                 </span>
@@ -913,7 +910,6 @@
             path_.pop()   // 删除最后一位空元素
             this.stepOneBase.netdisc.sceneFilePath = path_
             this.stepOneBase.netdisc.pathV = data.data.resourcePath
-            // } else if (data.msg == '6023') {
           } else if (data.msg == '612') {
             // 工程路径的tree
             let list = data.data.map((item, index) => {
@@ -1298,7 +1294,7 @@
               messageFun('success', '创建模板成功')
               this.innerVisible = false
               this.getList()
-            }
+            } else if(data.data.code == 101) messageFun('info', '模板名已存在，创建失败')
             //创建失败
             break
           // 编辑模板
@@ -1401,9 +1397,9 @@
             let task = this.stepOneBase.netdisc.treeData.find(curr => curr.id == item)
             return {
               filePath: {
-                pathResource: fir.netdisc.pathV,                     // 工程路径
-                pathScene: fir.netdisc.sceneFilePath.join('/'),      // 场景文件路径
-                fileName: task.label,                                // 场景文件名
+                pathResource: fir.netdisc.pathV,                          // 工程路径
+                pathScene: fir.netdisc.sceneFilePath.join('/') + '/',     // 场景文件路径
+                fileName: task.label,                                     // 场景文件名
               }
             }
           }),
@@ -1517,8 +1513,7 @@
               if (data.data.code == '201') {
                 messageFun('success', '创建项目成功')
                 this.getItemList(newItemName)
-              }
-              if (data.data.code == '101') messageFun('error', '创建失败，项目名已存在')
+              } else if (data.data.code == '101') messageFun('error', '创建失败，项目名已存在')
             }
           )
           .catch(() => null)
@@ -1966,7 +1961,7 @@
             box-sizing: border-box;
             display: flex;
             align-content: flex-start;
-            justify-content: space-between;
+            justify-content: flex-start;
             flex-wrap: wrap;
             overflow-y: scroll;
 
@@ -1975,7 +1970,7 @@
               height: 150px;
               border-radius: 8px;
               overflow: hidden;
-              margin: 0px 0px 30px 0px;
+              margin: 0px 18px 30px 0px;
               cursor: pointer;
 
               &.addMore {

@@ -43,11 +43,18 @@
           </el-select>
         </div>
         <!--查询时间-->
-        <div class="filter-item">
+        <div class="filter-item f">
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
           </span>
-          <modelCalendar style="display: inline-block;" @changeSelectDate="changeFilterDate"/>
+          <el-date-picker
+            v-model="filter.date"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期">
+          </el-date-picker>
+          <!--          <modelCalendar style="display: inline-block;" @changeSelectDate="changeFilterDate"/>-->
         </div>
         <!--查询-->
         <div class="filter-btn primary" @click="getList">
@@ -233,8 +240,9 @@
           projectVal: '-1',
           projectList: [],
           inquireLabel: '查询时间',
-          inquireValS: 0,
-          inquireValV: new Date(),
+          // inquireValS: 0,
+          // inquireValV: new Date(),
+          date: null,
           iquireBtn: '查询',
           resetBtn: '重置',
           exportBtn: '导出记录'
@@ -299,7 +307,8 @@
       },
       // 获取 table 数据
       async getList() {
-        let t = `pageSize=${this.table.pageSize}&pageIndex=${this.table.currentPage}&layerNo=${this.filter.taskIdVal}&fileName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`
+        let f = this.filter,
+          t = `pageSize=${this.table.pageSize}&pageIndex=${this.table.currentPage}&layerNo=${f.taskIdVal}&fileName=${f.scenesVal}&projectUuid=${f.projectVal}&beginTime=${f.date ? f.date[0].getTime() : 0}&endTime=${f.date ? f.date[1].getTime() : new Date().getTime()}`
         let data = await getConsumptionTable(t)
         this.table.rechargeData = data.data.data.map(curr => {
           let tableStatus = ''
@@ -350,31 +359,33 @@
         this.table.outPutTableTotal = data.data.total
       },
       // 时间筛选条件修改
-      changeFilterDate(val) {
-        [].forEach.call(val, (curr, index) => {
-          let [year, month, day] = curr.split('-'),
-            r = getDate(year, month, day)
-          if (index == 0) {
-            this.filter.inquireValS = r
-          } else {
-            this.filter.inquireValV = r
-          }
-        })
-      },
+      // changeFilterDate(val) {
+      //   [].forEach.call(val, (curr, index) => {
+      //     let [year, month, day] = curr.split('-'),
+      //       r = getDate(year, month, day)
+      //     if (index == 0) {
+      //       this.filter.inquireValS = r
+      //     } else {
+      //       this.filter.inquireValV = r
+      //     }
+      //   })
+      // },
       // 重置
       reset() {
         Object.assign(this.filter, {
           taskIdVal: '',
           scenesVal: '',
           projectVal: '-1',
-          inquireValS: 0,
-          inquireValV: new Date(),
+          // inquireValS: 0,
+          // inquireValV: new Date(),
+          date: null
         })
         this.getList()
       },
       // 导出记录
       async exportTable() {
-        let t = `layerNo=${this.filter.taskIdVal}&fileName=${this.filter.scenesVal}&projectUuid=${this.filter.projectVal}&beginTime=${this.filter.inquireValS == 0 ? 0 : this.filter.inquireValS.getTime()}&endTime=${this.filter.inquireValV.getTime()}`,
+        let f = this.filter,
+          t = `layerNo=${f.taskIdVal}&fileName=${f.scenesVal}&projectUuid=${f.projectVal}&beginTime=${f.date ? f.date[0].getTime() : 0}&endTime=${f.date ? f.date[1].getTime() : new Date().getTime()}`,
           data = await exportConsumptionTable(t)
         // 导出下载
         exportDownloadFun(data, '消费记录', 'xlsx')
@@ -400,6 +411,23 @@
 </script>
 
 <style lang="less" scoped>
+  /deep/ .el-date-editor {
+    .el-range__icon,
+    .el-range-separator,
+    .el-input__icon.el-range__close-icon {
+      line-height: 22px;
+    }
+  }
+
+  .filter-item {
+    display: flex;
+    align-items: center;
+
+    &.f {
+      margin-right: 20px;
+    }
+  }
+
   .consumption-wrapper {
     overflow: hidden;
   }

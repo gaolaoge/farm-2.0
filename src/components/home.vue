@@ -103,7 +103,6 @@
   import {
     homeT,
     echartsData,
-    putNewZoneID
   } from '@/api/api.js'
   import {
     getRecentTaskList
@@ -178,7 +177,6 @@
           if (!val) return false
           this.getHomeTData(val)
           this.getEchartsData(val)
-          putNewZoneID({"zoneUuid": val})   // 传达切换分区事件
           this.getTaskList()                // 获取近期项目列表
         },
         immediate: true

@@ -240,7 +240,8 @@
 <script>
   import {
     homeSelect,
-    getInfo
+    getInfo,
+    putNewZoneID
   } from '@/api/api.js'
   import {
     identify
@@ -356,6 +357,7 @@
       zoneId: {
         handler: function (val) {
           if (!val || val == this.workBenchVal) return false
+          putNewZoneID({"zoneUuid": val})   // 传达切换分区事件
           this.workBenchVal = val
           this.changeIsGpu()
         },
@@ -539,7 +541,7 @@
 <style scoped lang="less">
   .header-wrapper {
     position: relative;
-    z-index: 2;
+    z-index: 10;
     height: 120px;
     width: 100%;
 
