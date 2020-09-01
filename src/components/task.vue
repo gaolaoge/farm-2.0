@@ -253,11 +253,11 @@
         t.uploadTableBtnDelete = true       // 上传分析 - 删除
         t.uploadTableBtnAgain = true        // 上传分析 - 重新分析
         if (val.includes(this.$t('task.status.upload_ing'))) {
-          t.uploadTableBtnDelete = false;
+          t.uploadTableBtnDelete = false
           t.uploadTableBtnAgain = false
         }
         if (val.includes(this.$t('task.status.analysis_ing'))) {
-          t.uploadTableBtnDelete = false;
+          t.uploadTableBtnDelete = false
           t.uploadTableBtnAgain = false
         }
         if (val.includes(this.$t('task.status.upload_timeOut'))) t.uploadTableBtnAgain = false
