@@ -22,7 +22,11 @@ export function getHeadersList() {
 export function exportInvoiceTable(data) {
   return businessServer({
     url: `/billing/invoice/getInvoiceExcel?${data}`,
-    method: 'GET'
+    method: 'GET',
+    responseType: 'blob',
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
 }
 

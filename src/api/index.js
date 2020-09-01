@@ -4,6 +4,8 @@ import {
   messageFun
 } from "../assets/common"
 
+let lock = true
+
 // 业务服务
 const businessServer = new axios.create({
   baseURL: process.env.BASE_URI,
@@ -39,13 +41,11 @@ businessServer.interceptors.response.use(
     }
   })
 
-let lock = false
-
 function createEM() {
   if(lock) lock = false
   else return false
   messageFun('error', '授权失效，需要重新登录')
-  setTimeout(() => lock = true, 200)
+  setTimeout(() => lock = true, 1000)
 }
 
 export {

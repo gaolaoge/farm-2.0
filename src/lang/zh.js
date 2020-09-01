@@ -154,6 +154,7 @@ export default {
     renderBtnGroup: ['新建任务', '开始', '暂停', '删除', '下载完成帧', '全部渲染', '重新渲染', '归档', '拷贝', '刷新'],
     archiveRecords: '归档记录',
     status: {
+      wait: '等待',
       canceled: '已取消',
       giveUp: '已放弃',
       upload_ing: '上传中...',
@@ -162,7 +163,9 @@ export default {
       analysis_ing: '分析中',
       render_ing: '渲染中',
       render_timeOut: '渲染暂停',
-      render_all: '待全部渲染',
+      render_timeOut_t: '渲染暂停（超时）',
+      render_timeOut_a: '渲染暂停（欠费）',
+      render_all: '待全速渲染',
       render_done: '渲染完成',
       toBeSet: '待设置参数'
     }

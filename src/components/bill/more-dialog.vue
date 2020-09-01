@@ -27,35 +27,35 @@
               label="帧数"
               sortable
               width="140"
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--下载次数-->
             <el-table-column
               prop="downloadNum"
               label="下载次数"
               sortable
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--费用（金币）-->
             <el-table-column
               prop="cost"
               label="费用（金币）"
               sortable
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--大小-->
             <el-table-column
               prop="size"
               label="大小"
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--单价（金币/核对）-->
             <el-table-column
               prop="price"
               label="单价（金币/核对）"
               sortable
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--下载完成时间 -->
             <el-table-column
               prop="date"
               label="下载完成时间"
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
 
           </el-table>
         </div>
@@ -73,57 +73,57 @@
               label="帧数"
               width="140"
               sortable
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--渲染费用（金币）-->
             <el-table-column
               prop="gold"
               label="渲染费用（金币）"
               sortable
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--渲染时长-->
             <el-table-column
               prop="duration"
               label="渲染时长"
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--渲染开始时间-->
             <el-table-column
               prop="startDate"
               label="渲染开始时间"
               sortable
               show-overflow-tooltip
-              width="192" />
+              width="192"/>
             <!--渲染结束时间 -->
             <el-table-column
               prop="endDate"
               label="渲染结束时间"
               show-overflow-tooltip
-              width="192" />
+              width="192"/>
             <!--单价（金币/核时）-->
             <el-table-column
               prop="price"
               label="单价（金币/核时）"
-              show-overflow-tooltip />
+              show-overflow-tooltip/>
             <!--CPU利用率-->
             <!--<el-table-column-->
-              <!--prop="percent"-->
-              <!--label="CPU利用率"-->
-              <!--show-overflow-tooltip />-->
+            <!--prop="percent"-->
+            <!--label="CPU利用率"-->
+            <!--show-overflow-tooltip />-->
             <!--内存峰值-->
             <!--<el-table-column-->
-              <!--prop="peak"-->
-              <!--label="内存峰值"-->
-              <!--show-overflow-tooltip />-->
+            <!--prop="peak"-->
+            <!--label="内存峰值"-->
+            <!--show-overflow-tooltip />-->
 
           </el-table>
         </div>
         <!--分页-->
         <!--<div class="page">-->
-          <!--<el-pagination-->
-            <!--background-->
-            <!--layout="prev, pager, next, jumper"-->
-            <!--:current-page.sync="table.currentPage"-->
-            <!--:total="table.outPutTableTotal">-->
-          <!--</el-pagination>-->
+        <!--<el-pagination-->
+        <!--background-->
+        <!--layout="prev, pager, next, jumper"-->
+        <!--:current-page.sync="table.currentPage"-->
+        <!--:total="table.outPutTableTotal">-->
+        <!--</el-pagination>-->
         <!--</div>-->
       </div>
     </section>
@@ -138,7 +138,7 @@
 
   export default {
     name: 'more-dialog',
-    data(){
+    data() {
       return {
         dialogTit: '消费详情',
         // 下载消费详情
@@ -175,22 +175,22 @@
       },
       downloadDialogTableData: {
         type: Array,
-        default: function(){
+        default: function () {
           return []
         }
       },
       renderDialogTableData: {
         type: Array,
-        default: function(){
+        default: function () {
           return []
         }
       }
     },
     watch: {
       downloadDialogTableData: {
-        handler: function(val){
+        handler: function (val) {
           this.downloadTableData = val.map(curr => {
-            let { year, month, day, hour, minutes, seconds } = createCalendar(new Date(curr.finishTime))
+            let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.finishTime))
             return {
               framesNum: curr.frameNo,          //帧数
               downloadNum: curr.downloadNo,     //已下载次数
@@ -205,7 +205,7 @@
         immediate: true
       },
       renderDialogTableData: {
-        handler: function(val){
+        handler: function (val) {
           this.expendTableData = val.map(curr => {
 
             return {
@@ -227,7 +227,7 @@
     },
     methods: {
       // 关闭
-      closeDialogFun(){
+      closeDialogFun() {
         this.$emit('closeDialog', false)
       }
     },
@@ -239,60 +239,69 @@
 
 <style lang="less" scoped>
   .more-dialog {
+    background-color: #f1f4f9;
     overflow: hidden;
     height: 87vh;
     position: relative;
+
     .header {
       position: absolute;
       width: 100%;
+
       .closeBtn {
         position: relative;
         z-index: 9;
         float: right;
-        width:18px;
-        height:18px;
+        width: 18px;
+        height: 18px;
         cursor: pointer;
-        opacity:0.6;
+        opacity: 0.6;
       }
     }
+
     section {
       .label-table {
         position: relative;
+
         .label {
           display: inline-block;
-          font-size:16px;
-          color:rgba(255,255,255,0.6);
+          font-size: 16px;
+          background-color: rgba(255, 255, 255, 1);
           padding: 10px 30px;
           cursor: pointer;
-          background-color: rgba(22, 29, 37, 1);
+          color: rgba(22, 29, 37, 0.6);
           border-radius: 8px 8px 0px 0px;
-          font-weight:600;
-          color:rgba(255, 255, 255, 0.9);
+          font-weight: 600;
         }
       }
+
       .tableList {
-        background-color: rgba(22, 29, 37, 1);
+        background-color: rgba(255, 255, 255, 1);
         border-radius: 0px 0px 8px 8px;
       }
     }
   }
-  /deep/.el-table {
+
+  /deep/ .el-table {
     th:nth-of-type(1),
     td:nth-of-type(1) {
       padding-left: 18px;
     }
   }
-  /deep/.el-table__body-wrapper {
+
+  /deep/ .el-table__body-wrapper {
     height: calc(100vh - 220px);
   }
+
   /*.page {*/
-    /*margin: 4px 25px 30px;*/
+  /*margin: 4px 25px 30px;*/
   /*}*/
   @media screen and (orientation: portrait) {
     .more-dialog {
       height: 87vw;
     }
-    /deep/.el-table__body-wrapper {
+
+    /deep/ .el-table__body-wrapper {
       height: calc(100vw - 220px);
     }
   }

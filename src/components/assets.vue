@@ -20,7 +20,10 @@
             </li>
           </ul>
         </div>
-        <div class="farm-primary-form-btn" v-for="(item,index) in btnGroup.myUploadBtnGroup" :key="index"
+        <div class="farm-primary-form-btn"
+             :class="[{'cannotToBe': !item.action}]"
+             v-for="(item,index) in btnGroup.myUploadBtnGroup"
+             :key="index"
              @click="operating('upload', item['text'])">
           <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default"
                :style="{'transform': item.css }">
@@ -56,15 +59,16 @@
       </div>
       <!--渲染输出操作-->
       <div class="outPutBtnGroup" v-show="table.navListActiveIndex == 1">
-        <div class="farm-primary-form-btn" v-for="(item,index) in btnGroup.outPutBtnGroup" :key="index"
+        <div class="farm-primary-form-btn"
+             :class="[{'cannotToBe': !item.action}]"
+             v-for="(item,index) in btnGroup.outPutBtnGroup"
+             :key="index"
              @click="operating('render', item['text'])">
-          <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default"
+          <span>{{ item['text'] }}</span>
+          <img :src="item.initialIcon" v-if="item.initialIcon" class="btnIcon default"
                :style="{'transform': item.css }">
-          <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover"
+          <img :src="item.selectedIcon" v-if="item.selectedIcon" class="btnIcon hover"
                :style="{'transform': item.css }">
-          <span>
-            {{ item['text'] }}
-          </span>
         </div>
       </div>
       <div class="rightOPerate">
@@ -110,12 +114,17 @@
       <div class="tableList">
         <!--我的上传-->
         <div class="myUploadTable" v-show="table.navListActiveIndex == 0">
-          <my-upload ref="myUploadTable" :uploadType="btnGroup.howToCreateIindex" :searchInputVal="uploadSearchInputVal"/>
+          <my-upload ref="myUploadTable"
+                     @uploadSelectionF="uploadSelectionF"
+                     :uploadType="btnGroup.howToCreateIindex"
+                     :searchInputVal="uploadSearchInputVal"/>
         </div>
         <!--渲染输出-->
         <div class="outPutTable" v-show="table.navListActiveIndex == 1">
-          <!--渲染输出Tab-->
-          <out-put-render ref="outPutTable" :searchInputVal="renderSearchInputVal" @clearInput="clearInput"/>
+          <out-put-render ref="outPutTable"
+                          @renderSelectionF="renderSelectionF"
+                          @clearInput="clearInput"
+                          :searchInputVal="renderSearchInputVal"/>
         </div>
       </div>
     </div>
@@ -141,26 +150,30 @@
             {
               initialIcon: require('@/icons/addIcon-black.png'),
               selectedIcon: require('@/icons/addIcon-white.png'),
-              text: this.$t('assets.myUploadBtnGroup')[1]  // 新建文件夹
+              text: this.$t('assets.myUploadBtnGroup')[1], // 新建文件夹
+              action: true
             },
             {
               initialIcon: require('@/icons/u-black.png'),
               selectedIcon: require('@/icons/u-white.png'),
               text: this.$t('assets.myUploadBtnGroup')[2], // 下载
-              css: 'rotate(180deg)'
+              css: 'rotate(180deg)',
+              action: false
             }
           ],
           outPutBtnGroup: [
             {
-              initialIcon: require('@/icons/u-blue.png'),
+              initialIcon: require('@/icons/u-black.png'),
               selectedIcon: require('@/icons/u-white.png'),
               text: this.$t('assets.outPutBtnGroup')[0], // 下载
-              css: 'rotate(180deg)'
+              css: 'rotate(180deg)',
+              action: false
             },
             {
-              initialIcon: require('@/icons/deleteIcon-blue.png'),
+              initialIcon: require('@/icons/deleteIcon-black.png'),
               selectedIcon: require('@/icons/deleteIcon-white.png'),
               text: this.$t('assets.outPutBtnGroup')[1], // 删除
+              action: false
             }
           ],
           moreBtnText: this.$t('assets.moreBtnText'),
@@ -231,6 +244,18 @@
       createTableIconList()
     },
     methods: {
+      uploadSelectionF(list) {
+        if(!list.length) {
+          this.btnGroup.myUploadBtnGroup[1]['action'] = false
+          return false
+        }
+        if(list.some(item => item['ing'])) this.btnGroup.myUploadBtnGroup[1]['action'] = false
+        else this.btnGroup.myUploadBtnGroup[1]['action'] = true
+      },
+      renderSelectionF(list) {
+        if (!list.length) this.btnGroup.outPutBtnGroup.forEach(item => item.action = false)
+        else this.btnGroup.outPutBtnGroup.forEach(item => item.action = true)
+      },
       searchFun(type) {
         if (type == 'render') this.$refs.outPutTable.getList()
         else this.$refs.myUploadTable.getList()
@@ -243,9 +268,11 @@
         if (type == 'render') {
           switch (active) {
             case this.$t('assets.outPutBtnGroup')[0]:  // 下载
+              if(!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.outPutTable.downloadFun()
               break
             case this.$t('assets.outPutBtnGroup')[1]:  // 删除
+              if(!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.outPutTable.deleteFun()
               break
           }
@@ -260,19 +287,24 @@
             case '新建文件夹':                           // 新建文件夹
               this.$refs.myUploadTable.createFolder()
               break
-            case '下载':                                // 下载
-              this.$refs.myUploadTable.downloadFile()
+            case '下载':
+              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              this.$refs.myUploadTable.downloadFile()  // 下载
               break
             case '移动到':                              // 移动到
+              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.moveFile()
               break
             case '复制到':                              // 复制到
+              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.copyFile()
               break
             case '重命名':                              // 重命名
+              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.rename()
               break
             case '解压':                                // 解压
+              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.unzip()
               break
             case '删除':                                // 删除
@@ -298,6 +330,7 @@
       padding: 0px 30px;
       background-color: rgba(255, 255, 255, 1);
       border-radius: 8px;
+      user-select: none;
 
       .myUploadBtnGroup,
       .outPutBtnGroup,
@@ -456,6 +489,28 @@
 
       &:hover {
         border: 1px solid rgba(39, 95, 239, 0.4);
+      }
+    }
+  }
+
+  .farm-primary-form-btn.cannotToBe {
+    cursor: no-drop;
+    color: rgba(22, 29, 37, 0.29);
+
+    img {
+      opacity: 0.29;
+    }
+
+    &:hover {
+      color: rgba(22, 29, 37, 0.29);
+      background-color: #f8f8f8;
+
+      .btnIcon.default {
+        display: inline-block;
+      }
+
+      .btnIcon.hover {
+        display: none;
       }
     }
   }

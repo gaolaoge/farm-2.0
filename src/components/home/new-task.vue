@@ -1282,14 +1282,13 @@
         switch (this.dialogAdd.editOrAdd) {
           // 新建模板
           case 'addMore':
-            val = {
+            let data = await createTaskSetNewPlugin({
               templateName: this.dialogAdd.form.valName,        //模板名称
               softUuid: this.dialogAdd.form.valSoftware[1],     //软件uuid
               pluginUuids: this.dialogAdd.nList.map(curr => {
                 return curr.pluginUuid
               })
-            }
-            let data = await createTaskSetNewPlugin(val)
+            })
             if (data.data.code == 201) {
               messageFun('success', '创建模板成功')
               this.innerVisible = false
@@ -1299,21 +1298,19 @@
             break
           // 编辑模板
           case 'editOne':
-            let obj = this.stepTwoBase['renderList'][this.dialogAdd.index]
-            val = {
+            let obj = this.stepTwoBase['renderList'][this.dialogAdd.index],
+              data2 = await createTaskSetEditPlugin({
               templateUuid: obj['renderTemplate']['templateUuid'],                 // 模板uuid
               templateName: this.dialogAdd.form.valName,                           // 模板名称
               softUuid: this.dialogAdd.form.valSoftware[1],                        // 软件uuid
               isDefault: obj['renderTemplate']['isDefault'],                       // 是否默认
               pluginUuids: this.dialogAdd.nList.map(curr => curr.pluginUuid)       // 插件
-            }
-            let data2 = await createTaskSetEditPlugin(val)
+            })
             if (data2.data.code == 200) {
               messageFun('success', '编辑成功')
               this.innerVisible = false
               this.getList()
-            }
-            // 编辑失败
+            } else if(data2.data.code == 101) messageFun('info', '模板名已存在，编辑失败')
             break
         }
       },
@@ -1974,7 +1971,7 @@
               cursor: pointer;
 
               &.addMore {
-                width: 228px;
+                width: 226px;
                 height: 146px;
                 border: 2px dashed rgba(22, 29, 37, 0.29);
                 display: flex;

@@ -180,6 +180,7 @@
       // 多选
       handleSelectionChange(val){
         this.table.selectionList = val
+        this.$emit('renderSelectionF', val)
       },
       // 筛选条件发生变化
       filterHandler(value, row, column){
@@ -327,6 +328,7 @@
       },
       // 下载item 申请打包
       async downloadFun(){
+        if(!this.table.selectionList.length) return false
         let r = await seeBalance()
         if(r.data.code == 1001){ messageFun('info',`当前账户余额为${r.data.data}，请先进行充值！`); return false }
         this.$confirm('将下载选中选, 是否继续?', '提示', {
@@ -378,6 +380,7 @@
       },
       // 删除item
       deleteFun(){
+        if(!this.table.selectionList.length) return false
         this.$confirm('将删除选中选, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

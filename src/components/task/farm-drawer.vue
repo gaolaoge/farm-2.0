@@ -538,9 +538,11 @@
                   ]">
               {{ result.statusData }}
             </span>
-            <img :src="result.miniImgHref"
+            <img v-show="result.miniImgHref"
+                 :src="result.miniImgHref"
                  class="img"
                  @click="$store.commit('setShowThumb', true)">
+            <img src="@/assets/no_thumb.png" v-show="!result.miniImgHref" >
           </div>
           <div class="dataList">
 
@@ -1362,9 +1364,12 @@
           this.result.statusData = row['status']
           let t = `frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=240`,
             data = await getThumbnail(t)
-          this.result.miniImgHref = data.data.data
-          let a = await getThumbnail(`frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=900`)
-          this.$store.commit('setThumbURL', a.data.data)
+          if(data.data.code == 1000) this.result.miniImgHref = null
+          else if(data.data.code == 200){
+            this.result.miniImgHref = data.data.data == ''
+            let a = await getThumbnail(`frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=900`)
+            this.$store.commit('setThumbURL', a.data.data)
+          }
         } catch (err) {
         }
       },
@@ -1990,7 +1995,6 @@
         }
 
         let valList = val.replace(/，/g, ',').split(',').filter(curr => curr != '')          // 输入帧
-        console.log(valList)
 
         if (valList.length > 3) {
           this.errFun('最多优先测试3帧');
@@ -2002,9 +2006,9 @@
         }
 
         let range = this.setting.num.tableData[0].range,         // 帧范围
-          rangeH = Number(range.split('-')[0]),                // 首帧
-          rangeF = Number(range.split('-')[1]),                // 尾帧
-          interval = Number(this.setting.num.tableData[0].num),// 帧间隔
+          rangeH = Number(range.split('-')[0]),                  // 首帧
+          rangeF = Number(range.split('-')[1]),                  // 尾帧
+          interval = Number(this.setting.num.tableData[0].num),  // 帧间隔
           result = renderingRange(rangeH, rangeF, interval),     // 遍历帧范围
           r = valList.every(curr => result.includes(Number(curr)))        // 【帧范围】是否完全包含【输入帧】
 

@@ -403,7 +403,9 @@
       this.getTaskItemListFun()
     },
     watch: {
-
+      'zoneId': function (val) {
+        this.getList()
+      }
     },
     computed: {
       ...mapState(['zoneId']),

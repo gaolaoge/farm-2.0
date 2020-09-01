@@ -308,6 +308,7 @@
       // 多选
       handleSelectionChange(val) {
         this.table.selectionList = val
+        this.$emit('uploadSelectionF', val)
       },
       // 筛选条件发生变化
       filterHandler(value, row, column) {
@@ -355,7 +356,6 @@
       },
       // 移动到
       moveFile() {
-        if (!this.table.selectionList.length) return false
         let result = this.table.selectionList.find(item => item['ing'])
         if (result) {
           messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
@@ -382,7 +382,6 @@
       },
       // 复制到
       copyFile() {
-        if (!this.table.selectionList.length) return false
         let result = this.table.selectionList.find(item => item['ing'])
         if(result) {
           messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
@@ -393,7 +392,6 @@
       },
       // 重命名
       rename() {
-        if (this.table.selectionList.length != 1) return false
         if (this.table.selectionList[0]['ing']) {
           messageFun('info', '目标正在上传中，无法操作')
           return false
@@ -439,7 +437,6 @@
       },
       // 删除
       deleteFile() {
-        if (!this.table.selectionList.length) return false
         let result = this.table.selectionList.find(item => item['ing'])
         if (!result) {
           messageFun('info', '一个或多个目标正在上传中，无法进行此操作')

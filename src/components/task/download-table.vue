@@ -918,15 +918,14 @@
                     taskUuid: curr.FatherTaskUuId,
                     layerUuidList: [curr.taskUuid]
                   })
-                } else {
-                  dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
-                }
+                } else dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
               })
               let data = await itemStart({
                 "instructType": 2,
                 "instructTaskList": dataList
               })
               if (data.data.code == 200) messageFun('success', '操作成功')
+              else if (data.data.code == 1000) messageFun('info', '报错，操作失败')
             },
             () => messageFun('info', '已取消暂停')
           )

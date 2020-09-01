@@ -47,6 +47,7 @@
           v-model="info.birthdayVal"
           type="date"
           @change="changeBirthdayDate"
+          :picker-options="pickerOptions"
           placeholder="选择日期" />
         <span class="remarks">{{ info.birthdayRemarks }}</span>
       </div>
@@ -96,6 +97,11 @@
     name: 'infoTable',
     data() {
       return {
+        pickerOptions: {
+          disabledDate(time) {
+            return time.getTime() > new Date();
+          },
+        },
         value1: new Date(),
         editBtn: '修改',
         editAvatar: '修改头像',
@@ -134,7 +140,7 @@
           "birthday": this.info.birthdayVal.getTime(),
         })
         if (data.data.code == 200) {
-          this.$store.commit('changeBirthday', val)
+          this.$store.commit('changeBirthday', this.info.birthdayVal.getTime())
           messageFun('success', this.$t('message.editSuc'))
         } else if (data.data.code == 999) messageFun('warning', this.$t('message.noTimes'))
       },
