@@ -453,7 +453,7 @@
           <span>{{ btn.next }}</span>
         </div>
         <!--确定-->
-        <div class="btnGroup-btn confirm" @click.once="confirmFun" v-show="taskType == 'profession'">
+        <div class="btnGroup-btn confirm" @click="confirmFun" v-show="taskType == 'profession'">
           <span>{{ btn.confirm }}</span>
         </div>
       </div>
@@ -464,7 +464,7 @@
           <span>{{ btn.previous }}</span>
         </div>
         <!--确定-->
-        <div class="btnGroup-btn confirm" @click.once="confirmFun">
+        <div class="btnGroup-btn confirm" @click="confirmFun">
           <span>{{ btn.confirm }}</span>
         </div>
       </div>
@@ -871,6 +871,7 @@
         },
         infoMessageShow: false,     // 选择渲染文件 - 我的电脑 - 工程路径 - 问号
         renderFileTypeList: [],     // 可用的场景文件格式
+        confirmLock: true,          // 提交锁 关闭5秒后开启
       }
     },
     props: {},
@@ -1380,6 +1381,9 @@
       },
       // 4.提交
       async confirmFun() {
+        if(!this.confirmLock) return
+        this.confirmLock = false
+        setTimeout(() => this.confirmLock = true, 5000)
         let fir = this.stepOneBase,
           sec = this.stepTwoBase,
           thi = this.stepThreeBase
