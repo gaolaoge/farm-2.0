@@ -36,13 +36,13 @@
         :filters="table.statusList"
         width="120">
         <template slot-scope="scope">
-          <span v-if="scope.row.status == '上传失败' || scope.row.status == '分析失败'" style="color: #F90023">
+          <span v-if="scope.row.status == '上传失败' || scope.row.status == '分析失败'" style="color: rgba(255, 62, 77, 1)">
             {{ scope.row.status }}
           </span>
-          <span v-if="scope.row.status == '待设置参数'" style="color: #00E3FF">
+          <span v-if="scope.row.status == '待设置参数'" style="color: rgba(70, 203, 93, 1)">
             {{ scope.row.status }}
           </span>
-          <span v-if="scope.row.status == '分析警告' || scope.row.status == '上传暂停'" style="color: #E5C78A">
+          <span v-if="scope.row.status == '分析警告' || scope.row.status == '上传暂停'" style="color: rgba(255, 191, 0, 1)">
             {{ scope.row.status }}
           </span>
           <span v-if="scope.row.status == '已取消' || scope.row.status == '已放弃'" style="color: #555">
