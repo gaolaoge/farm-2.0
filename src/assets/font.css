@@ -32,3 +32,24 @@
   font-weight: normal;
   font-style: normal;
 }
+
+@font-face {
+  font-family: "Cabin-Bold";
+  src: url('Cabin-Bold.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "nexa-bold";
+  src: url('nexa-bold.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MontserratAlternates-BlackItalic";
+  src: url('MontserratAlternates-BlackItalic.ttf');
+  font-weight: normal;
+  font-style: normal;
+}

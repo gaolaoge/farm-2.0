@@ -14,7 +14,7 @@
             height:`${containerBoxData.height}px`,
             }">
             <img ref="$img" :src="imgURL"/>
-            <div class="img-mask" />
+            <div class="img-mask"/>
             <div class="select-box"
                  v-if="imgURL"
                  @mousedown="onMouseDown($event, 'move')"
@@ -28,29 +28,28 @@
                   backgroundSize:`${containerBoxData.width}px ${containerBoxData.height}px`,
                 }">
               <ul class="x-line">
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'top')" />
-                <li />
-                <li />
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'bottom')" />
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'top')"/>
+                <li/>
+                <li/>
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'bottom')"/>
               </ul>
               <ul class="y-line">
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'left')" />
-                <li />
-                <li />
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'right')" />
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'left')"/>
+                <li/>
+                <li/>
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'right')"/>
               </ul>
               <ul class="point">
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'top-left')" />
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'top-right')" />
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'bottom-left')" />
-                <li @mousedown.stop="onMouseDown($event, 'stretch', 'bottom-right')" />
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'top-left')"/>
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'top-right')"/>
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'bottom-left')"/>
+                <li @mousedown.stop="onMouseDown($event, 'stretch', 'bottom-right')"/>
               </ul>
-              <div class="cross" />
+              <div class="cross"/>
             </div>
           </div>
           <p class="downloadAgain" @click="fileImage">
             <span>{{ downloadAgain }}</span>
-            <img src="@/icons/fileAgain2.png" alt="" class="imgAgain" @click="fileImage">
           </p>
         </div>
         <!--右侧-->
@@ -79,7 +78,7 @@
         default: 'url'
       }
     },
-    data(){
+    data() {
       return {
         title: '上传头像',
         avatarPreviewText: '头像预览',
@@ -101,12 +100,12 @@
         },
       }
     },
-    created(){
+    created() {
       // 全局监听松开事件，放在在内容选择框外松开
       document.addEventListener('mouseup', this.onMouseUp)
       document.addEventListener('mousemove', this.onMouseMove)
     },
-    beforeDestroy(){
+    beforeDestroy() {
       document.removeEventListener('mouseup', this.onMouseUp)
       document.removeEventListener('mousemove', this.onMouseMove)
     },
@@ -138,13 +137,13 @@
         const params = base64Str.split(',')
         const mime = params[0].match(/:(.*?)/)[1]
         const fileData = atob(params[1]) // 解码Base64
-        let { length } = fileData
+        let {length} = fileData
         const uint8Array = new Uint8Array(length)
         while (length) {
           length -= 1
           uint8Array[length] = fileData.charCodeAt(length)
         }
-        return new File([uint8Array], fileName, { type: mime })
+        return new File([uint8Array], fileName, {type: mime})
       },
 
       // 获取驼峰写法
@@ -159,7 +158,7 @@
 
       // 鼠标点击
       onMouseDown(event, action, direction) {
-        const { selectData } = this
+        const {selectData} = this
         selectData.action = action
         selectData.direction = direction || ''
         selectData.originPoint = {
@@ -170,15 +169,15 @@
 
       // 鼠标松开
       onMouseUp() {
-        const { selectData } = this
+        const {selectData} = this
         selectData.action = ''
         selectData.direction = ''
       },
 
       // 鼠标移动
       onMouseMove(event) {
-        const { selectData, containerBoxData } = this
-        const { x, y } = selectData.originPoint
+        const {selectData, containerBoxData} = this
+        const {x, y} = selectData.originPoint
         const moveX = event.clientX - x // X轴移动的距离
         const moveY = event.clientY - y // Y轴移动的距离
         if (selectData.action === 'move') { // 移动选择框
@@ -217,7 +216,7 @@
 
       // 选择框拉伸
       doStretch(selectData, containerBoxData, moveX, moveY) {
-        const { minWidth } = this
+        const {minWidth} = this
 
         // 获取溢出长度
         function getOverflowLength() {
@@ -308,7 +307,7 @@
 
       // 设置预览图
       setPreview() {
-        const { selectData, scaleRate } = this
+        const {selectData, scaleRate} = this
         const $canvas = this.$refs.$canvas.getContext('2d')
         $canvas.clearRect(0, 0, 190, 190)
         $canvas.drawImage(
@@ -323,11 +322,11 @@
           190,
         )
       },
-      fileImage(){
+      fileImage() {
         let input = document.createElement('INPUT')
         input.type = 'file'
-        input.accept='.jpg,.jpeg,.png'
-        input.addEventListener('change',event => this.fileChange(event))
+        input.accept = '.jpg,.jpeg,.png'
+        input.addEventListener('change', event => this.fileChange(event))
         input.click()
       },
       // 选择图片
@@ -335,7 +334,7 @@
         const fileObj = event.target.files[0]
         const reader = new FileReader()
         reader.onload = () => {
-          const { selectData, containerBoxData } = this
+          const {selectData, containerBoxData} = this
           this.imgURL = reader.result
           this.getImgSize(this.imgURL).then((result) => {
             if (result.width > result.height) { // 350为外盒子宽高
@@ -387,16 +386,19 @@
     margin: 0;
     padding: 0;
   }
+
   .c-avatar-cutter {
     .container {
       width: 574px;
       height: 507px;
     }
+
     .content {
       display: flex;
       height: 242px;
     }
   }
+
   .c-left {
     position: relative;
     display: flex;
@@ -408,9 +410,11 @@
     border: solid 1px #e8e8e8;
     background-repeat: round;
     background-image: url(../../icons/empty.png);
+
     .container-box {
       position: relative;
     }
+
     .img-mask {
       position: absolute;
       top: 0;
@@ -420,9 +424,12 @@
       opacity: 0.3;
       background-color: white;
     }
+
     img {
-      width: 100%;height: 100%
+      width: 100%;
+      height: 100%
     }
+
     .select-box {
       position: absolute;
       top: 0;
@@ -437,10 +444,12 @@
       position: absolute;
       width: 100%;
       height: 100%;
+
       li {
         position: relative;
         border: dashed 1px rgba(39, 95, 239, 1);
       }
+
       li:nth-child(1):before,
       li:nth-last-child(1):before {
         position: absolute;
@@ -452,30 +461,49 @@
         background-color: rgba(39, 95, 239, 1);
       }
     }
+
     .x-line {
       flex-direction: column;
+
       li:nth-child(1) {
         cursor: n-resize;
-        &:before {left: 50%;}
+
+        &:before {
+          left: 50%;
+        }
       }
+
       li:nth-last-child(1) {
         cursor: s-resize;
-        &:before {left: 50%;}
+
+        &:before {
+          left: 50%;
+        }
       }
     }
+
     .y-line {
       li:nth-child(1) {
         cursor: w-resize;
-        &:before {top: 50%;}
+
+        &:before {
+          top: 50%;
+        }
       }
+
       li:nth-last-child(1) {
         cursor: e-resize;
-        &:before {top: 50%;}
+
+        &:before {
+          top: 50%;
+        }
       }
     }
+
     .point {
       width: 100%;
       height: 100%;
+
       li {
         position: absolute;
         margin-left: -3px;
@@ -486,27 +514,32 @@
         cursor: crosshair;
         background-color: rgba(39, 95, 239, 1);
       }
+
       li:nth-child(1) {
         top: 2px;
         left: 1px;
         cursor: nw-resize;
       }
+
       li:nth-child(2) {
         top: 2px;
         right: -2px;
         cursor: ne-resize;
       }
+
       li:nth-child(3) {
         bottom: -2px;
         left: 1px;
         cursor: sw-resize;
       }
+
       li:nth-child(4) {
         bottom: -2px;
         right: -2px;
         cursor: se-resize;
       }
     }
+
     .cross {
       position: absolute;
       top: 50%;
@@ -519,6 +552,7 @@
       background-size: cover;
       background-image: url(../../icons/icon-cancel.png);
     }
+
     .downloadAgain {
       position: absolute;
       bottom: -31px;
@@ -526,6 +560,7 @@
       cursor: pointer;
       font-size: 14px;
       width: 100%;
+
       span {
         color: rgba(22, 29, 37, 1);
       }
@@ -538,9 +573,11 @@
       }
     }
   }
+
   .c-left--doing {
     background-image: url(../../icons/empty--pure.png);
   }
+
   .c-right {
     flex: 1;
     position: relative;
@@ -548,8 +585,10 @@
     font-size: 16px;
     color: #333333;
     text-align: center;
+
     .preview {
       width: 120px;
+
       canvas {
         display: block;
         width: 120px;
@@ -559,14 +598,19 @@
         /*background-repeat: round;*/
         /*background-image: url(../../icons/empty.png);*/
       }
-      .canvas--doing {background-image: url(../../icons/empty--pure.png);}
+
+      .canvas--doing {
+        background-image: url(../../icons/empty--pure.png);
+      }
     }
+
     .dir {
       width: 120px;
       font-size: 14px;
       color: rgba(22, 29, 37, 0.5);
       margin-top: 15px;
     }
+
     input[type=file] {
       position: absolute;
       left: 0;
@@ -577,10 +621,11 @@
       background-color: white;
     }
   }
+
   .c-btn-group {
     position: absolute;
-    bottom: 20px;
-    right: 40px;
+    bottom: 30px;
+    right: 30px;
     margin-top: 20px;
 
   }

@@ -34,9 +34,12 @@
           show-overflow-tooltip>
           <template slot-scope="scope">
             <div class="s">
-              <span>
+              <span :class="[
+                {'readed': scope.row.isRead == 1},
+                {'unread': scope.row.isRead == 0}
+              ]">
                 {{ scope.row.noticeDetail }}
-                <div v-show="scope.row.isRead == 0" class="unread" />
+                <div v-show="scope.row.isRead == 0" class="unread"/>
               </span>
             </div>
           </template>
@@ -228,6 +231,7 @@
     span {
       position: relative;
       font-size: 14px;
+
       .unread {
         position: absolute;
         right: 0px;
@@ -250,4 +254,5 @@
       font-size: 10px;
     }
   }
+
 </style>

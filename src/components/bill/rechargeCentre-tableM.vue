@@ -464,7 +464,7 @@
   }
 
   /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 560px);
+    height: calc(100vh - 540px);
   }
 
   .recharge-table {

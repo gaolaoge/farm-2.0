@@ -190,7 +190,7 @@
     flex-direction: column;
 
     .personInfo {
-      margin: 20px 20px 20px 50px;
+      margin: 0px 20px 20px 50px;
       height: 191px;
       background-color: rgba(255, 255, 255, 1);
       box-shadow: 0px 4px 20px 0px rgba(27, 83, 244, 0.05);
@@ -257,6 +257,7 @@
             font-weight: 600;
             color: rgba(27, 83, 244, 1);
             line-height: 37px;
+            font-family: Cabin-Bold;
           }
         }
 

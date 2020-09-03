@@ -338,7 +338,7 @@
       },
       // 下载
       downloadFile() {
-        if (!this.table.selectionList.length) return
+        if (this.table.selectionList.length == 0) return
         else if (this.table.selectionList.some(item => item['ing'])) messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
         else this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: 2,
@@ -375,7 +375,8 @@
       },
       // 重命名
       rename() {
-        if (this.table.selectionList[0]['ing']) messageFun('info', '目标正在上传中，无法操作')
+        if (!this.table.selectionList.length != 1) return
+        else if (this.table.selectionList[0]['ing']) messageFun('info', '目标正在上传中，无法操作')
         else this.$prompt('请输入新名称', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -437,7 +438,7 @@
 
 <style lang="less" scoped>
   /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 395px);
+    height: calc(100vh - 375px);
 
     tr {
       cursor: pointer;

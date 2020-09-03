@@ -30,9 +30,20 @@
           width="55"/>
         <!--消息-->
         <el-table-column
-          prop="noticeDetail"
           label="消息详情"
-          show-overflow-tooltip/>
+          show-overflow-tooltip>
+          <template slot-scope="scope">
+            <div class="s">
+              <span :class="[
+                {'readed': scope.row.isRead == 1},
+                {'unread': scope.row.isRead == 0}
+              ]">
+                {{ scope.row.noticeDetail }}
+                <div v-show="scope.row.isRead == 0" class="unread"/>
+              </span>
+            </div>
+          </template>
+        </el-table-column>
         <!--日期-->
         <el-table-column
           label="日期"

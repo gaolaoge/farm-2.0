@@ -41,8 +41,14 @@
             width="45"/>
           <!--消息-->
           <el-table-column
-            prop="noticeDetail"
-            width="250"/>
+            width="250">
+            <template slot-scope="scope">
+              <span :class="[
+                {'readed': scope.row.isRead == 1},
+                {'unread': scope.row.isRead == 0}
+              ]">{{ scope.row.noticeDetail }}</span>
+            </template>
+          </el-table-column>
           <!--时间-->
           <el-table-column
             prop="createTime"/>
@@ -63,8 +69,14 @@
             width="45"/>
           <!--消息-->
           <el-table-column
-            prop="noticeDetail"
-            width="250"/>
+            width="250">
+            <template slot-scope="scope">
+              <span :class="[
+                {'readed': scope.row.isRead == 1},
+                {'unread': scope.row.isRead == 0}
+              ]">{{ scope.row.noticeDetail }}</span>
+            </template>
+          </el-table-column>
           <!--时间-->
           <el-table-column
             prop="createTime"/>
@@ -74,11 +86,17 @@
       <div class="footer">
         <div>
           <!--系统-->
-          <el-checkbox v-model="checkboxBtnVal" class="checkbox" v-show="messageKey.isRead != 1 && systemSelectionList.length" />
-          <span class="s" v-show="messageKey.isRead != 1 && systemSelectionList.length" @click="readedAll('system')">{{ checkboxBtn }}</span>
+          <span class="s"
+                v-show="messageKey.isRead != 1 && messageKey.noticeType == 1"
+                @click="readedAll('system')">
+            {{ checkboxBtn }}
+          </span>
           <!--活动-->
-          <el-checkbox v-model="checkboxBtnVal" class="checkbox" v-show="messageKey.isRead != 1 && activitySelectionList.length" />
-          <span class="s" v-show="messageKey.isRead != 1 && activitySelectionList.length" @click="readedAll('activity')">{{ checkboxBtn }}</span>
+          <span class="s"
+                v-show="messageKey.isRead != 1 && messageKey.noticeType == 2"
+                @click="readedAll('activity')">
+            {{ checkboxBtn }}
+          </span>
         </div>
         <span class="showMeAll" @click="showMeAll">{{ all }}</span>
       </div>
@@ -95,6 +113,7 @@
     createDateFun
   } from '@/assets/common'
   import {messageFun} from "../../assets/common";
+
   export default {
     name: 'messageTable',
     data() {
@@ -122,28 +141,29 @@
     },
     methods: {
       // 标记为已读
-      async readedAll(type){
-        let list = type == 'system' ? this.systemSelectionList : this.activitySelectionList,
-          data = await readMessages({
-          'isRead': 1,
-          'noticeUuidList': list.map(item => item.noticeUuid)
-        })
-        if(data.data.code == 201){
+      async readedAll(type) {
+        let list = type == 'system' ? this.systemSelectionList : this.activitySelectionList
+        if(!list.length) return
+        let data = await readMessages({
+            'isRead': 1,
+            'noticeUuidList': list.map(item => item.noticeUuid)
+          })
+        if (data.data.code == 201) {
           messageFun('success', '操作成功')
           this.getMessageListF()
         }
       },
       // 系统多选
-      systemSelectionChange(val){
+      systemSelectionChange(val) {
         this.systemSelectionList = val
       },
       //活动多选
-      activitySelectionChange(val){
+      activitySelectionChange(val) {
         this.activitySelectionList = val
       },
       // 切换Table
       changeNavTable(index) {
-        this.messageKey.noticeType = ++ index
+        this.messageKey.noticeType = ++index
         this.getMessageListF()
       },
       // 切换btn
@@ -155,7 +175,7 @@
         this.$router.push('/messageCenter')
       },
       // 获取站内信列表
-      async getMessageListF(){
+      async getMessageListF() {
         // isRead 是否已读 1已读 0未读 3全部
         // noticeType 1系统 2活动
         // keyword 关键字
@@ -164,13 +184,13 @@
         let m = this.messageKey,
           v = `isRead=${m.isRead}&noticeType=${m.noticeType}&keyword=&pageIndex=${m.pageIndex}&pageSize=10`
         let data = await getMessageList(v)
-        if(data.data.code == 200){
-          if(m.noticeType == 1) this.systemTableData = data.data.data.map(item => {
+        if (data.data.code == 200) {
+          if (m.noticeType == 1) this.systemTableData = data.data.data.map(item => {
             return Object.assign(item, {
               createTime: createDateFun(new Date(item.createTime), 'mini')
             })
           })
-          else if(m.noticeType == 2) this.activityTableData = data.data.data.map(item => {
+          else if (m.noticeType == 2) this.activityTableData = data.data.data.map(item => {
             return Object.assign(item, {
               createTime: createDateFun(new Date(item.createTime), 'mini')
             })
@@ -319,7 +339,7 @@
         padding: 20px;
         box-sizing: border-box;
 
-        /deep/.el-checkbox {
+        /deep/ .el-checkbox {
           margin-right: 8px;
         }
 
@@ -378,5 +398,13 @@
   /deep/ .el-table td,
   /deep/ .el-table th {
     vertical-align: text-top;
+  }
+
+  .readed {
+    opacity: 0.6;
+  }
+
+  .unread {
+    color: rgba(0, 0, 0, 0.9);
   }
 </style>

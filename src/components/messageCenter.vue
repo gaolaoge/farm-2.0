@@ -58,6 +58,18 @@
   }
 </script>
 
+<style lang="less">
+  .readed {
+    opacity: 0.6;
+    font-size: 14px;
+    line-height: 32px;
+  }
+
+  .unread {
+    color: rgba(0, 0, 0, 0.9);
+  }
+</style>
+
 <style lang="less" scoped>
   .messageCenter {
     overflow: hidden;

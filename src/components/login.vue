@@ -49,7 +49,7 @@
                        type="text"
                        @blur="phoneCodeVerif"
                        @focus="login.phoneForm.codeVerif = null"
-                       class="farm-input"
+                       class="farm-input farm-cord-input"
                        :class="[{'inputError': login.phoneForm.codeVerif === false}]"/>
                 <!--获取验证码-->
                 <div class="verif">
@@ -72,9 +72,8 @@
               <el-switch v-model="login.phoneForm.autoLogin"
                          active-color="RGBA(27, 83, 244, 1)"
                          inactive-color="rgba(230, 230, 230, 1)"/>
-              <span class="switchLabel">
-              {{ $t('login_page.SMS_verif.auto_login') }}
-            </span>
+              <span class="switchLabel">{{ $t('login_page.SMS_verif.auto_login') }}</span>
+              <span class="w"><span @click="navActive = 2">{{ $t('login_page.account_verif.register') }}</span></span>
               <!--登录按钮-->
               <div class="btnLogin" :class="[{'canBeClick': login.phoneForm.phoneVerif && login.phoneForm.codeVerif}]"
                    @click="phoneLoginFun">
@@ -174,7 +173,7 @@
                        ref="forgetMode_code"
                        @blur="findBackCodeVerif"
                        @focus="login.forgetMode.codeFormat = null"
-                       class="farm-input"
+                       class="farm-input farm-cord-input"
                        :class="[{'inputError': login.forgetMode.codeFormat === false}]"/>
                 <span class="warnInfo" v-show="login.forgetMode.codeFormat === false">{{ login.forgetMode.warnInfo.code }}</span>
                 <img src="@/icons/login-success.png" class="i"
@@ -336,13 +335,13 @@
                      @blur="codeVerif"
                      @focus="registered.status.code = null"
                      ref="codeRegister"
-                     class="farm-input"
+                     class="farm-input farm-cord-input"
                      :class="[{'inputError': registered.status.code === false}]"/>
               <span class="warnInfo" v-show="registered.status.code === false">{{ registered.warnInfo.code }}</span>
               <img src="@/icons/login-success.png" class="i" v-show="registered.status.code === true">
               <img src="@/icons/login-error .png" class="i canClick" v-show="registered.status.code === false"
                    @click="deleteInput('code')">
-              <div class="verif">
+              <div class="verif register">
                 <div class="btn"
                      :class="[{'canClick': registered.status.phone}]"
                      @click="den"
@@ -497,7 +496,7 @@
           }
         },
         registered: {
-          tick: false,
+          tick: true,
           countdown: '60s',
           verifShow: true,
           intervalFun: null,
@@ -848,21 +847,27 @@
       // 短信验证登录 - 验证手机格式
       jk() {
         let f = this.login.phoneForm
-        if (!f.phone) {
-          f.phoneVerif = null
-          return false
-        } else if (!this.reg.phoneReg.test(f.phone)) {
+        if (!f.phone)f.phoneVerif = null
+        else if (!this.reg.phoneReg.test(f.phone)) {
           this.login.warnInfo.phone = this.$t('login_page.SMS_verif.phone_warnInfo')
           f.phoneVerif = false
-          return false
         }
       },
-      jkC() {
+      async jkC() {
         let f = this.login.phoneForm
-        if (this.reg.phoneReg.test(f.phone)) f.phoneVerif = true
-        else f.phoneVerif = null
+        if (!this.reg.phoneReg.test(f.phone)) f.phoneVerif = null
+        else {
+          let data = await registerPhone(f.phone)
+          //code:200   手机号已存在
+          //code:4031  手机号未注册
+          if(data.data.code == 200) f.phoneVerif = true
+          else if(data.data.code == 4031) {
+            this.login.warnInfo.phone = this.$t('login_page.message.need_to_register')
+            f.phoneVerif = false
+          }
+        }
       },
-      // 登录 点击errIcon
+      // 登录 点击errIcons
       loginDeleteInput(list, item) {
         this.login[list][item] = ''
         this.$refs[list + '_' + item].focus()
@@ -878,10 +883,7 @@
         }
         // 校验
         if (/^\d{6}$/.test(r.code)) r.codeVerif = true
-        else {
-          // '请正确输入验证码'
-          r.codeVerif = false
-        }
+        else r.codeVerif = false    // '请正确输入验证码'
       },
       // 帐号 登录
       async accountloginFun() {
@@ -1234,19 +1236,6 @@
               line-height: 22px;
               cursor: pointer;
             }
-
-            .verif {
-              right: 10px;
-              height: 40px;
-
-              .btn.suc {
-                cursor: pointer;
-
-                &:hover {
-                  color: rgba(22, 29, 37, 0.6);
-                }
-              }
-            }
           }
         }
 
@@ -1442,7 +1431,7 @@
 
           &.canClick {
             cursor: pointer;
-            background-color: RGBA(14, 71, 161, 1);
+            background-color: rgba(22, 113, 255, 0.8);
 
             span {
               color: rgba(255, 255, 255, 1);
@@ -1535,39 +1524,38 @@
 
   .verif {
     position: absolute;
-    right: 10px;
+    right: 0px;
     top: 0px;
-    height: 36px;
+    height: 38px;
+    width: 90px;
+    border-radius: 8px;
+    border: 1px solid rgba(22, 29, 37, 0.19);
     display: flex;
+    justify-content: center;
     align-items: center;
+    &.register {
+      height: 34px;
+    }
 
     .btn {
       font-size: 14px;
       font-weight: 500;
       color: rgba(22, 29, 37, 0.4);
 
-      &.canClick {
-        color: rgba(22, 29, 37, 0.8);
+      &.canClick,
+      &.suc {
         cursor: pointer;
+
+        &:hover {
+          color: rgba(22, 29, 37, 0.6);
+        }
       }
     }
 
     .delayDate {
       font-size: 14px;
-      text-align: center;
-      color: rgba(22, 29, 37, 0.8);
+      color: rgba(27, 83, 244, 1);
 
-    }
-  }
-
-  .f {
-    position: relative;
-
-    .verif {
-      top: 0px;
-      right: 10px;
-      height: 40px;
-      cursor: pointer;
     }
   }
 
@@ -1677,6 +1665,10 @@
     .btnLogin {
       margin-top: 0px;
     }
+  }
+
+  .farm-cord-input {
+    width: 220px;
   }
 
 </style>

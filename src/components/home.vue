@@ -347,7 +347,8 @@
 
             .n {
               font-size: 40px;
-              font-family: Helvetica;
+              font-family: MontserratAlternates-BlackItalic;
+              font-style: italic;
               color: rgba(22, 29, 37, 1);
               line-height: 48px;
               margin: 49px 0px 5px 50px;
@@ -505,6 +506,10 @@
 
           .sw {
             width: 162px;
+            height: 185px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
 
             .dd {
               position: relative;
@@ -513,7 +518,6 @@
               border-radius: 10px;
               padding: 6px;
               box-sizing: border-box;
-              margin-bottom: 29px;
 
               .d {
                 width: 150px;
@@ -538,14 +542,15 @@
             .n {
               display: block;
               font-size: 40px;
-              font-family: Helvetica;
+              font-family: MontserratAlternates-BlackItalic;
+              font-style: italic;
+              font-weight: 900;
               color: rgba(22, 29, 37, 1);
               line-height: 48px;
               width: 162px;
               text-overflow: ellipsis;
               white-space: nowrap;
               overflow: hidden;
-              margin-bottom: 15px;
             }
 
             .k {

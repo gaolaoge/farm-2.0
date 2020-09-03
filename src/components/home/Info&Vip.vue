@@ -209,8 +209,7 @@
           flex-direction: column;
           justify-content: center;
 
-          .name,
-          .level {
+          .name {
             font-size: 16px;
             font-family: NexaBold;
             color: rgba(22, 29, 37, 1);
@@ -219,6 +218,8 @@
           }
 
           .level {
+            font-size: 12px;
+            font-family: SourceHanSansCN-Regular, SourceHanSansCN;
             margin-top: 5px;
             font-weight: 400;
             color: rgba(22, 29, 37, 0.3);
@@ -339,7 +340,7 @@
 
           .val {
             font-size: 18px;
-            font-family: Helvetica;
+            font-family: Cabin-Bold;
             color: rgba(27, 83, 244, 1);
             line-height: 22px;
           }
@@ -367,6 +368,7 @@
         width: 267px;
         height: 1px;
         background-color: rgba(22, 29, 37, 0.09);
+        margin: 10px 0px;
       }
 
       .echarts {

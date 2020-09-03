@@ -14,7 +14,7 @@
               v-for="item in filter.tradingtatusList"
               :key="item.value"
               :label="item.label"
-              :value="item.value" />
+              :value="item.value"/>
           </el-select>
         </div>
         <!--发票状态-->
@@ -27,14 +27,14 @@
               v-for="item in filter.paymentMethodList"
               :key="item.value"
               :label="item.label"
-              :value="item.value" />
+              :value="item.value"/>
           </el-select>
         </div>
         <!--查询时间-->
         <div class="filter-item f">
           <span class="filter-item-label">
             {{ filter.inquireLabel }}：
-<!--            {{ filter.date }}-->
+            <!--            {{ filter.date }}-->
           </span>
           <el-date-picker
             v-model="filter.date"
@@ -43,7 +43,7 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期">
           </el-date-picker>
-<!--          <model-calendar style="display: inline-block;" ref="calendar" @changeSelectDate="changeFilterDate"/>-->
+          <!--          <model-calendar style="display: inline-block;" ref="calendar" @changeSelectDate="changeFilterDate"/>-->
         </div>
         <!--查询-->
         <div class="filter-btn primary" @click="getList">
@@ -58,6 +58,7 @@
           {{ filter.exportBtn }}
         </div>
       </div>
+      <div class="l"/>
       <!--table-->
       <el-table
         :data="table.invoicingData"
@@ -243,8 +244,8 @@
         this.table.total = data.data.total
         this.table.invoicingData = data.data.data.map(curr => {
           let {year, month, day, hour, minutes, seconds} = createCalendar(new Date(curr.updateTime)),
-              status
-          switch(curr.invoiceStatus){
+            status
+          switch (curr.invoiceStatus) {
             case 0:
               status = '审核中'
               break
@@ -259,13 +260,13 @@
               break
           }
           return {
-              invoice: curr.invoiceTitle,          // 发票抬头
-              invoiceNum: curr.taxpayerId,         // 纳税人标识号
-              invoiceAmount: curr.invoiceAmount,   // 发票金额（元）
-              invoiceType: curr.invoiceType == 0 ? '增值税普票' : '-',           // 发票类型
-              invoiceState: status,                // 发票状态
-              email: curr.email,                   // 邮箱
-              date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,   // 开票时间
+            invoice: curr.invoiceTitle,          // 发票抬头
+            invoiceNum: curr.taxpayerId,         // 纳税人标识号
+            invoiceAmount: curr.invoiceAmount,   // 发票金额（元）
+            invoiceType: curr.invoiceType == 0 ? '增值税普票' : '-',           // 发票类型
+            invoiceState: status,                // 发票状态
+            email: curr.email,                   // 邮箱
+            date: `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`,   // 开票时间
           }
         })
       },
@@ -301,9 +302,9 @@
         exportDownloadFun(data, '开票记录', 'xlsx')
       },
       // 获取发票抬头list
-      async getHeadersListF(){
+      async getHeadersListF() {
         let data = await getHeadersList()
-        if(data.data.code == 200) this.filter.tradingtatusList = data.data.data.map(curr => {
+        if (data.data.code == 200) this.filter.tradingtatusList = data.data.data.map(curr => {
           return {
             value: curr,
             label: curr
@@ -321,20 +322,23 @@
 </script>
 
 <style lang="less" scoped>
-  /deep/.el-date-editor {
+  /deep/ .el-date-editor {
     .el-range__icon,
     .el-range-separator,
     .el-input__icon.el-range__close-icon {
       line-height: 22px;
     }
   }
+
   .filter-item {
     display: flex;
     align-items: center;
+
     &.f {
       margin-right: 20px;
     }
   }
+
   .invoicing {
     overflow: hidden;
   }
@@ -344,7 +348,7 @@
   }
 
   /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 550px);
+    height: calc(100vh - 540px);
   }
 
   .invoicing-table {
@@ -369,6 +373,13 @@
         right: 0px;
       }
     }
+
+    .l {
+      margin-top: 8px;
+      background-color: rgba(22, 29, 37, 0.1);
+      height: 1px;
+    }
+
   }
 
   .download-tab {

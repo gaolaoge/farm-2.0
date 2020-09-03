@@ -39,6 +39,7 @@
           <el-radio :label=0>{{ info.sexRadio[1] }}</el-radio>
         </el-radio-group>
         <span class="remarks" v-show="info.sexVal == null">{{ info.sexRemarks }}</span>
+        <img src="@/icons/star.png" v-show="info.sexVal == null">
       </div>
       <!--生日-->
       <div class="form-item">
@@ -49,7 +50,8 @@
           @change="changeBirthdayDate"
           :picker-options="pickerOptions"
           placeholder="选择日期" />
-        <span class="remarks">{{ info.birthdayRemarks }}</span>
+        <span class="remarks" v-show="info.birthdayVal == null">{{ info.birthdayRemarks }}</span>
+        <img src="@/icons/star.png" v-show="info.birthdayVal == null">
       </div>
       <!--邮箱-->
       <div class="form-item">
@@ -267,10 +269,13 @@
         font-size: 14px;
         line-height: 20px;
         width: 510px;
-        margin-bottom: 20px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
 
         .label {
           color: rgba(22, 29, 37, 0.59);
+          padding-right: 10px;
         }
 
         .val {

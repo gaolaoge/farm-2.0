@@ -26,7 +26,9 @@
         </div>
         <div class="r">
           <!--消息-->
-          <div class="messageE" :class="[{'active': showMessageList},{'isHome': inHome}]" v-operating3>
+          <div class="messageE"
+               :class="[{'active': showMessageList},{'isHome': inHome}]"
+               v-operating3>
             <img src="@/icons/messageIconheaderM2.png"
                  @click="showMessageList = !showMessageList"
                  v-show="!showMessageList"
@@ -252,7 +254,6 @@
   import {setInfo} from '@/assets/common'
   import {mapState} from 'vuex'
   import messageTable from '@/components/headerM/message-table'
-
 
   export default {
     name: 'headerM',

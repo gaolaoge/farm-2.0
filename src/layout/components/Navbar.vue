@@ -247,7 +247,6 @@
           .ib {
             border: 1px solid rgba(27, 83, 244, 1);
             background-color: rgba(255, 255, 255, 1);
-            box-shadow: 0px 2px 12px 0px rgba(27, 83, 244, 0.15);
 
             img {
               &.defaultIcon {
