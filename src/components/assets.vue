@@ -6,8 +6,8 @@
       <div class="myUploadBtnGroup" v-show="table.navListActiveIndex == 0">
         <!--上传-->
         <div class="more-btn" v-operating2>
+          <img :src="btnGroup.uploadInitialIcon">
           <span>{{ btnGroup.uploadText }}</span>
-          <img :src="btnGroup.uploadInitialIcon" alt="">
         </div>
         <!--上传list-->
         <div class="uploadBtnList" v-show="btnGroup.showUploadBtnList">
@@ -64,11 +64,11 @@
              v-for="(item,index) in btnGroup.outPutBtnGroup"
              :key="index"
              @click="operating('render', item['text'])">
-          <span>{{ item['text'] }}</span>
           <img :src="item.initialIcon" v-if="item.initialIcon" class="btnIcon default"
                :style="{'transform': item.css }">
           <img :src="item.selectedIcon" v-if="item.selectedIcon" class="btnIcon hover"
                :style="{'transform': item.css }">
+          <span>{{ item['text'] }}</span>
         </div>
       </div>
       <div class="rightOPerate">
@@ -383,7 +383,7 @@
       }
 
       img {
-        margin-left: 4px;
+        margin: 0px 4px;
         width: 10px;
       }
 

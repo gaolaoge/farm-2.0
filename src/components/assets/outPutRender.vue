@@ -416,7 +416,7 @@
 <style lang="less" scoped>
 
   /deep/.el-table__body-wrapper {
-    height: calc(100vh - 395px);
+    height: calc(100vh - 375px);
     tr {
       cursor: pointer;
     }
@@ -431,7 +431,7 @@
 
   @media screen and (orientation: portrait) {
     /deep/.el-table__body-wrapper {
-      height: calc(100vw - 395px);
+      height: calc(100vw - 375px);
     }
   }
 </style>
