@@ -126,8 +126,8 @@
                      @click="operateBtnFun(item['text'])"
                      v-for="(item,index) in stepOneBase.local.operateBtnGroup"
                      :key="index">
-                  <img :src="item.initialIcon" alt="" v-if="item.initialIcon" class="btnIcon default">
-                  <img :src="item.selectedIcon" alt="" v-if="item.selectedIcon" class="btnIcon hover">
+                  <img :src="item.initialIcon" v-if="item.initialIcon" class="btnIcon default">
+                  <img :src="item.selectedIcon" v-if="item.selectedIcon" class="btnIcon hover">
                   <span>{{ item['text'] }}</span>
                 </div>
               </div>
@@ -141,14 +141,14 @@
 
                   <el-table-column
                     type="selection"
-                    align="center"
-                    width="55"/>
+                    align="right"
+                    width="45"/>
                   <!--场景文件-->
                   <el-table-column
                     prop="sceneFile"
                     label="场景名"
                     show-overflow-tooltip
-                    width="220"/>
+                    width="180"/>
                   <!--工程路径-->
                   <el-table-column
                     prop="address"
@@ -160,7 +160,7 @@
                           transferType: 4,              // 传输类型
                           sceneFile: scope.$index
                         })">
-                        <span>{{ scope.row.address }}</span>
+                        <span :title="scope.row.address">{{ scope.row.address }}</span>
                         <img src="@/icons/more-btn.png">
                       </div>
                     </template>
@@ -681,7 +681,7 @@
               {
                 text: '添加',
                 initialIcon: require('@/icons/addIcon-Blue.png'),
-                selectedIcon: require('@/icons/addIcon-Whit.png')
+                selectedIcon: require('@/icons/addIcon-white.png')
               },
               {
                 text: '删除',
@@ -1771,6 +1771,13 @@
             .netdist {
               padding: 20px;
               box-sizing: border-box;
+              height: 100%;
+
+              .farm-form {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+              }
 
               .farm-form-item {
                 display: flex;
@@ -1786,7 +1793,7 @@
 
                   &.b {
                     position: relative;
-                    height: 422px;
+                    height: 100%;
                     padding: 0px 20px;
 
                     /*选择渲染文件 - 我的资产 - 场景文件 - nav*/
@@ -1905,6 +1912,9 @@
                   }
                 }
 
+                &:nth-of-type(2) {
+                  flex-grow: 1;
+                }
               }
             }
 

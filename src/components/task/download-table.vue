@@ -25,13 +25,13 @@
           label="任务ID"
           sortable
           show-overflow-tooltip
-          width="100"/>
+          width="106"/>
         <!--场景名-->
         <el-table-column
           prop="sceneName"
           label="场景名"
           show-overflow-tooltip
-          width="200"/>
+          width="224"/>
         <!--状态-->
         <el-table-column
           label="状态"
@@ -58,7 +58,7 @@
           label="渲染进度"
           sortable
           show-overflow-tooltip
-          width="230">
+          width="170">
           <template slot-scope="scope">
             <el-progress :percentage="isNaN(scope.row.percent) ? 0 : scope.row.percent"
                          :show-text="false"
@@ -75,40 +75,40 @@
           show-overflow-tooltip
           :filter-method="filterStatus"
           :filters="table.itemList"
-          width="180"/>
+          width="186"/>
         <!--渲染中-->
         <el-table-column
           prop="rendering"
           sortable
-          width="100"
+          width="86"
           show-overflow-tooltip
           label="渲染中"/>
         <!--等待-->
         <el-table-column
           prop="wait"
           sortable
-          width="100"
+          width="86"
           show-overflow-tooltip
           label="等待"/>
         <!--暂停-->
         <el-table-column
           prop="timeOut"
           sortable
-          width="100"
+          width="86"
           show-overflow-tooltip
           label="暂停"/>
         <!--完成-->
         <el-table-column
           prop="carryOut"
           sortable
-          width="100"
+          width="86"
           show-overflow-tooltip
           label="完成"/>
         <!--失败-->
         <el-table-column
           prop="failure"
           label="失败"
-          width="100"
+          width="86"
           show-overflow-tooltip
           sortable/>
         <!--渲染时长-->
@@ -117,32 +117,32 @@
           label="渲染时长"
           sortable
           show-overflow-tooltip
-          width="180"/>
+          width="170"/>
         <!--渲染费用（金币）-->
         <el-table-column
           prop="renderingCost"
           label="渲染费用（金币）"
           sortable
           show-overflow-tooltip
-          width="156"/>
+          width="150"/>
         <!--帧范围-->
         <el-table-column
           prop="frameRange"
           label="帧范围"
           sortable
           show-overflow-tooltip
-          width="100"/>
+          width="110"/>
         <!--间隔帧-->
         <el-table-column
           prop="intervalFrame"
           label="间隔帧"
           sortable
           show-overflow-tooltip
-          width="100"/>
+          width="86"/>
         <!--相机-->
         <el-table-column
           prop="camera"
-          width="100"
+          width="142"
           sortable
           show-overflow-tooltip
           label="相机"/>
@@ -152,14 +152,14 @@
           label="层名"
           sortable
           show-overflow-tooltip
-          width="100"/>
+          width="164"/>
         <!--下载情况-->
         <el-table-column
           label="下载情况"
           show-overflow-tooltip
           :filter-method="filterStatus"
           :filters="table.downloadStatusList"
-          width="120">
+          width="116">
           <template slot-scope="scope">
             <span v-if="scope.row.downloadStatus == '待下载'" style="color: #F90023">
               {{ scope.row.downloadStatus }}
@@ -178,14 +178,14 @@
           label="渲染开始时间"
           sortable
           show-overflow-tooltip
-          width="180"/>
+          width="174"/>
         <!--渲染结束时间-->
         <el-table-column
           prop="renderingEndTime"
           label="渲染结束时间"
           sortable
           show-overflow-tooltip
-          width="180"/>
+          width="174"/>
         <!--创建人-->
         <el-table-column
           prop="founder"
@@ -200,7 +200,7 @@
           label="创建时间"
           sortable
           show-overflow-tooltip
-          width="200"/>
+          width="174"/>
 
       </el-table>
     </div>

@@ -49,6 +49,7 @@
           type="date"
           @change="changeBirthdayDate"
           :picker-options="pickerOptions"
+          :clearable="false"
           placeholder="选择日期" />
         <span class="remarks" v-show="info.birthdayVal == null">{{ info.birthdayRemarks }}</span>
         <img src="@/icons/star.png" v-show="info.birthdayVal == null">

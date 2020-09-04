@@ -67,6 +67,99 @@
 
   .unread {
     color: rgba(0, 0, 0, 0.9);
+    line-height: 32px;
+  }
+
+  .systemTable,
+  .activityTable {
+    overflow: hidden;
+    padding: 10px;
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .btnList {
+      padding: 10px 0px;
+      display: flex;
+      justify-content: space-between;
+
+      .btn {
+        display: inline-block;
+        width: 68px;
+        height: 24px;
+        background-color: rgba(248, 248, 248, 1);
+        border-radius: 13px;
+        text-align: center;
+        margin: 0px 15px;
+        cursor: pointer;
+
+        span {
+          font-size: 14px;
+          color: rgba(22, 29, 37, 0.39);
+          line-height: 24px;
+        }
+
+        &.active {
+          background-color: rgba(39, 95, 239, 1);
+
+          span {
+            color: rgba(255, 255, 255, 1);
+          }
+        }
+      }
+    }
+
+    .table {
+      flex-grow: 1;
+    }
+
+    .page {
+      margin: 0px 25px 30px;
+    }
+  }
+
+  .readAll {
+    font-size: 14px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: 500;
+    color: rgba(22, 29, 37, 0.8);
+    margin-right: 40px;
+    cursor: pointer;
+
+    &:hover {
+      color: rgba(22, 29, 37, 1);
+    }
+  }
+
+  .s {
+    display: flex;
+    align-items: center;
+    span {
+      position: relative;
+      font-size: 14px;
+
+      .unread {
+        position: absolute;
+        right: 0px;
+        top: -0px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: rgba(255, 62, 77, 0.8);
+      }
+    }
+  }
+
+  /deep/ .el-table__body-wrapper {
+    height: calc(100vh - 330px);
+  }
+
+  /deep/ .el-table__row {
+    td:nth-of-type(3) .cell {
+      color: rgba(22, 29, 37, 0.5);
+      font-size: 10px;
+    }
   }
 </style>
 

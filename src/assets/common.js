@@ -23,6 +23,18 @@ const createDateFun = function (date, mini) {
   else return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
 }
 
+// 最近两天内化简倒计时
+const simplify = function (date) {
+  let halfDay = 1000 * 60 * 60 * 12,                             // 半天的毫秒时
+    todayNum = new Date(new Date().toDateString()).getTime()     // 当日零时时间戳
+  if (date - todayNum <= halfDay) return '今天上午'
+  else if (date - todayNum < halfDay * 2) return '今天下午'
+  else if (todayNum - date < halfDay) return '昨天上午'
+  else if (todayNum - date < halfDay * 2) return '昨天下午'
+  else if (todayNum - date < halfDay * 3) return '前天下午'
+  else if (todayNum - date < halfDay * 4) return '前天下午'
+}
+
 // 耗时
 const consum = function (time) {
   let result = ''
@@ -86,8 +98,8 @@ const exportDownloadFun = (data, name, type, isProtocal) => {
 }
 
 // 2位排序
-const sortF = function(a, b){
-  if(a < b) return
+const sortF = function (a, b) {
+  if (a < b) return
   a += b
   b = a - b
   a -= b
@@ -293,7 +305,8 @@ export {
   IEVersion,
   clearUserCookie,
   getFileSize,
-  sortF
+  sortF,
+  simplify
 }
 
 

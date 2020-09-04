@@ -110,7 +110,8 @@
     readMessages
   } from "../../api/header-api"
   import {
-    createDateFun
+    createDateFun,
+    simplify
   } from '@/assets/common'
   import {messageFun} from "../../assets/common";
 
@@ -185,17 +186,19 @@
           v = `isRead=${m.isRead}&noticeType=${m.noticeType}&keyword=&pageIndex=${m.pageIndex}&pageSize=10`
         let data = await getMessageList(v)
         if (data.data.code == 200) {
+          let halfDay = 1000 * 60 * 60 * 12,              // 半天的毫秒时
+            todayNum = new Date(new Date().toDateString()).getTime(),      // 当日零时时间戳
+             theDayBeforeYesterday = todayNum - halfDay * 4
           if (m.noticeType == 1) this.systemTableData = data.data.data.map(item => {
             return Object.assign(item, {
-              createTime: createDateFun(new Date(item.createTime), 'mini')
+              createTime: theDayBeforeYesterday > item.createTime ? createDateFun(new Date(item.createTime), 'mini') : simplify(item.createTime)
             })
           })
           else if (m.noticeType == 2) this.activityTableData = data.data.data.map(item => {
             return Object.assign(item, {
-              createTime: createDateFun(new Date(item.createTime), 'mini')
+              createTime: theDayBeforeYesterday > item.createTime ? createDateFun(new Date(item.createTime), 'mini') : simplify(item.createTime)
             })
           })
-
           // {
           //  createBy: "system"
           //  createTime: 1591061954296

@@ -62,7 +62,7 @@
         taskTemplate: null,           // 任务数统计数据
         framesTemplate: null,         // 帧数数统计数据
         consumptionTemplate: null,    // 消费统计数据
-        statusTemplate: null,    // 消费统计数据
+        statusTemplate: null,         // 消费统计数据
       }
     },
     methods: {
@@ -128,7 +128,7 @@
   }
 </script>
 
-// echarts公共样式
+<!--echarts公共样式-->
 <style lang="less">
 
   .el-picker-panel.el-date-range-picker.el-popper {

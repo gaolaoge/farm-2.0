@@ -97,4 +97,14 @@
   /deep/ .el-table .el-table__row:hover::after {
     display: none
   }
+
+  /deep/.el-checkbox__input.is-checked+.el-checkbox__label {
+    color: rgba(27, 83, 244, 1);
+  }
+
+  /deep/.el-table__header tr th:nth-of-type(1) .cell,
+  /deep/.el-table__body tr td:nth-of-type(1) .cell {
+    padding-left: 20px;
+  }
+
 </style>

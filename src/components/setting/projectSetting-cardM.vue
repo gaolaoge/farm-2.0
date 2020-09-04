@@ -352,7 +352,7 @@
       // 编辑项目 - 保存
       async editSaveBtnFun() {
         let c = this.editProject
-        if(!c.nameV) return false
+        if (!c.nameV) return false
         let data = await editTask({
           'projectName': c.nameV,
           'projectStatus': c.statusV,
@@ -448,6 +448,7 @@
     display: inline-block;
     margin-right: 10px;
     cursor: pointer;
+    text-decoration: underline;
   }
 
   .createProject,
@@ -462,11 +463,12 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
+    user-select: none;
 
     .createBase,
     .editBase {
       background-color: rgba(255, 255, 255, 1);
-      box-shadow: 0px 1px 30px 0px rgba(16, 20, 27, 1);
+      box-shadow: 0px 1px 6px 0px rgba(27, 83, 244, 0.15);
       border-radius: 8px;
       overflow: hidden;
 
@@ -522,6 +524,7 @@
       .con {
         .name {
           width: 428px;
+
           &.err {
             color: rgba(255, 62, 77, 1);
           }

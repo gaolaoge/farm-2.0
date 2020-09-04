@@ -65,12 +65,13 @@
         <!--发票类型-->
         <div class="item">
           <span class="label">{{ typeLabel }}：</span>
-          <el-radio-group v-model="typeVal" class="radio">
-            <el-radio :label="item.value"
-                      v-for="(item,index) in typeValList"
-                      :key="index">{{ item.label }}
-            </el-radio>
-          </el-radio-group>
+<!--          <el-radio-group v-model="typeVal" class="radio">-->
+<!--            <el-radio :label="item.value"-->
+<!--                      v-for="(item,index) in typeValList"-->
+<!--                      :key="index">{{ item.label }}-->
+<!--            </el-radio>-->
+<!--          </el-radio-group>-->
+          <span class="typeV">{{ typeV }}</span>
         </div>
         <!--发票抬头-->
         <div class="item">
@@ -95,21 +96,23 @@
 
               <el-table-column
                 prop="invoiceTitle"
-                width="400"
+                min-width="400"
                 show-overflow-tooltip
                 label="发票抬头"/>
 
               <el-table-column
                 prop="taxpayerId"
+                width="200"
                 label="纳税人识别号"/>
 
               <el-table-column
                 prop="email"
+                width="220"
                 label="邮箱"/>
 
               <el-table-column
                 prop="isDefault"
-                width="140"
+                width="80"
                 label="是否默认">
                 <template slot-scope="scope">
                   <span>{{ scope.row.isDefault == 0 ? '非默认' : '默认' }}</span>
@@ -117,7 +120,7 @@
               </el-table-column>
 
               <el-table-column
-                width="360"
+                width="240"
                 label="操作">
                 <template slot-scope="scope">
                   <span class="table-btn" @click="setDefault(scope.$index)">{{ operatingBtn[0] }}</span>
@@ -224,6 +227,7 @@
             value: '1'
           }
         ],
+        typeV: '增值税普票',
         invoiceLabel: '开票抬头',
         btn: '立即开票',
         recordingTableData: [
@@ -572,6 +576,13 @@
         font-size: 20px;
         font-weight: 600;
         color: rgba(22, 29, 37, 0.8);
+        font-family: Cabin-Bold;
+      }
+
+      .typeV {
+        line-height: 24px;
+        font-size: 14px;
+        font-family: PingFangSC-Semibold, PingFang SC;
       }
 
       .valTable {
@@ -592,17 +603,14 @@
     }
 
     .btn {
-      width: 116px;
+      width: 96px;
       height: 32px;
-      /*background-color: rgba(53, 130, 254, 1);*/
-      background-color: rgba(0, 95, 255, 1);
-      box-shadow: 0px 1px 10px 0px rgba(22, 29, 37, 0.2);
+      background-color: rgba(27, 83, 244, 1);
       border-radius: 6px;
       text-align: center;
       cursor: pointer;
       margin-left: 122px;
       margin-top: 30px;
-      opacity: 0.8;
 
       span {
         font-size: 14px;
@@ -611,9 +619,6 @@
         line-height: 32px;
       }
 
-      /*&:hover {*/
-      /*  background-color: rgba(0, 95, 255, 1);*/
-      /*}*/
     }
 
     .table-btn {
@@ -727,6 +732,8 @@
       background: rgba(241, 244, 249, 1);
       box-shadow: 0px 1px 6px 0px rgba(27, 83, 244, 0.3);
       border-radius: 8px 8px 0px 0px;
+      position: relative;
+      z-index: 1;
 
       .el-dialog__title {
         margin-left: 30px;

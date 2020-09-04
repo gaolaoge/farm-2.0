@@ -262,8 +262,8 @@
 <style lang="less" scoped>
   .editPassword {
     .container {
-      width: 574px;
-      height: 507px;
+      width: 400px;
+      height: 380px;
     }
 
     .content {
@@ -272,7 +272,9 @@
       flex-direction: column;
 
       .x {
-        margin-top: 70px;
+        position: absolute;
+        bottom: 30px;
+        right: 30px;
       }
     }
 
@@ -282,7 +284,7 @@
       flex-direction: column;
 
       img {
-        margin-top: 74px;
+        margin-top: 10px;
         margin-bottom: 23px;
       }
 
@@ -324,11 +326,12 @@
     }
 
     .farm-item {
-      position: relative;
-      width: 300px;
+      padding: 0px 30px;
+      width: 100%;
       height: 36px;
       margin-bottom: 20px;
       display: flex;
+      box-sizing: border-box;
 
       .phone {
         width: 100%;
@@ -380,7 +383,7 @@
         box-sizing: border-box;
 
         &.code {
-          width: 200px;
+          width: 240px;
         }
 
         &::-webkit-input-placeholder { /* WebKit browsers */

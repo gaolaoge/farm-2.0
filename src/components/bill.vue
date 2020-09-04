@@ -211,14 +211,17 @@
 
         .avatar {
           margin-bottom: 10px;
-          width: 86px;
-          border-radius: 50%;
+          width: 60px;
+          border-radius: 16px;
+          padding: 5px;
+          border: 1px solid rgba(22, 29, 37, 0.09);
         }
 
         .name {
           font-size: 14px;
           font-weight: 600;
           color: rgba(22, 29, 37, 1);
+          font-family: NexaBold;
         }
 
         .level {
@@ -230,9 +233,8 @@
           }
 
           span {
-            font-size: 11px;
-            font-weight: 400;
-            color: rgba(229, 199, 138, 0.7);
+            font-size: 12px;
+            color: rgba(22, 29, 37, 0.3);
           }
         }
       }
@@ -280,7 +282,6 @@
           height: 30px;
           background-color: rgba(0, 97, 255, 1);
           border: 1px solid rgba(0, 97, 255, 1);
-          box-shadow: 0px 1px 10px 0px rgba(22, 29, 37, 0.2);
           text-align: center;
           border-radius: 6px;
           cursor: pointer;
