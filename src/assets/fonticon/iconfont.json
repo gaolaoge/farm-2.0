@@ -6,18 +6,18 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "781638",
+      "name": "右箭头",
+      "font_class": "sanjiaoright",
+      "unicode": "e6b7",
+      "unicode_decimal": 59063
+    },
+    {
       "icon_id": "9287597",
       "name": "筛选",
       "font_class": "shaixuan2",
       "unicode": "e624",
       "unicode_decimal": 58916
-    },
-    {
-      "icon_id": "1055090",
-      "name": "展开",
-      "font_class": "webicon215",
-      "unicode": "e68d",
-      "unicode_decimal": 59021
     },
     {
       "icon_id": "12103028",

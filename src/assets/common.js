@@ -147,9 +147,9 @@ const createTableIconList = function () {
     else {
       let table = document.getElementsByClassName('download-table')[0],
         el_table = table.querySelector('.el-table__body-wrapper'),
-        y = [...table.querySelector('.el-table__body-wrapper')]
-      console.log(y)
-      y.forEach(curr => {
+        list = el_table.querySelectorAll('table tbody .el-table__row .el-table__expand-icon')
+      console.log(list)
+      list.forEach(curr => {
         // let i = document.createElement('I'),
         //   ii = document.createElement('I')
         // i.classList.add('farmIconFont')
@@ -161,12 +161,12 @@ const createTableIconList = function () {
         let original = curr.querySelector('i'),
             i = document.createElement('I')
         i.classList.add('farmIconFont')
-        i.classList.add('iconwebicon215')
+        i.classList.add('iconsanjiaoright')
         curr.removeChild(original)
         curr.appendChild(i)
       })
     }
-  }, 100)
+  }, 300)
 }
 
 // message 信息
