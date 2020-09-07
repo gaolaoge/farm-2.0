@@ -181,7 +181,7 @@
           moreBtnList: this.$t('assets.moreBtnList'),    // ['移动到', '复制到', '重命名', '解压', '删除']
           showMoreBtnList: false,
           howToCreateBtn: this.$t('assets.howToCreateBtn'),  // ['手动创建资产目录', '自动创建资产目录']
-          howToCreateIindex: 0
+          howToCreateIindex: '0'
         },
         info: this.$t('assets.info'),
         table: {
@@ -349,7 +349,7 @@
       font-size: 12px;
       line-height: 41px;
       font-weight: 400;
-      color: rgba(229, 199, 138, 0.6);
+      color: rgba(255, 191, 0, 1);
       user-select: none;
     }
 

@@ -441,7 +441,7 @@
           phoneForm: {
             phone: '',
             code: '',
-            autoLogin: true,
+            autoLogin: false,
             v: false,
             verifShow: true,
             countdown: '60s',
@@ -455,7 +455,7 @@
             password: 'gaoge1834',
 //            account: '',
 //            password: '',
-            isAutoLogin: true,
+            isAutoLogin: false,
             passwordEye: false
           },
           formStatus: {

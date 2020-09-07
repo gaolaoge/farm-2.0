@@ -1666,11 +1666,12 @@
         })
           .then(
             ({value}) => {
+              console.log(value)
               if (!value) messageFun('info', '项目名为必填项')
               else {
-                newItemName = value.value
+                newItemName = value
                 return addNewItem({
-                  projectName: value.value,
+                  projectName: value,
                   isDefault: 1
                 })
               }

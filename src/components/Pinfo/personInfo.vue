@@ -199,7 +199,6 @@
     },
     mounted() {
       this.info.sexVal = this.user.sex
-      console.log(this.user)
       this.info.birthdayVal = this.user.birthday ? new Date(this.user.birthday) : null
     }
   }

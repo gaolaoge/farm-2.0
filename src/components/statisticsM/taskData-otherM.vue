@@ -26,7 +26,10 @@
         </div>
         <!--下拉框-->
         <div class="select bl">
-          <el-select v-model="dateInterval" placeholder="请选择" @change="changeDateInterval">
+          <el-select v-model="dateInterval"
+                     placeholder="请选择"
+
+                     @change="changeDateInterval">
             <el-option
               v-for="item in dateIntervalList"
               :key="item.value"
@@ -49,7 +52,11 @@
     </div>
     <section>
       <div class="selectData">
-        <el-select v-model="taskV" multiple collapse-tags placeholder="请选择">
+        <el-select v-model="taskV"
+                   multiple
+                   :multiple-limit="5"
+                   collapse-tags
+                   placeholder="请选择">
           <el-option
             v-for="item in taskList"
             :key="item.value"

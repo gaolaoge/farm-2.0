@@ -163,8 +163,8 @@
         type: String,
         default: ''
       },
-      uploadtype: {
-        type: Number,
+      uploadType: {
+        type: String,
       },
     },
     watch: {
@@ -317,7 +317,7 @@
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: type == 'file' ? 0 : 1,
           userID: this.user.id,
-          networkPath: this.uploadType == 1 ? '' : this.path
+          networkPath: this.uploadType == 1 ? '' : this.path,
         })
       },
       // 新建文件夹
