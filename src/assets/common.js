@@ -142,22 +142,13 @@ const createTableIconList = function () {
       })
     }
     // 展开图标
-    // if (document.getElementsByClassName('openSon').length) return false
-    if(false) return false
+    if (document.getElementsByClassName('iconsanjiaoright').length) return false
     else {
       let table = document.getElementsByClassName('download-table')[0],
         el_table = table.querySelector('.el-table__body-wrapper'),
         list = el_table.querySelectorAll('table tbody .el-table__row .el-table__expand-icon')
       console.log(list)
       list.forEach(curr => {
-        // let i = document.createElement('I'),
-        //   ii = document.createElement('I')
-        // i.classList.add('farmIconFont')
-        // i.classList.add('iconshaixuan2')
-        // ii.classList.add('farmIconFont')
-        // ii.classList.add('iconshaixuan1')
-        // curr.appendChild(i)
-        // curr.appendChild(ii)
         let original = curr.querySelector('i'),
             i = document.createElement('I')
         i.classList.add('farmIconFont')
