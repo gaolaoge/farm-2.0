@@ -109,41 +109,64 @@ const sortF = function (a, b) {
 const createTableIconList = function () {
   setTimeout(() => {
     // 筛选图标
-    if (document.getElementsByClassName('iconshaixuan').length) return false
-    let t = [...document.getElementsByClassName('el-icon-arrow-down')]
-    t.forEach(curr => {
-      let i = document.createElement('I'),
-        ii = document.createElement('I')
-      i.classList.add('iconfont')
-      i.classList.add('iconshaixuan')
-      ii.classList.add('iconfont')
-      ii.classList.add('iconshaixuan1')
-      curr.appendChild(i)
-      curr.appendChild(ii)
-    })
+    if (document.getElementsByClassName('iconshaixuan2').length) return false
+    else {
+      let t = [...document.getElementsByClassName('el-icon-arrow-down')]
+      t.forEach(curr => {
+        let i = document.createElement('I'),
+          ii = document.createElement('I')
+        i.classList.add('farmIconFont')
+        i.classList.add('iconshaixuan2')
+        ii.classList.add('farmIconFont')
+        ii.classList.add('iconshaixuan1')
+        curr.appendChild(i)
+        curr.appendChild(ii)
+      })
+    }
     // 排序图标
-    let q = [...document.getElementsByClassName('ascending')]
-    q.forEach(curr => {
-      let i = document.createElement('I')
-      i.classList.add('el-icon-arrow-up')
-      i.classList.add('k')
-      curr.appendChild(i)
-    })
-    let w = [...document.getElementsByClassName('descending')]
-    w.forEach(curr => {
-      let i = document.createElement('I')
-      i.classList.add('el-icon-arrow-up')
-      i.classList.add('k')
-      curr.appendChild(i)
-    })
+    if (document.getElementsByClassName('kkkk').length) return false
+    else {
+      let q = [...document.getElementsByClassName('ascending')]
+      q.forEach(curr => {
+        let i = document.createElement('I')
+        i.classList.add('el-icon-arrow-up')
+        i.classList.add('kkkk')
+        curr.appendChild(i)
+      })
+      let w = [...document.getElementsByClassName('descending')]
+      w.forEach(curr => {
+        let i = document.createElement('I')
+        i.classList.add('el-icon-arrow-up')
+        i.classList.add('kkkk')
+        curr.appendChild(i)
+      })
+    }
     // 展开图标
-    let s = [...document.getElementsByClassName('el-table__expand-icon')]
-    s.forEach(curr => {
-      let img = document.createElement('IMG')
-      img.src = require('@/icons/iii.png')
-      curr.appendChild(img)
-    })
-  }, 0)
+    // if (document.getElementsByClassName('openSon').length) return false
+    if(false) return false
+    else {
+      let table = document.getElementsByClassName('download-table')[0],
+        el_table = table.querySelector('.el-table__body-wrapper'),
+        y = [...table.querySelector('.el-table__body-wrapper')]
+      console.log(y)
+      y.forEach(curr => {
+        // let i = document.createElement('I'),
+        //   ii = document.createElement('I')
+        // i.classList.add('farmIconFont')
+        // i.classList.add('iconshaixuan2')
+        // ii.classList.add('farmIconFont')
+        // ii.classList.add('iconshaixuan1')
+        // curr.appendChild(i)
+        // curr.appendChild(ii)
+        let original = curr.querySelector('i'),
+            i = document.createElement('I')
+        i.classList.add('farmIconFont')
+        i.classList.add('iconwebicon215')
+        curr.removeChild(original)
+        curr.appendChild(i)
+      })
+    }
+  }, 100)
 }
 
 // message 信息

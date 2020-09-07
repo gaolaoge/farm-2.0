@@ -200,6 +200,7 @@
     getRecordList,
     reductionDownloadList,
     compressionFiles,
+    itemDelete,
     seeBalance
   } from '@/api/api'
   import {
@@ -221,6 +222,9 @@
             },
             {
               text: '还原到渲染下载'
+            },
+            {
+              text: '删除'
             }
           ],
           tableData: [],
@@ -234,19 +238,62 @@
       ...mapState(['zoneId'])
     },
     methods: {
-      // 操作触发
+      // 操作
       operatFun(val) {
+        if (!this.dialogTable.dialogTableSelection.length) return false
         switch (val) {
           case '下载完成帧':
             this.downloadLayerFun()
             break
           case '还原到渲染下载':
             this.reductionFUn()
+                break
+          case '删除':
+            this.deleteFun()
         }
       },
-      // 下载完成帧
+      // 操作 - 删除
+      deleteFun() {
+        this.$confirm('将删除选中选, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(
+            async () => {
+              let dataList = [],
+                fat = []
+              this.dialogTable.dialogTableSelection.forEach(curr => {
+                if ('selfIndex' in curr) {
+                  fat.push(curr['taskUuid']);
+                  return false
+                }
+                let dataListIndex = dataList.findIndex(item => item.taskUuid == curr.FatherTaskUuId)
+                if (dataListIndex == -1) {
+                  dataList.push({
+                    taskUuid: curr.FatherTaskUuId,
+                    layerUuidList: [curr.taskUuid]
+                  })
+                } else dataList[dataListIndex]['layerUuidList'].push(curr.taskUuid)
+              })
+              dataList.forEach(curr => {
+                if (!fat.some(item => item == curr.taskUuid)) curr.taskUuid = ''
+              })
+              let data = await itemDelete({
+                "instructType": 4,
+                "instructTaskList": dataList
+              })
+              if (data.data.code == 204) {
+                messageFun('success', '操作成功')
+                this.getList()
+              } else messageFun('error', '操作报错')
+            },
+            () => messageFun('info', '已取消删除')
+          )
+          .catch(() => messageFun('error', '报错，操作失败'))
+      },
+      // 操作 - 下载完成帧
       async downloadLayerFun() {
-        if (!this.dialogTable.dialogTableSelection.length) return false
         let r = await seeBalance()
         if (r.data.code == 1001) {
           messageFun('info', `当前账户余额为${r.data.data}，请先进行充值！`);
@@ -298,10 +345,8 @@
         let data = await compressionFiles(path)
         exportDownloadFun(data, data.headers.file, 'zip')
       },
-      // 还原到渲染下载
+      // 操作 - 还原到渲染下载
       reductionFUn() {
-        if (!this.dialogTable.dialogTableSelection.length) return false
-
         this.$confirm('将选中项还原到渲染下载列表, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -490,7 +535,6 @@
           }
         })
       },
-
     },
     mounted() {
       createTableIconList()

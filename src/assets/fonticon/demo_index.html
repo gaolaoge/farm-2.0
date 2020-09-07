@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <title>IconFont Demo</title>
-  <link rel="shortcut icon" href="https://gtms04.alicdn.com/tps/i4/TB1_oz6GVXXXXaFXpXXJDFnIXXX-64-64.ico" type="image/x-icon"/>
+  <link rel="shortcut icon" href="https://img.alicdn.com/tps/i4/TB1_oz6GVXXXXaFXpXXJDFnIXXX-64-64.ico" type="image/x-icon"/>
   <link rel="stylesheet" href="https://g.alicdn.com/thx/cube/1.3.2/cube.min.css">
   <link rel="stylesheet" href="demo.css">
   <link rel="stylesheet" href="iconfont.css">
@@ -23,7 +23,7 @@
         <li class="dib"><span>Symbol</span></li>
       </ul>
       
-      <a href="https://www.iconfont.cn/manage/index?manage_type=myprojects&projectId=1717437" target="_blank" class="nav-more">查看项目</a>
+      <a href="https://www.iconfont.cn/manage/index?manage_type=myprojects&projectId=1717174" target="_blank" class="nav-more">查看项目</a>
       
     </div>
     <div class="tab-container">
@@ -31,13 +31,19 @@
           <ul class="icon_lists dib-box">
           
             <li class="dib">
-              <span class="icon iconfont">&#xe624;</span>
+              <span class="icon farmIconFont">&#xe624;</span>
                 <div class="name">筛选</div>
                 <div class="code-name">&amp;#xe624;</div>
               </li>
           
             <li class="dib">
-              <span class="icon iconfont">&#xe61d;</span>
+              <span class="icon farmIconFont">&#xe68d;</span>
+                <div class="name">展开</div>
+                <div class="code-name">&amp;#xe68d;</div>
+              </li>
+          
+            <li class="dib">
+              <span class="icon farmIconFont">&#xe61d;</span>
                 <div class="name">筛选</div>
                 <div class="code-name">&amp;#xe61d;</div>
               </li>
@@ -60,19 +66,19 @@
           <h3 id="-font-face">第一步：拷贝项目下面生成的 <code>@font-face</code></h3>
 <pre><code class="language-css"
 >@font-face {
-  font-family: 'iconfont';
+  font-family: 'farmIconFont';
   src: url('iconfont.eot');
   src: url('iconfont.eot?#iefix') format('embedded-opentype'),
       url('iconfont.woff2') format('woff2'),
       url('iconfont.woff') format('woff'),
       url('iconfont.ttf') format('truetype'),
-      url('iconfont.svg#iconfont') format('svg');
+      url('iconfont.svg#farmIconFont') format('svg');
 }
 </code></pre>
           <h3 id="-iconfont-">第二步：定义使用 iconfont 的样式</h3>
 <pre><code class="language-css"
->.iconfont {
-  font-family: "iconfont" !important;
+>.farmIconFont {
+  font-family: "farmIconFont" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
@@ -82,10 +88,10 @@
           <h3 id="-">第三步：挑选相应图标并获取字体编码，应用于页面</h3>
 <pre>
 <code class="language-html"
->&lt;span class="iconfont"&gt;&amp;#x33;&lt;/span&gt;
+>&lt;span class="farmIconFont"&gt;&amp;#x33;&lt;/span&gt;
 </code></pre>
           <blockquote>
-            <p>"iconfont" 是你项目下的 font-family。可以通过编辑项目查看，默认是 "iconfont"。</p>
+            <p>"farmIconFont" 是你项目下的 font-family。可以通过编辑项目查看，默认是 "iconfont"。</p>
           </blockquote>
           </div>
       </div>
@@ -93,16 +99,25 @@
         <ul class="icon_lists dib-box">
           
           <li class="dib">
-            <span class="icon iconfont iconshaixuan"></span>
+            <span class="icon farmIconFont iconshaixuan2"></span>
             <div class="name">
               筛选
             </div>
-            <div class="code-name">.iconshaixuan
+            <div class="code-name">.iconshaixuan2
             </div>
           </li>
           
           <li class="dib">
-            <span class="icon iconfont iconshaixuan1"></span>
+            <span class="icon farmIconFont iconwebicon215"></span>
+            <div class="name">
+              展开
+            </div>
+            <div class="code-name">.iconwebicon215
+            </div>
+          </li>
+          
+          <li class="dib">
+            <span class="icon farmIconFont iconshaixuan1"></span>
             <div class="name">
               筛选
             </div>
@@ -128,11 +143,11 @@
 <pre><code class="language-html">&lt;link rel="stylesheet" href="./iconfont.css"&gt;
 </code></pre>
         <h3 id="-">第二步：挑选相应图标并获取类名，应用于页面：</h3>
-<pre><code class="language-html">&lt;span class="iconfont iconxxx"&gt;&lt;/span&gt;
+<pre><code class="language-html">&lt;span class="farmIconFont iconxxx"&gt;&lt;/span&gt;
 </code></pre>
         <blockquote>
           <p>"
-            iconfont" 是你项目下的 font-family。可以通过编辑项目查看，默认是 "iconfont"。</p>
+            farmIconFont" 是你项目下的 font-family。可以通过编辑项目查看，默认是 "iconfont"。</p>
         </blockquote>
       </div>
       </div>
@@ -141,10 +156,18 @@
           
             <li class="dib">
                 <svg class="icon svg-icon" aria-hidden="true">
-                  <use xlink:href="#iconshaixuan"></use>
+                  <use xlink:href="#iconshaixuan2"></use>
                 </svg>
                 <div class="name">筛选</div>
-                <div class="code-name">#iconshaixuan</div>
+                <div class="code-name">#iconshaixuan2</div>
+            </li>
+          
+            <li class="dib">
+                <svg class="icon svg-icon" aria-hidden="true">
+                  <use xlink:href="#iconwebicon215"></use>
+                </svg>
+                <div class="name">展开</div>
+                <div class="code-name">#iconwebicon215</div>
             </li>
           
             <li class="dib">

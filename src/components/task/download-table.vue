@@ -25,7 +25,7 @@
           label="任务ID"
           sortable
           show-overflow-tooltip
-          width="106"/>
+          width="146"/>
         <!--场景名-->
         <el-table-column
           prop="sceneName"
