@@ -11,6 +11,7 @@
           </div>
         </div>
       </div>
+      <!--操作-->
       <div class="oper" :class="[{'inhome': inHome}]">
         <!--选择分区-->
         <div class="workbench">
@@ -28,28 +29,21 @@
           <!--消息-->
           <div class="messageE"
                :class="[{'active': showMessageList},{'isHome': inHome}]"
+               @click="showMessageList = !showMessageList"
                v-operating3>
-            <img src="@/icons/messageIconheaderM2.png"
-                 @click="showMessageList = !showMessageList"
-                 v-show="!showMessageList"
-                 class="problemImg"
-                 alt="">
-            <img src="@/icons/messageIconheaderM-hover.png"
-                 @click="showMessageList = !showMessageList"
-                 v-show="showMessageList"
-                 class="problemImg"
-                 alt="">
+            <img src="@/icons/messageIconheaderM2.png" v-show="!showMessageList">
+            <img src="@/icons/messageIconheaderM-hover.png" v-show="showMessageList">
             <!--下拉框-->
             <div class="messageBase" :class="[{'inHome': !inHome}]">
               <message-table v-show="showMessageList"/>
             </div>
           </div>
           <!--问号-->
-          <div class="problemE" :class="[{'active': showProblemList},{'isHome': inHome}]" v-operating2>
-            <img src="@/icons/problem2.png"
-                 alt=""
-                 class="problemImg"
-                 @click="showProblemList = !showProblemList">
+          <div class="problemE"
+               :class="[{'active': showProblemList},{'isHome': inHome}]"
+               @click="showProblemList = !showProblemList"
+               v-operating2>
+            <img src="@/icons/problem2.png">
             <!--下拉框-->
             <div class="newsBase">
               <ul class="userOperate" v-show="showProblemList">
@@ -78,10 +72,7 @@
           </div>
           <!--头像-->
           <div class="userInfo" v-show="!inHome" :class="[{'active': showUserList}]" v-operating>
-            <img :src="user.avatar"
-                 alt=""
-                 class="userImg">
-            <!--:class="[{'show': showUserList}]"-->
+            <img :src="user.avatar" class="userImg">
             <!--下拉框-->
             <div class="newsBase" :class="[{'show': showUserList}]">
               <ul class="userOperate" v-show="showUserList">
@@ -695,11 +686,8 @@
           .messageE,
           .userInfo {
             margin-left: 30px;
-
-            .problemImg {
-              cursor: pointer;
-              user-select: none;
-            }
+            cursor: pointer;
+            user-select: none;
 
             .newsBase,
             .messageBase {

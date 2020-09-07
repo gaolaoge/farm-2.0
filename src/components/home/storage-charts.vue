@@ -216,7 +216,7 @@
           if(val != '/') return false
           setTimeout(() => {
             this.init()
-          }, 800)
+          }, 100)
         },
         immediate: true
       }
@@ -230,8 +230,8 @@
     height: 100%;
 
     .ec {
-      width: 100%;
-      height: 100%;
+      width: 266px;
+      height: 228px;
     }
   }
 </style>

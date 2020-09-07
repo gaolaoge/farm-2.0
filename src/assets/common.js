@@ -147,7 +147,6 @@ const createTableIconList = function () {
       let table = document.getElementsByClassName('download-table')[0],
         el_table = table.querySelector('.el-table__body-wrapper'),
         list = el_table.querySelectorAll('table tbody .el-table__row .el-table__expand-icon')
-      console.log(list)
       list.forEach(curr => {
         let original = curr.querySelector('i'),
             i = document.createElement('I')
