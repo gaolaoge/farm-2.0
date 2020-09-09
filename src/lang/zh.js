@@ -150,8 +150,8 @@ export default {
   // 任务
   task: {
     tableNavList: ['上传分析', '渲染下载'],
-    uploadBtnGroup: ['新建任务', '删除', '重新分析', '刷新'],
-    renderBtnGroup: ['新建任务', '开始', '暂停', '删除', '下载完成帧', '全部渲染', '重新渲染', '归档', '拷贝', '刷新'],
+    uploadBtnGroup: ['新建任务', '删除', '重新分析'],
+    renderBtnGroup: ['新建任务', '开始', '暂停', '删除', '下载完成帧', '全部渲染', '重新渲染', '归档', '拷贝'],
     archiveRecords: '归档记录',
     status: {
       wait: '等待',

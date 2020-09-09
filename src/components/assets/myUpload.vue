@@ -77,6 +77,9 @@
         layout="prev, pager, next, jumper"
         :total="table.total">
       </el-pagination>
+      <div class="farm-primary-form-btn btn" @click="refreshF">
+        <span>{{ refresh }}</span>
+      </div>
     </div>
     <el-dialog
       :show-close="false"
@@ -156,6 +159,7 @@
           },
           resolve: null,         // 回调函数
         },
+        refresh: '刷新'
       }
     },
     props: {
@@ -240,6 +244,10 @@
       }
     },
     methods: {
+      // 刷新
+      refreshF(){
+        this.getAssetsCatalog(this.path, this.searchInputVal)
+      },
       // 解压 输入密码
       sendPassword() {
         this.$prompt('请输入密码', '提示', {
@@ -437,22 +445,6 @@
 </script>
 
 <style lang="less" scoped>
-  /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 375px);
-
-    tr {
-      cursor: pointer;
-    }
-  }
-
-  .page {
-    margin: 4px 25px 30px;
-  }
-
-  .outPut-wrapper {
-    overflow: hidden;
-  }
-
   .bread {
     display: flex;
     align-items: center;
@@ -569,12 +561,6 @@
           }
         }
       }
-    }
-  }
-
-  @media screen and (orientation: portrait) {
-    /deep/ .el-table__body-wrapper {
-      height: calc(100vw - 395px);
     }
   }
 </style>

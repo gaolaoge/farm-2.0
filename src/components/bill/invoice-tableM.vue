@@ -134,6 +134,9 @@
         @current-change="jump"
         :current-page.sync="table.currentPage"
         :total="table.total"/>
+      <div class="farm-primary-form-btn btn" @click="getList">
+        <span>{{ refresh }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -208,7 +211,8 @@
           iquireBtn: '查询',
           resetBtn: '重置',
           exportBtn: '导出记录'
-        }
+        },
+        refresh: '刷新'
       }
     },
     components: {
@@ -320,85 +324,3 @@
     }
   }
 </script>
-
-<style lang="less" scoped>
-  /deep/ .el-date-editor {
-    .el-range__icon,
-    .el-range-separator,
-    .el-input__icon.el-range__close-icon {
-      line-height: 22px;
-    }
-  }
-
-  .filter-item {
-    display: flex;
-    align-items: center;
-
-    &.f {
-      margin-right: 20px;
-    }
-  }
-
-  .invoicing {
-    overflow: hidden;
-  }
-
-  .page {
-    margin: 4px 25px 30px;
-  }
-
-  /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 540px);
-  }
-
-  .invoicing-table {
-    overflow: hidden;
-
-    .filter {
-      position: relative;
-      height: 50px;
-      background-color: rgba(255, 255, 255, 1);
-      border-radius: 4px;
-      margin: 20px 10px 0px;
-      width: calc(100% - 20px);
-      padding: 0px 20px;
-      box-sizing: border-box;
-
-      .t {
-        width: 200px;
-      }
-
-      .r {
-        position: absolute;
-        right: 0px;
-      }
-    }
-
-    .l {
-      margin-top: 8px;
-      background-color: rgba(22, 29, 37, 0.1);
-      height: 1px;
-    }
-
-  }
-
-  .download-tab {
-    font-size: 14px;
-    font-weight: 400;
-    color: rgba(0, 97, 255, 1);
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  .download-tab-none {
-    font-size: 14px;
-    font-weight: 400;
-    color: rgba(255, 255, 255 0.6);
-  }
-
-  @media screen and (orientation: portrait) {
-    /deep/ .el-table__body-wrapper {
-      height: calc(100vw - 557px);
-    }
-  }
-</style>

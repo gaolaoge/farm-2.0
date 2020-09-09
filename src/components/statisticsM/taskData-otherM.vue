@@ -288,7 +288,7 @@
       },
       // 获取charts数据通道
       aisle() {
-        if (this.lock) return false
+        if(!this.taskV.length || this.lock) return false
         this.lock = true
         this.getChartsData()
         setTimeout(() => this.lock = false, 200)

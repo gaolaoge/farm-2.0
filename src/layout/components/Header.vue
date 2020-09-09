@@ -29,10 +29,10 @@
           <!--消息-->
           <div class="messageE"
                :class="[{'active': showMessageList},{'isHome': inHome}]"
-               @click="showMessageList = !showMessageList"
+               @click.self="showMessageList = !showMessageList"
                v-operating3>
-            <img src="@/icons/messageIconheaderM2.png" v-show="!showMessageList">
-            <img src="@/icons/messageIconheaderM-hover.png" v-show="showMessageList">
+            <img src="@/icons/messageIconheaderM2.png" v-show="!showMessageList" @click.self="showMessageList = true">
+            <img src="@/icons/messageIconheaderM-hover.png" v-show="showMessageList" @click.self="showMessageList = false">
             <!--下拉框-->
             <div class="messageBase" :class="[{'inHome': !inHome}]">
               <message-table v-show="showMessageList"/>
@@ -304,7 +304,7 @@
       }
     },
     computed: {
-      ...mapState(['user', 'login', 'zoneId', 'socket_backS']),
+      ...mapState(['user', 'login', 'zoneId', 'socket_backS', 'socket_plugin_msg']),
     },
     mounted() {
       this.getList()
@@ -347,7 +347,6 @@
       },
       zoneId: {
         handler: function (val) {
-          console.log('s')
           this.getBulletinF()   // 获取公告
           putNewZoneID({"zoneUuid": val})   // 传达切换分区事件
           this.workBenchVal = val
@@ -363,6 +362,13 @@
           this.$store.commit('WEBSOCKET_BACKS_INIT', val)
         },
         immediate: true
+      },
+      'socket_plugin_msg': {
+        handler: function(data){
+
+        },
+        immediate: true,
+        deep: true
       }
     },
     methods: {

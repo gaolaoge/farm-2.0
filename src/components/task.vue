@@ -172,10 +172,6 @@
             {
               text: this.$t('task.uploadBtnGroup')[2],
               class: 'againBtn'
-            },
-            {
-              text: this.$t('task.uploadBtnGroup')[3],
-              class: 'refresh'
             }
           ],
           renderBtnGroup: [
@@ -216,10 +212,6 @@
             {
               text: this.$t('task.renderBtnGroup')[8],
               class: 'copyBtn'
-            },
-            {
-              text: this.$t('task.renderBtnGroup')[9],
-              class: 'refresh'
             }
           ],
           archiveRecords: this.$t('task.archiveRecords'),
@@ -348,9 +340,6 @@
             if (!this.btnGroup.uploadTableBtnAgain) return false
             this.$refs.uploadMode.analyseAgainFun()
             break
-          case this.$t('task.uploadBtnGroup')[3]: // 刷新
-            this.$refs.uploadMode.getList()
-            break
         }
       },
       // 渲染下载 - 操作台
@@ -387,9 +376,6 @@
           case this.$t('task.renderBtnGroup')[8]: // 拷贝
             if (!this.btnGroup.downloadTableBtnCopy) return false
             this.$refs.renderMode.copyFun()
-            break
-          case this.$t('task.renderBtnGroup')[9]: // 刷新
-            this.$refs.renderMode.getList()
             break
         }
       },
@@ -459,6 +445,24 @@
     }
   }
 </script>
+
+<style lang="less">
+  .upload-table,
+  .download-table {
+    position: relative;
+    height: 100%;
+    .page {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      display: inline-flex;
+      .btn {
+        margin-left: 20px;
+      }
+    }
+
+  }
+</style>
 
 <style lang="less" scoped>
   .task-wrapper {

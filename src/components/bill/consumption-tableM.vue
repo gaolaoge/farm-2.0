@@ -174,6 +174,9 @@
         :current-page.sync="table.currentPage"
         :total="table.outPutTableTotal">
       </el-pagination>
+      <div class="farm-primary-form-btn btn" @click="getList">
+        <span>{{ refresh }}</span>
+      </div>
     </div>
     <!--详情-->
     <el-dialog :visible.sync="dialogVisible"
@@ -252,6 +255,7 @@
         renderDialogTableData: [],
         downloadDialogTableData: [],
         // pageInfo: {}
+        refresh: '刷新'
       }
     },
     components: {
@@ -411,73 +415,6 @@
 </script>
 
 <style lang="less" scoped>
-  /deep/ .el-date-editor {
-    .el-range__icon,
-    .el-range-separator,
-    .el-input__icon.el-range__close-icon {
-      line-height: 22px;
-    }
-  }
-
-  .filter-item {
-    display: flex;
-    align-items: center;
-
-    &.f {
-      margin-right: 20px;
-    }
-  }
-
-  .consumption-wrapper {
-    overflow: hidden;
-  }
-
-  .page {
-    margin: 4px 25px 30px;
-  }
-
-  /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 540px);
-  }
-
-  .recharge-table {
-    overflow: hidden;
-
-    .filter {
-      position: relative;
-      height: 50px;
-      background-color: rgba(255, 255, 255, 1);
-      border-radius: 4px;
-      margin: 20px 10px 0px;
-      width: calc(100% - 20px);
-      padding: 0px 20px;
-      box-sizing: border-box;
-
-      .t {
-        width: 200px;
-      }
-
-      .r {
-        position: absolute;
-        right: 0px;
-      }
-    }
-
-    .l {
-      margin-top: 8px;
-      background-color: rgba(22, 29, 37, 0.1);
-      height: 1px;
-    }
-  }
-
-  .operateBtn {
-    font-size: 14px;
-    font-weight: 400;
-    color: rgba(0, 97, 255, 1);
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
   /deep/ .el-dialog {
     width: 80vw;
     margin-top: 5vh !important;
@@ -486,11 +423,6 @@
   @media screen and (orientation: portrait) {
     /deep/ .el-dialog__wrapper {
       width: 100vh;
-    }
-
-    /deep/ .el-table__body-wrapper {
-      height: calc(100vw - 557px);
-
     }
 
     /deep/ .el-dialog {

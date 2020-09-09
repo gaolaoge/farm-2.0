@@ -1421,7 +1421,9 @@
             layerTaskUuid: curr.layerTaskUuid,                    // 层uuid
             frameTaskUuid: curr.frameTaskUuid,                    // 帧uuid
             taskTaskUuid: curr.taskUuid,                          // 主uuid
-            inFilePath: curr.inFilePath
+            inFilePath: curr.inFilePath,
+            outFilePath: curr.outFilePath,
+            layerName: data_.taskInfo.layerName
           }
         })
         this.result.happen[0]['num'] = data_.frameCount['running']
@@ -1662,19 +1664,17 @@
         this.$prompt('', '新建项目', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          inputPlaceholder: '请输入项目名称'
+          inputPlaceholder: '请输入项目名称',
+          inputPattern: /^\w+$/,
+          inputErrorMessage: '项目名格式不正确'
         })
           .then(
-            ({value}) => {
-              console.log(value)
-              if (!value) messageFun('info', '项目名为必填项')
-              else {
-                newItemName = value
-                return addNewItem({
-                  projectName: value,
-                  isDefault: 1
-                })
-              }
+            value => {
+              newItemName = value.value
+              return addNewItem({
+                projectName: value.value,
+                isDefault: 1
+              })
             },
             () => {
               messageFun('info', '取消创建')
@@ -1834,7 +1834,10 @@
           messageFun('error', `当前账户余额为${data.data.data}，请先进行充值！`);
           return false
         }
-        let fileList = this.result.selectionResult.map(item => item['taskUuid'] + '/' + item['layerName'] + '/' + item['outputFilePath'])
+        let fileList = this.result.selectionResult.map(item => {
+          let outputFilePath = item['outFilePath'].split(this.user.id + '\\')[1]
+          return item['taskTaskUuid'] + '/' + item['layerName'] + '/' + outputFilePath
+        })
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           'transferType': 2,
           'userID': this.user.id,
@@ -2012,14 +2015,14 @@
           list = str.split(',').reduce((total, item) => total.concat(item.split('，')), []),  // 帧范围参数
           interval = Number(this.setting.num.tableData[0].num),  // 帧间隔
           result = new Set()   // 遍历出渲染帧
-        if(list.some(item => !item)){
+        if (list.some(item => !item)) {
           this.errFun('输入格式不正确，请重新输入')
           return false
         }
         list.forEach(item => {
           if (/[-_]+?/.test(item)) {
             let t = item.match(/\d+/g)
-            if(t[0] == t[1]) {
+            if (t[0] == t[1]) {
               result.add(t[0])
               return
             }
@@ -2041,7 +2044,7 @@
       }
     },
     computed: {
-      ...mapState(['zone', 'isGup'])
+      ...mapState(['zone', 'isGup', 'user'])
     }
   }
 </script>

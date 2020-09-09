@@ -83,13 +83,18 @@
       </el-table>
     </div>
 
-    <el-pagination
-      background
-      layout="prev, pager, next, jumper"
-      :current-page.sync="page.index"
-      @current-change="jump"
-      :total="page.total">
-    </el-pagination>
+    <div class="page">
+      <el-pagination
+        background
+        layout="prev, pager, next, jumper"
+        :current-page.sync="page.index"
+        @current-change="jump"
+        :total="page.total">
+      </el-pagination>
+      <div class="farm-primary-form-btn btn" @click="getList('', 1, page.size)">
+        <span>{{ refresh }}</span>
+      </div>
+    </div>
 
     <!--新建项目dialog-->
     <div class="createProject" v-show="createBaseShow">
@@ -249,6 +254,7 @@
         btnSave: '确定',
         editAvatar: '修改图片',
         showCutter: false,
+        refresh: '刷新'
       }
     },
     watch: {
@@ -326,12 +332,16 @@
       },
       // 新建项目 - 保存
       async createSaveBtnFun() {
-        let c = this.createProject
-        if (!c.name) return false
-        let data = await createTask({
+        let c = this.createProject,
+          data
+        if (!c.name.trim()) {
+          messageFun('info', '项目名不能为空')
+          return false
+        } else data = await createTask({
           'projectName': c.name,
           'isDefault': c.checked
         })
+
         if (data.data.code == 201) {
           messageFun('success', '创建成功')
           this.createBaseShow = false
@@ -619,7 +629,15 @@
     }
   }
 
+  .page {
+    margin: 10px;
+    display: inline-flex;
+    .btn {
+      margin-left: 20px;
+    }
+  }
+
   /deep/ .el-table .el-table__row:hover::after {
-    display: none
+    display: none;
   }
 </style>

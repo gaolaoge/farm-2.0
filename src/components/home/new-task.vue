@@ -883,7 +883,7 @@
       // 验证表格是否填写完整
       disableSelf() {
         let a = this.dialogAdd
-        if (a.form.valName && a.nList.length && a.form.formatName) return true
+        if (a.form.valName.trim() && a.nList.length && a.form.formatName) return true
         else return false
       }
     },
@@ -1280,7 +1280,7 @@
       async taskDefine() {
         let val
         // 若表格未填写完整 返回
-        if (!this.disableSelf) return false
+        if (!this.disableSelf) return false   // 验证表格是否填写完整
         switch (this.dialogAdd.editOrAdd) {
           // 新建模板
           case 'addMore':
@@ -1495,7 +1495,9 @@
         this.$prompt('', '新建项目', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          inputPlaceholder: '请输入项目名称'
+          inputPlaceholder: '请输入项目名称',
+          inputPattern: /^\w+$/,
+          inputErrorMessage: '项目名格式不正确'
         })
           .then(
             value => {

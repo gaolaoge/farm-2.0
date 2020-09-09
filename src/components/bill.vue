@@ -307,8 +307,10 @@
 
 
     }
+
     .tableGroup {
       flex-grow: 1;
+
       .remind {
         position: absolute;
         top: 0px;
@@ -335,5 +337,86 @@
 </style>
 
 <style lang="less">
+  .recharge-centre,
+  .invoicing,
+  .consumption-wrapper {
+    overflow: hidden;
 
+    /deep/ .el-table__body-wrapper {
+      height: calc(100vh - 530px);
+    }
+
+    /deep/ .el-date-editor {
+      .el-range__icon,
+      .el-range-separator,
+      .el-input__icon.el-range__close-icon {
+        line-height: 22px;
+      }
+    }
+
+    .recharge-table,
+    .invoicing-table,
+    .recharge-table {
+      overflow: hidden;
+
+      .filter {
+        position: relative;
+        height: 50px;
+        background-color: rgba(255, 255, 255, 1);
+        border-radius: 4px;
+        margin: 20px 10px 0px;
+        width: calc(100% - 20px);
+        padding: 0px 20px;
+        box-sizing: border-box;
+
+        .t {
+          width: 200px;
+        }
+
+        .r {
+          position: absolute;
+          right: 0px;
+        }
+      }
+
+      .l {
+        margin-top: 8px;
+        background-color: rgba(22, 29, 37, 0.1);
+        height: 1px;
+      }
+    }
+
+    .operateBtn,
+    .download-tab {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(0, 97, 255, 1);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+
+      &.f {
+        margin-right: 20px;
+      }
+    }
+
+    .page {
+      margin: 10px;
+      display: inline-flex;
+
+      .btn {
+        margin-left: 20px;
+      }
+    }
+
+    @media screen and (orientation: portrait) {
+      /deep/ .el-table__body-wrapper {
+        height: calc(100vw - 557px);
+      }
+    }
+  }
 </style>

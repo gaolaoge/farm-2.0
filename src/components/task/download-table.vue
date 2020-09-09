@@ -220,6 +220,9 @@
         :current-page.sync="table.current"
         :total="table.renderTableTotal">
       </el-pagination>
+      <div class="farm-primary-form-btn btn" @click="getList">
+        <span>{{ refresh }}</span>
+      </div>
     </div>
     <!--详情抽屉-->
     <farmDrawer ref="drawer"
@@ -375,7 +378,8 @@
         renderAgainBoxcheckbox: ['失败帧', '完成帧'],
         renderAgainBoxSupplement: '（完成帧重现渲染会重复扣除费用）',
         renderAgainBoxTit: '确认重新渲染以下帧么？',
-        renderAgainBoxBtnList: ['取消', '确定']
+        renderAgainBoxBtnList: ['取消', '确定'],
+        refresh: '刷新'
       }
     },
     methods: {
@@ -1066,14 +1070,6 @@
 
 <style lang="less" scoped>
   .download-table {
-    position: relative;
-    height: 100%;
-
-    .page {
-      position: absolute;
-      left: 25px;
-      bottom: 30px;
-    }
 
     .progressL {
       display: inline-block;

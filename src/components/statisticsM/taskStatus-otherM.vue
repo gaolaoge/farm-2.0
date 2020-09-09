@@ -93,7 +93,7 @@
           if (!val) return false
           else {
             this.cProjectUuid = val.projectUuid
-            this.taskV = this.cProjectUuid
+            this.taskV = this.cProjectUuid[0]
           }
         },
         immediate: true
@@ -141,14 +141,15 @@
       },
       // 获取charts数据通道
       aisle() {
-        if (this.lock) return false
+        if (!this.taskV.length || this.lock) return false
         this.lock = true
         this.getChartsData()
         setTimeout(() => this.lock = false, 200)
       },
       // 获取charts数据
       async getChartsData() {
-        let data = await getStatusData(this.taskV)
+        console.log(this.taskV[0])
+        let data = await getStatusData(this.taskV[0])
         if (data.data.code != 200) messageFun('error', '获取数据失败')
         else {
           this.chartsSeries = [

@@ -553,4 +553,32 @@
       }
     }
   }
+
+  .outPut-wrapper {
+    overflow: hidden;
+
+    .el-table__body-wrapper {
+      height: calc(100vh - 362px);
+
+      tr {
+        cursor: pointer;
+      }
+    }
+
+    .page {
+      margin: 10px;
+      display: inline-flex;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      .btn {
+        margin-left: 20px;
+      }
+    }
+
+    @media screen and (orientation: portrait) {
+      /deep/ .el-table__body-wrapper {
+        height: calc(100vw - 375px);
+      }
+    }
+  }
 </style>
