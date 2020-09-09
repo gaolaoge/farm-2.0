@@ -1126,11 +1126,11 @@
           t: '渲染结果',
           dataO: {
             costLabel: '费用(金币)',
-            costVal: '.0000',
+            costVal: '-',
             totalLabel: '总渲染时长',
-            totalVal: '22分0秒',
+            totalVal: '-',
             averageLabel: '平均渲染时长',
-            averageVal: '1分0秒'
+            averageVal: '-'
           },
           statusData: '',
           statusList: {
@@ -1291,6 +1291,14 @@
           middleVal: 0,
           bottomVal: 0
         })
+      },
+      'socket_plugin_msg': {
+        handler: function (e) {
+          let data = JSON.parse(e.data)
+          if(data.code != 852 || this.typeInfo != 'result' || this.result.showDetails) return false
+          let {taskUuid, layerUuid} = data
+          if(this.taskData.FatherTaskUuId == taskUuid && this.taskData.taskUuid == layerUuid) this.getRenderItemMoreTableF()
+        }
       }
     },
     methods: {
@@ -2044,7 +2052,7 @@
       }
     },
     computed: {
-      ...mapState(['zone', 'isGup', 'user'])
+      ...mapState(['zone', 'isGup', 'user', 'socket_plugin_msg'])
     }
   }
 </script>

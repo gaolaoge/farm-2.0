@@ -28,7 +28,7 @@
         <div class="r">
           <!--消息-->
           <div class="messageE"
-               :class="[{'active': showMessageList},{'isHome': inHome}]"
+               :class="[{'active': showMessageList},{'isHome': inHome},{'haveNewMS': haveNewMS}]"
                @click.self="showMessageList = !showMessageList"
                v-operating3>
             <img src="@/icons/messageIconheaderM2.png" v-show="!showMessageList" @click.self="showMessageList = true">
@@ -240,6 +240,7 @@
     identify
   } from '@/api/newTask-api'
   import {
+    getMessageList,
     getBulletin
   } from '@/api/header-api'
   import {setInfo} from '@/assets/common'
@@ -262,6 +263,7 @@
         showUserList: false,                    // 个人信息下拉
         showProblemList: false,                 // 问题下拉
         showMessageList: false,                 // 消息下拉
+        haveNewMS: false,
         userOperateList: [
           {
             text: this.$t('header.userOLT')[0],
@@ -295,12 +297,12 @@
             text: this.$t('header.problemOLT')[1]
           }
         ],
-        guideShow: false,
-        guideShowStep: 1,
+        guideShow: false,                       // 显示【渲染指引】
+        guideShowStep: 1,                       // 【渲染指引】步骤
         uptop: this.$t('header.uptopBtn'),
-        bulletin: [],             // 公告
-        bulletinRealLength: null, // 公告真实长度
-        bulletinIndex: 0          // 显示的公告索引
+        bulletin: [],                           // 公告
+        bulletinRealLength: null,               // 公告真实长度
+        bulletinIndex: 0                        // 显示的公告索引
       }
     },
     computed: {
@@ -310,6 +312,7 @@
       this.getList()
       this.getUserInfo()
       this.getIdentify()
+      this.haveUnread()
     },
     watch: {
       login: {
@@ -364,14 +367,28 @@
         immediate: true
       },
       'socket_plugin_msg': {
-        handler: function(data){
-
+        handler: function(e){
+          // 站内信有新消息
+          let data = JSON.parse(e.data)
+          if (data.code == 851 && !this.haveNewMS) this.haveNewMS = true
         },
         immediate: true,
         deep: true
       }
     },
     methods: {
+      // 是否有未读
+      async haveUnread(){
+        let v = `isRead=0&noticeType=1&keyword=&pageIndex=1&pageSize=10`,
+          vv = `isRead=0&noticeType=2&keyword=&pageIndex=1&pageSize=10`,
+          data2,
+          data = await getMessageList(v)
+        if(data.data.data.length) {
+          this.haveNewMS = true
+          return false
+        } else data2 = await getMessageList(vv)
+        if(data2.data.data.length) this.haveNewMS = true
+      },
       // 公告滚动
       top() {
         if(!this.bulletinRealLength) return false
@@ -727,7 +744,7 @@
             cursor: pointer;
           }
 
-          .messageE {
+          .messageE.haveNewMS {
             &::after {
               position: absolute;
               top: 10px;
