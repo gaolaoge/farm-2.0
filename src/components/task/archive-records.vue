@@ -578,7 +578,7 @@
           .page {
             position: absolute;
             left: 8px;
-            bottom: 14px;
+            bottom: 4px;
           }
         }
       }
