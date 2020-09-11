@@ -61,7 +61,7 @@
                          class="im"
                          :class="[{'active': stepOneBase.showMe}]">
                   </div>
-                  <div class="netCatalogue" :class="[{'active': stepOneBase.showMe}]">
+                  <div class="netCatalogue setScollBarStyle" :class="[{'active': stepOneBase.showMe}]">
                     <el-tree
                       :data="stepOneBase.netdisc.catalogData"
                       node-key="id"
@@ -90,7 +90,7 @@
                       </span>
                     </div>
                     <!--场景文件tree-->
-                    <div class="tree" v-show="stepOneBase.netdisc.treeData.length">
+                    <div class="tree setScollBarStyle" v-show="stepOneBase.netdisc.treeData.length">
                       <el-tree
                         :data="stepOneBase.netdisc.treeData"
                         node-key="id"
@@ -1845,8 +1845,8 @@
 
                     .tree {
                       margin-top: 36px;
-                      max-height: 384px;
-                      overflow: scroll;
+                      height: calc(100% - 36px);
+                      overflow: auto;
                     }
 
                     .null {

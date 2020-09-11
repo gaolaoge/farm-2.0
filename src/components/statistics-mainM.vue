@@ -297,11 +297,12 @@
 
           .item {
             position: relative;
-            width: 119px;
+            width: 90px;
             height: 25px;
             background: rgba(248, 248, 248, 1);
             border-radius: 2px;
             border: 1px solid rgba(22, 29, 37, 0.1);
+            flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -313,9 +314,11 @@
               font-size: 12px;
               font-family: PingFangSC-Regular, PingFang SC;
               color: rgba(22, 29, 37, 1);
+              max-width: 50px;
               width: 70%;
               overflow: hidden;
               text-overflow: ellipsis;
+              white-space: nowrap;
             }
 
             img {

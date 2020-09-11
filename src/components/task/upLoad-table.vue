@@ -106,7 +106,7 @@
         layout="prev, pager, next, jumper"
         :total="table.uploadTableTotal">
       </el-pagination>
-      <div class="farm-primary-form-btn btn" @click="getList">
+      <div class="farm-primary-form-btn btn" @click="getList(null)">
         <span>{{ refresh }}</span>
       </div>
     </div>

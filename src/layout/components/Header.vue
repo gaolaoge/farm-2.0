@@ -650,7 +650,7 @@
                     position: absolute;
                     right: 10px;
                     top: calc(50% - 12px);
-                    background-color: #0f46a1;
+                    background-color: rgba(27, 83, 244, 0.9);
                     width: 32px;
                     height: 24px;
                     display: flex;

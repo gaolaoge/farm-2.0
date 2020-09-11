@@ -245,11 +245,11 @@
     },
     methods: {
       uploadSelectionF(list) {
-        if(!list.length) {
+        if (!list.length) {
           this.btnGroup.myUploadBtnGroup[1]['action'] = false
           return false
         }
-        if(list.some(item => item['ing'])) this.btnGroup.myUploadBtnGroup[1]['action'] = false
+        if (list.some(item => item['ing'])) this.btnGroup.myUploadBtnGroup[1]['action'] = false
         else this.btnGroup.myUploadBtnGroup[1]['action'] = true
       },
       renderSelectionF(list) {
@@ -268,11 +268,11 @@
         if (type == 'render') {
           switch (active) {
             case this.$t('assets.outPutBtnGroup')[0]:  // 下载
-              if(!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.outPutTable.downloadFun()
               break
             case this.$t('assets.outPutBtnGroup')[1]:  // 删除
-              if(!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.outPutTable.deleteFun()
               break
           }
@@ -288,23 +288,23 @@
               this.$refs.myUploadTable.createFolder()
               break
             case '下载':
-              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.downloadFile()  // 下载
               break
             case '移动到':                              // 移动到
-              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.moveFile()
               break
             case '复制到':                              // 复制到
-              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.copyFile()
               break
             case '重命名':                              // 重命名
-              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.rename()
               break
             case '解压':                                // 解压
-              if(!this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.myUploadBtnGroup[1]['action']) return false
               this.$refs.myUploadTable.unzip()
               break
             case '删除':                                // 删除
@@ -339,6 +339,12 @@
         height: 100%;
         display: flex;
         align-items: center;
+
+        .farm-primary-form-btn,
+        .more-btn,
+        .howToCreate {
+          flex-shrink: 0;
+        }
       }
     }
 
@@ -351,6 +357,15 @@
       font-weight: 400;
       color: rgba(255, 191, 0, 1);
       user-select: none;
+      max-width: calc(100% - 300px);
+
+      span {
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     .tableList {
@@ -558,7 +573,7 @@
     overflow: hidden;
 
     .el-table__body-wrapper {
-      height: calc(100vh - 362px);
+      height: calc(100vh - 360px);
 
       tr {
         cursor: pointer;
@@ -570,6 +585,7 @@
       display: inline-flex;
       flex-wrap: nowrap;
       justify-content: flex-start;
+
       .btn {
         margin-left: 20px;
       }

@@ -1673,7 +1673,7 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           inputPlaceholder: '请输入项目名称',
-          inputPattern: /^\w+$/,
+          inputPattern: /^(?=.*\S).+$/,
           inputErrorMessage: '项目名格式不正确'
         })
           .then(

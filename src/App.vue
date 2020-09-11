@@ -24,7 +24,7 @@ export default {
     padding: 0px;
   }
   #app {
-    font-family: 'SourceHanSansCN','Arial Bold';
+    /*font-family: 'SourceHanSansCN','Arial Bold';*/
     /*-webkit-font-smoothing: antialiased;*/
     /*-moz-osx-font-smoothing: grayscale;*/
     min-height: 810px;

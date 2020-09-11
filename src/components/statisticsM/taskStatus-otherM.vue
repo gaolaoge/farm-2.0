@@ -212,4 +212,7 @@
       }
     }
   }
+  .btnIcon {
+    width: 16px;
+  }
 </style>
