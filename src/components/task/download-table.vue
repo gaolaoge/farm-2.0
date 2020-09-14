@@ -4,7 +4,7 @@
       <el-table
         :data="table.RenderDownloadData"
         @select="tableSelect"
-        @selection-change="RenderDownloadSelectionChange"
+        @filter-change="filterChangeF"
         @select-all="selectAll"
         @row-click="showDetails"
         :row-class-name="tableRowStyle"
@@ -37,6 +37,7 @@
           label="状态"
           :filter-method="filterStatus"
           :filters="table.statusList"
+          column-key="status"
           show-overflow-tooltip
           width="110">
           <template slot-scope="scope">
@@ -73,6 +74,7 @@
           prop="viewProject"
           label="所属项目"
           show-overflow-tooltip
+          column-key="task"
           :filter-method="filterStatus"
           :filters="table.itemList"
           width="186"/>
@@ -159,6 +161,7 @@
           show-overflow-tooltip
           :filter-method="filterStatus"
           :filters="table.downloadStatusList"
+          column-key="download"
           width="116">
           <template slot-scope="scope">
             <span v-if="scope.row.downloadStatus == '待下载'" style="color: #F90023">
@@ -191,6 +194,7 @@
           prop="founder"
           label="创建人"
           show-overflow-tooltip
+          column-key="founder"
           :filter-method="filterStatus"
           :filters="table.usersList"
           width="100"/>
@@ -357,6 +361,7 @@
           pageSize: 10,
           unfoldList: [],               // 展开项
           downloadStatusList: [         // 筛选 - 下载情况
+            {text: '全部', value: '全部'},
             {text: '待下载', value: '待下载'},
             {text: '部分下载', value: '部分下载'},
             {text: '已下载', value: '已下载'}
@@ -364,6 +369,7 @@
           usersList: [],                // 筛选 - 创建人
           itemList: [],                 // 筛选 - 所属项目
           statusList: [                 // 筛选 - 状态
+            {text: '全部', value: '全部'},
             {text: '待全部渲染', value: '待全部渲染'},
             {text: '渲染中', value: '渲染中'},
             {text: '渲染暂停', value: '渲染暂停'},
@@ -482,8 +488,28 @@
           table.toggleRowSelection(row, false)
         }
       },
-      // 渲染下载多选
-      RenderDownloadSelectionChange(val) {
+      // 筛选条件修改
+      filterChangeF(val) {
+        if(Object.keys(val)[0] == 'status') this.$emit('changeFilter', {
+          'tab': 'downloadT',
+          'type': 'status',
+          'val': val['status']
+        })
+        else if(Object.keys(val)[0] == 'task') this.$emit('changeFilter', {
+          'tab': 'downloadT',
+          'type': 'task',
+          'val': val['task']
+        })
+        else if(Object.keys(val)[0] == 'download') this.$emit('changeFilter', {
+          'tab': 'downloadT',
+          'type': 'download',
+          'val': val['download']
+        })
+        else if(Object.keys(val)[0] == 'founder') this.$emit('changeFilter', {
+          'tab': 'downloadT',
+          'type': 'founder',
+          'val': val['founder']
+        })
       },
       // 【非业务逻辑】全选
       selectAll(selection) {

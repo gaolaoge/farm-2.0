@@ -1375,7 +1375,7 @@
             data = await getThumbnail(t)
           if (data.data.code == 1000) this.result.miniImgHref = null
           else if (data.data.code == 200) {
-            this.result.miniImgHref = data.data.data == ''
+            this.result.miniImgHref = data.data.data
             let a = await getThumbnail(`frameTaskUuid=${row.frameTaskUuid}&layerTaskUuid=${row.layerTaskUuid}&size=900`)
             this.$store.commit('setThumbURL', a.data.data)
           }
@@ -2028,8 +2028,10 @@
           return false
         }
         list.forEach(item => {
-          if (/[-_]+?/.test(item)) {
+          if (/[-_]/.test(item)) {
             let t = item.match(/\d+/g)
+            t[0] = Number(t[0])
+            t[1] = Number(t[1])
             if (t[0] == t[1]) {
               result.add(t[0])
               return
@@ -2037,12 +2039,12 @@
             sortF(t[0], t[1])
             do {
               result.add(t[0])
-              t[0] += interval
+              t[0] = t[0] + interval
             } while (t[0] < t[1])
           } else result.add(item)
         })
 
-        if (valList.some(item => !result.has(item))) this.errFun('优先帧超出帧范围，请重新输入')
+        if (valList.some(item => !result.has(Number(item)))) this.errFun('优先帧超出帧范围，请重新输入')
         else this.setting.priority.customizeInputError = false
       },
       // 验证报错

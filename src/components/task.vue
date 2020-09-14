@@ -90,6 +90,35 @@
               :key="index">
           {{ item.text }} ( {{ item.num }} )
         </span>
+        <div class="tableFilterList"
+             v-for="(item,index) in table.filterList"
+             :key="index"
+             v-show="index == table.navListActiveIndex">
+          <!--状态-->
+          <div class="statusS" v-show="item.status.length">
+            <span class="label">{{ item.label[0] }}：</span>
+            <span class="val">{{ item.status.join('、') }}</span>
+            <img src="@/icons/b.png" @click="upLoadSeletedList">
+          </div>
+          <!--所属项目-->
+          <div class="statusS" v-if="item.task" v-show="item.task.length">
+            <span class="label">{{ item.label[2] }}：</span>
+            <span class="val">{{ item.task.join('、') }}</span>
+            <img src="@/icons/b.png" @click="upLoadSeletedList">
+          </div>
+          <!--下载情况-->
+          <div class="statusS" v-if="item.download" v-show="item.download.length">
+            <span class="label">{{ item.label[3] }}：</span>
+            <span class="val">{{ item.download.join('、') }}</span>
+            <img src="@/icons/b.png" @click="upLoadSeletedList">
+          </div>
+          <!--创建人-->
+          <div class="founderS" v-show="item.founder.length">
+            <span class="label">{{ item.label[1] }}：</span>
+            <span class="val">{{ item.founder.join('、') }}</span>
+            <img src="@/icons/b.png" @click="upLoadSeletedList">
+          </div>
+        </div>
       </div>
       <div class="tableList"
            ref="UploadAnalysisTable">
@@ -101,6 +130,7 @@
           <upload-table @uploadTbaleTotalItem="uploadTbaleTotalItem"
                         @upLoadSeletedList="upLoadSeletedList"
                         @toRenderTable="table.navListActiveIndex = 1"
+                        @changeFilter="changeTabFilter"
                         ref="uploadMode"/>
         </div>
         <!--渲染下载-->
@@ -110,6 +140,7 @@
           <!--渲染下载表格-->
           <download-table @renderTbaleTotalItem="renderTbaleTotalItem"
                           @j="j"
+                          @changeFilter="changeTabFilter"
                           @archiveNum="getArchiveNum"
                           ref="renderMode"/>
         </div>
@@ -157,6 +188,20 @@
             {
               text: this.$t('task.tableNavList')[1],
               num: 0
+            }
+          ],
+          filterList: [
+            {
+              status: [],
+              founder: [],
+              label: ['状态', '创建人']
+            },
+            {
+              status: [],
+              task: [],
+              download: [],
+              founder: [],
+              label: ['状态', '创建人', '所属项目', '下载情况']
             }
           ],
           navListActiveIndex: 0,
@@ -242,6 +287,10 @@
       newTask
     },
     methods: {
+      // tab 筛选条件改变
+      changeTabFilter(data){
+        this.table.filterList[data.tab == 'upload' ? 0 : 1][data.type] = data.val
+      },
       // 上传分析 多选结果
       upLoadSeletedList(val) {
         let t = this.btnGroup
@@ -395,10 +444,10 @@
         },
       },
       'socket_backS_msg': {
-        handler: function(e){
+        handler: function (e) {
           let data = JSON.parse(e.data)
           if (data.code != 852) this.$refs.renderMode.getList()           // 渲染列表
-          else if(data.code != 854) this.$refs.uploadMode.getList()       // 分析列表
+          else if (data.code != 854) this.$refs.uploadMode.getList()       // 分析列表
           else return false
         },
         immediate: true,
@@ -451,11 +500,13 @@
   .download-table {
     position: relative;
     height: 100%;
+
     .page {
       position: absolute;
       left: 10px;
       bottom: 10px;
       display: inline-flex;
+
       .btn {
         margin-left: 20px;
       }
@@ -493,11 +544,14 @@
         flex-shrink: 1;
         flex-grow: 1;
         max-width: 400px;
+
         .farm-primary-form-btn {
           flex-shrink: 0;
         }
+
         .searchItem {
           flex-grow: 1;
+
           .farm-form-input {
             width: 100%;
           }
@@ -552,6 +606,42 @@
       margin: 0px 20px 20px 50px;
       display: flex;
       flex-direction: column;
+
+      .navList {
+        display: flex;
+        align-items: center;
+        .tableFilterList {
+          display: inline-flex;
+
+          .statusS,
+          .founderS {
+            display: flex;
+            align-items: center;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            border: 1px solid rgba(22, 29, 37, 0.1);
+            margin-right: 20px;
+            padding: 0px 10px;
+
+
+            .label {
+              font-size: 12px;
+              color: rgba(22, 29, 37, 0.4);
+            }
+
+            .val {
+              font-size: 12px;
+              color: rgba(22, 29, 37, 0.8);
+            }
+
+            img {
+              cursor: pointer;
+              margin-left: 20px;
+            }
+          }
+        }
+      }
     }
 
     .tableList {

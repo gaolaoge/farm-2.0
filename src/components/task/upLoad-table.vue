@@ -3,6 +3,7 @@
     <el-table
       :data="table.UploadAnalysisData"
       @selection-change="handleSelectionChange"
+      @filter-change="filterChangeF"
       @row-click="showDetails"
       :row-class-name="tableRowStyle"
       class="u"
@@ -32,6 +33,7 @@
       <el-table-column
         label="状态"
         show-overflow-tooltip
+        column-key="status"
         :filter-method="filterStatus"
         :filters="table.statusList"
         width="120">
@@ -78,6 +80,7 @@
       <el-table-column
         prop="founder"
         label="创建人"
+        column-key="founder"
         show-overflow-tooltip
         :filters="table.usersList"
         width="100"/>
@@ -170,6 +173,7 @@
           // 所属项目筛选数组
           projectList: [],
           statusList: [
+            {text: '全部', value: '全部'},
             {text: '上传中', value: '上传中...'},
             {text: '上传暂停', value: '上传暂停'},
             {text: '上传失败', value: '上传失败'},
@@ -190,6 +194,18 @@
       }
     },
     methods: {
+      filterChangeF(val){
+        if(Object.keys(val)[0] == 'status') this.$emit('changeFilter', {
+          'tab': 'upload',
+          'type': 'status',
+          'val': val['status']
+        })
+        else if(Object.keys(val)[0] == 'founder') this.$emit('changeFilter', {
+          'tab': 'upload',
+          'type': 'founder',
+          'val': val['founder']
+        })
+      },
       // farm-drawer 翻页
       changeTypeInfo(val) {
         this.itemName = val
@@ -224,8 +240,9 @@
         this.$emit('upLoadSeletedList', [...r])
       },
       // 上传分析 - 筛选 - 状态
-      filterStatus(value, row) {
-        return row.status === value
+      filterStatus(value, row, column) {
+        const property = column['property']
+        return row[property] === value
       },
       // 上传分析 - 打开详情
       showDetails(row, column, event) {

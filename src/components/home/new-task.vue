@@ -61,18 +61,27 @@
                          class="im"
                          :class="[{'active': stepOneBase.showMe}]">
                   </div>
-                  <div class="netCatalogue setScollBarStyle" :class="[{'active': stepOneBase.showMe}]">
+                  <div class="netCatalogue" :class="[{'active': stepOneBase.showMe}]">
                     <el-tree
                       :data="stepOneBase.netdisc.catalogData"
                       node-key="id"
                       :load="catalogDataGetChildNode"
                       lazy
+                      class="setScollBarStyle"
+                      v-if="stepOneBase.showMe"
                       :props="stepOneBase.netdisc.defaultProps">
                       <span class="custom-tree-node" slot-scope="{ node, data }">
                         <img src="@/icons/folder.png" alt="">
                         <span>{{ node.label }}</span>
                       </span>
                     </el-tree>
+                    <div class="btnG" v-show="stepOneBase.showMe">
+                      <span v-for="(item,index) in stepOneBase.netdisc.treeOperateBtn"
+                            :key="index"
+                            @click="treeOperateFun(item.val)">
+                        {{ item.label }}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <!--场景文件-->
@@ -91,6 +100,9 @@
                     </div>
                     <!--场景文件tree-->
                     <div class="tree setScollBarStyle" v-show="stepOneBase.netdisc.treeData.length">
+                      <div class="table-header">
+                        <span v-for="(item,index) in stepOneBase.netdisc.table_header" :key="index">{{item}}</span>
+                      </div>
                       <el-tree
                         :data="stepOneBase.netdisc.treeData"
                         node-key="id"
@@ -580,14 +592,10 @@
           <!--按钮-->
           <div class="btnGroup">
             <div class="btnGroup-btn save" @click="taskDefine" :class="[{'disable-self': !disableSelf}]">
-              <span>
-                {{ dialogAdd.save }}
-              </span>
+              <span>{{ dialogAdd.save }}</span>
             </div>
             <div class="btnGroup-btn cancel" @click="innerVisible = false">
-              <span>
-                {{ dialogAdd.cancel }}
-              </span>
+              <span>{{ dialogAdd.cancel }}</span>
             </div>
           </div>
         </div>
@@ -659,10 +667,10 @@
             }
           ],
           netdisc: {     // 我的资产
-            firstOpenCatalogTree: true,
             myAssets: '资产',
             pathLabel: '工程路径',
-            pathV: '选择工程路径',
+            pathV: '选择工程路径',    // 工程路径最终值
+            pathVTemporary: null,   // 工程路径临时选中值
             fileLabel: '场景文件',
             folderText: '文件夹',
             warnSpan: '请先选择工程路径',
@@ -675,6 +683,17 @@
             treeData: [],           // 场景文件 - 树状图
             catalogData: [],        // 工程路径 - 树状图
             cDataGetChildNodeCB: null,   // 工程路径获取子节点回调
+            table_header: ['场景名'],
+            treeOperateBtn: [
+              {
+                label: '取消',
+                val: 'cancel'
+              },
+              {
+                label: '确定',
+                val: 'confirm'
+              }
+            ]
           },
           local: {   // 我的电脑
             operateBtnGroup: [
@@ -883,7 +902,7 @@
       // 验证表格是否填写完整
       disableSelf() {
         let a = this.dialogAdd
-        if (a.form.valName.trim() && a.nList.length && a.form.formatName) return true
+        if (a.form.valName.trim() && a.form.valSoftware) return true
         else return false
       }
     },
@@ -944,9 +963,16 @@
       }
     },
     methods: {
+      // 1.选择渲染文件 - 我的资产 - 工程文件 - 树状图 - 操作
+      treeOperateFun(val){
+        let n = this.stepOneBase.netdisc
+        if(val == 'cancel') n.pathVTemporary = null
+        else if(val == 'confirm') n.pathV = n.pathVTemporary
+        this.stepOneBase.showMe = false
+      },
       // 1.选择渲染文件 - 我的资产 - 工程文件 - 树状图 - 进入文件夹
       catalogDataGetChildNode(node, resolve) {
-        this.stepOneBase.netdisc.pathV = node.data.position
+        this.stepOneBase.netdisc.pathVTemporary = node.data.position    // 存储临时选中地址
         this.projectJump(node.data.position)
         this.cDataGetChildNodeCB = resolve
       },
@@ -1295,24 +1321,24 @@
               messageFun('success', '创建模板成功')
               this.innerVisible = false
               this.getList()
-            } else if(data.data.code == 101) messageFun('info', '模板名已存在，创建失败')
+            } else if (data.data.code == 101) messageFun('info', '模板名已存在，创建失败')
             //创建失败
             break
           // 编辑模板
           case 'editOne':
             let obj = this.stepTwoBase['renderList'][this.dialogAdd.index],
               data2 = await createTaskSetEditPlugin({
-              templateUuid: obj['renderTemplate']['templateUuid'],                 // 模板uuid
-              templateName: this.dialogAdd.form.valName,                           // 模板名称
-              softUuid: this.dialogAdd.form.valSoftware[1],                        // 软件uuid
-              isDefault: obj['renderTemplate']['isDefault'],                       // 是否默认
-              pluginUuids: this.dialogAdd.nList.map(curr => curr.pluginUuid)       // 插件
-            })
+                templateUuid: obj['renderTemplate']['templateUuid'],                 // 模板uuid
+                templateName: this.dialogAdd.form.valName,                           // 模板名称
+                softUuid: this.dialogAdd.form.valSoftware[1],                        // 软件uuid
+                isDefault: obj['renderTemplate']['isDefault'],                       // 是否默认
+                pluginUuids: this.dialogAdd.nList.map(curr => curr.pluginUuid)       // 插件
+              })
             if (data2.data.code == 200) {
               messageFun('success', '编辑成功')
               this.innerVisible = false
               this.getList()
-            } else if(data2.data.code == 101) messageFun('info', '模板名已存在，编辑失败')
+            } else if (data2.data.code == 101) messageFun('info', '模板名已存在，编辑失败')
             break
         }
       },
@@ -1333,14 +1359,15 @@
       },
       // 1.选择渲染文件 - 我的资产 - 展开网盘目录
       expandDiskDirectory() {
-        this.stepOneBase.showMe = !this.stepOneBase.showMe
-        if (!this.stepOneBase.netdisc.firstOpenCatalogTree) return false
-        this.stepOneBase.netdisc.firstOpenCatalogTree = false
-        this.$store.commit('WEBSOCKET_BACKS_SEND', {
-          'code': 612,
-          'customerUuid': this.user.id,
-          'path': ''
-        })  // 向后台获取网盘目录 tree
+        if(this.stepOneBase.showMe) this.stepOneBase.showMe = false
+        else {
+          this.stepOneBase.showMe = true
+          this.$store.commit('WEBSOCKET_BACKS_SEND', {
+            'code': 612,
+            'customerUuid': this.user.id,
+            'path': ''
+          })
+        }
       },
       // 1.选择渲染文件 - 我的电脑 -【添加】新场景文件
       operateBtnAddMore() {
@@ -1382,7 +1409,7 @@
       },
       // 4.提交
       async confirmFun() {
-        if(!this.confirmLock) return
+        if (!this.confirmLock) return
         this.confirmLock = false
         setTimeout(() => this.confirmLock = true, 5000)
         let fir = this.stepOneBase,
@@ -1575,7 +1602,7 @@
         // })
         // 向后台获取网盘目录 场景路径
         let data = await getHistoryPath(`account=${this.user.account}`)
-        if(data.data.code == 208) {
+        if (data.data.code == 208) {
           // scenePath 场景文件导航Path / resourcePath 工程路径Path
           let path_ = data.data.data.scenePath.split('/')
           path_.pop()   // 删除最后一位空元素
@@ -1847,6 +1874,16 @@
                       margin-top: 36px;
                       height: calc(100% - 36px);
                       overflow: auto;
+
+                      .table-header {
+                        margin: 16px 0px 4px;
+                        padding: 0px 46px;
+
+                        span {
+                          color: rgba(22, 29, 37, 0.6);
+                          font-size: 14px;
+                        }
+                      }
                     }
 
                     .null {
@@ -1906,7 +1943,37 @@
                   box-shadow: 0px 0px 0px 1px rgba(22, 29, 37, 0);
                   background-color: rgba(255, 255, 255, 1);
                   transition: all 0.2s;
-                  overflow: scroll;
+                  /*overflow: scroll;*/
+                  display: flex;
+                  flex-direction: column;
+
+                  .el-tree {
+                    overflow: scroll;
+                    height: calc(100% - 37px);
+                  }
+
+                  .btnG {
+                    position: absolute;
+                    bottom: 0px;
+                    height: 37px;
+                    width: 100%;
+                    background-color: rgba(241, 244, 249, 1);
+                    border-radius: 0px 0px 6px 6px;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+
+                    span {
+                      font-size: 14px;
+                      font-family: PingFangSC-Regular, PingFang SC;
+                      color: rgba(22, 29, 37, 0.5);
+                      margin-right: 30px;
+                      cursor: pointer;
+                      &:hover {
+                        color: rgba(22, 29, 37, 1);
+                      }
+                    }
+                  }
 
                   &.active {
                     height: 320px;

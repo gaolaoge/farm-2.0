@@ -151,6 +151,7 @@
     .echartsM {
       background-color: rgba(255, 255, 255, 1);
       width: calc(50% - 10px);
+      min-width: 830px;
       height: calc(50% - 10px);
       border-radius: 14px;
       /*overflow: hidden;*/
@@ -369,6 +370,7 @@
 <style lang="less" scoped>
   .statisticsM-wrapper {
     width: 100%;
+    min-width: 1670px;
     padding: 0px 20px 20px 50px;
     display: flex;
     flex-wrap: wrap;
