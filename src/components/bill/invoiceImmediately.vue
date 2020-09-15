@@ -79,7 +79,6 @@
           <div class="valTable">
             <el-table
               :data="invoiceTableData"
-              height="220"
               style="width: 100%">
 
               <el-table-column
@@ -588,7 +587,7 @@
       .valTable {
         flex-grow: 1;
         width: 1px;
-        height: 280px;
+        /*height: 280px;*/
         border-radius: 10px;
         padding: 10px;
         box-sizing: border-box;
@@ -630,8 +629,9 @@
     }
 
     .addMore {
-      margin-top: 15px;
+      margin: 15px 0px;
       cursor: pointer;
+      user-select: none;
 
       img {
         width: 20px;
@@ -777,5 +777,12 @@
       }
     }
 
+  }
+
+  .valTable {
+    /deep/.el-table__body-wrapper{
+      min-height: 67px;
+      height: calc(100vh - 780px);
+    }
   }
 </style>

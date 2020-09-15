@@ -1843,7 +1843,7 @@
                       top: 0px;
                       height: 34px;
                       width: calc(100% - 40px);
-                      border-bottom: 1px solid rgba(22, 29, 37, 0.29);
+                      border-bottom: 1px solid rgba(22, 29, 37, 0.19);
                       display: flex;
                       align-items: center;
 

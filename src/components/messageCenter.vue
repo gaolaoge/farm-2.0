@@ -62,12 +62,10 @@
   .readed {
     opacity: 0.6;
     font-size: 14px;
-    line-height: 32px;
   }
 
   .unread {
     color: rgba(0, 0, 0, 0.9);
-    line-height: 32px;
   }
 
   .systemTable,
@@ -115,7 +113,7 @@
     }
 
     .page {
-      margin: 0px 25px 30px;
+
     }
   }
 
@@ -138,24 +136,14 @@
     span {
       position: relative;
       font-size: 14px;
-
-      .unread {
-        position: absolute;
-        right: 0px;
-        top: -0px;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: rgba(255, 62, 77, 0.8);
-      }
     }
   }
 
-  /deep/ .el-table__body-wrapper {
-    height: calc(100vh - 330px);
+  .el-table__body-wrapper {
+    height: calc(100vh - 250px);
   }
 
-  /deep/ .el-table__row {
+  .el-table__row {
     td:nth-of-type(3) .cell {
       color: rgba(22, 29, 37, 0.5);
       font-size: 10px;

@@ -8,6 +8,7 @@
       :row-class-name="tableRowStyle"
       class="u"
       :border=true
+      ref="uploadTableImportant"
       style="width: 100%">
 
       <el-table-column
@@ -194,6 +195,10 @@
       }
     },
     methods: {
+      // 清除筛选条件
+      clearFilterF(type){
+        this.$refs.uploadTableImportant.clearFilter(type)
+      },
       filterChangeF(val){
         if(Object.keys(val)[0] == 'status') this.$emit('changeFilter', {
           'tab': 'upload',

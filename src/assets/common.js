@@ -16,10 +16,11 @@ const createCalendar = function (date) {
 }
 
 // 获得日期时间
-const createDateFun = function (date, mini) {
-  if (date.getFullYear() == '1970') return '-'
+const createDateFun = function (date, mini, inADay) {
+  if (date.getFullYear() == '1970' && !inADay) return '-'
   let {year, month, day, hour, minutes, seconds} = createCalendar(date)
   if (mini) return `${year}-${month}-${day}`
+  else if (inADay) return `${hour}:${minutes}:${seconds}`
   else return `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`
 }
 
@@ -27,12 +28,13 @@ const createDateFun = function (date, mini) {
 const simplify = function (date) {
   let halfDay = 1000 * 60 * 60 * 12,                             // 半天的毫秒时
     todayNum = new Date(new Date().toDateString()).getTime()     // 当日零时时间戳
-  if (date - todayNum <= halfDay) return '今天上午'
-  else if (date - todayNum < halfDay * 2) return '今天下午'
-  else if (todayNum - date < halfDay) return '昨天上午'
-  else if (todayNum - date < halfDay * 2) return '昨天下午'
-  else if (todayNum - date < halfDay * 3) return '前天下午'
-  else if (todayNum - date < halfDay * 4) return '前天下午'
+  if (date - todayNum <= halfDay * 2) {
+    return createDateFun(new Date(date - todayNum), false, true)
+  } else if (todayNum - date < halfDay * 2) {
+    return '昨天' + createDateFun(new Date(todayNum - date), false, true)
+  } else if (todayNum - date < halfDay * 4) {
+    return '前天' + createDateFun(new Date(todayNum - date), false, true)
+  }
 }
 
 // 耗时

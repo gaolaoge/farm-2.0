@@ -154,7 +154,6 @@
       min-width: 830px;
       height: calc(50% - 10px);
       border-radius: 14px;
-      /*overflow: hidden;*/
       display: flex;
       flex-direction: column;
       transition: all 0.1s;
@@ -267,6 +266,7 @@
           width: 100%;
 
           /deep/ .el-select {
+            position: relative;
             padding: 10px 15px;
 
             .el-input__inner {
@@ -284,6 +284,21 @@
               .el-input__suffix-inner {
 
               }
+            }
+
+            .el-tag {
+              display: none!important;
+            }
+          }
+          &.h {
+            /deep/ .el-select::after {
+              position: absolute;
+              top: 12px;
+              left: 24px;
+              content: '按项目统计';
+              font-size: 14px;
+              color: rgba(22, 29, 37, 0.6);
+
             }
           }
         }

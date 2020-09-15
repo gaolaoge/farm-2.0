@@ -389,6 +389,10 @@
       }
     },
     methods: {
+      // 清除筛选条件
+      clearFilterF(type){
+        this.$refs.renderTableImportant.clearFilter(type)
+      },
       // farm-drawer 翻页
       changeTypeInfo(val) {
         this.itemName = val
@@ -619,7 +623,7 @@
                 failure: item.frameCount.fail,                         // 失败
                 renderingTime: consum(item.useTime),                   // 渲染时长
                 renderingCost: item.cost,                              // 渲染费用（金币）
-                frameRange: item.frameStart + '-' + item.frameEnd,     // 帧范围
+                frameRange: item.frameRange,                           // 帧范围
                 intervalFrame: item.frameInterval,                     // 间隔帧
                 camera: item.camera,                                   // 相机
                 layerName: item.layerName,                             // 层名
@@ -993,6 +997,7 @@
         this.drawerTaskData = item
         this.$refs.drawer.getItemList()
         this.$refs.drawer.setParameterNext(data.data)
+        this.$refs.drawer.isCopy = true
         this.showDrawer = true
       },
       // 打包后下载

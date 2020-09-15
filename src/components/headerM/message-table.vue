@@ -44,9 +44,10 @@
             width="250">
             <template slot-scope="scope">
               <span :class="[
+                'messageItem',
                 {'readed': scope.row.isRead == 1},
                 {'unread': scope.row.isRead == 0}
-              ]">{{ scope.row.noticeDetail }}</span>
+              ]" :title="scope.row.noticeDetail">{{ scope.row.noticeDetail }}</span>
             </template>
           </el-table-column>
           <!--时间-->
@@ -72,9 +73,10 @@
             width="250">
             <template slot-scope="scope">
               <span :class="[
+                'messageItem',
                 {'readed': scope.row.isRead == 1},
                 {'unread': scope.row.isRead == 0}
-              ]">{{ scope.row.noticeDetail }}</span>
+              ]" :title="scope.row.noticeDetail">{{ scope.row.noticeDetail }}</span>
             </template>
           </el-table-column>
           <!--时间-->
@@ -349,7 +351,7 @@
         .showMeAll,
         .s {
           font-size: 12px;
-          color: rgba(22, 29, 37, 1);
+          color: rgba(22, 29, 37, 0.79);
           cursor: pointer;
         }
 
@@ -403,11 +405,17 @@
     vertical-align: text-top;
   }
 
+  .messageItem {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
   .readed {
     opacity: 0.6;
   }
 
   .unread {
-    color: rgba(0, 0, 0, 0.9);
+    color: rgba(0, 0, 0, 0.79);
   }
 </style>

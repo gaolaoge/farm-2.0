@@ -98,25 +98,25 @@
           <div class="statusS" v-show="item.status.length">
             <span class="label">{{ item.label[0] }}：</span>
             <span class="val">{{ item.status.join('、') }}</span>
-            <img src="@/icons/b.png" @click="upLoadSeletedList">
+            <img src="@/icons/b.png" @click="cancelFilterStatus(index)">
           </div>
           <!--所属项目-->
           <div class="statusS" v-if="item.task" v-show="item.task.length">
             <span class="label">{{ item.label[2] }}：</span>
             <span class="val">{{ item.task.join('、') }}</span>
-            <img src="@/icons/b.png" @click="upLoadSeletedList">
+            <img src="@/icons/b.png" @click="cancelFilterTask">
           </div>
           <!--下载情况-->
           <div class="statusS" v-if="item.download" v-show="item.download.length">
             <span class="label">{{ item.label[3] }}：</span>
             <span class="val">{{ item.download.join('、') }}</span>
-            <img src="@/icons/b.png" @click="upLoadSeletedList">
+            <img src="@/icons/b.png" @click="cancelFilterDownload">
           </div>
           <!--创建人-->
           <div class="founderS" v-show="item.founder.length">
             <span class="label">{{ item.label[1] }}：</span>
             <span class="val">{{ item.founder.join('、') }}</span>
-            <img src="@/icons/b.png" @click="upLoadSeletedList">
+            <img src="@/icons/b.png" @click="cancelFilterFounder(index)">
           </div>
         </div>
       </div>
@@ -287,6 +287,28 @@
       newTask
     },
     methods: {
+      // tab 取消【状态】筛选
+      cancelFilterStatus(index){
+        if(index == 0) this.$refs.uploadMode.clearFilterF('status')
+        else this.$refs.renderMode.clearFilterF('status')
+        this.table.filterList[index]['status'] = []
+      },
+      // tab 取消【创建人】筛选
+      cancelFilterFounder(index){
+        if(index == 0) this.$refs.uploadMode.clearFilterF('founder')
+        else this.$refs.renderMode.clearFilterF('founder')
+        this.table.filterList[index]['founder'] = []
+      },
+      // tab 取消【下载情况】筛选
+      cancelFilterDownload(){
+        this.$refs.renderMode.clearFilterF('download')
+        this.table.filterList[1]['download'] = []
+      },
+      // tab 取消【所属项目】筛选
+      cancelFilterTask(){
+        this.$refs.renderMode.clearFilterF('task')
+        this.table.filterList[1]['task'] = []
+      },
       // tab 筛选条件改变
       changeTabFilter(data){
         this.table.filterList[data.tab == 'upload' ? 0 : 1][data.type] = data.val

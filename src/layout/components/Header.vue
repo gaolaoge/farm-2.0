@@ -355,7 +355,6 @@
           this.workBenchVal = val
           this.changeIsGpu()
         },
-        immediate: true
       },
       'user.account': {
         handler: function (val) {
@@ -372,8 +371,6 @@
           let data = JSON.parse(e.data)
           if (data.code == 851 && !this.haveNewMS) this.haveNewMS = true
         },
-        immediate: true,
-        deep: true
       }
     },
     methods: {
@@ -462,7 +459,7 @@
           .catch(error => console.log(`工作台下拉框获取报错，${error}`))
       },
       changeIsGpu() {
-        this.$store.commit('changeIsGpu', this.workBenchList.find(curr => curr.val == this.workBenchVal).isGpu)
+        this.$store.commit('changeIsGpu', this.workBenchList.find(curr => curr.val == this.workBenchVal)['isGpu'])
       },
       async getUserInfo() {
         let data = await getInfo(),

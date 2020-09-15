@@ -1746,11 +1746,40 @@
             ratio: this.zone == 1 ? 0 : curr.ratio                // 宽高比
           }
         })
-        let v = {
+        let v = this.isCopy ? {
+          taskUuid: this.taskData.taskUuid,                        // 项目Uuid
+          source: 1,                                               // 是否为web端
+          zoneUuid: this.zoneId,
+          commitTaskDTO: {
+            layer: Number(tt.num.singleChoiceVal),                  // 启动分层渲染
+            frameCustomNo: tt.priority.customize.match(/\d/g) || [],// 自定义帧
+            layerSettingsList,
+            isGpu: this.isGup,                                       // 是否为gpu，分区信息对象可找到
+            taskType: this.zone,                                     // 任务类型 1，影视版；2，效果图.
+            taskSource: 1,                                           // 任务来源 ，网页端 1
+            frameCustom: Number(tt.priority.selfVal),                // 是否开启自定义帧1是，0否
+            colorChannel: this.zone == 1 ? 0 : 0,                    // 颜色通道。影视版固定值0
+            aoChannel: this.zone == 1 ? 0 : 0,                       // AO通道。影视版固定值0
+            renderPattern: tt.mode.modeList.find(curr => curr.val == tt.mode.mode).id,   // 选中的配置编号 渲染模式
+            testRender: this.zone == 1 ? {                                               // 测试帧对象
+              testRendering: tt.priority.topVal == '1' || tt.priority.middleVal == '1' || tt.priority.bottomVal == '1' ? '1' : '0',        // 是否开启测试帧（优先渲染）1是0否
+              frameFirst: tt.priority.topVal,                        // 首帧 1是 0否
+              frameMiddle: tt.priority.middleVal,                    // 中间帧
+              frameFinally: tt.priority.bottomVal                    // 末帧
+            } : null,
+            otherSettings: {                                         // 其他设置
+              projectName: tt.other.view.split('-/-')[1],            // 项目名称
+              projectUuid: tt.other.view.split('-/-')[0],            // 项目uuid
+              frameTimeoutWarn: tt.other.remindVal,                  // 超时警告
+              frameTimeoutStop: tt.other.stopVal                     // 超时停止
+            }
+          }
+        } : {
           taskUuid: this.taskData.taskUuid,                       // 项目Uuid
           layer: Number(tt.num.singleChoiceVal),                  // 启动分层渲染
           frameCustomNo: tt.priority.customize.match(/\d/g) || [],// 自定义帧
           layerSettingsList,
+          source: 1,                                               // 是否为web端
           isGpu: this.isGup,                                       // 是否为gpu，分区信息对象可找到
           taskType: this.zone,                                     // 任务类型 1，影视版；2，效果图.
           taskSource: 1,                                           // 任务来源 ，网页端 1
@@ -1776,6 +1805,7 @@
           this.closeDrawer()
           this.$emit('toRenderTable')
           this.$emit('getListAgain')
+          this.isCopy = false
         }
       },
       // 渲染结果 - 主 - 操作
@@ -2054,7 +2084,7 @@
       }
     },
     computed: {
-      ...mapState(['zone', 'isGup', 'user', 'socket_plugin_msg'])
+      ...mapState(['zone', 'isGup', 'user', 'socket_plugin_msg', 'zoneId'])
     }
   }
 </script>

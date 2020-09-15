@@ -44,12 +44,11 @@
         </div>
         <!--查询时间-->
         <div class="filter-item f">
-          <span class="filter-item-label">
-            {{ filter.inquireLabel }}：
-          </span>
+          <span class="filter-item-label">{{ filter.inquireLabel }}：</span>
           <el-date-picker
             v-model="filter.date"
             type="daterange"
+            :clearable="false"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期">

@@ -101,7 +101,6 @@
     },
     mounted() {
       window.addEventListener('resize', () => this.ec.resize())
-      this.date = [this.getDateE(6), this.getDateE(0)]
     },
     computed: {
       ...mapState(['zoneId'])

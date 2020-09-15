@@ -19,6 +19,7 @@
           <el-date-picker
             v-model="date"
             type="daterange"
+            :clearable="false"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期">
@@ -51,7 +52,7 @@
       </div>
     </div>
     <section>
-      <div class="selectData">
+      <div class="selectData h">
         <el-select v-model="taskV"
                    multiple
                    :multiple-limit="5"

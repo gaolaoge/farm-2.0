@@ -40,7 +40,6 @@
                 {'unread': scope.row.isRead == 0}
               ]">
                 {{ scope.row.noticeDetail }}
-                <div v-show="scope.row.isRead == 0" class="unread"/>
               </span>
             </div>
           </template>
@@ -49,7 +48,7 @@
         <el-table-column
           label="日期"
           prop="createTime"
-          width="160"/>
+          width="180"/>
       </el-table>
     </div>
     <div class="page">
