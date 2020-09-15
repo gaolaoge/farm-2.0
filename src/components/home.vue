@@ -12,6 +12,10 @@
                v-for="(item,index) in taskStatus.list"
                :key="index"
                @click="$router.push({name: 'task',params: {'name': item.name}})">
+            <span v-if="index == 0 && item.num" class="setInfo">
+              {{ taskStatus.setTask }}
+              <img src="">
+            </span>
             <h6 class="n">{{ item.num }}</h6>
             <span class="name">{{ item.name }}</span>
           </div>
@@ -139,7 +143,8 @@
               num: 0
             },
           ],
-          haveNewItem: false
+          haveNewItem: false,
+          setTask: '去设置参数'
         },
         statistics: {
           list: [
@@ -441,6 +446,16 @@
                 background-image: linear-gradient(180deg, rgba(109, 212, 0, 1) 0%, rgba(247, 181, 0, 1) 100%);
               }
             }
+          }
+
+          .setInfo {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            color: rgba(27, 83, 244, 1);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
           }
         }
       }

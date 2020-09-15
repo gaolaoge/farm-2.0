@@ -1431,7 +1431,8 @@
             taskTaskUuid: curr.taskUuid,                          // 主uuid
             inFilePath: curr.inFilePath,
             outFilePath: curr.outFilePath,
-            layerName: data_.taskInfo.layerName
+            layerName: data_.taskInfo.layerName,
+            fileName: curr.fileName
           }
         })
         this.result.happen[0]['num'] = data_.frameCount['running']
@@ -1873,8 +1874,11 @@
           return false
         }
         let fileList = this.result.selectionResult.map(item => {
+          console.log(item)
+          console.log(item['outFilePath'].split(this.user.id + '\\'))
           let outputFilePath = item['outFilePath'].split(this.user.id + '\\')[1]
-          return item['taskTaskUuid'] + '/' + item['layerName'] + '/' + outputFilePath
+          // return item['taskTaskUuid'] + '/' + item['layerName'] + '/' + outputFilePath
+          return item['outFilePath'] + item['fileName']
         })
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           'transferType': 2,

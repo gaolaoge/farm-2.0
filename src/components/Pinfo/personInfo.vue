@@ -59,7 +59,7 @@
         <span class="label">{{ info.emailLabel }}：</span>
         <span class="val">{{ user.email || '未绑定' }}</span>
         <span class="editBtn" @click="editEmailMoudle = true">{{ editBtn }}</span>
-        <span class="remarks">{{ info.emailRemarks }}</span>
+        <span class="remarks" v-if="!user.email">{{ info.emailRemarks }}</span>
       </div>
     </section>
     <!--修改头像-->

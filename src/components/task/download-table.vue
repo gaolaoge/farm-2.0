@@ -224,7 +224,7 @@
         :current-page.sync="table.current"
         :total="table.renderTableTotal">
       </el-pagination>
-      <div class="farm-primary-form-btn btn" @click="getList">
+      <div class="farm-primary-form-btn btn" @click="getList()">
         <span>{{ refresh }}</span>
       </div>
     </div>
