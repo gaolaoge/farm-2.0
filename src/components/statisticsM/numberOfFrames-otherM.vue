@@ -48,7 +48,11 @@
     </div>
     <section>
       <div class="selectData h">
-        <el-select v-model="taskV" :multiple-limit="5" multiple collapse-tags placeholder="请选择">
+        <el-select v-model="taskV"
+                   :multiple-limit="5"
+                   multiple
+                   collapse-tags
+                   placeholder="">
           <el-option
             v-for="item in taskList"
             :key="item.value"

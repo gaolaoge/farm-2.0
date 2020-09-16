@@ -472,8 +472,6 @@
           else if (data.code != 854) this.$refs.uploadMode.getList()       // 分析列表
           else return false
         },
-        immediate: true,
-        deep: true
       }
     },
     mounted() {

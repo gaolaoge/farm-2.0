@@ -29,7 +29,6 @@
         <div class="select bl">
           <el-select v-model="dateInterval"
                      placeholder="请选择"
-
                      @change="changeDateInterval">
             <el-option
               v-for="item in dateIntervalList"
@@ -57,7 +56,7 @@
                    multiple
                    :multiple-limit="5"
                    collapse-tags
-                   placeholder="请选择">
+                   placeholder="">
           <el-option
             v-for="item in taskList"
             :key="item.value"
@@ -218,6 +217,7 @@
       },
       // echarts 初始化
       init() {
+        console.log(this.chartsSeries)
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
           tooltip: {

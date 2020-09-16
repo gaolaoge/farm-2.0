@@ -52,7 +52,8 @@ export default new Vuex.Store({
     thumb: {
       showLargeThumbWin: false,
       LargeImgHref: null
-    }
+    },
+    pluginDialog: false,    // 打开插件窗口
   },
   getter: {},
   mutations: {
@@ -79,7 +80,6 @@ export default new Vuex.Store({
         this.WEBSOCKET_BACKS_INIT(state, account)
       })
     },
-
     // 对与后台的websocket发送消息
     WEBSOCKET_BACKS_SEND(state, data) {
       if (!state.socket_backS) return false
@@ -115,6 +115,10 @@ export default new Vuex.Store({
       state.socket_plugin.close()
       state.socket_plugin = null
     },
+    // 打开插件窗口
+    openPluginDialog(s, bool){
+      s.pluginDialog = bool
+    },
     // 渲染结果 缩略图 展示
     setShowThumb(s, bool){
       s.thumb.showLargeThumbWin = bool
@@ -130,7 +134,7 @@ export default new Vuex.Store({
       s.user.totalInvoiceAmount = val
     },
     becomeErr(s, val){
-      s[val] = 'err'
+      s[val] = null
     },
     addOne(s, val) {
       s[val] ++

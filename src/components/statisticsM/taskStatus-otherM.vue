@@ -147,7 +147,6 @@
       },
       // 获取charts数据
       async getChartsData() {
-        console.log(this.taskV[0])
         let data = await getStatusData(this.taskV[0])
         if (data.data.code != 200) messageFun('error', '获取数据失败')
         else {

@@ -14,7 +14,7 @@
                @click="$router.push({name: 'task',params: {'name': item.name}})">
             <span v-if="index == 0 && item.num" class="setInfo">
               {{ taskStatus.setTask }}
-              <img src="">
+              <img src="@/icons/toUploadTab.png">
             </span>
             <h6 class="n">{{ item.num }}</h6>
             <span class="name">{{ item.name }}</span>
