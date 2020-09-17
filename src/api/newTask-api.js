@@ -43,3 +43,12 @@ export function newTaskProfession(data){
     data
   })
 }
+
+// 发送场景文件与ID映射关系
+export function pushTaskID(data){
+  return businessServer({
+    url: `/professional/task/addSceneFileName`,
+    method: 'POST',
+    data
+  })
+}

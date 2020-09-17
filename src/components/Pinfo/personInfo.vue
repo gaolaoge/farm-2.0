@@ -6,7 +6,7 @@
         <!--头像编辑-->
         <div class="avatarEdit" @click="avatarEditFun"><span>{{ editAvatar }}</span></div>
         <!--头像-->
-        <img :src="user.avatar" alt="" class="avatarImg">
+        <img :src="user.avatar ? user.avatar : require('@/assets/userImg.png')" class="avatarImg">
       </div>
       <!--账号-->
       <div class="form-item">

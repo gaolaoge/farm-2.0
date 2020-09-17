@@ -10,7 +10,7 @@ export default new Vuex.Store({
       name: null,           // 昵称
       account: null,        // 账号
       phone: null,
-      avatar: require('@/assets/userImg.png'),  // 头像
+      avatar: null,  // 头像
       token: '',
       balance: '0.000',     // 金币余额
       haveCapacity: '0.000',// 剩余容量

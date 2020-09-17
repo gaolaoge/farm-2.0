@@ -625,7 +625,8 @@
     getFileType,
     savePath,
     newTaskProfession,
-    getHistoryPath
+    getHistoryPath,
+    pushTaskID
   } from '@/api/newTask-api'
   import {
     mapState
@@ -1455,17 +1456,25 @@
         })
         if (data.data.code == 200) {
           if (fir.index == 0) this.createSuc()
-          else this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
-            'transferType': 5,
-            'userID': this.user.id,
-            'taskList': fir.local.filelist.map((curr, index) => {
-              return {
-                'sceneFile': curr.absolutePath,            // 场景文件
-                'path': curr.address,                      // 工程路径
-                'taskID': data.data.data[index]
-              }
+          else {
+            this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+              'transferType': 5,
+              'userID': this.user.id,
+              'taskList': fir.local.filelist.map((curr, index) => {
+                return {
+                  'sceneFile': curr.absolutePath,            // 场景文件
+                  'path': curr.address,                      // 工程路径
+                  'taskID': data.data.data[index]
+                }
+              })
             })
-          })
+            pushTaskID({'pathList': fir.local.filelist.map((curr, index) => {
+              return {
+                'fileName': curr.absolutePath,            // 场景文件
+                'taskUuid': data.data.data[index]
+              }
+            })})
+          }
         }
       },
       // 4.创建成功

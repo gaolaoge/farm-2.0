@@ -384,7 +384,7 @@
       },
       // 重命名
       rename() {
-        if (!this.table.selectionList.length != 1) return
+        if (this.table.selectionList.length != 1) return
         else if (this.table.selectionList[0]['ing']) messageFun('info', '目标正在上传中，无法操作')
         else this.$prompt('请输入新名称', '提示', {
           confirmButtonText: '确定',

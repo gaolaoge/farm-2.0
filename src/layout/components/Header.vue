@@ -72,7 +72,7 @@
           </div>
           <!--头像-->
           <div class="userInfo" v-show="!inHome" :class="[{'active': showUserList}]" v-operating>
-            <img :src="user.avatar" class="userImg">
+            <img :src="user.avatar ? user.avatar : require('@/assets/userImg.png')" class="userImg">
             <!--下拉框-->
             <div class="newsBase" :class="[{'show': showUserList}]">
               <ul class="userOperate" v-show="showUserList">

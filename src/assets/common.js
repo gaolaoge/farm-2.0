@@ -151,7 +151,7 @@ const createTableIconList = function () {
         list = el_table.querySelectorAll('table tbody .el-table__row .el-table__expand-icon')
       list.forEach(curr => {
         let original = curr.querySelector('i'),
-            i = document.createElement('I')
+          i = document.createElement('I')
         i.classList.add('farmIconFont')
         i.classList.add('iconsanjiaoright')
         curr.removeChild(original)
@@ -293,7 +293,7 @@ const clearUserCookie = function (phone, account, token) {
 }
 
 // 文件大小单位转换
-function getFileSize(fileByte) {
+const getFileSize = function (fileByte) {
   var fileSizeByte = fileByte,
     fileSizeMsg = ""
   if (fileSizeByte < 1048576) fileSizeMsg = (fileSizeByte / 1024).toFixed(2) + "KB"
@@ -303,6 +303,27 @@ function getFileSize(fileByte) {
   else if (fileSizeByte > 1073741824 && fileSizeByte < 1099511627776) fileSizeMsg = (fileSizeByte / (1024 * 1024 * 1024)).toFixed(2) + "GB"
   else fileSizeMsg = "文件超过1TB"
   return fileSizeMsg
+}
+
+// 比较
+function compare(a, b) {
+  if (new Date(a).getTime() > new Date(b).getTime()) return true
+  else return false
+}
+
+// 交换
+function axchange(arr, a, b) {
+  let aV = arr[a]
+  arr[a] = arr[b]
+  arr[b] = aV
+}
+
+// 日期排序 2020-01-01
+const sortDateF = function (arr) {
+  for (let t = 1; t < arr.length - 1; t++) {
+    for (let i = 0; i < arr.length - t; i++) if (compare(arr[i], arr[i + 1])) axchange(arr, i, i + 1)
+  }
+  return arr
 }
 
 export {
@@ -321,7 +342,8 @@ export {
   clearUserCookie,
   getFileSize,
   sortF,
-  simplify
+  simplify,
+  sortDateF
 }
 
 

@@ -87,7 +87,8 @@
   } from 'vuex'
   import {
     messageFun,
-    createCalendar
+    createCalendar,
+    sortDateF
   } from "../../assets/common"
 
   export default {
@@ -220,6 +221,7 @@
       },
       // echarts 初始化
       init() {
+        console.log(this.chartsSeries)
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
           tooltip: {
@@ -313,9 +315,28 @@
         if (data.data.code != 200) messageFun('error', '获取数据失败')
         else {
           if (this.navIndex == 1) {
+            let base = data.data.data,
+              data_ = await getTaskData({
+                "type": 1,
+                "projectUuid": this.taskV,
+                "dateBegin": this.date[0].getTime(),
+                "dateEnd": this.date[1].getTime(),
+                "defaultDateStatus": num,
+                "zoneuuid": this.zoneId
+              })
+            this.chartsSeries = Object.keys(data_.data.data).map((item, index) => {
+              let base_ = base[item],
+                result = data_.data.data[item]
 
-          } else if (this.navIndex == 0) {
-            this.chartsSeries = Object.keys(data.data.data).map((item, index) => {
+              const result_ = {}
+              Object.keys(result)
+                .sort((preItem, nextItem) => preItem.replace(/-/g, '') - nextItem.replace(/-/g, ''))
+                .forEach(key => {
+                  result_[key] = result[key]
+                  base_ += result[key]
+                  result_[key] = base_
+                })
+
               return {
                 name: this.taskList.find(curr => curr.value == item).label,
                 type: 'line',
@@ -338,7 +359,40 @@
                     }
                   ])
                 },
-                data: this.transformType(data.data.data[item])
+                data: this.transformType(result_)
+              }
+            })
+          } else if (this.navIndex == 0) {
+            this.chartsSeries = Object.keys(data.data.data).map((item, index) => {
+              const result_ = {}
+              Object.keys(data.data.data[item])
+                .sort((preItem, nextItem) => preItem.replace(/-/g, '') - nextItem.replace(/-/g, ''))
+                .forEach(key => {
+                  result_[key] = data.data.data[item][key]
+                })
+              return {
+                name: this.taskList.find(curr => curr.value == item).label,
+                type: 'line',
+                smooth: true,         // 是否平滑曲线显示
+                symbol: 'circle',     // 标记的样式
+                symbolSize: 5,
+                sampling: 'average',
+                itemStyle: {
+                  color: this.color[index]
+                },
+                areaStyle: {
+                  color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                      offset: 0,
+                      color: this.linearGradientT[index]
+                    },
+                    {
+                      offset: 1,
+                      color: this.linearGradientB[index]
+                    }
+                  ])
+                },
+                data: this.transformType(result_)
               }
             })
           }

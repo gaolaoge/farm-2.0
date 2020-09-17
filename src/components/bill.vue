@@ -3,7 +3,7 @@
     <!--公共部分-->
     <div class="personInfo">
       <div class="info">
-        <img :src="user.avatar" alt="" class="avatar">
+        <img :src="user.avatar ? user.avatar : require('@/assets/userImg.png')" alt="" class="avatar">
         <div class="name">
           {{ user.name }}
         </div>

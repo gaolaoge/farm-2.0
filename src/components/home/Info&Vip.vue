@@ -4,7 +4,7 @@
       <div class="f">
         <!--头像-->
         <div class="avatar">
-          <img :src="user.avatar" alt="">
+          <img :src="user.avatar ? user.avatar : require('@/assets/userImg.png')" alt="">
         </div>
         <!--账号&等级-->
         <div class="nl">
