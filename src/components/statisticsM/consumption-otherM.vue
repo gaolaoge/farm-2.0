@@ -260,7 +260,7 @@
           },
           grid: {
             top: 50,
-            left: 26,
+            left: 36,
             right: 26,
           },
           series: this.chartsSeries

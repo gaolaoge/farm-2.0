@@ -92,10 +92,11 @@
       <div class="dl-wrapper">
         <div class="tree">
           <el-tree
-            :data="dl.treeData"
             node-key="id"
-            :load="dlGetTreeData"
             lazy
+            v-if="dialogVisible"
+            :data="dl.treeData"
+            :load="dlGetTreeData"
             :destroy-on-close="true"
             :props="dl.defaultProps">
             <span class="custom-tree-node" slot-scope="{ node, data }">

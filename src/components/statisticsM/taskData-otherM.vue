@@ -55,6 +55,7 @@
         <el-select v-model="taskV"
                    multiple
                    :multiple-limit="5"
+                   @change="changeTaskV"
                    collapse-tags
                    placeholder="">
           <el-option
@@ -125,7 +126,7 @@
           }
         ],
         taskV: [],
-        taskL: [],
+        taskL: [],   // 显示已选中项目标签
         date: [],
         fullBtn: true,
         chartsSeries: [],
@@ -177,7 +178,6 @@
       },
       navIndex() {
         this.navIndex == 0 ? this.taskV = this.cProjectUuid : this.taskV = this.nProjectUuid
-        this.aisle()
       },
       'chartsData': {
         handler: function (val) {
@@ -199,6 +199,9 @@
       ...mapState(['zoneId'])
     },
     methods: {
+      changeTaskV() {
+        this.navIndex == 0 ? this.cProjectUuid = this.taskV : this.nProjectUuid = this.taskV
+      },
       // 日期区间下拉框修改
       changeDateInterval(val) {
         switch (val) {
@@ -217,7 +220,6 @@
       },
       // echarts 初始化
       init() {
-        console.log(this.chartsSeries)
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
           tooltip: {
@@ -264,7 +266,7 @@
           },
           grid: {
             top: 50,
-            left: 26,
+            left: 36,
             right: 26,
           },
           series: this.chartsSeries
@@ -289,7 +291,7 @@
       },
       // 获取charts数据通道
       aisle() {
-        if(!this.taskV.length || this.lock) return false
+        if (!this.taskV.length || this.lock) return false
         this.lock = true
         this.getChartsData()
         setTimeout(() => this.lock = false, 200)
@@ -310,32 +312,36 @@
         })
         if (data.data.code != 200) messageFun('error', '获取数据失败')
         else {
-          this.chartsSeries = Object.keys(data.data.data).map((item, index) => {
-            return {
-              name: this.taskList.find(curr => curr.value == item).label,
-              type: 'line',
-              smooth: true,         // 是否平滑曲线显示
-              symbol: 'circle',     // 标记的样式
-              symbolSize: 5,
-              sampling: 'average',
-              itemStyle: {
-                color: this.color[index]
-              },
-              areaStyle: {
-                color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                  {
-                    offset: 0,
-                    color: this.linearGradientT[index]
-                  },
-                  {
-                    offset: 1,
-                    color: this.linearGradientB[index]
-                  }
-                ])
-              },
-              data: this.transformType(data.data.data[item])
-            }
-          })
+          if (this.navIndex == 1) {
+
+          } else if (this.navIndex == 0) {
+            this.chartsSeries = Object.keys(data.data.data).map((item, index) => {
+              return {
+                name: this.taskList.find(curr => curr.value == item).label,
+                type: 'line',
+                smooth: true,         // 是否平滑曲线显示
+                symbol: 'circle',     // 标记的样式
+                symbolSize: 5,
+                sampling: 'average',
+                itemStyle: {
+                  color: this.color[index]
+                },
+                areaStyle: {
+                  color: new this.$echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                      offset: 0,
+                      color: this.linearGradientT[index]
+                    },
+                    {
+                      offset: 1,
+                      color: this.linearGradientB[index]
+                    }
+                  ])
+                },
+                data: this.transformType(data.data.data[item])
+              }
+            })
+          }
           this.init()
         }
       },
