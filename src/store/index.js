@@ -54,6 +54,7 @@ export default new Vuex.Store({
       LargeImgHref: null
     },
     pluginDialog: false,    // 打开插件窗口
+    redirectToTask: null,   // 站内信跳转到task
   },
   getter: {},
   mutations: {
@@ -114,6 +115,10 @@ export default new Vuex.Store({
       if (!state.socket_plugin) return false
       state.socket_plugin.close()
       state.socket_plugin = null
+    },
+    // 站内信跳转到task
+    newRedirectToTask(state, data){
+      state.redirectToTask = data
     },
     // 打开插件窗口
     openPluginDialog(s, bool){

@@ -762,12 +762,13 @@
         let r = this.registered
         r.status.phoneInit = false
         if (!r.form.phone) {
-          r.status.phone = null;
+          r.status.phone = null
           return false
         }
         if (!this.reg.phoneReg.test(r.form.phone)) {
           this.registered.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_one')
-          r.status.phone = false
+          if(ing) r.status.phone = null
+          else r.status.phone = false
           return false
         }
         let data = await registerPhone(r.form.phone)

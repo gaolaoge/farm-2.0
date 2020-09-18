@@ -31,7 +31,6 @@
                  placeholder="输入场景名、任务ID">
           <!--搜索按钮-->
           <img src="@/icons/global-search-icon.png"
-               alt=""
                class="searchIcon"
                @click="searchUploadInput">
         </div>
@@ -288,29 +287,29 @@
     },
     methods: {
       // tab 取消【状态】筛选
-      cancelFilterStatus(index){
-        if(index == 0) this.$refs.uploadMode.clearFilterF('status')
+      cancelFilterStatus(index) {
+        if (index == 0) this.$refs.uploadMode.clearFilterF('status')
         else this.$refs.renderMode.clearFilterF('status')
         this.table.filterList[index]['status'] = []
       },
       // tab 取消【创建人】筛选
-      cancelFilterFounder(index){
-        if(index == 0) this.$refs.uploadMode.clearFilterF('founder')
+      cancelFilterFounder(index) {
+        if (index == 0) this.$refs.uploadMode.clearFilterF('founder')
         else this.$refs.renderMode.clearFilterF('founder')
         this.table.filterList[index]['founder'] = []
       },
       // tab 取消【下载情况】筛选
-      cancelFilterDownload(){
+      cancelFilterDownload() {
         this.$refs.renderMode.clearFilterF('download')
         this.table.filterList[1]['download'] = []
       },
       // tab 取消【所属项目】筛选
-      cancelFilterTask(){
+      cancelFilterTask() {
         this.$refs.renderMode.clearFilterF('task')
         this.table.filterList[1]['task'] = []
       },
       // tab 筛选条件改变
-      changeTabFilter(data){
+      changeTabFilter(data) {
         this.table.filterList[data.tab == 'upload' ? 0 : 1][data.type] = data.val
       },
       // 上传分析 多选结果
@@ -472,6 +471,23 @@
           else if (data.code != 854) this.$refs.uploadMode.getList()       // 分析列表
           else return false
         },
+      },
+      'redirectToTask': {
+        handler: function (obj) {
+          if(!obj) return false
+          // taskID: "SWT-511"
+          // type: "analyse"
+          if (obj.type == 'analyse') {
+            this.table.navListActiveIndex = 0
+            this.btnGroup.searchInputUpload = obj.taskID
+            setTimeout(() => {this.searchUploadInput()}, 0)
+          } else if (obj.type == 'render') {
+            this.table.navListActiveIndex = 1
+            this.btnGroup.searchInputDownload = obj.taskID
+            setTimeout(() => {this.searchRenderInput()}, 0)
+          }
+        },
+        immediate: true
       }
     },
     mounted() {
@@ -510,7 +526,7 @@
       }
     },
     computed: {
-      ...mapState['socket_backS_msg']
+      ...mapState(['socket_backS_msg', 'redirectToTask'])
     }
   }
 </script>
@@ -630,6 +646,7 @@
       .navList {
         display: flex;
         align-items: center;
+
         .tableFilterList {
           display: inline-flex;
 

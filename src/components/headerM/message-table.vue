@@ -33,6 +33,7 @@
           :show-header=false
           :data="systemTableData"
           @selection-change="systemSelectionChange"
+          @row-click="tableClick"
           style="width: 100%">
           <!--多选-->
           <el-table-column
@@ -115,6 +116,9 @@
     createDateFun,
     simplify
   } from '@/assets/common'
+  import {
+    mapState
+  } from 'vuex'
   import {messageFun} from "../../assets/common";
 
   export default {
@@ -142,15 +146,42 @@
         activitySelectionList: [],  // 活动多选结果
       }
     },
+    computed: {
+      ...mapState['zoneId']
+    },
     methods: {
+      tableClick(row, column, event) {
+        let taskID = JSON.parse(row.noticeParam)['taskDetails'],
+          taskZoneID = row.noticeData.split('&').find(item => item.split('=')[0] == 'zoneUuid').split('=')[1],
+          type = row.noticeUrl
+        // analyse  =>  分析页面
+        // render   =>  渲染页面
+        // recharge =>  充值页面
+        // info     =>  用户基本信息页面
+        if (type == 'info') this.$router.push('/Pinfo')
+        else if (type == 'recharge') this.$router.push('/upTop')
+        else {
+          sessionStorage.setItem('taskListActive', type == 'analyse' ? 0 : 1)
+          this.$route.path == '/task' ? null : this.$router.push('/task')
+          if(this.zoneId != taskZoneID) this.$store.commit('changeZoneId', taskZoneID)
+          this.$store.commit('newRedirectToTask', {
+            type,
+            taskID
+          })
+        }
+        readMessages({
+          'isRead': 1,
+          'noticeUuidList': [row.noticeUuid]
+        })
+      },
       // 标记为已读
       async readedAll(type) {
         let list = type == 'system' ? this.systemSelectionList : this.activitySelectionList
-        if(!list.length) return
+        if (!list.length) return
         let data = await readMessages({
-            'isRead': 1,
-            'noticeUuidList': list.map(item => item.noticeUuid)
-          })
+          'isRead': 1,
+          'noticeUuidList': list.map(item => item.noticeUuid)
+        })
         if (data.data.code == 201) {
           messageFun('success', '操作成功')
           this.getMessageListF()
@@ -190,7 +221,7 @@
         if (data.data.code == 200) {
           let halfDay = 1000 * 60 * 60 * 12,              // 半天的毫秒时
             todayNum = new Date(new Date().toDateString()).getTime(),      // 当日零时时间戳
-             theDayBeforeYesterday = todayNum - halfDay * 4
+            theDayBeforeYesterday = todayNum - halfDay * 4
           if (m.noticeType == 1) this.systemTableData = data.data.data.map(item => {
             return Object.assign(item, {
               createTime: theDayBeforeYesterday > item.createTime ? createDateFun(new Date(item.createTime), 'mini') : simplify(item.createTime)
