@@ -221,7 +221,6 @@
       },
       // echarts 初始化
       init() {
-        console.log(this.chartsSeries)
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
           tooltip: {
@@ -364,12 +363,6 @@
             })
           } else if (this.navIndex == 0) {
             this.chartsSeries = Object.keys(data.data.data).map((item, index) => {
-              const result_ = {}
-              Object.keys(data.data.data[item])
-                .sort((preItem, nextItem) => preItem.replace(/-/g, '') - nextItem.replace(/-/g, ''))
-                .forEach(key => {
-                  result_[key] = data.data.data[item][key]
-                })
               return {
                 name: this.taskList.find(curr => curr.value == item).label,
                 type: 'line',
@@ -392,7 +385,7 @@
                     }
                   ])
                 },
-                data: this.transformType(result_)
+                data: this.transformType(data.data.data[item])
               }
             })
           }

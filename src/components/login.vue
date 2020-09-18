@@ -154,8 +154,9 @@
                 <input v-model="login.forgetMode.phone"
                        autofocus
                        :placeholder="$t('login_page.forgetMode.phone_placeholder')"
-                       @blur="findBackPhoneVerif"
+                       @blur="findBackPhoneVerif(false)"
                        @focus="login.forgetMode.phoneFormat = null"
+                       @input="findBackPhoneVerif(true)"
                        ref="forgetMode_phone"
                        class="farm-input"
                        :class="[{'inputError': login.forgetMode.phoneFormat === false}]"/>
@@ -171,7 +172,8 @@
                 <input v-model="login.forgetMode.code"
                        :placeholder="$t('login_page.forgetMode.code_placeholder')"
                        ref="forgetMode_code"
-                       @blur="findBackCodeVerif"
+                       @blur="findBackCodeVerif(false)"
+                       @input="findBackCodeVerif(true)"
                        @focus="login.forgetMode.codeFormat = null"
                        class="farm-input farm-cord-input"
                        :class="[{'inputError': login.forgetMode.codeFormat === false}]"/>
@@ -184,13 +186,14 @@
                 <!--验证-->
                 <div class="verif">
                   <div class="btn"
+                       :class="[{'suc': login.forgetMode.phoneFormat}]"
                        @click="findBackGetCode"
                        v-show="login.forgetMode.verifShow">
                     {{ login.forgetMode.btnText }}
                   </div>
                   <span class="delayDate" v-show="!login.forgetMode.verifShow">
-                  {{ login.forgetMode.countdown }}
-                </span>
+                    {{ login.forgetMode.countdown }}
+                  </span>
                 </div>
               </div>
               <!--按钮-->
@@ -316,7 +319,8 @@
             <div class="u">
               <input v-model="registered.form.phone"
                      :placeholder="$t('login_page.register.ph_placeholder')"
-                     @blur="phoneVerif"
+                     @blur="phoneVerif(false)"
+                     @input="phoneVerif(true)"
                      @focus="inputGetFocus('phone')"
                      ref="phoneRegister"
                      class="farm-input"
@@ -754,7 +758,7 @@
         inp.focus()
       },
       // 注册-手机号码验证
-      async phoneVerif() {
+      async phoneVerif(ing) {
         let r = this.registered
         r.status.phoneInit = false
         if (!r.form.phone) {
@@ -967,28 +971,26 @@
         this.getUserInfo()
       },
       // 找回密码 验证手机号格式是否有效
-      findBackPhoneVerif() {
+      findBackPhoneVerif(ing) {
         let f = this.login.forgetMode
         if (!f.phone) return false
         if (!this.reg.phoneReg.test(f.phone)) {
           f.warnInfo.phone = this.$t('login_page.message.phoneTypeErr_one')
-          f.phoneFormat = false
-          return false
-        }
-        f.phoneFormat = true
+          if(ing) f.phoneFormat = null
+          else f.phoneFormat = false
+        } else f.phoneFormat = true
       },
       // 找回密码 验证验证码格式
-      findBackCodeVerif() {
+      findBackCodeVerif(ing) {
         let f = this.login.forgetMode
         // 若手机号格式不正确或验证码未空，不进行验证
         if (!f.phoneFormat || !f.code) return false
         // 验证码格式不正确
-        if (!this.reg.codeReg.test(f.code)) {
+        else if (!this.reg.codeReg.test(f.code)) {
           f.warnInfo.code = this.$t('login_page.message.codeTypeErr_two')
-          f.codeFormat = false
-          return false
-        }
-        f.codeFormat = true
+          if(ing) f.codeFormat = null
+          else f.codeFormat = false
+        } else f.codeFormat = true
       },
       // 找回密码 获取验证码
       async findBackGetCode() {
@@ -1545,10 +1547,7 @@
       &.canClick,
       &.suc {
         cursor: pointer;
-
-        &:hover {
-          color: rgba(22, 29, 37, 0.6);
-        }
+        color: rgba(27, 83, 244, 0.8);
       }
     }
 
