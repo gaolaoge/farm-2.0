@@ -5,6 +5,7 @@
 </template>
 
 <script>
+  import {mapState} from 'vuex'
   export default {
     name: 'home-charts',
     data() {
@@ -21,6 +22,7 @@
       // }
     },
     computed: {
+      ...mapState(['user']),
       maxNum() {
         let m = Math.max.apply(null, this.cData)
         if (m == 0) {
@@ -35,30 +37,22 @@
         this.ec = this.$echarts.init(this.$refs.ec)
         this.ec.setOption({
           title: {
-            text: '75.0',
+            text: Number(this.user.totalCapacity).toFixed(1),
             textStyle: {
-              color: "rgba(22, 29, 37, 1)",
+              color: 'rgba(22, 29, 37, 1)',
               fontSize: 22
             },
             subtext: '资产总容量',
             subtextStyle: {
               color: 'rgba(22, 29, 37, 0.59)',
+              fontSize: 10
             },
-            itemGap: 10, // 主副标题距离
+            itemGap: 2, // 主副标题距离
             left: 'center',
-            top: '90'
-          },
-          // legend: {
-          //   orient: 'vertical',
-          // },
-          grid: {
-            "top": 0,
-            "bottom": 0,
-            "left": 0,
-            "right": 0
+            top: 'center'
           },
           angleAxis: {
-            max: 100, // 满分
+            max: this.user.totalCapacity, // 满分
             clockwise: true, // 逆时针
             // 隐藏刻度线
             axisLine: {
@@ -95,110 +89,111 @@
             radius: '100%' //图形大小
           },
           series: [
-            // 灰色环
             {
               type: 'bar',
-              data: [
-                {
-                  value: 100,
-                  itemStyle: {
-                    color: 'rgba(0, 0, 0, 0.05)',
+              data: [{
+                value: this.user.usedCapacity,
+                itemStyle: {
+                  normal: {
+                    color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [
+                      {
+                        offset: 0,
+                        color: 'rgba(162, 203, 255, 1)'
+                      },
+                      {
+                        offset: 0.5,
+                        color: 'rgba(72, 144, 255, 1)'
+                      },
+                      {
+                        offset: 1,
+                        color: 'rgba(0, 75, 206, 1)'
+                      }
+                    ])
                   }
+                },
+              }],
+              coordinateSystem: 'polar',
+              roundCap: true,
+              barWidth: 13,
+              barGap: '-100%', // 两环重叠
+              z: 2,
+            },
+            { // 灰色环
+              type: 'bar',
+              data: [{
+                value: this.user.totalCapacity,
+                itemStyle: {
+                  color: '#e2e2e2'
                 }
-              ],
+              }],
               coordinateSystem: 'polar',
               roundCap: true,
               barWidth: 10,
-              barGap: '0', // 两环重叠
-              zlevel: 1
+              barGap: '-100%', // 两环重叠
+              z: 1
             },
-            // 内环
             {
-              type: 'bar',
+              type: 'pie',
+              radius: '50%',
+              center: ['50%', '50%'],
+              label: {
+                formatter: '{per|{d}}{abg|}\n{hr|}\n  {a|{b}} ',
+                rich: {
+                  a: {
+                    color: 'rgba(22, 29, 37, 0.49)',
+                    lineHeight: 22,
+                    fontSize: 12,
+                    align: 'center'
+                  },
+                  hr: {
+                    borderColor: '#aaa',
+                    width: '5',
+                    borderWidth: 0.5,
+                    height: 0
+                  },
+                  per: {
+                    color: 'rgba(22, 29, 37, 0.79)',
+                    padding: [2, 4],
+                    lineHeight: 22,
+                    align: 'center',
+                    fontSize: 13,
+                    fontWeight: 500
+                  }
+                }
+              },
+              labelLine: {
+                normal: {
+                  length: 14,  // 改变标示线的长度
+                  lineStyle: {
+                    color: "rgba(22, 29, 37, 0.6)"  // 改变标示线的颜色
+                  }
+                },
+              },
               data: [
                 {
-                  value: 70,
-                  name: 'gaoge',
+                  value: this.user.usedCapacity,
+                  name: '已用',
                   itemStyle: {
-                    normal: {
-                      color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [
-                        {
-                          offset: 0,
-                          color: 'rgba(162, 203, 255, 1)'
-                        },
-                        {
-                          offset: 0.5,
-                          color: 'rgba(72, 144, 255, 1)'
-                        },
-                        {
-                          offset: 1,
-                          color: 'rgba(0, 75, 206, 1)'
-                        }
-                      ])
-                    }
+                    color: 'rgba(255,255,255,0)'
                   },
-                }
-              ],
-              coordinateSystem: 'polar',
-              roundCap: true,
-              barWidth: 14,
-              barGap: '0', // 两环重叠
-              zlevel: 1
-            },
-            // 内环
-            {
-              type: 'bar',
-              data: [
+                },
                 {
-                  value: 30,
+                  value: this.user.haveCapacity,
+                  name: '剩余',
                   itemStyle: {
-                    normal: {
-                      color: 'pink'
-                    }
+                    color: 'rgba(255,255,255,0)'
                   },
-                }
+                },
               ],
-              coordinateSystem: 'polar',
-              roundCap: true,
-              barWidth: 14,
-              barGap: '-2', // 两环重叠
-              zlevel: 1
-            },
-            // 外环
-            // {
-            //   type: 'bar',
-            //   data: [
-            //     {
-            //       value: 70,
-            //       itemStyle: {
-            //         normal: {
-            //           color: new this.$echarts.graphic.LinearGradient(1, 0, 0, 0, [
-            //             {
-            //               offset: 0,
-            //               color: 'rgba(162, 203, 255, 0)'
-            //             },
-            //             {
-            //               offset: 0.5,
-            //               color: 'rgba(72, 144, 255, 0)'
-            //             },
-            //             {
-            //               offset: 1,
-            //               color: '#f40'
-            //             }
-            //           ]),
-            //           shadowColor: '#f40',
-            //           shadowBlur: 6,
-            //           opacity: 0.2,
-            //         }
-            //       },
-            //     }
-            //   ],
-            //   coordinateSystem: 'polar',
-            //   roundCap: true,
-            //   barWidth: 14,
-            //   barGap: '0', // 两环重叠
-            //   zlevel: 0
-            // },
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 40,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              },
+              z: 4
+            }
           ]
         })
       }
@@ -212,8 +207,8 @@
         window.addEventListener("resize", this.ec.resize)
       },
       '$route.path': {
-        handler: function(val){
-          if(val != '/') return false
+        handler: function (val) {
+          if (val != '/') return false
           setTimeout(() => {
             this.init()
           }, 100)

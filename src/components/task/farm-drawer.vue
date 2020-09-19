@@ -1873,13 +1873,7 @@
           messageFun('error', `当前账户余额为${data.data.data}，请先进行充值！`);
           return false
         }
-        let fileList = this.result.selectionResult.map(item => {
-          console.log(item)
-          console.log(item['outFilePath'].split(this.user.id + '\\'))
-          let outputFilePath = item['outFilePath'].split(this.user.id + '\\')[1]
-          // return item['taskTaskUuid'] + '/' + item['layerName'] + '/' + outputFilePath
-          return item['outFilePath'] + item['fileName']
-        })
+        let fileList = this.result.selectionResult.map(item => item['outFilePath'] + item['fileName'])
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           'transferType': 2,
           'userID': this.user.id,

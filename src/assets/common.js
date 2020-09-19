@@ -242,6 +242,8 @@ const setInfo = function (data) {
   store.commit('changeTotalInvoiceAmount', data.totalInvoiceAmount)                              // 已开票金额
   store.commit('changeTotalInvoiceAble', data.totalInvoiceAble)                                  // 可开票金额
   store.commit('changeUserBalance', data.goldBalance.toFixed(3))                      // 金币余额
+  store.commit('changeTotalCapacity', (data.capacity / 1073741824).toFixed(3))                       // 总容量
+  store.commit('changeUsedCapacity', (data.haveCapacity / 1073741824).toFixed(3))                    // 已用容量
   store.commit('changeHaveCapacity', ((data.capacity - data.haveCapacity) / 1073741824).toFixed(3))     // 剩余容量
   store.commit('changePayAmount', data.cumulativeRecharge.toFixed(3))                 // 累计支付金额
   store.commit('changeGoldCoins', data.totalArrival.toFixed(3))                       // 累计到账金币

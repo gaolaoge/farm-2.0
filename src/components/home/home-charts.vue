@@ -63,7 +63,12 @@
               },
             },
             "axisLine": {
-              show: false
+              // show: false
+              lineStyle: {        // 属性lineStyle控制线条样式
+                color: 'rgba(22, 29, 37, 0.3)',
+                width: 2,
+                type: 'solid'
+              }
             },
             "axisTick": {
               "show": false
@@ -84,7 +89,12 @@
             "max": this.maxNum,
             "interval": Math.ceil(this.maxNum / 2),
             "axisLine": {
-              "show": false
+              // "show": false
+              lineStyle: {        // 属性lineStyle控制线条样式
+                color: 'rgba(22, 29, 37, 0.3)',
+                width: 2,
+                type: 'solid'
+              }
             },
             "axisLabel": {
               "show": false,

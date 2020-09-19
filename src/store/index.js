@@ -13,6 +13,8 @@ export default new Vuex.Store({
       avatar: null,  // 头像
       token: '',
       balance: '0.000',     // 金币余额
+      totalCapacity: 0,     // 总容量
+      usedCapacity: 0,      // 已用容量
       haveCapacity: '0.000',// 剩余容量
       payAmount: '0.000',   // 累计支付金币
       goldCoins: '0.000',   // 累计到账金币
@@ -115,6 +117,14 @@ export default new Vuex.Store({
       if (!state.socket_plugin) return false
       state.socket_plugin.close()
       state.socket_plugin = null
+    },
+    // 总容量
+    changeTotalCapacity(s, num){
+      s.user.totalCapacity = num
+    },
+    // 已用容量
+    changeUsedCapacity(s, num){
+      s.user.usedCapacity = num
     },
     // 站内信跳转到task
     newRedirectToTask(state, data){

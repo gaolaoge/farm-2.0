@@ -480,11 +480,17 @@
           if (obj.type == 'analyse') {
             this.table.navListActiveIndex = 0
             this.btnGroup.searchInputUpload = obj.taskID
-            setTimeout(() => {this.searchUploadInput()}, 0)
+            setTimeout(() => {
+              this.searchUploadInput()
+              this.btnGroup.searchInputUpload = ''
+            }, 0)
           } else if (obj.type == 'render') {
             this.table.navListActiveIndex = 1
             this.btnGroup.searchInputDownload = obj.taskID
-            setTimeout(() => {this.searchRenderInput()}, 0)
+            setTimeout(() => {
+              this.searchRenderInput()
+              this.btnGroup.searchInputDownload = ''
+            }, 0)
           }
         },
         immediate: true
