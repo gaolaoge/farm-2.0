@@ -46,7 +46,8 @@
     appMain
   } from './components'
   import iv from '@/components/home/Info&Vip'
-  import {mapState} from 'vuex'
+  import { mapState } from 'vuex'
+  import store from "../store";
 
   export default {
     name: 'layout-wrapper',
@@ -83,7 +84,7 @@
       },
       'socket_plugin': {
         handler: function(val){
-          if(val) this.openPlugin()
+          if(!val) this.openPlugin()
         }
       }
     },
@@ -93,18 +94,16 @@
         window.open('http://223.80.107.190:8084/Setup.exe', '_blank')
       },
       // 触发插件
-      triggerPlugin(){
+      triggerPlugin() {
         let son = document.createElement('IFRAME')
         document.body.appendChild(son)
         son.src = 'walter://'
         son.contentDocument.open()
       },
-      // 显示插件
       openPlugin(){
-        if(this.socket_plugin) {
-          this.$store.commit('WEBSOCKET_PLUGIN_SEND', 'open')
-        } else this.$store.commit('openPluginDialog', true)
-      },
+        if(store.state.socket_plugin) store.commit('WEBSOCKET_PLUGIN_SEND', 'open')
+        else store.commit('openPluginDialog', true)
+      }
     }
   }
 </script>

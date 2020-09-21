@@ -1,6 +1,5 @@
 import {
-  Message,
-  MessageBox
+  Message
 } from 'element-ui'
 import store from '../store'
 
@@ -328,6 +327,12 @@ const sortDateF = function (arr) {
   return arr
 }
 
+// 显示插件
+const openPlugin = function(){
+  if(store.state.socket_plugin) store.commit('WEBSOCKET_PLUGIN_SEND', 'open')
+  else store.commit('openPluginDialog', true)
+}
+
 export {
   createCalendar,
   createDateFun,
@@ -345,7 +350,7 @@ export {
   getFileSize,
   sortF,
   simplify,
-  sortDateF
+  sortDateF,
 }
 
 

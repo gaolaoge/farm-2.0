@@ -122,7 +122,7 @@
     createDateFun,
     consum,
     messageFun,
-    getFileSize
+    getFileSize,
   } from '@/assets/common.js'
   import {
     mapState
@@ -246,7 +246,7 @@
     },
     methods: {
       // 刷新
-      refreshF(){
+      refreshF() {
         this.getAssetsCatalog(this.path, this.searchInputVal)
       },
       // 解压 输入密码
@@ -271,6 +271,10 @@
       },
       // 弹窗进一步获取结构
       dlGetTreeData(node, resolve) {
+        if (!this.socket_backS_msg) {
+          this.commit('WEBSOCKET_PLUGIN_INIT', true)
+          return false
+        }
         if (node.label) this.dl.path += (node.label + '/')
         if (node.level == 0) {
           return resolve([{
@@ -323,7 +327,8 @@
 
       // 上传
       uploadFun(type) {
-        this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+        if (!this.socket_backS_msg) this.commit('WEBSOCKET_PLUGIN_INIT', true)
+        else this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: type == 'file' ? 0 : 1,
           userID: this.user.id,
           networkPath: this.uploadType == 1 ? '' : this.path,
@@ -331,7 +336,8 @@
       },
       // 新建文件夹
       createFolder() {
-        this.$prompt('请输入新文件夹名称', '提示', {
+        if (!this.socket_backS_msg) this.commit('WEBSOCKET_PLUGIN_INIT', true)
+        else this.$prompt('请输入新文件夹名称', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
         })
@@ -350,11 +356,11 @@
         if (this.table.selectionList.length == 0) return
         else if (this.table.selectionList.some(item => item['ing'])) messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
         else this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
-          transferType: 2,
-          userID: this.user.id,
-          isRender: 0,
-          fileList: this.table.selectionList.map(item => item.position)
-        })
+            transferType: 2,
+            userID: this.user.id,
+            isRender: 0,
+            fileList: this.table.selectionList.map(item => item.position)
+          })
       },
       // 移动到
       moveFile() {
@@ -366,7 +372,8 @@
       },
       // 确认 - 移动/复制
       configF(type) {
-        if (this.dl.checkPath) this.$store.commit('WEBSOCKET_BACKS_SEND', {
+        if (!this.socket_backS_msg) this.commit('WEBSOCKET_PLUGIN_INIT', true)
+        else if (this.dl.checkPath) this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': type == 'move' ? 605 : 606,
           'customerUuid': this.user.id,
           'targetFolderPath': this.dl.checkPath,
@@ -385,25 +392,27 @@
       // 重命名
       rename() {
         if (this.table.selectionList.length != 1) return
+        else if (!this.socket_backS_msg) this.commit('WEBSOCKET_PLUGIN_INIT', true)
         else if (this.table.selectionList[0]['ing']) messageFun('info', '目标正在上传中，无法操作')
         else this.$prompt('请输入新名称', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-        })
-          .then(({value}) => {
-            this.$store.commit('WEBSOCKET_BACKS_SEND', {
-              'code': 607,
-              'customerUuid': this.user.id,
-              'renameFilePath': this.path + this.table.selectionList[0]['fileName'],   // 被重命名的文件路径
-              'newFileName': value                                                     // 新文件名
-            })
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
           })
-          .catch(() => messageFun('info', '操作取消'))
+            .then(({value}) => {
+              this.$store.commit('WEBSOCKET_BACKS_SEND', {
+                'code': 607,
+                'customerUuid': this.user.id,
+                'renameFilePath': this.path + this.table.selectionList[0]['fileName'],   // 被重命名的文件路径
+                'newFileName': value                                                     // 新文件名
+              })
+            })
+            .catch(() => messageFun('info', '操作取消'))
       },
       // 解压
       unzip(password) {
         let type = ['zip', 'rar', 'tar', 'tar.gz', 'tar.bz2', 'tar.Z']
-        if (this.table.selectionList.length != 1) messageFun('info', '压缩动作只能针对单一文件，操作失败')
+        if (!this.socket_backS_msg) this.commit('WEBSOCKET_PLUGIN_INIT', true)
+        else if (this.table.selectionList.length != 1) messageFun('info', '压缩动作只能针对单一文件，操作失败')
         else if (this.table.selectionList[0]['ing']) messageFun('info', '目标正在上传中，无法操作')
         else if (!type.some(curr => curr == this.table.selectionList[0]['type'])) messageFun('info', '非压缩文件，无法操作')
         else this.unzipAction(this.table.selectionList[0]['position'], password)
@@ -418,7 +427,8 @@
       },
       // 删除
       deleteFile() {
-        if (this.table.selectionList.some(item => item['ing'])) messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
+        if (!this.socket_backS_msg) this.commit('WEBSOCKET_PLUGIN_INIT', true)
+        else if (this.table.selectionList.some(item => item['ing'])) messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
         else this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 604,
           'customerUuid': this.user.id,
@@ -427,7 +437,8 @@
       },
       // 获取网盘各级目录
       getAssetsCatalog(filePath, keyword) {
-        if (!this.socket_backS) setTimeout(() => this.getAssetsCatalog(filePath, keyword), 1000)
+        if (!this.socket_backS_msg) this.commit('WEBSOCKET_PLUGIN_INIT', true)
+        else if (!this.socket_backS) setTimeout(() => this.getAssetsCatalog(filePath, keyword), 1000)
         else this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 601,
           'customerUuid': this.user.id,
@@ -440,7 +451,7 @@
       this.getAssetsCatalog('', this.searchInputVal)
     },
     computed: {
-      ...mapState(['user', 'socket_backS', 'socket_backS_msg', 'socket_plugin_msg'])
+      ...mapState(['user', 'socket_backS', 'socket_plugin', 'socket_backS_msg', 'socket_plugin_msg'])
     }
   }
 </script>
