@@ -81,11 +81,6 @@
           else this.showGZ = false
         },
         immediate: true
-      },
-      'socket_plugin': {
-        handler: function(val){
-          if(!val) this.openPlugin()
-        }
       }
     },
     methods: {
@@ -100,9 +95,10 @@
         son.src = 'walter://'
         son.contentDocument.open()
       },
+      // 打开【传输列表】
       openPlugin(){
-        if(store.state.socket_plugin) store.commit('WEBSOCKET_PLUGIN_SEND', 'open')
-        else store.commit('openPluginDialog', true)
+        if(this.socket_plugin) this.$store.commit('WEBSOCKET_PLUGIN_SEND', 'open')
+        else this.$store.commit('openPluginDialog', true)
       }
     }
   }

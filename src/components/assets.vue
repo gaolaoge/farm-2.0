@@ -135,6 +135,7 @@
   import outPutRender from '@/components/assets/outPutRender'
   import myUpload from '@/components/assets/myUpload'
   import {createTableIconList} from '@/assets/common.js'
+  import {mapState} from "vuex";
 
   export default {
     name: 'assets',
@@ -313,6 +314,16 @@
           }
         }
       }
+    },
+    watch: {
+      'socket_plugin': {
+        handler: function(val){
+          // if(!val) this.$store.commit('WEBSOCKET_PLUGIN_INIT', true)
+        }
+      }
+    },
+    computed: {
+      ...mapState(['socket_plugin'])
     }
   }
 </script>
