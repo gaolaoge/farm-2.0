@@ -1432,7 +1432,8 @@
             inFilePath: curr.inFilePath,
             outFilePath: curr.outFilePath,
             layerName: data_.taskInfo.layerName,
-            fileName: curr.fileName
+            fileName: curr.fileName,
+            taskID: data_.taskInfo.taskNo
           }
         })
         this.result.happen[0]['num'] = data_.frameCount['running']
@@ -1875,7 +1876,11 @@
         }
         let fileList = this.result.selectionResult.map(item => {
           let index = item['outFilePath'].indexOf(item.taskTaskUuid)
-          return '\\' + item['outFilePath'].slice(index) + item['fileName']
+          return {
+            path: '\\' + item['outFilePath'].slice(index) + item['fileName'],
+            taskID: item['rowId'],          // 任务ID
+            fileName: item['sceneName']     // 场景名
+          }
         })
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           'transferType': 2,

@@ -978,10 +978,12 @@
           return false
         }
         let list = this.computedResult()
-        console.log(list)
         let fileList = list.map(item => {
-          if (item['selfIndex']) return item['taskUuid'] + '/'
-          else return item['taskUuid'] + '/' + item['layerName'] + '/'
+          return {
+            path: item['selfIndex'] ? item['taskUuid'] + '/' : item['taskUuid'] + '/' + item['layerName'] + '/',
+            taskID: item['rowId'],          // 任务ID
+            fileName: item['sceneName']     // 场景名
+          }
         })
         this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           'transferType': 2,

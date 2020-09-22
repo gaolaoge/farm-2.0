@@ -315,13 +315,6 @@
         }
       }
     },
-    watch: {
-      'socket_plugin': {
-        handler: function(val){
-          // if(!val) this.$store.commit('WEBSOCKET_PLUGIN_INIT', true)
-        }
-      }
-    },
     computed: {
       ...mapState(['socket_plugin'])
     }

@@ -1058,6 +1058,7 @@
       // 1.选择渲染文件 - 切换选择场景文件方式
       changeFileSelection(index) {
         this.stepOneBase.index = index
+        if(index == 1 && !this.socket_plugin) this.$store.commit('WEBSOCKET_PLUGIN_INIT', true)
       },
       // 1.选择渲染文件 - 我的电脑 = 工程路径 问号提示
       renderHeader(h, {column}) {
@@ -1604,11 +1605,6 @@
       },
       // 0.预备事件
       async readyToWork() {
-        // if (this.socket_backS) this.$store.commit('WEBSOCKET_BACKS_SEND', {
-        //   'code': 602,
-        //   'customerUuid': this.user.id,
-        //   'path': ''
-        // })
         // 向后台获取网盘目录 场景路径
         let data = await getHistoryPath(`account=${this.user.account}`)
         if (data.data.code == 208) {

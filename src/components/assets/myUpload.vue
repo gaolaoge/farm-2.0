@@ -242,6 +242,14 @@
           let data = JSON.parse(e.data)
           if (data.code == 100 || data.code == 101) this.getAssetsCatalog(this.path, this.searchInputVal)
         }
+      },
+      '$route': {
+        handler: function (val) {
+          console.log(val)
+          if (val.name == 'assets' && !this.socket_plugin)
+            this.$store.commit('WEBSOCKET_PLUGIN_INIT', true)
+        },
+        immediate: true
       }
     },
     methods: {
@@ -324,7 +332,7 @@
 
       // 上传
       uploadFun(type) {
-        if (!this.socket_backS_msg) this.$store.commit('WEBSOCKET_PLUGIN_INIT', true)
+        if (!this.socket_plugin) this.$store.commit('WEBSOCKET_PLUGIN_INIT', true)
         else this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
           transferType: type == 'file' ? 0 : 1,
           userID: this.user.id,
