@@ -578,10 +578,10 @@
           data = this.zone == 1 ? await getRenderTableList(t) : await uploadTabGetList(f),
           usersList = new Set()
         this.table.renderTableTotal = data.data.total              // 【渲染下载】翻页长度
-        this.$emit('renderTbaleTotalItem', data.data.total)  // 【渲染下载】标签后显示长度
+        this.$emit('renderTableTotalItem', data.data.total)  // 【渲染下载】标签后显示长度
         this.$emit('archiveNum', data.data.other)             // 【归档记录】长度
         this.table.RenderDownloadData = this.zone == 1 ? data.data.data.map((curr, fatherIndex) => {
-          let children = [],
+          let children = null,
             downloadStatusS = [],
             downloadStatus = '部分下载'
           // 兼容数据结构错误 生产时删除判断
@@ -672,7 +672,7 @@
             renderingEndTime: createDateFun(new Date(curr.endTime)),                        // 渲染结束时间
             founder: curr.account,                                 // 创建人
             creationTime: createDateFun(new Date(curr.createTime)),// 创建时间
-            children,
+            children: children.length == 1 ? null : children,
             rowId: curr.taskNo,                                    // 唯一值
             selfIndex: fatherIndex,
             isExpire: curr.isExpire,                               // 1过期 0未过期
@@ -784,11 +784,10 @@
             inFilePath: curr.inFilePath
           }
         })
-        console.log(this.table.RenderDownloadData)
         this.table.usersList = [...usersList].map(curr => {
           return {'text': curr, 'value': curr}
         })  // 创建人列表
-
+        console.log(this.table.RenderDownloadData)
       },
       // 操作 - 开始
       startFun() {

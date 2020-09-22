@@ -455,10 +455,10 @@
             btnText: this.$t('login_page.getCode')
           },
           accountForm: {
-            account: 'gaoge1834',
-            password: 'gaoge1834',
-//            account: '',
-//            password: '',
+            // account: 'gaoge1834',
+            // password: 'gaoge1834',
+           account: '',
+           password: '',
             isAutoLogin: false,
             passwordEye: false
           },

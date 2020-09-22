@@ -126,7 +126,7 @@
              class="uploadTable"
              v-show="table.navListActiveIndex == 0">
           <!--上传分析 table-->
-          <upload-table @uploadTbaleTotalItem="uploadTbaleTotalItem"
+          <upload-table @uploadTableTotalItem="uploadTableTotalItem"
                         @upLoadSeletedList="upLoadSeletedList"
                         @toRenderTable="table.navListActiveIndex = 1"
                         @changeFilter="changeTabFilter"
@@ -137,7 +137,7 @@
              class="renderTable"
              v-show="table.navListActiveIndex == 1">
           <!--渲染下载表格-->
-          <download-table @renderTbaleTotalItem="renderTbaleTotalItem"
+          <download-table @renderTableTotalItem="renderTableTotalItem"
                           @j="j"
                           @changeFilter="changeTabFilter"
                           @archiveNum="getArchiveNum"
@@ -393,10 +393,10 @@
         this.btnGroup.archiveRecordsNum = val
         this.$refs.archiveTable.getList()
       },
-      uploadTbaleTotalItem(val) {
+      uploadTableTotalItem(val) {
         this.table.navList[0]['num'] = val
       },
-      renderTbaleTotalItem(val) {
+      renderTableTotalItem(val) {
         this.table.navList[1]['num'] = val
       },
       // 上传分析 - 操作台

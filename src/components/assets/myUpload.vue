@@ -199,7 +199,7 @@
                 'fileName': item.fileType == '文件夹' ? item.fileName.slice(0, item.fileName.length - 1) : (item.completedTime != 0 ? item.fileName : item.fileName + '.cloudtransfer.uploading'),
                 'position': this.path + item.fileName,
                 'ing': item.completedTime != 0 ? false : true,
-                'size': getFileSize(item.size)
+                'size': item.fileType == '文件夹' ? '-' : getFileSize(item.size)
               })
             })
           } else if (data.msg == '601' && this.dialogVisible) {
@@ -429,8 +429,7 @@
       },
       // 删除
       deleteFile() {
-        if (this.table.selectionList.some(item => item['ing'])) messageFun('info', '一个或多个目标正在上传中，无法进行此操作')
-        else this.$store.commit('WEBSOCKET_BACKS_SEND', {
+        this.$store.commit('WEBSOCKET_BACKS_SEND', {
           'code': 604,
           'customerUuid': this.user.id,
           filePathList: this.table.selectionList.map(item => this.path + item.fileName)

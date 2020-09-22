@@ -1277,8 +1277,6 @@
           }
         }
       }
-      // attribution: String,
-      // required: true
     },
     watch: {
       taskData: function (val) {

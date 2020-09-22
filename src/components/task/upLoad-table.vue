@@ -366,7 +366,7 @@
         })
         // this.table.statusList = [...statusList].map(curr => { return {'text': curr, 'value':curr }})
         this.table.uploadTableTotal = data.data.total
-        this.$emit('uploadTbaleTotalItem', data.data.total)
+        this.$emit('uploadTableTotalItem', data.data.total)
         loading.close()
       },
       // 关键字检索
