@@ -1389,6 +1389,7 @@
         //   pageIndex: '',
         //   pageSize: ''
         // }
+        this.result.miniImgHref = null
         let parameter = `taskUuid=${this.taskData.FatherTaskUuId}&layerTaskUuid=${this.taskData.taskUuid}&keyword=${this.result.searchInpVal}&pageIndex=1&pageSize=999`,
           data = await getRenderTSeeMore(parameter),
           data_ = data.data.data

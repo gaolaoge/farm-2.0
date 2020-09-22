@@ -542,7 +542,8 @@
         //打开抽屉
         this.showDrawer = true
         this.$refs.drawer.turnPage('result')
-        this.drawerTaskData = row
+        console.log(row)
+        this.drawerTaskData = row.secretChild ? row.secretChild[0] : row
         let tableDomList = this.$refs.downLoadTable.getElementsByClassName('el-table__row'),
           d = this.$refs.downLoadTable.getElementsByClassName('farmTableSelected')[0]
         if (d) d.classList.remove('farmTableSelected')
@@ -676,7 +677,8 @@
             rowId: curr.taskNo,                                    // 唯一值
             selfIndex: fatherIndex,
             isExpire: curr.isExpire,                               // 1过期 0未过期
-            inFilePath: curr.inFilePath
+            inFilePath: curr.inFilePath,
+            secretChild: children.length == 1 ? children : null,   // 伪child列表
           }
         }) : data.data.data.map((curr, fatherIndex) => {
           // account: "gaoge1834"         // 任务创建人
