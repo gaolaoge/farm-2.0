@@ -13,24 +13,8 @@
         ec: null
       }
     },
-    props: {
-      // cData: {
-      //   type: Array
-      // },
-      // cDate: {
-      //   type: Array
-      // }
-    },
     computed: {
       ...mapState(['user']),
-      maxNum() {
-        let m = Math.max.apply(null, this.cData)
-        if (m == 0) {
-          return 2
-        } else {
-          return m % 2 == 1 ? m + 1 : m
-        }
-      }
     },
     methods: {
       init() {
@@ -199,22 +183,12 @@
       }
     },
     watch: {
-      cData(val) {
-        this.init()
-      },
-      cDate(val) {
-        this.init()
-        window.addEventListener("resize", this.ec.resize)
-      },
-      '$route.path': {
-        handler: function (val) {
-          if (val != '/') return false
-          setTimeout(() => {
-            this.init()
-          }, 100)
+      'user': {
+        handler: function(val){
+          this.init()
         },
-        immediate: true
-      }
+        deep: true
+      },
     }
   }
 </script>

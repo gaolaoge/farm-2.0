@@ -116,17 +116,16 @@
     assetsExportLayer,
     assetsExportFrame,
     assetsDeleteItem,
-    compressionFiles,
-    downloadFrame,
     seeBalance
   } from '@/api/api'
   import {
     consum,
     createDateFun,
     messageFun,
-    UuidFun,
-    exportDownloadFun
   } from '@/assets/common.js'
+  import {
+    mapState
+  } from 'vuex'
 
   export default {
     name: 'outPut',
@@ -174,12 +173,15 @@
         default: ''
       }
     },
+    computed: {
+      ...mapState(['user', 'socket_plugin'])
+    },
     methods: {
       // 刷新
-      refreshF(){
+      refreshF() {
         let step = this.table.nextTbaleType
-        if(step == 'layer') this.getList()
-        else if(step == 'frame') this.getLayerList()
+        if (step == 'layer') this.getList()
+        else if (step == 'frame') this.getLayerList()
         else this.getFrameList()
       },
       // 翻页
@@ -280,11 +282,12 @@
             fileName: curr.layerName,            // 文件名
             project: this.table.objectName,      // 所属项目
             fileSize: curr.fileSize,             // 文件大小
-            fileType: '文件夹',                  // 文件类型
+            fileType: '文件夹',                   // 文件类型
             downLoadTime: '-',                  // 下载次数
             date: '',                           // 剩余有效期（天）
             upDate: createDateFun(new Date(curr.updateTime)),  // 更新时间
-            itemUuid: curr.layerTaskUuid
+            itemUuid: curr.layerTaskUuid,       // 层任务Uuid
+            mainUuid: curr.taskUuid             // 主任务Uuid
           }
         })
         this.table.outPutTableTotal = data.data.total
@@ -312,9 +315,10 @@
             downLoadTime: curr.downloadCount,               // 下载次数
             date: curr.indate == 0 ? '-' : consum(curr.indate - new Date().getTime()), // 剩余有效期（天）
             upDate: createDateFun(new Date(curr.updateTime)),                        // 更新时间
-            itemUuid: curr.frameTaskUuid,
+            itemUuid: curr.taskUuid,
             frameTaskUuid: curr.frameTaskUuid,
-            layerTaskUuid: curr.layerTaskUuid
+            layerTaskUuid: curr.layerTaskUuid,
+            outputPath: curr.outputPath
           }
         })
         this.table.outPutTableTotal = data.data.total
@@ -344,11 +348,12 @@
       // 下载item 申请打包
       async downloadFun() {
         if (!this.table.selectionList.length) return false
-        let r = await seeBalance()
-        if (r.data.code == 1001) {
-          messageFun('info', `当前账户余额为${r.data.data}，请先进行充值！`);
-          return false
-        }
+        else if (!this.socket_plugin) this.$store.commit('WEBSOCKET_PLUGIN_INIT', true)
+        // let r = await seeBalance()
+        // if (r.data.code == 1001) {
+        //   messageFun('info', `当前账户余额为${r.data.data}，请先进行充值！`);
+        //   return false
+        // }
         this.$confirm('将下载选中选, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -356,53 +361,33 @@
         })
           .then(
             async () => {
-              let code = 1,
-                type = 3,
-                uuidList = this.table.selectionList.map(item => item.itemUuid)
-              if (this.table.nextTbaleType == 'layer') type = 1
-              if (this.table.nextTbaleType == 'frame') type = 2
-              if (type != 3) {
-                messageFun('success', '发起文件打包请求')
-                let code = UuidFun(),
-                  // socket_ = new WebSocket(`ws://192.168.1.182:5000/professional/websocket/package/${code}`)
-                  socket_ = new WebSocket(`ws://223.80.107.190:5000/professional/websocket/package/${code}`)
-                socket_.addEventListener('open', function () {
-                  socket_.send(JSON.stringify({
-                    'message': {
-                      type,
-                      uuidList: uuidList
-                    }
-                  }))
-                })
-                socket_.addEventListener('message', e => {
-                  let data = JSON.parse(e.data)
-                  if (data.code == 200) {
-                    this.downloadingFun(data.data)
-                  }
-                  if (data.code == 209) {
-                    socket_.close();
-                    this.downloadingFun(data.data)
-                  }
-                })
-              }
-              if (type == 3) {
-                this.table.selectionList.forEach(async curr => {
-                  let t = `frameTaskUuid=${curr.frameTaskUuid}&layerTaskUuid=${curr.layerTaskUuid}&type=3`,
-                    data = await downloadFrame(t)
-                  exportDownloadFun(data, data.headers.file, '')
-                })
-              }
+              let type = 3  // 帧任务
+              if (this.table.nextTbaleType == 'layer') type = 1  // 主任务
+              else if (this.table.nextTbaleType == 'frame') type = 2  // 层任务
+              let fileList = this.table.selectionList.map(item => {
+                let path
+                if(type == 1) path = item['itemUuid'] + '\\'
+                else if(type == 2) path = item['mainUuid'] + '\\' + item['fileName'] + '\\'
+                else path = item['itemUuid'] + '\\' + item['outFilePath'].split(item['itemUuid'])[1] + item['fileName']
+                return {
+                  path,
+                  taskID: item['rowId'],          // 任务ID
+                  fileName: item['sceneName']     // 场景名
+                }
+              })
+
+              this.$store.commit('WEBSOCKET_PLUGIN_SEND', {
+                'transferType': 2,
+                'userID': this.user.id,
+                isRender: 1,
+                fileList
+              })
             },
             () => {
               messageFun('info', '已取消下载');
               return false
             }
           )
-      },
-      // 打包后下载
-      async downloadingFun(path) {
-        let data = await compressionFiles(path)
-        exportDownloadFun(data, data.headers.file, 'zip')
       },
       // 删除item
       deleteFun() {

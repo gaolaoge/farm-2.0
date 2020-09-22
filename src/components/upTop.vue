@@ -252,9 +252,9 @@
             {
               userLevel: '普通用户',
               total: '累计充值0元',
-              price: '0.190',
-              unitPrice: '3.04',
-              RAM: '50G',
+              price: '0.200',
+              unitPrice: '3.20',
+              RAM: '10G',
               dir1: '相当于16核32线程节点机'
             },
             {
@@ -262,7 +262,7 @@
               total: '累计充值2000元',
               price: '0.175',
               unitPrice: '2.80',
-              RAM: '500G',
+              RAM: '20G',
               dir1: '相当于16核32线程节点机'
             },
             {
@@ -270,15 +270,15 @@
               total: '累计充值12000元',
               price: '0.150',
               unitPrice: '2.40',
-              RAM: '1T',
+              RAM: '30G',
               dir1: '相当于16核32线程节点机'
             },
             {
               userLevel: '尊贵铂金',
               total: '累计充值30000元',
               price: '0.125',
-              unitPrice: '2',
-              RAM: '2T',
+              unitPrice: '2.00',
+              RAM: '40G',
               dir1: '相当于16核32线程节点机'
             },
             {
@@ -286,7 +286,7 @@
               total: '累计充值60000元',
               price: '0.100',
               unitPrice: '1.60',
-              RAM: '5T',
+              RAM: '50G',
               dir1: '相当于16核32线程节点机',
               dir4: '包含每小时收费'
             }

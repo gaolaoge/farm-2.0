@@ -269,11 +269,11 @@
         if (type == 'render') {
           switch (active) {
             case this.$t('assets.outPutBtnGroup')[0]:  // 下载
-              if (!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.outPutBtnGroup[0]['action']) return false
               this.$refs.outPutTable.downloadFun()
               break
             case this.$t('assets.outPutBtnGroup')[1]:  // 删除
-              if (!this.btnGroup.myUploadBtnGroup[0]['action'] || !this.btnGroup.myUploadBtnGroup[1]['action']) return false
+              if (!this.btnGroup.outPutBtnGroup[1]['action']) return false
               this.$refs.outPutTable.deleteFun()
               break
           }

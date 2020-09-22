@@ -585,8 +585,7 @@
             downloadStatusS = [],
             downloadStatus = '部分下载'
           // 兼容数据结构错误 生产时删除判断
-          if (curr.renderLayerTaskDTOList[0]) {
-            children = curr.renderLayerTaskDTOList.map((item, sonIndex) => {
+          curr.renderLayerTaskDTOList[0] && (children = curr.renderLayerTaskDTOList.map((item, sonIndex) => {
               // let status
               // switch(item.layerTaskStatus){
               //   case 1:
@@ -645,8 +644,7 @@
                 FatherIndex: fatherIndex,
                 inFilePath: curr.inFilePath
               }
-            })
-          }
+            }))
           if (downloadStatusS.every(item => item == '待下载')) downloadStatus = '待下载'
           if (downloadStatusS.every(item => item == '已下载')) downloadStatus = '已下载'
           usersList.add(curr['account'])
@@ -714,7 +712,7 @@
           if (curr.downloadFrameCount == 0) downloadStatus = '待下载'
           else if (curr.downloadFrameCount < framesTotal) downloadStatus = '部分下载'
           else if (curr.downloadFrameCount >= framesTotal) downloadStatus = '已下载'
-          children = curr.designTaskDTOList.length ? curr.designTaskDTOList.map((item, sonIndex) => {
+          curr.designTaskDTOList.length && (children = curr.designTaskDTOList.map((item, sonIndex) => {
             let itemTotal = item.win + item.lose + item.rendering + item.await + item.stopped,
               status = itemDownloadStatus(item.layerTaskStatus)
             // if(status == '渲染暂停' && item.result == 5) status = '待全速渲染'
@@ -754,8 +752,7 @@
               FatherIndex: fatherIndex,
               inFilePath: curr.inFilePath
             }
-          }) : null
-
+          }))
           return {
             taskUuid: curr.taskUuid,
             id: curr.taskNo,                                       // 任务ID
@@ -787,6 +784,7 @@
             inFilePath: curr.inFilePath
           }
         })
+        console.log(this.table.RenderDownloadData)
         this.table.usersList = [...usersList].map(curr => {
           return {'text': curr, 'value': curr}
         })  // 创建人列表
@@ -972,11 +970,11 @@
       // 操作 - 下载完成帧
       async downloadFils() {
         if (!this.table.renderSelectionList.length) return false
-        let r = await seeBalance()
-        if (r.data.code == 1001) {
-          messageFun('info', `当前账户余额为${r.data.data}，请先进行充值！`);
-          return false
-        }
+        // let r = await seeBalance()
+        // if (r.data.code == 1001) {
+        //   messageFun('info', `当前账户余额为${r.data.data}，请先进行充值！`);
+        //   return false
+        // }
         let list = this.computedResult()
         let fileList = list.map(item => {
           return {
@@ -1093,11 +1091,6 @@
         this.getList()
       }
     },
-    // props: {
-    //   searchInput: {
-    //     type: String,
-    //   }
-    // }
   }
 </script>
 

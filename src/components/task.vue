@@ -468,7 +468,10 @@
         handler: function (e) {
           let data = JSON.parse(e.data)
           if (data.code == 852) this.$refs.renderMode.getList()           // 渲染列表
-          else if (data.code == 854) this.$refs.uploadMode.getList()       // 分析列表
+          else if (data.code == 854) {
+            console.log('-----------this.$refs.uploadMode.getList()------------')
+            this.$refs.uploadMode.getList()
+          }       // 分析列表
           else return false
         },
       },
